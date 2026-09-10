@@ -324,7 +324,10 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   .mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;font-size:10px;font-weight:500;color:var(--text-muted);background:none;border:none;cursor:pointer;min-width:50px}
   .mnav-item.active{color:var(--primary)}
   .mnav-item svg{width:20px;height:20px}
-  button,input[type="button"],.btn,.btn-sm,.btn-icon,.task-check{min-height:44px}
+  button,input[type="button"],.btn,.btn-sm,.btn-icon{min-height:44px}
+  /* 勾选圆圈：保持正圆，用隐形热区扩大点击范围到44px（不能直接拉高，否则圆会变形） */
+  .task-check{width:24px;height:24px;min-height:24px;position:relative}
+  .task-check::after{content:"";position:absolute;inset:-10px}
   .btn-sm{min-height:36px;padding:6px 12px}
   .btn-icon{min-height:36px;min-width:36px}
   .sync-import-bar{padding:10px 14px}
