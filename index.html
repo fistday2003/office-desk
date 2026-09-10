@@ -1484,41 +1484,62 @@ function getProjectTaskStats(projectId){
   return {total:pts.length,done:done,pct:pts.length>0?Math.round(done/pts.length*100):0};
 }
 
+// ===== 项目跟进：索引形式（默认只显示项目名称，点击展开全部内容） =====
+const projectOpenIds = new Set();
 function renderProjects(){
   const container = document.getElementById('projectList');
   const active = projects.filter(p=>p.status!=='completed');
-  
-  let html = '';
-  if(projects.length===0){
-    html = '<div class="card" style="text-align:center;color:var(--text-muted);padding:32px">还没有项目，点击右上角「新建项目」开始</div>';
-  } else {
-    // 按层级渲染：先父后子
-    const rendered = new Set();
-    function renderProject(p, isChild){
-      if(rendered.has(p.id)) return;
-      rendered.add(p.id);
-      const stats = getProjectTaskStats(p.id);
-      html += projectCard(p, stats, isChild);
-      // 渲染子项目 — 在父项目下方加分组标识
-      const children = active.filter(c=>c.parentId===p.id);
-      if(children.length>0 && !isChild){
-        html += '<div class="project-children-list">';
-        html += '<div class="project-children-header" onclick="toggleChildren(\''+p.id+'\')" style="cursor:pointer;user-select:none">';
-        html += '<svg class="toggle-arrow" id="arrow_'+p.id+'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform .2s;vertical-align:middle;margin-right:2px"><path d="M9 18l6-6-6-6"/></svg>';
-        html += '子项目（'+children.length+'个）</div>';
-        html += '<div id="children_'+p.id+'" style="display:none">';
-      }
-      children.forEach(child=>renderProject(child, true));
-      if(children.length>0 && !isChild){
-        html += '</div></div>';
-      }
-    }
-    // 渲染顶级项目（进行中/卡住）
-    active.filter(p=>!p.parentId || !active.find(a=>a.id===p.parentId)).forEach(p=>renderProject(p, false));
-    // 已完成项目统一收进下方“已完成项目文件夹”，不在此渲染
+
+  if(active.length===0){
+    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">📁</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">还没有进行中的项目</div><div style="font-size:13px">点击右上角「新建项目」开始</div></div>';
+    return;
   }
-  
+
+  // 排列：父项目在前，紧跟其子项目（子项目缩进标识）
+  const top = active.filter(p=>!p.parentId || !active.find(a=>a.id===p.parentId));
+  const ordered = [];
+  top.forEach(p=>{
+    ordered.push({p, isChild:false});
+    active.filter(c=>c.parentId===p.id).forEach(c=>ordered.push({p:c, isChild:true}));
+  });
+  // 兜底：未被归入的（防止循环引用等极端情况）
+  active.forEach(p=>{ if(!ordered.some(o=>o.p.id===p.id)) ordered.push({p, isChild:!!p.parentId}); });
+
+  let html = '';
+  ordered.forEach(({p, isChild})=>{
+    const open = projectOpenIds.has(p.id);
+    const logCount = (p.logs||[]).length;
+    const stats = getProjectTaskStats(p.id);
+    const childrenCount = active.filter(c=>c.parentId===p.id).length;
+    const parentName = isChild ? (projects.find(pp=>pp.id===p.parentId)||{}).name : null;
+    // 索引行
+    html += '<div class="archive-row'+(isChild?' project-child-row':'')+'" onclick="toggleProjectOpen(\''+p.id+'\')"'+(isChild?' style="padding-left:26px"':'')+'>';
+    html += '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><polyline points="9 14 11 16 15 12"/></svg>';
+    html += '<div class="arch-name">'+(isChild?'<span style="font-size:11px;color:var(--text-muted);margin-right:4px">└</span>':'')+escHtml(p.name)+'</div>';
+    // 摘要信息：状态 + 跟进/子项目/待办概览
+    let meta = [];
+    meta.push(p.status==='blocked' ? '🚫 卡住了' : '🔄 进行中');
+    if(parentName) meta.push('子项目 · '+escHtml(parentName));
+    if(childrenCount>0) meta.push(childrenCount+'个子项目');
+    if(logCount>0) meta.push(logCount+'条跟进');
+    if(stats.total>0) meta.push('待办 '+stats.done+'/'+stats.total);
+    if((p.files||[]).length>0) meta.push('📎'+p.files.length);
+    html += '<div class="arch-meta">'+meta.join(' · ')+'</div>';
+    html += '<span class="arch-chevron'+(open?' open':'')+'">▶</span>';
+    html += '</div>';
+    // 详情（点开才渲染）
+    html += '<div class="archive-detail" id="projectDetail_'+p.id+'" style="display:'+(open?'block':'none')+'">';
+    if(open){
+      html += projectCard(p, stats, isChild);
+    }
+    html += '</div>';
+  });
   container.innerHTML = html;
+}
+function toggleProjectOpen(id){
+  if(projectOpenIds.has(id)) projectOpenIds.delete(id);
+  else projectOpenIds.add(id);
+  renderProjects();
 }
 
 // ===== 已完成项目：独立 Tab，索引形式（只显示名称，点击展开详情） =====
