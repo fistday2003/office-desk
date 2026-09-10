@@ -150,6 +150,8 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .file-dl{font-size:11px;color:var(--primary);text-decoration:none;flex-shrink:0}
 .task-file-del{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;font-size:13px;border:none;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .task-file-add{margin-top:8px}
+/* 拖拽文件悬停高亮 */
+.drop-hover{outline:2px dashed var(--primary);outline-offset:-4px;background:rgba(37,99,235,.04)!important}
 
 /* Badges */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
@@ -576,7 +578,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 
 <!-- ====== MODAL: Project ====== -->
 <div class="modal-overlay" id="modalProject" style="display:none">
-  <div class="modal">
+  <div class="modal" data-drop-modal="1">
     <h3 id="modalProjectTitle">新建项目</h3>
     <div class="form-group"><label>项目名称</label><input type="text" id="projectName" placeholder="输入项目名称"></div>
     <div class="form-group"><label>附件（选填）</label>
@@ -897,7 +899,7 @@ function taskCard(t, section){
   html += '<span class="task-chevron'+(isOpen?' open':'')+'">▶</span>';
   html += '</div>';
   // 详情区：默认折叠，点击标题展开
-  html += '<div class="task-detail" id="taskDetail_'+t.id+'" style="display:'+(isOpen?'block':'none')+'">';
+  html += '<div class="task-detail" id="taskDetail_'+t.id+'" data-drop-task="'+t.id+'" style="display:'+(isOpen?'block':'none')+'">';
   html += '<div class="card-meta">';
   html += '<span class="badge '+priorityClass(t.priority)+'">'+priorityLabel(t.priority)+'</span>';
   if(t.deadline) html += '<span class="badge badge-date">📅 '+fmtDate(t.deadline)+'</span>';
@@ -989,6 +991,10 @@ function handleTaskFiles(){
   const taskId = input.dataset.taskId;
   const files = Array.from(input.files||[]);
   input.value = '';
+  if(files.length===0) return;
+  addTaskFilesFromList(taskId, files);
+}
+function addTaskFilesFromList(taskId, files){
   const t = tasks.find(t=>t.id===taskId);
   if(!t || files.length===0) return;
   t.files = t.files||[];
@@ -1097,42 +1103,48 @@ function handleProjectFilePick(){
   const files = Array.from(input.files||[]);
   input.value = '';
   if(files.length===0) return;
-  if(mode==='modal'){
-    if(projectModalFiles.length + files.length > 9){ showToast('每个项目最多添加 9 个附件'); return; }
-    files.forEach(f=>{
-      projectModalPending++;
+  if(mode==='modal') addProjectModalFilesFromList(files);
+  else addProjectFilesFromList(mode, files);
+}
+function addProjectModalFilesFromList(files){
+  if(files.length===0) return;
+  if(projectModalFiles.length + files.length > 9){ showToast('每个项目最多添加 9 个附件'); return; }
+  files.forEach(f=>{
+    projectModalPending++;
+    renderProjectModalFiles();
+    processTaskFile(f).then(r=>{
+      projectModalFiles.push(r);
+    }).catch(e=>{
+      showToast(e.message);
+    }).finally(()=>{
+      projectModalPending--;
       renderProjectModalFiles();
-      processTaskFile(f).then(r=>{
-        projectModalFiles.push(r);
-      }).catch(e=>{
-        showToast(e.message);
-      }).finally(()=>{
-        projectModalPending--;
-        renderProjectModalFiles();
-      });
     });
-  } else {
-    const p = projects.find(pp=>pp.id===mode);
-    if(!p) return;
-    p.files = p.files||[];
-    if(p.files.length + files.length > 9){ showToast('每个项目最多添加 9 个附件'); return; }
-    let done = 0; const results = [];
-    files.forEach(f=>{
-      processTaskFile(f).then(r=>{
-        results.push(r);
-      }).catch(e=>{
-        showToast(e.message);
-      }).finally(()=>{
-        done++;
-        if(done===files.length && results.length){
-          p.files.push(...results);
-          saveAll();
-          refreshAll();
-          showToast('✓ 已添加 '+results.length+' 个附件', 'info');
-        }
-      });
+  });
+}
+function addProjectFilesFromList(pid, files){
+  if(files.length===0) return;
+  const p = projects.find(pp=>pp.id===pid);
+  if(!p) return;
+  if(p.status==='completed'){ showToast('已完成的项目不能再添加附件'); return; }
+  p.files = p.files||[];
+  if(p.files.length + files.length > 9){ showToast('每个项目最多添加 9 个附件'); return; }
+  let done = 0; const results = [];
+  files.forEach(f=>{
+    processTaskFile(f).then(r=>{
+      results.push(r);
+    }).catch(e=>{
+      showToast(e.message);
+    }).finally(()=>{
+      done++;
+      if(done===files.length && results.length){
+        p.files.push(...results);
+        saveAll();
+        refreshAll();
+        showToast('✓ 已添加 '+results.length+' 个附件', 'info');
+      }
     });
-  }
+  });
 }
 function renderProjectModalFiles(){
   const box = document.getElementById('projectModalFiles');
@@ -1167,6 +1179,34 @@ function viewProjectFile(pid, idx){
   if(!p || !p.files || !p.files[idx]) return;
   window.open(p.files[idx].dataUrl, '_blank');
 }
+
+// ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 新建编辑项目弹窗）=====
+function dropZoneFromEvent(e){
+  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal]') : null;
+}
+document.addEventListener('dragover', e=>{
+  const zone = dropZoneFromEvent(e);
+  if(zone){
+    e.preventDefault();
+    if(e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    zone.classList.add('drop-hover');
+  }
+});
+document.addEventListener('dragleave', e=>{
+  const zone = dropZoneFromEvent(e);
+  if(zone && !zone.contains(e.relatedTarget)) zone.classList.remove('drop-hover');
+});
+document.addEventListener('drop', e=>{
+  const zone = dropZoneFromEvent(e);
+  if(!zone) return;
+  e.preventDefault();
+  zone.classList.remove('drop-hover');
+  const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+  if(files.length===0) return;
+  if(zone.dataset.dropModal) addProjectModalFilesFromList(files);
+  else if(zone.dataset.dropTask) addTaskFilesFromList(zone.dataset.dropTask, files);
+  else if(zone.dataset.projectId) addProjectFilesFromList(zone.dataset.projectId, files);
+});
 
 function toggleTask(id){
   const t = tasks.find(t=>t.id===id);
