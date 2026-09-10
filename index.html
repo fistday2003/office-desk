@@ -540,6 +540,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 
 <!-- 待办附件文件选择（隐藏） -->
 <input type="file" id="taskFileInput" multiple style="display:none" onchange="handleTaskFiles()">
+<input type="file" id="projectFileInput" multiple style="display:none" onchange="handleProjectFilePick()">
 
 <!-- ====== MODAL: Task ====== -->
 <div class="modal-overlay" id="modalTask" style="display:none">
@@ -578,7 +579,10 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   <div class="modal">
     <h3 id="modalProjectTitle">新建项目</h3>
     <div class="form-group"><label>项目名称</label><input type="text" id="projectName" placeholder="输入项目名称"></div>
-    <div class="form-group"><label>卡点/阻碍</label><textarea id="projectBlockers" placeholder="遇到什么问题？"></textarea></div>
+    <div class="form-group"><label>附件（选填）</label>
+      <div id="projectModalFiles" class="task-files" style="margin-top:0"></div>
+      <div class="task-file-add"><button type="button" class="btn btn-sm btn-ghost" onclick="pickProjectModalFiles()">📎 添加附件</button><span id="projectModalFilesHint" style="font-size:11px;color:var(--text-muted);margin-left:8px">图片自动压缩，单个文件最大 3MB</span></div>
+    </div>
     <div class="form-group"><label>父项目</label>
       <select id="projectParent"><option value="">无（独立项目）</option></select>
     </div>
@@ -1071,6 +1075,99 @@ function fmtSize(b){
   return (b/1048576).toFixed(1)+'MB';
 }
 
+// ===== 项目附件 =====
+let projectModalFiles = [];   // 新建/编辑项目弹窗里暂存的附件，点保存时写入项目
+let projectModalPending = 0;  // 还在压缩处理中的文件数
+
+function pickProjectModalFiles(){
+  const input = document.getElementById('projectFileInput');
+  input.dataset.mode = 'modal';
+  input.value = '';
+  input.click();
+}
+function addProjectFiles(pid){
+  const input = document.getElementById('projectFileInput');
+  input.dataset.mode = pid;
+  input.value = '';
+  input.click();
+}
+function handleProjectFilePick(){
+  const input = document.getElementById('projectFileInput');
+  const mode = input.dataset.mode;
+  const files = Array.from(input.files||[]);
+  input.value = '';
+  if(files.length===0) return;
+  if(mode==='modal'){
+    if(projectModalFiles.length + files.length > 9){ showToast('每个项目最多添加 9 个附件'); return; }
+    files.forEach(f=>{
+      projectModalPending++;
+      renderProjectModalFiles();
+      processTaskFile(f).then(r=>{
+        projectModalFiles.push(r);
+      }).catch(e=>{
+        showToast(e.message);
+      }).finally(()=>{
+        projectModalPending--;
+        renderProjectModalFiles();
+      });
+    });
+  } else {
+    const p = projects.find(pp=>pp.id===mode);
+    if(!p) return;
+    p.files = p.files||[];
+    if(p.files.length + files.length > 9){ showToast('每个项目最多添加 9 个附件'); return; }
+    let done = 0; const results = [];
+    files.forEach(f=>{
+      processTaskFile(f).then(r=>{
+        results.push(r);
+      }).catch(e=>{
+        showToast(e.message);
+      }).finally(()=>{
+        done++;
+        if(done===files.length && results.length){
+          p.files.push(...results);
+          saveAll();
+          refreshAll();
+          showToast('✓ 已添加 '+results.length+' 个附件', 'info');
+        }
+      });
+    });
+  }
+}
+function renderProjectModalFiles(){
+  const box = document.getElementById('projectModalFiles');
+  const hint = document.getElementById('projectModalFilesHint');
+  if(!box) return;
+  let html = '';
+  projectModalFiles.forEach((f,idx)=>{
+    const isImg = f.type && f.type.indexOf('image/')===0;
+    html += '<div class="task-file-item">';
+    if(isImg) html += '<img src="'+f.dataUrl+'">';
+    else html += '<span class="file-ic">📄</span>';
+    html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+    html += '<button class="task-file-del" onclick="removeProjectModalFile('+idx+')" title="移除">×</button>';
+    html += '</div>';
+  });
+  box.innerHTML = html;
+  if(hint) hint.textContent = projectModalPending>0 ? '正在处理附件，请稍候...' : '图片自动压缩，单个文件最大 3MB';
+}
+function removeProjectModalFile(idx){
+  projectModalFiles.splice(idx,1);
+  renderProjectModalFiles();
+}
+function removeProjectFile(pid, idx){
+  const p = projects.find(pp=>pp.id===pid);
+  if(!p || !p.files) return;
+  p.files.splice(idx,1);
+  saveAll();
+  refreshAll();
+}
+function viewProjectFile(pid, idx){
+  const p = projects.find(pp=>pp.id===pid);
+  if(!p || !p.files || !p.files[idx]) return;
+  window.open(p.files[idx].dataUrl, '_blank');
+}
+
 function toggleTask(id){
   const t = tasks.find(t=>t.id===id);
   if(!t) return;
@@ -1367,9 +1464,32 @@ function projectCard(p, stats, isChild){
   }
   html += '</div></div>';
 
-  // 卡点提示（原“当前进度/下一步”已并入跟进记录，不再单独展示）
+  // 卡点提示（历史数据兼容；新版表单已去掉卡点/阻碍）
   if(p.blockers){
     html += '<div style="margin-top:6px"><div class="project-blockers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+escHtml(p.blockers)+'</div></div>';
+  }
+
+  // 项目附件区
+  const pfiles = p.files||[];
+  if(pfiles.length>0){
+    html += '<div class="task-files">';
+    pfiles.forEach((f,idx)=>{
+      const isImg = f.type && f.type.indexOf('image/')===0;
+      html += '<div class="task-file-item">';
+      if(isImg){
+        html += '<img src="'+f.dataUrl+'" onclick="viewProjectFile(\''+p.id+'\','+idx+')" title="点击放大">';
+      } else {
+        html += '<span class="file-ic">📄</span>';
+      }
+      html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+      if(!isImg) html += '<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">下载</a>';
+      html += '<button class="task-file-del" onclick="removeProjectFile(\''+p.id+'\','+idx+')" title="删除附件">×</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  if(!isDone){
+    html += '<div class="task-file-add" style="margin-top:6px"><button class="btn btn-sm btn-ghost" onclick="addProjectFiles(\''+p.id+'\')">📎 添加附件</button></div>';
   }
 
   // 跟进时间线（以时间为阶段，每条可编辑、自动标注编辑时间）
@@ -1545,7 +1665,9 @@ function editProject(id){
   if(!p) return;
   document.getElementById('modalProjectTitle').textContent = '编辑项目';
   document.getElementById('projectName').value = p.name;
-  document.getElementById('projectBlockers').value = p.blockers||'';
+  projectModalFiles = (p.files||[]).slice();
+  projectModalPending = 0;
+  renderProjectModalFiles();
   document.getElementById('projectStatus').value = p.status;
   populateParentSelect(id, p.parentId);
   document.getElementById('modalProject').style.display = 'flex';
@@ -1578,7 +1700,9 @@ function openProjectModal(){
   editingId = null;
   document.getElementById('modalProjectTitle').textContent = '新建项目';
   document.getElementById('projectName').value = '';
-  document.getElementById('projectBlockers').value = '';
+  projectModalFiles = [];
+  projectModalPending = 0;
+  renderProjectModalFiles();
   document.getElementById('projectStatus').value = 'active';
   populateParentSelect(null, '');
   document.getElementById('modalProject').style.display = 'flex';
@@ -1734,19 +1858,7 @@ function renderReview(){
   }
   html += '</div>';
   html += '</div>';
-  
-  // Blockers summary
-  html += '<div class="card"><div style="font-weight:600;font-size:14px;margin-bottom:10px">🚫 卡点汇总</div>';
-  if(blockedProjects.length===0){
-    html += '<div style="color:var(--text-muted);font-size:14px;padding:8px">✓ 所有项目畅通无阻，没有卡点</div>';
-  } else {
-    blockedProjects.forEach(p=>{
-      html += '<div class="project-blockers" style="margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-      html += '<div><strong>'+escHtml(p.name)+'</strong>：'+escHtml(p.blockers||'未记录卡点')+'</div></div>';
-    });
-  }
-  html += '</div>';
-  
+
   document.getElementById('reviewContent').innerHTML = html;
 }
 
@@ -1828,15 +1940,21 @@ document.getElementById('btnNoteSave').addEventListener('click',()=>{
 document.getElementById('btnProjectSave').addEventListener('click',()=>{
   const name = document.getElementById('projectName').value.trim();
   if(!name){showToast('请输入项目名称');return}
-  const blockers = document.getElementById('projectBlockers').value.trim();
+  if(projectModalPending>0){showToast('附件还在处理中，请稍等 1~2 秒再保存');return}
   const status = document.getElementById('projectStatus').value;
   const parentId = document.getElementById('projectParent').value||null;
 
   if(editingId){
     const p = projects.find(p=>p.id===editingId);
-    if(p){p.name=name;p.blockers=blockers;p.status=status;p.parentId=parentId;}
+    if(p){
+      p.name=name;p.status=status;p.parentId=parentId;
+      if(projectModalFiles.length) p.files=projectModalFiles;
+      else if(p.files) delete p.files;
+    }
   } else {
-    projects.push({id:uid(),name,blockers,status,parentId,logs:[],createdAt:Date.now()});
+    const np = {id:uid(),name,status,parentId,logs:[],createdAt:Date.now()};
+    if(projectModalFiles.length) np.files = projectModalFiles;
+    projects.push(np);
   }
   saveAll();
   closeModal('modalProject');
@@ -2115,13 +2233,18 @@ async function doSyncUpload(){
   showToast('<span class="sync-spinner"></span>正在上传 '+count+' 条数据...', 'info');
 
   // 附件（图片/文件）体积大且只保存在本机，不随同步传输
-  const hasFiles = tasks.some(t=>(t.files||[]).length>0);
+  const hasFiles = tasks.some(t=>(t.files||[]).length>0) || projects.some(p=>(p.files||[]).length>0);
   const syncTasks = tasks.map(t=>{
     const c = Object.assign({}, t);
     delete c.files;
     return c;
   });
-  const data = {v:4, tasks: syncTasks, notes, projects, syncedAt:new Date().toISOString()};
+  const syncProjects = projects.map(p=>{
+    const c = Object.assign({}, p);
+    delete c.files;
+    return c;
+  });
+  const data = {v:4, tasks: syncTasks, notes, projects: syncProjects, syncedAt:new Date().toISOString()};
   const jsonStr = JSON.stringify(data);
   const topic = getSyncTopic();
   const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
@@ -2274,14 +2397,18 @@ async function doSyncReceive(){
   const syncTime = received.syncedAt ? new Date(received.syncedAt).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
 
   showConfirm('已接收 '+newTotal+' 条数据'+(curTotal>0?'（当前 '+curTotal+' 条将被覆盖）':'')+(syncTime?'\n数据同步时间：'+syncTime:'')+'，确认导入？', ()=>{
-    // 附件只存本机不随同步传输：导入时保留本机已有任务的附件，避免丢失
+    // 附件只存本机不随同步传输：导入时保留本机已有任务/项目的附件，避免丢失
     tasks = (received.tasks||[]).map(rt=>{
       const local = tasks.find(t=>t.id===rt.id);
       if(local && local.files && local.files.length) rt.files = local.files;
       return rt;
     });
     notes = received.notes || [];
-    projects = received.projects || [];
+    projects = (received.projects||[]).map(rp=>{
+      const local = projects.find(p=>p.id===rp.id);
+      if(local && local.files && local.files.length) rp.files = local.files;
+      return rp;
+    });
     saveAll();
     refreshAll();
     showToast('✓ 同步成功！已导入 '+newTotal+' 条数据', 'info');
