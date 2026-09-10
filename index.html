@@ -547,6 +547,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 <!-- 待办附件文件选择（隐藏） -->
 <input type="file" id="taskFileInput" multiple style="display:none" onchange="handleTaskFiles()">
 <input type="file" id="projectFileInput" multiple style="display:none" onchange="handleProjectFilePick()">
+<input type="file" id="noteFileInput" multiple style="display:none" onchange="handleNoteFilePick()">
 
 <!-- ====== MODAL: Task ====== -->
 <div class="modal-overlay" id="modalTask" style="display:none">
@@ -569,10 +570,14 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 
 <!-- ====== MODAL: Note ====== -->
 <div class="modal-overlay" id="modalNote" style="display:none">
-  <div class="modal">
+  <div class="modal" data-drop-note-modal="1">
     <h3 id="modalNoteTitle">速记灵感</h3>
     <div class="form-group"><label>内容</label><textarea id="noteContent" placeholder="写下你的想法..."></textarea></div>
     <div class="form-group"><label>标签（用逗号分隔）</label><input type="text" id="noteTags" placeholder="例如：产品,营销,待办"></div>
+    <div class="form-group"><label>附件（选填）</label>
+      <div id="noteModalFiles" class="task-files" style="margin-top:0"></div>
+      <div class="task-file-add"><button type="button" class="btn btn-sm btn-ghost" onclick="pickNoteModalFiles()">📎 添加附件</button><span id="noteModalFilesHint" style="font-size:11px;color:var(--text-muted);margin-left:8px">图片自动压缩，单个文件最大 3MB，也可直接拖文件进来</span></div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnNoteCancel">取消</button>
       <button class="btn btn-primary" id="btnNoteSave">保存</button>
@@ -1184,9 +1189,107 @@ function viewProjectFile(pid, idx){
   window.open(p.files[idx].dataUrl, '_blank');
 }
 
-// ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 新建编辑项目弹窗）=====
+// ===== 灵感速记附件 =====
+let noteModalFiles = [];   // 速记弹窗里暂存的附件，点保存时写入笔记
+let noteModalPending = 0;  // 还在压缩处理中的文件数
+
+function pickNoteModalFiles(){
+  const input = document.getElementById('noteFileInput');
+  input.dataset.mode = 'modal';
+  input.value = '';
+  input.click();
+}
+function addNoteFiles(nid){
+  const input = document.getElementById('noteFileInput');
+  input.dataset.mode = nid;
+  input.value = '';
+  input.click();
+}
+function handleNoteFilePick(){
+  const input = document.getElementById('noteFileInput');
+  const mode = input.dataset.mode;
+  const files = Array.from(input.files||[]);
+  input.value = '';
+  if(files.length===0) return;
+  if(mode==='modal') addNoteModalFilesFromList(files);
+  else addNoteFilesFromList(mode, files);
+}
+function addNoteModalFilesFromList(files){
+  if(files.length===0) return;
+  if(noteModalFiles.length + files.length > 9){ showToast('每条速记最多添加 9 个附件'); return; }
+  files.forEach(f=>{
+    noteModalPending++;
+    renderNoteModalFiles();
+    processTaskFile(f).then(r=>{
+      noteModalFiles.push(r);
+    }).catch(e=>{
+      showToast(e.message);
+    }).finally(()=>{
+      noteModalPending--;
+      renderNoteModalFiles();
+    });
+  });
+}
+function renderNoteModalFiles(){
+  const box = document.getElementById('noteModalFiles');
+  const hint = document.getElementById('noteModalFilesHint');
+  if(!box) return;
+  let html = '';
+  noteModalFiles.forEach((f,idx)=>{
+    const isImg = f.type && f.type.indexOf('image/')===0;
+    html += '<div class="task-file-item">';
+    if(isImg) html += '<img src="'+f.dataUrl+'">';
+    else html += '<span class="file-ic">📄</span>';
+    html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+    html += '<button class="task-file-del" onclick="removeNoteModalFile('+idx+')" title="移除">×</button>';
+    html += '</div>';
+  });
+  box.innerHTML = html;
+  if(hint) hint.textContent = noteModalPending>0 ? '正在处理附件，请稍候...' : '图片自动压缩，单个文件最大 3MB，也可直接拖文件进来';
+}
+function removeNoteModalFile(idx){
+  noteModalFiles.splice(idx,1);
+  renderNoteModalFiles();
+}
+function addNoteFilesFromList(nid, files){
+  if(files.length===0) return;
+  const n = notes.find(nn=>nn.id===nid);
+  if(!n) return;
+  n.files = n.files||[];
+  if(n.files.length + files.length > 9){ showToast('每条速记最多添加 9 个附件'); return; }
+  let done = 0; const results = [];
+  files.forEach(f=>{
+    processTaskFile(f).then(r=>{
+      results.push(r);
+    }).catch(e=>{
+      showToast(e.message);
+    }).finally(()=>{
+      done++;
+      if(done===files.length && results.length){
+        n.files.push(...results);
+        saveAll();
+        refreshAll();
+        showToast('✓ 已添加 '+results.length+' 个附件', 'info');
+      }
+    });
+  });
+}
+function removeNoteFile(nid, idx){
+  const n = notes.find(nn=>nn.id===nid);
+  if(!n || !n.files) return;
+  n.files.splice(idx,1);
+  saveAll();
+  refreshAll();
+}
+function viewNoteFile(nid, idx){
+  const n = notes.find(nn=>nn.id===nid);
+  if(!n || !n.files || !n.files[idx]) return;
+  window.open(n.files[idx].dataUrl, '_blank');
+}
+
+// ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 速记卡片 / 新建编辑弹窗）=====
 function dropZoneFromEvent(e){
-  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal]') : null;
+  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal],[data-drop-note],[data-drop-note-modal]') : null;
 }
 document.addEventListener('dragover', e=>{
   const zone = dropZoneFromEvent(e);
@@ -1207,7 +1310,9 @@ document.addEventListener('drop', e=>{
   zone.classList.remove('drop-hover');
   const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
   if(files.length===0) return;
-  if(zone.dataset.dropModal) addProjectModalFilesFromList(files);
+  if(zone.dataset.dropNoteModal) addNoteModalFilesFromList(files);
+  else if(zone.dataset.dropNote) addNoteFilesFromList(zone.dataset.dropNote, files);
+  else if(zone.dataset.dropModal) addProjectModalFilesFromList(files);
   else if(zone.dataset.dropTask) addTaskFilesFromList(zone.dataset.dropTask, files);
   else if(zone.dataset.projectId) addProjectFilesFromList(zone.dataset.projectId, files);
 });
@@ -1301,12 +1406,32 @@ function renderNotes(){
     html = '<div class="card" style="text-align:center;color:var(--text-muted);padding:32px">还没有灵感记录，点击右上角开始速记</div>';
   }
   filtered.forEach(n=>{
-    html += '<div class="card note-card">';
+    html += '<div class="card note-card" data-drop-note="'+n.id+'">';
     html += '<div class="card-header"><div class="card-title" style="font-size:14px;font-weight:400">'+escHtml(n.content).replace(/\n/g,'<br>')+'</div>';
     html += '<div class="card-actions">';
+    html += '<button class="btn-icon" onclick="addNoteFiles(\''+n.id+'\')" title="添加附件">📎</button>';
     html += '<button class="btn-icon" onclick="editNote(\''+n.id+'\')" title="编辑"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
     html += '<button class="btn-icon" onclick="deleteNote(\''+n.id+'\')" title="删除" style="color:var(--danger)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
     html += '</div></div>';
+    // 附件区
+    const nfiles = n.files||[];
+    if(nfiles.length>0){
+      html += '<div class="task-files">';
+      nfiles.forEach((f,idx)=>{
+        const isImg = f.type && f.type.indexOf('image/')===0;
+        html += '<div class="task-file-item">';
+        if(isImg){
+          html += '<img src="'+f.dataUrl+'" onclick="viewNoteFile(\''+n.id+'\','+idx+')" title="点击放大">';
+        } else {
+          html += '<span class="file-ic">📄</span>';
+        }
+        html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+        if(!isImg) html += '<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">下载</a>';
+        html += '<button class="task-file-del" onclick="removeNoteFile(\''+n.id+'\','+idx+')" title="删除附件">×</button>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
     html += '<div class="card-meta">';
     n.tags.forEach(tag=>{
       html += '<span class="badge badge-tag" onclick="setNoteFilter(\''+escAttr(tag)+'\')">'+escHtml(tag)+'</span>';
@@ -1324,6 +1449,9 @@ function editNote(id){
   document.getElementById('modalNoteTitle').textContent = '编辑灵感';
   document.getElementById('noteContent').value = n.content;
   document.getElementById('noteTags').value = n.tags.join('，');
+  noteModalFiles = (n.files||[]).slice();
+  noteModalPending = 0;
+  renderNoteModalFiles();
   document.getElementById('modalNote').style.display = 'flex';
 }
 
@@ -1340,6 +1468,9 @@ function openNoteModal(){
   document.getElementById('modalNoteTitle').textContent = '速记灵感';
   document.getElementById('noteContent').value = '';
   document.getElementById('noteTags').value = '';
+  noteModalFiles = [];
+  noteModalPending = 0;
+  renderNoteModalFiles();
   document.getElementById('modalNote').style.display = 'flex';
   document.getElementById('noteContent').focus();
 }
@@ -1965,14 +2096,21 @@ document.getElementById('btnModalSave').addEventListener('click',()=>{
 document.getElementById('btnNoteSave').addEventListener('click',()=>{
   const content = document.getElementById('noteContent').value.trim();
   if(!content){showToast('请输入内容');return}
+  if(noteModalPending>0){showToast('附件还在处理中，请稍等 1~2 秒再保存');return}
   const tagsRaw = document.getElementById('noteTags').value.trim();
   const tags = tagsRaw ? tagsRaw.split(/[,，]/).map(t=>t.trim()).filter(Boolean) : [];
-  
+
   if(editingId){
     const n = notes.find(n=>n.id===editingId);
-    if(n){n.content=content;n.tags=tags;}
+    if(n){
+      n.content=content;n.tags=tags;
+      if(noteModalFiles.length) n.files=noteModalFiles;
+      else if(n.files) delete n.files;
+    }
   } else {
-    notes.push({id:uid(),content,tags,createdAt:Date.now()});
+    const nn = {id:uid(),content,tags,createdAt:Date.now()};
+    if(noteModalFiles.length) nn.files = noteModalFiles;
+    notes.push(nn);
   }
   saveAll();
   closeModal('modalNote');
@@ -2277,9 +2415,14 @@ async function doSyncUpload(){
   showToast('<span class="sync-spinner"></span>正在上传 '+count+' 条数据...', 'info');
 
   // 附件（图片/文件）体积大且只保存在本机，不随同步传输
-  const hasFiles = tasks.some(t=>(t.files||[]).length>0) || projects.some(p=>(p.files||[]).length>0);
+  const hasFiles = tasks.some(t=>(t.files||[]).length>0) || projects.some(p=>(p.files||[]).length>0) || notes.some(n=>(n.files||[]).length>0);
   const syncTasks = tasks.map(t=>{
     const c = Object.assign({}, t);
+    delete c.files;
+    return c;
+  });
+  const syncNotes = notes.map(n=>{
+    const c = Object.assign({}, n);
     delete c.files;
     return c;
   });
@@ -2288,7 +2431,7 @@ async function doSyncUpload(){
     delete c.files;
     return c;
   });
-  const data = {v:4, tasks: syncTasks, notes, projects: syncProjects, syncedAt:new Date().toISOString()};
+  const data = {v:4, tasks: syncTasks, notes: syncNotes, projects: syncProjects, syncedAt:new Date().toISOString()};
   const jsonStr = JSON.stringify(data);
   const topic = getSyncTopic();
   const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
@@ -2447,7 +2590,11 @@ async function doSyncReceive(){
       if(local && local.files && local.files.length) rt.files = local.files;
       return rt;
     });
-    notes = received.notes || [];
+    notes = (received.notes||[]).map(rn=>{
+      const local = notes.find(n=>n.id===rn.id);
+      if(local && local.files && local.files.length) rn.files = local.files;
+      return rn;
+    });
     projects = (received.projects||[]).map(rp=>{
       const local = projects.find(p=>p.id===rp.id);
       if(local && local.files && local.files.length) rp.files = local.files;
