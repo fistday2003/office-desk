@@ -96,6 +96,61 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .sidebar-footer{padding:12px 24px;border-top:1px solid var(--border)}
 .sidebar-footer .nav-item{border-left:none;padding:10px 0}
 .sidebar-footer .nav-item svg{margin-right:0}
+
+/* ===== 数据看板 ===== */
+.dash-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.dash-select{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text);width:auto;min-height:36px}
+.dash-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:var(--primary-light);color:var(--primary-dark)}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.dash-metric{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.dm-label{font-size:12px;color:var(--text-secondary);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.dm-label svg{width:13px;height:13px;flex-shrink:0;color:var(--text-muted)}
+.dm-value{font-size:23px;font-weight:700;color:var(--text);line-height:1.15;letter-spacing:-.3px}
+.dm-value small{font-size:13px;font-weight:500;color:var(--text-secondary);margin-left:3px}
+.dm-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.dm-delta{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:2px}
+.dm-delta.up{color:#0f766e}
+.dm-delta.down{color:var(--danger)}
+.dm-delta.flat{color:var(--text-muted)}
+.dm-sub{font-size:11px;color:var(--text-muted)}
+.dash-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:9px}
+.dash-bar span{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.dash-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.dash-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.dash-panel-title{font-size:14px;font-weight:600;color:var(--text)}
+.dash-metric-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.dash-mtab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);cursor:pointer}
+.dash-mtab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.dash-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary);margin-top:10px}
+.dash-legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:2px}
+.dash-shop-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dash-shop-col{border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.dash-shop-head{display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:13px;font-weight:600}
+.dash-shop-tag{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600}
+.dash-shop-tag.lg{background:#e0f2fe;color:#0369a1}
+.dash-shop-tag.fs{background:#fef3c7;color:#b45309}
+.dash-kv{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--border)}
+.dash-kv:last-child{border-bottom:none}
+.dash-kv span:first-child{color:var(--text-secondary)}
+.dash-kv span:last-child{font-weight:600;color:var(--text)}
+.dash-table-wrap{overflow-x:auto}
+.dash-row-table{width:100%;border-collapse:collapse;font-size:13px}
+.dash-row-table th{text-align:left;font-size:12px;font-weight:600;color:var(--text-secondary);padding:9px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+.dash-row-table td{padding:10px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+.dash-row-table tbody tr:hover td{background:var(--primary-light)}
+.dash-empty{text-align:center;color:var(--text-secondary);padding:44px 20px;font-size:14px;line-height:1.9}
+.dash-mcard{display:none}
+.dash-mcard-item{border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.dash-mcard-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+@media (max-width:768px){
+  .dash-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .dm-value{font-size:19px}
+  .dash-metric{padding:12px}
+  .dash-shop-cols{grid-template-columns:1fr}
+  .dash-table-wrap{display:none}
+  .dash-mcard{display:block}
+  .dash-panel{padding:13px}
+}
 .main-content{flex:1;padding:20px 24px;overflow-y:auto;max-height:calc(100vh - var(--header-h))}
 
 /* Tab panels */
@@ -432,6 +487,10 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
         项目跟进
       </button>
+      <button class="nav-item" data-tab="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+        数据看板
+      </button>
       <button class="nav-item" data-tab="review">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         每周复盘
@@ -498,6 +557,22 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
       <div id="projectList"></div>
     </div>
 
+    <!-- TAB: 数据看板 -->
+    <div class="tab-panel" id="tab-data">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+          数据看板
+        </div>
+        <button class="btn btn-primary" id="btnAddDash">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          录入月度数据
+        </button>
+      </div>
+      <p class="section-subtitle">每月从阿里后台导出关键数字填进来，工作台自动算环比、画趋势、比两个店</p>
+      <div id="dashContent"></div>
+    </div>
+
     <!-- TAB: 每周复盘 -->
     <div class="tab-panel" id="tab-review">
       <div class="section-title">
@@ -533,6 +608,10 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   <button class="mnav-item" data-mtab="projects">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
     项目
+  </button>
+  <button class="mnav-item" data-mtab="data">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+    数据
   </button>
   <button class="mnav-item" data-mtab="review">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
@@ -608,6 +687,39 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 </div>
 
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
+<div class="modal-overlay" id="modalDash" style="display:none">
+  <div class="modal">
+    <h3 id="modalDashTitle">录入月度数据</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>年份</label><select id="dashYear"></select></div>
+      <div class="form-group" style="flex:1 1 130px"><label>月份</label><select id="dashMonthInput"></select></div>
+    </div>
+    <div class="form-group"><label>店铺</label>
+      <select id="dashShop">
+        <option value="langges">朗格斯（泳装 / 布基尼）</option>
+        <option value="fansi">凡适（BJJ / MMA）</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>收款额（美元）</label><input type="number" id="dashRevenue" placeholder="0" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>订单数（笔）</label><input type="number" id="dashOrders" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>询盘数（条）</label><input type="number" id="dashInquiries" placeholder="0" inputmode="numeric"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>新建客户数（个）</label><input type="number" id="dashNewCust" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>其中：新客户订单（笔）</label><input type="number" id="dashNewOrders" placeholder="0" inputmode="numeric"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>急速回复率（%）</label><input type="number" id="dashReply" placeholder="0" step="0.01" inputmode="decimal"></div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-top:-4px">填「新客户订单」是为了自动算新老客户占比。拿不准可以先留空，之后再补。</p>
+    <div class="modal-actions">
+      <button class="btn" id="btnDashCancel">取消</button>
+      <button class="btn btn-primary" id="btnDashSave">保存</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalSyncSetup" style="display:none">
   <div class="modal">
     <h3 id="syncSetupTitle">设置同步名称</h3>
@@ -714,11 +826,11 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length}
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample);
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample);
 }
 
 // Clear sample data
@@ -726,6 +838,7 @@ function clearSampleData(){
   tasks = tasks.filter(t=>!t._sample);
   notes = notes.filter(n=>!n._sample);
   projects = projects.filter(p=>!p._sample);
+  dashboard = dashboard.filter(d=>!d._sample);
   saveAll();
 }
 
@@ -770,6 +883,338 @@ function seedSampleData(){
   saveAll();
 }
 
+// 数据看板：首次为空时载入一组示例，方便立刻看懂用法（顶部「清空示例数据」可一键清除）
+function seedDashSample(){
+  const mk = (month,shop,revenue,orders,inquiries,newCustomers,newOrders,quickReply)=>
+    ({id:uid(),month,shop,revenue,orders,inquiries,newCustomers,newOrders,quickReply,_sample:true});
+  dashboard.push(
+    mk('2026-07','langges',86500,42,1580,210,12,41.2),
+    mk('2026-08','langges',92400,47,1712,238,15,44.8),
+    mk('2026-09','langges',68200,33,1240,176,9,38.5),
+    mk('2026-07','fansi',21800,15,420,68,6,30.2),
+    mk('2026-08','fansi',24600,17,462,74,7,33.6),
+    mk('2026-09','fansi',15900,11,318,52,3,35.7)
+  );
+}
+
+// ============================================================
+//  数据看板
+// ============================================================
+const SHOP_NAMES = {langges:'朗格斯', fansi:'凡适'};
+const DASH_METRICS = [
+  {key:'revenue',      label:'收款额',         fmt:v=>fmtMoney(v)},
+  {key:'orders',       label:'订单数',         fmt:v=>Math.round(v)+' 笔'},
+  {key:'inquiries',    label:'询盘数',         fmt:v=>Math.round(v)+' 条'},
+  {key:'newCustomers', label:'新建客户',       fmt:v=>Math.round(v)+' 个'},
+  {key:'newRatio',     label:'新客户订单占比', fmt:v=>v.toFixed(1)+'%', bar:true},
+  {key:'quickReply',   label:'急速回复率',     fmt:v=>v.toFixed(1)+'%'}
+];
+const DASH_TRENDS = [
+  {key:'revenue',      label:'收款额',    axis:v=>fmtMoney(v)},
+  {key:'orders',       label:'订单数',    axis:v=>String(Math.round(v))},
+  {key:'inquiries',    label:'询盘数',    axis:v=>String(Math.round(v))},
+  {key:'newCustomers', label:'新建客户',  axis:v=>String(Math.round(v))},
+  {key:'quickReply',   label:'急速回复率',axis:v=>v.toFixed(0)+'%'}
+];
+let dashSelMonth = null;
+let dashSelMetric = 'revenue';
+let editingDashId = null;
+
+function dNum(v){const n=parseFloat(v);return isNaN(n)?0:n}
+function fmtMoney(v){return '$'+Math.round(v).toLocaleString('en-US')}
+function fmtMonthLabel(m){const p=String(m).split('-');return p[0]+'年'+parseInt(p[1])+'月'}
+function fmtMonthShort(m){const p=String(m).split('-');return parseInt(p[1])+'月'}
+function dashMonths(){return [...new Set(dashboard.map(r=>r.month))].sort()}
+
+function dashAgg(list){
+  const a={revenue:0,orders:0,inquiries:0,newCustomers:0,newOrders:0,quickReply:0,
+           rateSum:0,rateN:0,count:0,hasNewOrders:false,hasReply:false};
+  list.forEach(r=>{
+    a.revenue+=dNum(r.revenue);
+    a.orders+=dNum(r.orders);
+    a.inquiries+=dNum(r.inquiries);
+    a.newCustomers+=dNum(r.newCustomers);
+    a.newOrders+=dNum(r.newOrders);
+    if(dNum(r.newOrders)>0) a.hasNewOrders=true;
+    if(r.quickReply!==''&&r.quickReply!=null){a.rateSum+=dNum(r.quickReply);a.rateN++;a.hasReply=true;}
+    a.count++;
+  });
+  a.quickReply = a.rateN ? a.rateSum/a.rateN : 0;
+  a.newRatio = a.orders ? Math.min(100, a.newOrders/a.orders*100) : 0;
+  return a;
+}
+
+function dashAt(month, shop){
+  return dashAgg(dashboard.filter(r=>r.month===month && (!shop || r.shop===shop)));
+}
+
+function dashPrevMonth(m){
+  const p=String(m).split('-');
+  const d=new Date(parseInt(p[0]),parseInt(p[1])-2,1);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+
+function dashDelta(cur, prev){
+  if(prev===null||prev===undefined) return {text:'—',cls:'flat'};
+  if(prev===0) return cur===0 ? {text:'—',cls:'flat'} : {text:'新增',cls:'up'};
+  const pct=(cur-prev)/Math.abs(prev)*100;
+  if(Math.abs(pct)<0.05) return {text:'持平',cls:'flat'};
+  return {text:(pct>0?'↑ ':'↓ ')+Math.abs(pct).toFixed(1)+'%', cls: pct>0?'up':'down'};
+}
+
+function dashChartSvg(months, metricKey){
+  const mt = DASH_TRENDS.find(t=>t.key===metricKey) || DASH_TRENDS[0];
+  const W=680, PL=68, PR=18, PT=22, PB=36, H=250;
+  const iw=W-PL-PR, ih=H-PT-PB;
+  const series=['langges','fansi'].map((shop,i)=>({
+    shop, name:SHOP_NAMES[shop], color: i===0 ? '#0891b2' : '#f59e0b',
+    vals: months.map(m=>{ const a=dashAt(m,shop); return a.count ? a[metricKey] : null; })
+  }));
+  const allv=[];
+  series.forEach(s=>s.vals.forEach(v=>{ if(v!==null) allv.push(v); }));
+  if(allv.length===0) return '<div style="color:var(--text-muted);font-size:13px;padding:24px 0;text-align:center">暂无可对比数据</div>';
+  let mx=Math.max.apply(null,allv), mn=Math.min.apply(null,allv);
+  if(mx===mn){ mx = mx ? mx*1.15 : 1; mn = mn*0.85; }
+  const padv=(mx-mn)*0.18; mx+=padv; mn-=padv; if(mn<0) mn=0;
+  const span=(mx-mn)||1;
+  const px=i=> months.length===1 ? PL+iw/2 : PL+iw*i/(months.length-1);
+  const py=v=> PT+ih-(v-mn)/span*ih;
+  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block" role="img" aria-label="月度趋势对比图">';
+  for(let i=0;i<=4;i++){
+    const v=mn+span*i/4, yy=py(v);
+    s+='<line x1="'+PL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+yy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="0.5"/>';
+    s+='<text x="'+(PL-8)+'" y="'+yy.toFixed(1)+'" text-anchor="end" dominant-baseline="central" font-size="11" fill="#94a3b8">'+mt.axis(v)+'</text>';
+  }
+  months.forEach((m,i)=>{
+    s+='<text x="'+px(i).toFixed(1)+'" y="'+(PT+ih+20)+'" text-anchor="middle" font-size="11" fill="#94a3b8">'+fmtMonthShort(m)+'</text>';
+  });
+  series.forEach(se=>{
+    const pts=[];
+    se.vals.forEach((v,i)=>{ if(v!==null) pts.push([px(i),py(v)]); });
+    if(pts.length>1){
+      s+='<polyline fill="none" stroke="'+se.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+'"/>';
+    }
+    pts.forEach(p=>{
+      s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.5" fill="#fff" stroke="'+se.color+'" stroke-width="2"/>';
+    });
+    if(months.length<=6){
+      se.vals.forEach((v,i)=>{
+        if(v===null) return;
+        s+='<text x="'+px(i).toFixed(1)+'" y="'+(py(v)-11).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="500" fill="'+se.color+'">'+mt.axis(v)+'</text>';
+      });
+    }
+  });
+  s+='</svg>';
+  return s;
+}
+
+const ICON_EDIT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+const ICON_DEL='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+
+function renderDash(){
+  const box=document.getElementById('dashContent');
+  if(!box) return;
+  const months=dashMonths();
+  if(months.length===0){
+    box.innerHTML='<div class="card dash-empty">'
+      +'还没有数据<br>'
+      +'<span style="font-size:13px">点右上角「录入月度数据」，把每个月从阿里后台导出的几个关键数字填进来<br>'
+      +'填过一次之后，每个月只要补一条，环比和趋势就自动出来了</span></div>';
+    return;
+  }
+  if(!dashSelMonth || months.indexOf(dashSelMonth)<0) dashSelMonth=months[months.length-1];
+  const m=dashSelMonth;
+  const cur=dashAt(m);
+  const prev=dashAt(dashPrevMonth(m));
+  const hasPrev=prev.count>0;
+  const isLatest = m===months[months.length-1];
+
+  let html='';
+  html+='<div class="dash-toolbar">';
+  html+='<select class="dash-select" id="dashMonthSel" onchange="dashPickMonth(this.value)">';
+  months.slice().reverse().forEach(mm=>{
+    html+='<option value="'+mm+'"'+(mm===m?' selected':'')+'>'+fmtMonthLabel(mm)+'</option>';
+  });
+  html+='</select>';
+  html+='<span class="dash-chip">两店合计 · '+cur.count+' 条记录</span>';
+  if(isLatest) html+='<span class="dash-chip" style="background:var(--success-light);color:#047857">最新月份</span>';
+  html+='</div>';
+
+  html+='<div class="dash-grid">';
+  DASH_METRICS.forEach(mt=>{
+    const v=cur[mt.key];
+    const pv=hasPrev?prev[mt.key]:null;
+    const d=dashDelta(v,pv);
+    let foot='对比上月';
+    if(!hasPrev) foot='无上月对比';
+    else if(mt.key==='newRatio' && !cur.hasNewOrders) foot='未填新客户订单';
+    else if(mt.key==='quickReply' && !cur.hasReply) foot='未填回复率';
+    html+='<div class="dash-metric">';
+    html+='<div class="dm-label">'+mt.label+'</div>';
+    html+='<div class="dm-value">'+mt.fmt(v)+'</div>';
+    html+='<div class="dm-foot"><span class="dm-delta '+d.cls+'">'+d.text+'</span><span class="dm-sub">'+foot+'</span></div>';
+    if(mt.bar) html+='<div class="dash-bar"><span style="width:'+v.toFixed(1)+'%"></span></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="dash-panel">';
+  html+='<div class="dash-panel-head"><div class="dash-panel-title">趋势对比（两店各一条线）</div><div class="dash-metric-tabs">';
+  DASH_TRENDS.forEach(t=>{
+    html+='<button class="dash-mtab'+(t.key===dashSelMetric?' active':'')+'" onclick="dashPickMetric(\''+t.key+'\')">'+t.label+'</button>';
+  });
+  html+='</div></div>';
+  html+=dashChartSvg(months,dashSelMetric);
+  html+='<div class="dash-legend"><span><i style="background:#0891b2"></i>朗格斯</span><span><i style="background:#f59e0b"></i>凡适</span></div>';
+  html+='</div>';
+
+  html+='<div class="dash-panel">';
+  html+='<div class="dash-panel-title" style="margin-bottom:12px">两店对比 · '+fmtMonthLabel(m)+'</div>';
+  html+='<div class="dash-shop-cols">';
+  ['langges','fansi'].forEach(shop=>{
+    const a=dashAt(m,shop);
+    html+='<div class="dash-shop-col">';
+    html+='<div class="dash-shop-head"><span class="dash-shop-tag '+(shop==='langges'?'lg':'fs')+'">'+SHOP_NAMES[shop]+'</span>'+(a.count?'':'<span style="font-size:12px;color:var(--text-muted);font-weight:400">本月未录入</span>')+'</div>';
+    if(a.count){
+      html+='<div class="dash-kv"><span>收款额</span><span>'+fmtMoney(a.revenue)+'</span></div>';
+      html+='<div class="dash-kv"><span>订单数</span><span>'+Math.round(a.orders)+' 笔</span></div>';
+      html+='<div class="dash-kv"><span>询盘数</span><span>'+Math.round(a.inquiries)+' 条</span></div>';
+      html+='<div class="dash-kv"><span>新建客户</span><span>'+Math.round(a.newCustomers)+' 个</span></div>';
+      html+='<div class="dash-kv"><span>新客户订单占比</span><span>'+(a.hasNewOrders?a.newRatio.toFixed(1)+'%':'—')+'</span></div>';
+      html+='<div class="dash-kv"><span>急速回复率</span><span>'+(a.hasReply?a.quickReply.toFixed(1)+'%':'—')+'</span></div>';
+      html+='<div class="dash-kv"><span>询盘→订单转化</span><span>'+(a.inquiries?((a.orders/a.inquiries)*100).toFixed(1)+'%':'—')+'</span></div>';
+    } else {
+      html+='<div style="font-size:12px;color:var(--text-muted);padding:6px 0">本月还没录入这个店的数据</div>';
+    }
+    html+='</div>';
+  });
+  html+='</div></div>';
+
+  const sorted=dashboard.slice().sort((a,b)=>{
+    if(a.month!==b.month) return a.month<b.month?1:-1;
+    return a.shop<b.shop?-1:1;
+  });
+  html+='<div class="dash-panel">';
+  html+='<div class="dash-panel-head"><div class="dash-panel-title">全部记录（'+dashboard.length+' 条）</div><span class="dm-sub">点右侧铅笔可改，垃圾桶可删</span></div>';
+  html+='<div class="dash-table-wrap"><table class="dash-row-table"><thead><tr>';
+  html+='<th>月份</th><th>店铺</th><th>收款额</th><th>订单</th><th>询盘</th><th>新建客户</th><th>新客户占比</th><th>急速回复率</th><th style="text-align:right">操作</th>';
+  html+='</tr></thead><tbody>';
+  sorted.forEach(r=>{
+    const a=dashAgg([r]);
+    html+='<tr>';
+    html+='<td>'+fmtMonthLabel(r.month)+'</td>';
+    html+='<td><span class="dash-shop-tag '+(r.shop==='langges'?'lg':'fs')+'">'+(SHOP_NAMES[r.shop]||r.shop)+'</span></td>';
+    html+='<td>'+fmtMoney(dNum(r.revenue))+'</td>';
+    html+='<td>'+Math.round(dNum(r.orders))+'</td>';
+    html+='<td>'+Math.round(dNum(r.inquiries))+'</td>';
+    html+='<td>'+Math.round(dNum(r.newCustomers))+'</td>';
+    html+='<td>'+(a.hasNewOrders?a.newRatio.toFixed(1)+'%':'—')+'</td>';
+    html+='<td>'+(r.quickReply===''||r.quickReply==null?'—':dNum(r.quickReply).toFixed(1)+'%')+'</td>';
+    html+='<td style="text-align:right;white-space:nowrap">';
+    html+='<button class="btn-icon" onclick="openDashModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
+    html+='<button class="btn-icon" onclick="deleteDashRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
+    html+='</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  html+='<div class="dash-mcard">';
+  sorted.forEach(r=>{
+    const a=dashAgg([r]);
+    html+='<div class="dash-mcard-item">';
+    html+='<div class="dash-mcard-head"><span><span class="dash-shop-tag '+(r.shop==='langges'?'lg':'fs')+'">'+(SHOP_NAMES[r.shop]||r.shop)+'</span> <strong style="font-size:13px">'+fmtMonthLabel(r.month)+'</strong></span>';
+    html+='<span style="white-space:nowrap"><button class="btn-icon" onclick="openDashModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
+    html+='<button class="btn-icon" onclick="deleteDashRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button></span></div>';
+    html+='<div class="dash-kv"><span>收款额</span><span>'+fmtMoney(dNum(r.revenue))+'</span></div>';
+    html+='<div class="dash-kv"><span>订单 / 询盘</span><span>'+Math.round(dNum(r.orders))+' 笔 / '+Math.round(dNum(r.inquiries))+' 条</span></div>';
+    html+='<div class="dash-kv"><span>新建客户</span><span>'+Math.round(dNum(r.newCustomers))+' 个</span></div>';
+    html+='<div class="dash-kv"><span>新客户占比</span><span>'+(a.hasNewOrders?a.newRatio.toFixed(1)+'%':'—')+'</span></div>';
+    html+='<div class="dash-kv"><span>急速回复率</span><span>'+(r.quickReply===''||r.quickReply==null?'—':dNum(r.quickReply).toFixed(1)+'%')+'</span></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='</div>';
+
+  box.innerHTML=html;
+}
+
+function dashPickMonth(m){ dashSelMonth=m; renderDash(); }
+function dashPickMetric(k){ dashSelMetric=k; renderDash(); }
+
+function openDashModal(id){
+  const now=new Date();
+  const ySel=document.getElementById('dashYear');
+  const mSel=document.getElementById('dashMonthInput');
+  if(ySel.options.length===0){
+    for(let y=now.getFullYear()+1;y>=2022;y--) ySel.innerHTML+='<option value="'+y+'">'+y+' 年</option>';
+    for(let i=1;i<=12;i++) mSel.innerHTML+='<option value="'+String(i).padStart(2,'0')+'">'+i+' 月</option>';
+  }
+  editingDashId = id||null;
+  const rec = id ? dashboard.find(d=>d.id===id) : null;
+  const m = rec ? rec.month : (dashSelMonth || (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')));
+  const parts=String(m).split('-');
+  ySel.value=parts[0];
+  mSel.value=parts[1];
+  document.getElementById('dashShop').value = rec ? rec.shop : 'langges';
+  document.getElementById('dashRevenue').value = rec ? rec.revenue : '';
+  document.getElementById('dashOrders').value = rec ? rec.orders : '';
+  document.getElementById('dashInquiries').value = rec ? rec.inquiries : '';
+  document.getElementById('dashNewCust').value = rec ? rec.newCustomers : '';
+  document.getElementById('dashNewOrders').value = rec ? rec.newOrders : '';
+  document.getElementById('dashReply').value = rec ? rec.quickReply : '';
+  document.getElementById('modalDashTitle').textContent = rec ? '编辑数据' : '录入月度数据';
+  document.getElementById('modalDash').style.display='flex';
+}
+
+function saveDashRecord(){
+  const month=document.getElementById('dashYear').value+'-'+document.getElementById('dashMonthInput').value;
+  const shop=document.getElementById('dashShop').value;
+  const replyRaw=document.getElementById('dashReply').value;
+  const rec={
+    month, shop,
+    revenue:dNum(document.getElementById('dashRevenue').value),
+    orders:dNum(document.getElementById('dashOrders').value),
+    inquiries:dNum(document.getElementById('dashInquiries').value),
+    newCustomers:dNum(document.getElementById('dashNewCust').value),
+    newOrders:dNum(document.getElementById('dashNewOrders').value),
+    quickReply: replyRaw==='' ? '' : dNum(replyRaw)
+  };
+  if(rec.revenue===0 && rec.orders===0 && rec.inquiries===0 && rec.newCustomers===0 && rec.quickReply===''){
+    showToast('至少填一项数据再保存'); return;
+  }
+  const finish=()=>{
+    saveAll(); closeModal('modalDash'); refreshAll();
+    showToast('✓ 已保存 '+fmtMonthLabel(month)+' '+(SHOP_NAMES[shop]||'')+' 的数据','info');
+  };
+  if(editingDashId){
+    const idx=dashboard.findIndex(d=>d.id===editingDashId);
+    if(idx>=0) dashboard[idx]=Object.assign({},dashboard[idx],rec,{_sample:false});
+    editingDashId=null;
+    finish();
+    return;
+  }
+  const exist=dashboard.find(d=>d.month===month && d.shop===shop);
+  if(exist){
+    showConfirm('该月该店已经有一条记录了，要用现在填的数据覆盖吗？',()=>{
+      Object.assign(exist,rec);
+      exist._sample=false;
+      finish();
+    });
+    return;
+  }
+  dashboard.push(Object.assign({id:uid(),createdAt:Date.now()},rec));
+  finish();
+}
+
+function deleteDashRecord(id){
+  const r=dashboard.find(d=>d.id===id);
+  if(!r) return;
+  showConfirm('确定删除 '+fmtMonthLabel(r.month)+' '+(SHOP_NAMES[r.shop]||'')+' 这条数据吗？',()=>{
+    dashboard=dashboard.filter(d=>d.id!==id);
+    saveAll(); refreshAll();
+    showToast('已删除');
+  });
+}
+
 // ============================================================
 //  BANNER
 // ============================================================
@@ -794,6 +1239,12 @@ function renderBanner(){
     blockedProjects.forEach(p=>{
       html += '<span class="banner-item">项目 <strong>'+escHtml(p.name)+'</strong>：'+escHtml(p.blockers||'待处理')+'</span>';
     });
+  }
+  // 数据看板：当月还没录入数据时温和提醒（只在已经开始用看板后提醒）
+  const curMonth = today.slice(0,7);
+  if(dashboard.length>0 && !dashboard.some(d=>d.month===curMonth)){
+    html += '<span class="banner-alert warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>'+parseInt(curMonth.split('-')[1])+' 月数据还没录入</span>';
+    html += '<span class="banner-item"><a onclick="switchTab(\'data\')">去录入 →</a></span>';
   }
   if(!html) html = '<span class="banner-empty">✓ 一切正常，没有逾期任务或卡住的项目</span>';
   document.getElementById('bannerContent').innerHTML = html;
@@ -2216,6 +2667,7 @@ document.getElementById('importFile').addEventListener('change',function(){
         tasks = data.tasks || [];
         notes = data.notes || [];
         projects = data.projects || [];
+        dashboard = data.dashboard || [];
         saveAll();
         refreshAll();
         showToast('导入成功！共恢复 '+totalItems()+' 条数据', 'info');
@@ -2231,7 +2683,7 @@ document.getElementById('importFile').addEventListener('change',function(){
 // Clear all data
 document.getElementById('btnClearAll').addEventListener('click',()=>{
   showConfirm('确定要清空所有数据吗？此操作不可恢复！建议先导出备份。', ()=>{
-    tasks = []; notes = []; projects = [];
+    tasks = []; notes = []; projects = []; dashboard = [];
     saveAll();
     refreshAll();
     showToast('所有数据已清空');
@@ -2600,7 +3052,7 @@ async function doSyncReceive(){
     return;
   }
 
-  const newTotal = (received.tasks||[]).length + (received.notes||[]).length + (received.projects||[]).length;
+  const newTotal = (received.tasks||[]).length + (received.notes||[]).length + (received.projects||[]).length + (received.dashboard||[]).length;
   const curTotal = totalItems();
   const syncTime = received.syncedAt ? new Date(received.syncedAt).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
 
@@ -2670,12 +3122,13 @@ function decodeSyncParts(wbo){
 document.getElementById('btnSyncImportYes').addEventListener('click',()=>{
   if(!pendingSyncData) return;
   const data = pendingSyncData;
-  const newTotal = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length;
+  const newTotal = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length + (data.dashboard||[]).length;
   const curTotal = totalItems();
   showConfirm('即将导入 '+newTotal+' 条数据'+(curTotal>0?'（当前有 '+curTotal+' 条将被覆盖）':'')+'，确定吗？', ()=>{
     tasks = data.tasks || [];
     notes = data.notes || [];
     projects = data.projects || [];
+    if(data.dashboard) dashboard = data.dashboard;
     saveAll();
     hideSyncBar();
     refreshAll();
@@ -2826,6 +3279,13 @@ function init(){
     loadData();
   }
   
+  // 数据看板：首次打开若为空，载入一组示例（顶部「清空示例数据」可一键清除）
+  if(dashboard.length===0 && !localStorage.getItem(STORAGE_PREFIX+'dash_seeded')){
+    seedDashSample();
+    localStorage.setItem(STORAGE_PREFIX+'dash_seeded','1');
+    saveAll();
+  }
+
   // Auto-postpone yesterday's tasks
   autoPostpone();
   
