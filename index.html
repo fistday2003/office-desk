@@ -526,7 +526,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.3 · 2026-09-11</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.4 · 2026-09-11</div>
     </div>
   </aside>
 
@@ -3474,6 +3474,10 @@ function asSnapshot(){
   };
 }
 
+// 字符串 -> base64（UTF-8 安全）。注意：encodeSync 会先做一次 JSON.stringify，
+// 这里要传"已经是 JSON 文本"的字符串，所以不能复用它，否则会多包一层引号。
+function asB64(str){ return btoa(unescape(encodeURIComponent(str))); }
+
 // ---- GitHub REST 封装 ----
 function asContentsApi(repo, path){
   return '/repos/'+repo+'/contents/'+path.split('/').map(encodeURIComponent).join('/');
@@ -3545,7 +3549,7 @@ async function asRun(manual){
     // ② 全量内容快照
     const snap = asSnapshot();
     await asPutFile(cfg.repo, cfg.branch, AS_DATA_PATH, cfg.token,
-      encodeSync(JSON.stringify(snap, null, 1)), 'auto: 内容快照 ' + snap.savedAt);
+      asB64(JSON.stringify(snap, null, 1)), 'auto: 内容快照 ' + snap.savedAt);
     asShownErr = '';
     setAsCfg({
       lastSync: new Date().toISOString(),
@@ -3575,8 +3579,9 @@ async function asRestore(){
                           cfg.token, null, 'application/vnd.github.raw');
     if(res.status === 404){ showToast('云端还没有存档数据'); return; }
     if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = JSON.parse(await res.text());
-    if(!data.tasks || !data.notes || !data.projects){ showToast('云端存档格式不正确'); return; }
+    let data = JSON.parse(await res.text());
+    if(typeof data === 'string') data = JSON.parse(data);   // 兼容 v1.4 早期双重编码的快照
+    if(!data || !data.tasks || !data.notes || !data.projects){ showToast('云端存档格式不正确'); return; }
     const n = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length + (data.dashboard||[]).length;
     const when = data.savedAt ? new Date(data.savedAt).toLocaleString('zh-CN') : '';
     showConfirm('云端存档共 ' + n + ' 条内容' + (when?('（'+when+'）'):'') +
