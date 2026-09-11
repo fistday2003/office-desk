@@ -344,6 +344,26 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .modal .form-group{margin-bottom:14px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
 .modal-actions .btn{min-width:80px;justify-content:center}
+/* ===== 自动三点同步 ===== */
+.as-box{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:4px 0 14px;background:#f8fafc}
+.as-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.as-row>label{font-size:13px;font-weight:700;color:var(--text);margin:0;line-height:1.4}
+.as-status{font-size:12px;line-height:1.7;color:var(--text-secondary);word-break:break-word;margin-top:8px}
+.as-status .ok{color:#059669;font-weight:600}
+.as-status .err{color:#dc2626;font-weight:600}
+.as-status .wait{color:#d97706;font-weight:600}
+.as-status .link{color:var(--primary);cursor:pointer;text-decoration:underline;margin-left:6px;white-space:nowrap}
+.switch{position:relative;display:inline-block;width:44px;height:24px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch .slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;transition:.2s;border-radius:24px}
+.switch .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;transition:.2s;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch input:checked + .slider{background:var(--primary)}
+.switch input:checked + .slider:before{transform:translateX(20px)}
+.as-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#94a3b8;margin-right:5px;vertical-align:1px}
+.as-dot.ok{background:#34d399}
+.as-dot.err{background:#f87171}
+.as-dot.syncing{background:#fbbf24;animation:aspulse 1s ease-in-out infinite}
+@keyframes aspulse{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* Toast */
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.15);animation:slideDown .3s ease;pointer-events:none}
@@ -438,7 +458,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
       </button>
       <button class="btn-header" id="btnSyncSettings" title="同步设置和连接测试">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        同步设置
+        <span class="as-dot" id="asDot"></span>同步设置
       </button>
       <button class="btn-header" id="btnImport" title="从文件导入恢复">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -740,6 +760,32 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
     </div>
     <div id="syncSetupHint" style="font-size:12px;color:var(--text-muted);margin-bottom:8px"></div>
     <div id="syncTestResult" style="font-size:12px;margin-bottom:8px;display:none;padding:8px 12px;border-radius:6px"></div>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0 14px">
+    <h4 style="font-size:14px;font-weight:700;margin:0 0 4px">自动三点同步</h4>
+    <p style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:10px">
+      你录入、上传、记录的所有内容（含附件），都会自动存到<b>云端存档</b>和<b>本地资料包</b>，不用手动点。<br>
+      令牌只填一次，保存在本机浏览器里。
+    </p>
+    <div class="as-box">
+      <div class="as-row">
+        <label>开启自动同步</label>
+        <span class="switch"><input type="checkbox" id="asEnabled"><span class="slider"></span></span>
+      </div>
+      <div class="as-status" id="asStatus">未配置</div>
+    </div>
+    <div class="form-group">
+      <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">GitHub 令牌</label>
+      <input type="password" id="asToken" placeholder="ghp_ 开头的一串字符" autocomplete="off" spellcheck="false">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+      <button class="btn btn-ghost" id="btnAsSyncNow" style="flex:1 1 46%;justify-content:center">立即同步一次</button>
+      <button class="btn btn-ghost" id="btnAsRestore" style="flex:1 1 46%;justify-content:center">从云端恢复</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">
+      本地资料包由「自动同步存档」计划任务每 15 分钟自动拉取一次，路径：D:\BaiduSyncdisk\工作文件\自研软件\办公平台
+    </p>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnSyncTestConn" style="margin-right:auto">测试连接</button>
       <button class="btn btn-ghost" id="btnSyncSetupCancel">取消</button>
@@ -765,6 +811,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
+const APP_VERSION = 'v1.4';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -825,6 +872,7 @@ function saveAll(){
   }catch(e){
     showToast('⚠️ 保存失败：本地存储空间已满。请删除部分附件或导出备份后清理');
   }
+  asSchedule();  // 内容一变，几秒后自动同步到云端存档
 }
 
 // 一次性迁移：旧项目的“当前进度/下一步”转为一条跟进记录（界面不再单独展示这两项）
@@ -2861,10 +2909,11 @@ let syncSetupCallback = null; // 设置完成后执行的回调
 
 // ========== 同步设置弹窗 ==========
 function openSyncSetupModal(hint, callback){
-  document.getElementById('syncSetupTitle').textContent = '设置同步名称';
+  document.getElementById('syncSetupTitle').textContent = '同步与存档设置';
   document.getElementById('syncSetupHint').textContent = hint || '';
   document.getElementById('syncNameInput').value = getSyncName();
   document.getElementById('modalSyncSetup').style.display = 'flex';
+  asRenderStatus();
   syncSetupCallback = callback;
   setTimeout(()=>document.getElementById('syncNameInput').focus(), 100);
 }
@@ -3337,6 +3386,321 @@ function checkBackupReminder(){
 }
 
 // ============================================================
+//  自动三点同步：工具内容 → GitHub 云端存档 → 本地资料包
+//  ① 浏览器里任何改动（录入/上传/记录），几秒后自动推到 GitHub 私有仓库
+//  ② 本机「自动同步存档」计划任务每 15 分钟把云端存档拉到 D:\BaiduSyncdisk 资料包
+// ============================================================
+const AS_KEY       = STORAGE_PREFIX + 'autosync';
+const AS_REPO      = 'fistday2003/office-desk-docs';
+const AS_API       = 'https://api.github.com';
+const AS_DATA_PATH = 'data/工作台数据.json';
+const AS_ATT_DIR   = 'data/attachments/';
+
+function getAsCfg(){
+  let c = {};
+  try{ c = JSON.parse(localStorage.getItem(AS_KEY)||'{}') || {}; }catch(e){ c = {}; }
+  return {
+    enabled: c.enabled !== false,
+    token: c.token || '',
+    repo: c.repo || AS_REPO,
+    branch: c.branch || 'main',
+    lastSync: c.lastSync || '',
+    lastResult: c.lastResult || '',
+    lastError: c.lastError || '',
+    hashes: c.hashes || {}
+  };
+}
+function setAsCfg(patch){
+  const c = Object.assign(getAsCfg(), patch||{});
+  try{ localStorage.setItem(AS_KEY, JSON.stringify(c)); }catch(e){}
+  return c;
+}
+function asReady(){ const c = getAsCfg(); return !!(c.enabled && c.token && c.repo); }
+
+// 轻量内容哈希：用来给附件命名 + 去重（同一张图不会重复上传）
+function asHash(s){
+  let h = 0x811c9dc5;
+  for(let i=0;i<s.length;i++){
+    h ^= s.charCodeAt(i);
+    h = (h + ((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24))) >>> 0;
+  }
+  return ('0000000'+h.toString(16)).slice(-8) + s.length.toString(36);
+}
+function asHashOf(f){
+  if(!f || !f.dataUrl) return '';
+  if(!f._h) f._h = asHash(f.dataUrl);
+  return f._h;
+}
+
+// 收集全部附件（任务 / 速记 / 项目）
+function asCollectAttachments(){
+  const out = [];
+  const add = (ownerType, ownerId, arr)=>{
+    (arr||[]).forEach((f,i)=>{
+      if(f && f.dataUrl) out.push({ownerType:ownerType, ownerId:ownerId, idx:i,
+        name:f.name||('附件'+(i+1)), type:f.type||'', dataUrl:f.dataUrl});
+    });
+  };
+  tasks.forEach(t=>add('task', t.id, t.files));
+  notes.forEach(n=>add('note', n.id, n.files));
+  projects.forEach(p=>add('project', p.id, p.files));
+  return out;
+}
+
+// 生成云端快照：文字内容全量 + 附件只留索引（附件本体另存为独立文件）
+function asSnapshot(){
+  const cfg = getAsCfg();
+  const light = (arr)=>{
+    return (arr||[]).map(item=>{
+      const c = Object.assign({}, item);
+      if(c.files && c.files.length){
+        c.files = c.files.map(f=>{
+          const key = asHashOf(f);
+          return {name:(f&&f.name)||'', type:(f&&f.type)||'', size:(f&&f.size)||0,
+                  path:(key && cfg.hashes[key]) ? cfg.hashes[key] : ''};
+        });
+      }
+      return c;
+    });
+  };
+  const attCount = asCollectAttachments().length;
+  return {
+    _app:'office-desk',
+    _version:APP_VERSION,
+    savedAt:new Date().toISOString(),
+    counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
+            dashboard:dashboard.length, attachments:attCount},
+    tasks:light(tasks), notes:light(notes), projects:light(projects), dashboard:dashboard
+  };
+}
+
+// ---- GitHub REST 封装 ----
+function asContentsApi(repo, path){
+  return '/repos/'+repo+'/contents/'+path.split('/').map(encodeURIComponent).join('/');
+}
+async function asGh(method, path, token, body, accept){
+  const headers = {
+    'Authorization':'Bearer '+token,
+    'Accept': accept || 'application/vnd.github+json',
+    'X-GitHub-Api-Version':'2022-11-28'
+  };
+  if(body) headers['Content-Type'] = 'application/json';
+  return await fetch(AS_API + path, {method:method, headers:headers, body: body?JSON.stringify(body):undefined});
+}
+async function asPutFile(repo, branch, path, token, base64, message){
+  const api = asContentsApi(repo, path);
+  let sha = null;
+  const g = await asGh('GET', api+'?ref='+encodeURIComponent(branch)+'&_='+Date.now(), token);
+  if(g.status === 200){ sha = (await g.json()).sha; }
+  else if(g.status === 401){ throw new Error('令牌无效或已过期，请重新粘贴令牌'); }
+  else if(g.status !== 404){ throw new Error('读取云端文件失败（HTTP '+g.status+'）'); }
+  const payload = {message:message, content:base64, branch:branch};
+  if(sha) payload.sha = sha;
+  const p = await asGh('PUT', api, token, payload);
+  if(p.status === 401 || p.status === 403){
+    throw new Error('令牌没有写入权限（HTTP '+p.status+'），请确认令牌含该私有仓库的 Contents 读写权限');
+  }
+  if(!p.ok){ throw new Error('写入失败（HTTP '+p.status+'）'); }
+  return await p.json();
+}
+
+// ---- 同步主流程 ----
+let asTimer = null, asRunning = false, asDirty = false, asShownErr = '';
+
+function asSchedule(delay){
+  try{
+    if(!asReady()){ asRenderStatus(); return; }
+    asDirty = true;
+    if(asTimer) clearTimeout(asTimer);
+    asTimer = setTimeout(()=>{ asTimer = null; asRun(false); }, (delay===undefined ? 7000 : delay));
+    asRenderStatus();
+  }catch(e){}
+}
+
+async function asRun(manual){
+  let cfg;
+  try{ cfg = getAsCfg(); }catch(e){ return; }
+  if(!cfg.token){ if(manual) showToast('请先粘贴 GitHub 令牌'); return; }
+  if(!cfg.enabled && !manual) return;
+  if(asRunning){ asDirty = true; if(manual) showToast('正在同步中，稍后会自动继续', 'info'); return; }
+  asRunning = true; asDirty = false; asRenderStatus('syncing');
+  let attUp = 0;
+  try{
+    // ① 附件：只上传没传过的
+    const atts = asCollectAttachments();
+    const hashes = Object.assign({}, cfg.hashes);
+    for(let i=0;i<atts.length;i++){
+      const a = atts[i];
+      const key = asHash(a.dataUrl);
+      if(hashes[key]) continue;
+      const m = String(a.name).match(/\.([A-Za-z0-9]{1,6})$/);
+      const path = AS_ATT_DIR + key + '.' + (m ? m[1].toLowerCase() : 'jpg');
+      const comma = a.dataUrl.indexOf(',');
+      const b64 = comma >= 0 ? a.dataUrl.slice(comma+1) : a.dataUrl;
+      await asPutFile(cfg.repo, cfg.branch, path, cfg.token, b64, 'auto: 附件 ' + a.name);
+      hashes[key] = path;
+      setAsCfg({hashes:hashes});
+      attUp++;
+    }
+    // ② 全量内容快照
+    const snap = asSnapshot();
+    await asPutFile(cfg.repo, cfg.branch, AS_DATA_PATH, cfg.token,
+      encodeSync(JSON.stringify(snap, null, 1)), 'auto: 内容快照 ' + snap.savedAt);
+    asShownErr = '';
+    setAsCfg({
+      lastSync: new Date().toISOString(),
+      lastResult: totalItems()+' 条内容'+(attUp ? ('、'+attUp+' 个新附件') : ''),
+      lastError: ''
+    });
+    asRenderStatus('ok');
+    if(manual) showToast('✓ 已同步到云端（'+totalItems()+' 条内容'+(attUp?('、'+attUp+' 个附件'):'')+'）', 'info');
+  }catch(e){
+    const msg = (e && e.message) || String(e);
+    setAsCfg({lastError: msg});
+    asRenderStatus('err');
+    if(manual || msg !== asShownErr){ asShownErr = msg; showToast('⚠ 自动同步失败：' + msg); }
+  }finally{
+    asRunning = false;
+    if(asDirty) asSchedule(3000);
+  }
+}
+
+// ---- 从云端恢复到本机 ----
+async function asRestore(){
+  const cfg = getAsCfg();
+  if(!cfg.token){ showToast('请先粘贴 GitHub 令牌'); return; }
+  showToast('<span class="sync-spinner"></span>正在从云端读取存档...', 'info');
+  try{
+    const res = await asGh('GET', asContentsApi(cfg.repo, AS_DATA_PATH)+'?ref='+encodeURIComponent(cfg.branch)+'&_='+Date.now(),
+                          cfg.token, null, 'application/vnd.github.raw');
+    if(res.status === 404){ showToast('云端还没有存档数据'); return; }
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = JSON.parse(await res.text());
+    if(!data.tasks || !data.notes || !data.projects){ showToast('云端存档格式不正确'); return; }
+    const n = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length + (data.dashboard||[]).length;
+    const when = data.savedAt ? new Date(data.savedAt).toLocaleString('zh-CN') : '';
+    showConfirm('云端存档共 ' + n + ' 条内容' + (when?('（'+when+'）'):'') +
+      '\n将覆盖本机当前 ' + totalItems() + ' 条数据，本机已有附件不会丢失。确定恢复吗？', async ()=>{
+      const mergeFiles = (localArr, incoming)=>{
+        return (incoming||[]).map(it=>{
+          const local = localArr.find(x=>x.id===it.id);
+          if(local && local.files && local.files.length){ it.files = local.files; }
+          else if(it.files && it.files.length){
+            it.files = it.files.filter(f=>f && f.path);
+          } else { it.files = it.files || []; }
+          return it;
+        });
+      };
+      tasks    = mergeFiles(tasks, data.tasks);
+      notes    = mergeFiles(notes, data.notes);
+      projects = mergeFiles(projects, data.projects);
+      if(Object.prototype.hasOwnProperty.call(data,'dashboard')) dashboard = data.dashboard || [];
+      saveAll(); refreshAll();
+      showToast('✓ 已恢复 ' + n + ' 条内容，正在补齐附件...', 'info');
+      await asPullAttachments();
+      saveAll(); refreshAll();
+      showToast('✓ 云端存档恢复完成', 'info');
+    });
+  }catch(e){
+    showToast('读取云端存档失败：' + ((e && e.message) || e));
+  }
+}
+
+// 把云端附件本体下载回来，还原成可直接查看的附件
+async function asPullAttachments(){
+  const cfg = getAsCfg();
+  const jobs = [];
+  const walk = (arr)=> (arr||[]).forEach(it=> (it.files||[]).forEach(f=>{ if(f && f.path && !f.dataUrl) jobs.push(f); }));
+  walk(tasks); walk(notes); walk(projects);
+  if(!jobs.length) return;
+  let ok = 0;
+  const cache = {};
+  for(let i=0;i<jobs.length && i<200;i++){
+    const f = jobs[i];
+    try{
+      if(cache[f.path] !== undefined){ if(cache[f.path]) f.dataUrl = cache[f.path]; continue; }
+      const res = await asGh('GET', asContentsApi(cfg.repo, f.path)+'?ref='+encodeURIComponent(cfg.branch),
+                             cfg.token, null, 'application/vnd.github.raw');
+      if(!res.ok){ cache[f.path] = ''; continue; }
+      const buf = new Uint8Array(await res.arrayBuffer());
+      let bin = '';
+      for(let p=0;p<buf.length;p+=0x8000){ bin += String.fromCharCode.apply(null, buf.subarray(p, p+0x8000)); }
+      const url = 'data:' + (f.type || 'application/octet-stream') + ';base64,' + btoa(bin);
+      cache[f.path] = url; f.dataUrl = url; ok++;
+    }catch(e){ cache[f.path] = ''; }
+  }
+  if(ok) console.log('已还原附件 ' + ok + ' 个');
+}
+
+// ---- 状态显示 ----
+function asRenderStatus(state){
+  try{
+    const c = getAsCfg();
+    const el = document.getElementById('asStatus');
+    const dot = document.getElementById('asDot');
+    const on = document.getElementById('asEnabled');
+    const inp = document.getElementById('asToken');
+    if(on && on.checked !== !!c.enabled) on.checked = !!c.enabled;
+    if(inp && !inp.value && c.token) inp.value = c.token;
+    if(dot){
+      dot.className = 'as-dot' + (!c.token || !c.enabled ? '' : (asRunning ? ' syncing' : (c.lastError ? ' err' : ' ok')));
+    }
+    if(!el) return;
+    if(!c.token){
+      el.innerHTML = '<span class="wait">未配置</span>：把 GitHub 令牌粘到下面，自动同步就生效了';
+    } else if(!c.enabled){
+      el.innerHTML = '<span class="wait">已暂停</span>：上面开关打开即恢复自动同步';
+    } else if(state === 'syncing' || asRunning){
+      el.innerHTML = '<span class="wait">正在同步…</span>';
+    } else if(c.lastError){
+      el.innerHTML = '<span class="err">上次同步失败</span>：' + escHtml(c.lastError);
+    } else if(c.lastSync){
+      const d = new Date(c.lastSync);
+      el.innerHTML = '<span class="ok">已同步</span> ' +
+        d.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) +
+        ' · ' + escHtml(c.lastResult || '');
+    } else {
+      el.innerHTML = '<span class="wait">等待首次同步…</span>';
+    }
+  }catch(e){}
+}
+
+// ---- 事件绑定 ----
+document.getElementById('asEnabled').addEventListener('change', function(){
+  setAsCfg({enabled: this.checked});
+  asRenderStatus();
+  if(this.checked){ showToast('自动同步已开启', 'info'); asSchedule(500); }
+  else showToast('自动同步已暂停');
+});
+document.getElementById('asToken').addEventListener('change', function(){
+  const v = this.value.trim();
+  if(v && v.indexOf('ghp_') !== 0 && v.indexOf('github_pat_') !== 0){
+    showToast('令牌格式不对，应以 ghp_ 或 github_pat_ 开头');
+    return;
+  }
+  setAsCfg({token: v, enabled: true, lastError: ''});
+  asShownErr = '';
+  asRenderStatus();
+  if(v){ showToast('令牌已保存到本机，开始首次同步', 'info'); asRun(true); }
+});
+document.getElementById('asToken').addEventListener('blur', function(){
+  this.dispatchEvent(new Event('change'));
+});
+document.getElementById('btnAsSyncNow').addEventListener('click', ()=>{ asRun(true); });
+document.getElementById('btnAsRestore').addEventListener('click', ()=>{ asRestore(); });
+
+// ---- 触发时机 ----
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'hidden' && asDirty && asReady() && !asRunning){
+    if(asTimer){ clearTimeout(asTimer); asTimer = null; }
+    asRun(false);
+  }
+});
+window.addEventListener('online', ()=>{ if(asReady() && getAsCfg().lastError) asSchedule(5000); });
+// 失败后每 5 分钟自动重试一次
+setInterval(()=>{ if(asReady() && !asRunning && getAsCfg().lastError) asRun(false); }, 300000);
+
+// ============================================================
 //  TOAST
 // ============================================================
 function showToast(msg, type='warning'){
@@ -3450,6 +3814,10 @@ function init(){
   
   // Check for sync data in URL hash (AFTER render to avoid conflicts)
   setTimeout(checkSyncHash, 100);
+
+  // 自动三点同步：打开页面就补一次（把离线时的改动、没传完的内容补上去）
+  asRenderStatus();
+  if(asReady()) asSchedule(3000);
 }
 
 init();
