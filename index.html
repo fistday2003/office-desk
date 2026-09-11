@@ -564,10 +564,17 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
           数据看板
         </div>
-        <button class="btn btn-primary" id="btnAddDash">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          录入月度数据
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="btnImportDash">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导入看板数据
+          </button>
+          <button class="btn btn-primary" id="btnAddDash">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            录入月度数据
+          </button>
+        </div>
+        <input type="file" id="dashImportInput" accept=".json,application/json" style="display:none" onchange="handleDashImport()">
       </div>
       <p class="section-subtitle">每月从阿里后台导出关键数字填进来，工作台自动算环比、画趋势、比两个店</p>
       <div id="dashContent"></div>
@@ -1203,6 +1210,62 @@ function saveDashRecord(){
   }
   dashboard.push(Object.assign({id:uid(),createdAt:Date.now()},rec));
   finish();
+}
+
+// ===== 导入看板数据（来自 Accio 自动取数脚本生成的 JSON）=====
+// 规则：按「月份+店铺」对齐；已存在的记录只更新自动取的 4 个字段，
+//       手工填的「新建客户数 / 新客户订单数」原样保留。
+function handleDashImport(){
+  const input=document.getElementById('dashImportInput');
+  const file=input.files && input.files[0];
+  input.value='';
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    let data;
+    try{ data=JSON.parse(e.target.result); }
+    catch(err){ showToast('文件读不出来，可能不是有效的 JSON 文件'); return; }
+    const recs = data && Array.isArray(data.records) ? data.records
+               : (Array.isArray(data) ? data : null);
+    if(!recs || !recs.length){ showToast('文件里没有找到看板数据'); return; }
+    const plan=[];
+    recs.forEach(r=>{
+      if(!r || !r.month || !r.shop) return;
+      if(r.shop!=='langges' && r.shop!=='fanshi') return;
+      plan.push({ r:r, exist: dashboard.find(d=>d.month===r.month && d.shop===r.shop) || null });
+    });
+    if(!plan.length){ showToast('文件里没有找到可用的看板数据'); return; }
+    const add=plan.filter(p=>!p.exist).length;
+    const upd=plan.length-add;
+    showConfirm('将导入 '+plan.length+' 条数据（新增 '+add+' 条，更新 '+upd+' 条）。\n已手工填写的「新建客户数 / 新客户订单数」会保留，确定吗？', ()=>{
+      plan.forEach(p=>{
+        const r=p.r;
+        const patch={
+          revenue: dNum(r.revenue),
+          orders: dNum(r.orders),
+          inquiries: dNum(r.inquiries),
+          quickReply: (r.quickReply===''||r.quickReply==null) ? '' : dNum(r.quickReply)
+        };
+        if(p.exist){
+          Object.assign(p.exist, patch);
+          // 示例数据不算「手工填写」，一并按导入值覆盖；真实记录才保留手工填的新客户数据
+          const isSample=!!p.exist._sample;
+          if(isSample || (r.newCustomers!=='' && r.newCustomers!=null)) p.exist.newCustomers=dNum(r.newCustomers);
+          if(isSample || (r.newOrders!=='' && r.newOrders!=null)) p.exist.newOrders=dNum(r.newOrders);
+          p.exist._sample=false;
+        } else {
+          dashboard.push(Object.assign({
+            id:uid(), createdAt:Date.now(), month:r.month, shop:r.shop,
+            newCustomers:(r.newCustomers===''||r.newCustomers==null)?0:dNum(r.newCustomers),
+            newOrders:(r.newOrders===''||r.newOrders==null)?0:dNum(r.newOrders)
+          }, patch));
+        }
+      });
+      saveAll(); refreshAll();
+      showToast('✓ 已导入 '+plan.length+' 条（新增 '+add+' 条，更新 '+upd+' 条）','info');
+    });
+  };
+  reader.readAsText(file);
 }
 
 function deleteDashRecord(id){
@@ -3256,6 +3319,15 @@ document.querySelectorAll('.mnav-item[data-mtab]').forEach(el=>{
 document.getElementById('btnAddTask').addEventListener('click',openTaskModal);
 document.getElementById('btnAddNote').addEventListener('click',openNoteModal);
 document.getElementById('btnAddProject').addEventListener('click',openProjectModal);
+
+// 数据看板：录入弹窗、保存、取消、导入
+// （此前这几处漏了绑定，"录入月度数据"点了没反应，2026-09-11 修复）
+document.getElementById('btnAddDash').addEventListener('click',()=>openDashModal());
+document.getElementById('btnDashSave').addEventListener('click',saveDashRecord);
+document.getElementById('btnDashCancel').addEventListener('click',()=>closeModal('modalDash'));
+document.getElementById('btnImportDash').addEventListener('click',()=>{
+  document.getElementById('dashImportInput').click();
+});
 
 // Keyboard shortcuts
 document.addEventListener('keydown',function(e){
