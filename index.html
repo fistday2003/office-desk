@@ -506,6 +506,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.2 · 2026-09-11</div>
     </div>
   </aside>
 
@@ -565,10 +566,10 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
           数据看板
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn" id="btnImportDash">
+          <label class="btn" for="dashImportInput" id="btnImportDash" style="cursor:pointer" title="选择由取数脚本生成的 JSON 文件">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             导入看板数据
-          </button>
+          </label>
           <button class="btn btn-primary" id="btnAddDash">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             录入月度数据
@@ -785,7 +786,34 @@ function loadData(){
     tasks = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'tasks')||'[]');
     notes = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'notes')||'[]');
     projects = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'projects')||'[]');
-  }catch(e){tasks=[];notes=[];projects=[]}
+    dashboard = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'dashboard')||'[]');
+  }catch(e){tasks=[];notes=[];projects=[];dashboard=[]}
+  if(!Array.isArray(dashboard)) dashboard=[];
+  healDashboard();
+}
+
+// 修复历史脏数据：早期版本把凡适的店铺标识写成了 fanshi / 中文名，
+// 导致数据存进去了却渲染不出来（趋势图、两店对比只用 langges / fansi）
+function healDashboard(){
+  let changed=false;
+  const before=dashboard.length;
+  dashboard.forEach(d=>{
+    if(!d) return;
+    const s=normShop(d.shop);
+    if(s && s!==d.shop){ d.shop=s; changed=true; }
+    const m=normMonth(d.month);
+    if(m && m!==d.month){ d.month=m; changed=true; }
+  });
+  dashboard=dashboard.filter(d=>d && (d.shop==='langges'||d.shop==='fansi'));
+  if(dashboard.length!==before) changed=true;
+  // 同一「月份+店铺」去重
+  const seen={};
+  dashboard=dashboard.filter(d=>{
+    const k=d.month+'|'+d.shop;
+    if(seen[k]){ changed=true; return false; }
+    seen[k]=1; return true;
+  });
+  if(changed) saveAll();
 }
 
 function saveAll(){
@@ -793,6 +821,7 @@ function saveAll(){
     localStorage.setItem(STORAGE_PREFIX+'tasks',JSON.stringify(tasks));
     localStorage.setItem(STORAGE_PREFIX+'notes',JSON.stringify(notes));
     localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(projects));
+    localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
   }catch(e){
     showToast('⚠️ 保存失败：本地存储空间已满。请删除部分附件或导出备份后清理');
   }
@@ -1215,29 +1244,70 @@ function saveDashRecord(){
 // ===== 导入看板数据（来自 Accio 自动取数脚本生成的 JSON）=====
 // 规则：按「月份+店铺」对齐；已存在的记录只更新自动取的 4 个字段，
 //       手工填的「新建客户数 / 新客户订单数」原样保留。
+//
+// 容错：外部文件里的店铺/月份写法千奇百怪（fanshi / fansi / 凡适 / 2026-8 …），
+//       这里统一归一化成内部标识，避免"导入成功但页面看不到"的假死现象。
+const DASH_SHOP_ALIAS = {
+  langges:'langges', linges:'langges', lignes:'langges', longgers:'langges',
+  langgesapparel:'langges', '朗格斯':'langges',
+  fansi:'fansi', fanshi:'fansi', fanshy:'fansi', victor:'fansi', '凡适':'fansi'
+};
+function normShop(v){
+  if(v===null||v===undefined) return '';
+  const k=String(v).trim().toLowerCase().replace(/\s|店$|店铺$/g,'');
+  return DASH_SHOP_ALIAS[k] || '';
+}
+function normMonth(v){
+  const m=String(v==null?'':v).trim().match(/^(\d{4})\s*[-/.年]?\s*(\d{1,2})/);
+  if(!m) return '';
+  const mm=parseInt(m[2],10);
+  if(mm<1||mm>12) return '';
+  return m[1]+'-'+String(mm).padStart(2,'0');
+}
+
 function handleDashImport(){
   const input=document.getElementById('dashImportInput');
   const file=input.files && input.files[0];
-  input.value='';
-  if(!file) return;
+  if(!file){ showToast('没有选到文件，请重新点一次「导入看板数据」'); input.value=''; return; }
   const reader=new FileReader();
+  reader.onerror=function(){ showToast('文件读取失败，请重试或换个文件'); input.value=''; };
   reader.onload=function(e){
     let data;
     try{ data=JSON.parse(e.target.result); }
-    catch(err){ showToast('文件读不出来，可能不是有效的 JSON 文件'); return; }
+    catch(err){ showToast('文件读不出来，可能不是有效的 JSON 文件'); input.value=''; return; }
     const recs = data && Array.isArray(data.records) ? data.records
                : (Array.isArray(data) ? data : null);
-    if(!recs || !recs.length){ showToast('文件里没有找到看板数据'); return; }
+    if(!recs || !recs.length){ showToast('文件里没有找到看板数据（缺少 records 字段）'); input.value=''; return; }
     const plan=[];
+    let skipped=0;
     recs.forEach(r=>{
-      if(!r || !r.month || !r.shop) return;
-      if(r.shop!=='langges' && r.shop!=='fanshi') return;
-      plan.push({ r:r, exist: dashboard.find(d=>d.month===r.month && d.shop===r.shop) || null });
+      if(!r) { skipped++; return; }
+      const month=normMonth(r.month||r.date||r.ym);
+      const shop=normShop(r.shop||r.store||r.shopName);
+      if(!month||!shop){ skipped++; return; }
+      plan.push({ r:r, month:month, shop:shop,
+                  exist: dashboard.find(d=>d.month===month && d.shop===shop) || null });
     });
-    if(!plan.length){ showToast('文件里没有找到可用的看板数据'); return; }
+    if(!plan.length){
+      showToast('文件里的 '+recs.length+' 条数据都没认出来（店铺或月份格式不对）');
+      input.value=''; return;
+    }
     const add=plan.filter(p=>!p.exist).length;
     const upd=plan.length-add;
-    showConfirm('将导入 '+plan.length+' 条数据（新增 '+add+' 条，更新 '+upd+' 条）。\n已手工填写的「新建客户数 / 新客户订单数」会保留，确定吗？', ()=>{
+    let msg='将导入 '+plan.length+' 条数据（新增 '+add+' 条，更新 '+upd+' 条）';
+    if(skipped) msg+='，另有 '+skipped+' 条没认出来会跳过';
+    msg+='。已手工填写的「新建客户数 / 新客户订单数」会保留。确定导入吗？';
+    showConfirm(msg, ()=>{
+      // 清理历史遗留的错误店铺标识记录（早期版本写成了 fanshi 之类）
+      const before=dashboard.length;
+      dashboard=dashboard.filter(d=>d.shop==='langges'||d.shop==='fansi');
+      const cleaned=before-dashboard.length;
+      // 清理后重新对齐一次，避免引用到已被移除的记录
+      let realAdd=0, realUpd=0;
+      plan.forEach(p=>{
+        p.exist = dashboard.find(d=>d.month===p.month && d.shop===p.shop) || null;
+        if(p.exist) realUpd++; else realAdd++;
+      });
       plan.forEach(p=>{
         const r=p.r;
         const patch={
@@ -1255,15 +1325,23 @@ function handleDashImport(){
           p.exist._sample=false;
         } else {
           dashboard.push(Object.assign({
-            id:uid(), createdAt:Date.now(), month:r.month, shop:r.shop,
+            id:uid(), createdAt:Date.now(), month:p.month, shop:p.shop,
             newCustomers:(r.newCustomers===''||r.newCustomers==null)?0:dNum(r.newCustomers),
             newOrders:(r.newOrders===''||r.newOrders==null)?0:dNum(r.newOrders)
           }, patch));
         }
       });
+      // 同一「月份+店铺」若出现重复，保留最后一条（防御）
+      const seen={};
+      dashboard=dashboard.filter(d=>{
+        const k=d.month+'|'+d.shop;
+        if(seen[k]) return false;
+        seen[k]=1; return true;
+      });
       saveAll(); refreshAll();
-      showToast('✓ 已导入 '+plan.length+' 条（新增 '+add+' 条，更新 '+upd+' 条）','info');
+      showToast('✓ 已导入 '+plan.length+' 条（新增 '+realAdd+' 条，更新 '+realUpd+' 条）'+(cleaned?'，并清理了 '+cleaned+' 条旧格式记录':''),'info');
     });
+    input.value='';
   };
   reader.readAsText(file);
 }
@@ -2701,7 +2779,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,exportedAt:new Date().toISOString()};
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3320,14 +3398,12 @@ document.getElementById('btnAddTask').addEventListener('click',openTaskModal);
 document.getElementById('btnAddNote').addEventListener('click',openNoteModal);
 document.getElementById('btnAddProject').addEventListener('click',openProjectModal);
 
-// 数据看板：录入弹窗、保存、取消、导入
+// 数据看板：录入弹窗、保存、取消
 // （此前这几处漏了绑定，"录入月度数据"点了没反应，2026-09-11 修复）
+// 「导入看板数据」用 <label for> 原生触发文件选择框，不再走 JS 二次调用
 document.getElementById('btnAddDash').addEventListener('click',()=>openDashModal());
 document.getElementById('btnDashSave').addEventListener('click',saveDashRecord);
 document.getElementById('btnDashCancel').addEventListener('click',()=>closeModal('modalDash'));
-document.getElementById('btnImportDash').addEventListener('click',()=>{
-  document.getElementById('dashImportInput').click();
-});
 
 // Keyboard shortcuts
 document.addEventListener('keydown',function(e){
