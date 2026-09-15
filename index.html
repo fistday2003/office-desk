@@ -388,8 +388,9 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   .main-content{padding:14px;max-height:none;padding-bottom:80px}
   .header-content{padding:16px 14px}
   .header-left h1{font-size:18px}
-  .header-left p{font-size:12px}
-  .btn-header{padding:5px 10px;font-size:12px}
+  .header-left p{font-size:12px;white-space:nowrap}
+  .btn-header{padding:5px 9px;font-size:12px;white-space:nowrap}   /* 文字不许在按钮内折行（手机上"同步设置"曾被挤成竖排） */
+  .header-actions{flex-wrap:wrap;gap:6px;justify-content:flex-end}  /* 放不下就在按钮之间换行 */
   .banner-inner{padding:8px 14px}
   .review-grid{grid-template-columns:1fr}
   .form-row>*{min-width:100%}
@@ -585,7 +586,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.5.1 · 2026-09-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.5.2 · 2026-09-15</div>
     </div>
   </aside>
 
@@ -929,7 +930,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.5.1';
+const APP_VERSION = 'v1.5.2';
 let tasks = [];
 let notes = [];
 let projects = [];
