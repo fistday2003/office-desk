@@ -585,7 +585,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.5 · 2026-09-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.5.1 · 2026-09-15</div>
     </div>
   </aside>
 
@@ -929,7 +929,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.5';
+const APP_VERSION = 'v1.5.1';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4319,15 +4319,16 @@ function expCsv(list, invoiceNames){
     const s=String(v==null?'':v);
     return /[",\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
   };
-  let out='序号,日期,记账账户,费用类别,事由,收款方,金额(元),报账状态,备注,发票文件\n';
+  // 列序：序号 / 日期 / 费用类别 / 事由 / 收款方 / 金额 / 报账状态 / 备注 / 凭证文件 / 记账账户（记账账户放最后）
+  let out='序号,日期,费用类别,事由,收款方,金额(元),报账状态,备注,凭证文件,记账账户\n';
   let i=0,total=0;
   list.forEach((r,k)=>{
     i++; total+=eNum(r.amount);
-    out+=[i, r.date||'', expAcctName(r.account), r.category||'', r.desc||'', r.payee||'',
+    out+=[i, r.date||'', r.category||'', r.desc||'', r.payee||'',
           eNum(r.amount).toFixed(2), r.filed?'已报账':'待报账', r.note||'',
-          (invoiceNames[k]||[]).join(' ')].map(q).join(',')+'\n';
+          (invoiceNames[k]||[]).join(' '), expAcctName(r.account)].map(q).join(',')+'\n';
   });
-  out+=['','','','','','合计',total.toFixed(2),'','',''].map(q).join(',')+'\n';
+  out+=['','','','','合计',total.toFixed(2),'','','',''].map(q).join(',')+'\n';
   return out;
 }
 function expPrintHtml(list, s, scope, autoPrint){
@@ -4335,37 +4336,102 @@ function expPrintHtml(list, s, scope, autoPrint){
   const two=n=>String(n).padStart(2,'0');
   const when=now.getFullYear()+'-'+two(now.getMonth()+1)+'-'+two(now.getDate())+' '+two(now.getHours())+':'+two(now.getMinutes());
   let rows='', i=0, invN=0;
+  // 列序：序号 / 日期 / 类别 / 事由 / 收款方 / 金额 / 凭证 / 状态 / 备注 / 记账账户（记账账户放最后）
   list.forEach(r=>{
     i++;
     const a=expAcct(r.account);
     const nf=(r.files||[]).length; invN+=nf;
-    rows+='<tr><td class="c">'+i+'</td><td class="c">'+escHtml(r.date||'')+'</td><td class="c">'+escHtml(a.name)+'</td>'
-        + '<td class="c">'+escHtml(r.category||'')+'</td><td>'+escHtml(r.desc||'')+'</td>'
-        + '<td class="c">'+escHtml(r.payee||'')+'</td><td class="r">'+eNum(r.amount).toFixed(2)+'</td>'
-        + '<td class="c">'+(nf||'')+'</td><td>'+escHtml(r.note||'')+'</td></tr>';
+    rows+='<tr>'
+      + '<td class="c idx">'+i+'</td>'
+      + '<td class="c nowrap">'+escHtml(r.date||'')+'</td>'
+      + '<td class="c">'+(r.category?escHtml(r.category):'<span class="none">—</span>')+'</td>'
+      + '<td class="desc">'+escHtml(r.desc||'')+'</td>'
+      + '<td class="c">'+(r.payee?escHtml(r.payee):'<span class="none">—</span>')+'</td>'
+      + '<td class="r amt">'+eNum(r.amount).toFixed(2)+'</td>'
+      + '<td class="c">'+(nf?'<span class="vch">'+nf+'</span>':'<span class="none">—</span>')+'</td>'
+      + '<td class="c"><span class="st '+(r.filed?'done':'wait')+'">'+(r.filed?'已报账':'待报账')+'</span></td>'
+      + '<td class="note">'+escHtml(r.note||'')+'</td>'
+      + '<td class="c"><span class="acct '+a.cls+'">'+escHtml(a.name)+'</span></td>'
+      + '</tr>';
   });
-  const css='*{box-sizing:border-box}'
-   +'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:#111;padding:24px 26px;font-size:13px;margin:0}'
-   +'h1{font-size:19px;text-align:center;margin:0 0 8px;letter-spacing:1px}'
-   +'.meta{text-align:center;font-size:12px;color:#666;margin-bottom:16px}'
-   +'table{width:100%;border-collapse:collapse}'
-   +'th,td{border:1px solid #999;padding:6px 8px;font-size:12px;vertical-align:top;word-break:break-all}'
-   +'th{background:#f0f0f0;font-weight:600;white-space:nowrap}'
+  // 分账户小计（给财务一眼看清各账户金额）
+  let acctBits='';
+  EXP_ACCOUNTS.forEach(a=>{
+    const sub=list.filter(r=>r.account===a.key);
+    if(!sub.length) return;
+    const t=sub.reduce((x,r)=>x+eNum(r.amount),0);
+    const up=sub.filter(r=>!r.filed);
+    const upT=up.reduce((x,r)=>x+eNum(r.amount),0);
+    acctBits+='<div class="ac"><span class="ac-name"><span class="dot '+a.cls+'"></span>'+escHtml(a.name)+'</span>'
+      + '<span class="ac-amt">'+fmtCNY(t)+'</span>'
+      + '<span class="ac-sub">'+sub.length+' 笔'+(up.length?(' · 待报 '+fmtCNY(upT)):' · 全部已报')+'</span></div>';
+  });
+  const css='*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+   +'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:#0f172a;padding:26px 28px;font-size:13px;margin:0;background:#fff}'
+   +'.head{border-bottom:3px solid #0f766e;padding-bottom:12px;margin-bottom:16px}'
+   +'h1{font-size:21px;margin:0 0 6px;letter-spacing:2px;color:#0f766e}'
+   +'.meta{font-size:12px;color:#64748b;line-height:1.7}'
+   +'.meta b{color:#0f172a}'
+   +'.cards{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}'
+   +'.card{flex:1 1 120px;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;background:#f8fafc}'
+   +'.card .k{font-size:11px;color:#64748b;margin-bottom:4px}'
+   +'.card .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}'
+   +'.card.unpaid .v{color:#b45309}.card.paid .v{color:#047857}'
+   +'.accts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}'
+   +'.ac{flex:1 1 150px;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;display:flex;flex-direction:column;gap:3px}'
+   +'.ac-name{font-size:12px;font-weight:600;color:#334155}'
+   +'.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}'
+   +'.dot.lg{background:#0369a1}.dot.fs{background:#b45309}.dot.zz{background:#4338ca}'
+   +'.ac-amt{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}'
+   +'.ac-sub{font-size:11px;color:#94a3b8}'
+   +'table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}'
+   +'thead th{background:#0f766e;color:#fff;font-weight:600;font-size:12px;padding:10px 8px;text-align:left;white-space:nowrap;border:none}'
+   +'tbody td{padding:8px;font-size:12px;border-bottom:1px solid #eef2f6;vertical-align:middle;word-break:break-word}'
+   +'tbody tr:nth-child(even) td{background:#f8fafc}'
+   +'tbody tr:last-child td{border-bottom:none}'
    +'td.c{text-align:center;white-space:nowrap}'
    +'td.r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}'
-   +'.total{text-align:right;font-size:15px;font-weight:700;margin-top:12px}'
-   +'.sign{margin-top:46px;font-size:13px;letter-spacing:1px}'
-   +'.toolbar{text-align:right;margin-bottom:12px}'
-   +'.toolbar button{padding:7px 16px;font-size:13px;cursor:pointer;border:1px solid #888;background:#f8f8f8;border-radius:4px}'
-   +'@media print{.toolbar{display:none}body{padding:0}}';
+   +'td.idx{color:#94a3b8}'
+   +'td.desc{min-width:150px}'
+   +'td.amt{font-weight:600}'
+   +'td.note{color:#64748b;font-size:11.5px}'
+   +'.none{color:#cbd5e1}'
+   +'.vch{display:inline-block;min-width:20px;padding:1px 7px;border-radius:9px;background:#f1f5f9;color:#475569;font-size:11px;font-weight:600}'
+   +'.st{display:inline-block;padding:2px 9px;border-radius:9px;font-size:11px;font-weight:600;white-space:nowrap}'
+   +'.st.wait{background:#fef3c7;color:#b45309}'
+   +'.st.done{background:#d1fae5;color:#047857}'
+   +'.acct{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap}'
+   +'.acct.lg{background:#e0f2fe;color:#0369a1}'
+   +'.acct.fs{background:#fef3c7;color:#b45309}'
+   +'.acct.zz{background:#e0e7ff;color:#4338ca}'
+   +'tfoot td{background:#ecfdf5;font-weight:700;font-size:13px;padding:10px 8px;border-top:2px solid #0f766e;color:#0f766e}'
+   +'tfoot .tsub{font-weight:600;font-size:11.5px;color:#b45309}'
+   +'.sign{margin-top:38px;font-size:13px;color:#334155;letter-spacing:1px;display:flex;gap:36px;flex-wrap:wrap}'
+   +'.foot{margin-top:16px;font-size:11px;color:#94a3b8;text-align:center}'
+   +'.toolbar{text-align:right;margin-bottom:14px}'
+   +'.toolbar button{padding:8px 18px;font-size:13px;cursor:pointer;border:1px solid #0f766e;background:#0f766e;color:#fff;border-radius:6px;font-weight:600}'
+   +'@page{size:A4 landscape;margin:10mm}'
+   +'@media print{.toolbar{display:none}body{padding:0}thead th{background:#0f766e !important}tbody tr:nth-child(even) td{background:#f8fafc !important}}';
   return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>报账明细单</title><style>'+css+'</style></head><body>'
    +'<div class="toolbar"><button onclick="window.print()">打印 / 另存为 PDF</button></div>'
-   +'<h1>报账汇总明细单</h1>'
-   +'<div class="meta">统计范围：'+escHtml(scope)+' ｜ 共 '+list.length+' 笔 ｜ 发票 '+invN+' 张 ｜ 生成时间：'+when+'</div>'
-   +'<table><thead><tr><th>序号</th><th>日期</th><th>记账账户</th><th>类别</th><th>事由</th><th>收款方</th><th>金额(元)</th><th>发票张数</th><th>备注</th></tr></thead>'
-   +'<tbody>'+rows+'</tbody></table>'
-   +'<div class="total">合计：'+fmtCNY(s.total)+'</div>'
-   +'<div class="sign">经手人：____________　　审核：____________　　日期：____________</div>'
+   +'<div class="head"><h1>报账汇总明细单</h1>'
+   +'<div class="meta">统计范围：<b>'+escHtml(scope)+'</b> ｜ 共 <b>'+list.length+'</b> 笔 ｜ 凭证 <b>'+invN+'</b> 张 ｜ 生成时间：'+when+'</div></div>'
+   +'<div class="cards">'
+   +'<div class="card"><div class="k">合计支出</div><div class="v">'+fmtCNY(s.total)+'</div></div>'
+   +'<div class="card unpaid"><div class="k">待报账</div><div class="v">'+fmtCNY(s.unpaid)+'</div></div>'
+   +'<div class="card paid"><div class="k">已报账</div><div class="v">'+fmtCNY(s.paid)+'</div></div>'
+   +'<div class="card"><div class="k">凭证张数</div><div class="v">'+invN+' 张</div></div>'
+   +'</div>'
+   +(acctBits?('<div class="accts">'+acctBits+'</div>'):'')
+   +'<table><thead><tr><th>序号</th><th>日期</th><th>类别</th><th>事由</th><th>收款方</th><th>金额(元)</th><th>凭证</th><th>报账状态</th><th>备注</th><th>记账账户</th></tr></thead>'
+   +'<tbody>'+rows+'</tbody>'
+   +'<tfoot><tr><td colspan="5">合计（共 '+list.length+' 笔）</td>'
+   +'<td class="r">'+eNum(s.total).toFixed(2)+'</td>'
+   +'<td class="c">'+invN+' 张</td>'
+   +'<td colspan="3" class="tsub">'+(s.unpaidCount?('其中待报账 '+fmtCNY(s.unpaid)+'（'+s.unpaidCount+' 笔）'):'全部已报账')+'</td>'
+   +'</tr></tfoot></table>'
+   +'<div class="sign"><span>经手人：____________</span><span>审核：____________</span><span>日期：____________</span></div>'
+   +'<div class="foot">本明细单由「办公工作台 · 报账整理」自动生成 ｜ 附件凭证见同目录「凭证」文件夹</div>'
    + (autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},350)}<\/script>' : '')
    +'</body></html>';
 }
@@ -4376,16 +4442,17 @@ function expReadmeTxt(list, s, scope){
    +'记录笔数：'+list.length+' 笔\r\n'
    +'金额合计：'+fmtCNY(s.total)+'\r\n'
    +'待报账金额：'+fmtCNY(s.unpaid)+'（'+s.unpaidCount+' 笔）\r\n'
-   +'发票张数：'+s.files+' 张\r\n'
+   +'凭证张数：'+s.files+' 张\r\n'
    +'打包时间：'+new Date().toLocaleString('zh-CN')+'\r\n'
    +'\r\n'
    +'包里有什么\r\n'
    +'----------------------------------------\r\n'
    +'报账明细.csv     —— 用 Excel 打开（已带 BOM，中文不乱码）\r\n'
    +'报账明细单.html  —— 双击用浏览器打开，可直接打印或存 PDF\r\n'
-   +'发票\\           —— 全部发票照片，文件名对应明细表里的「发票文件」列\r\n'
+   +'凭证\\            —— 单独一个文件夹，放全部发票/收据照片\r\n'
    +'\r\n'
-   +'发票文件命名规则：序号_日期_金额.扩展名\r\n';
+   +'凭证文件命名规则：序号_日期_金额.扩展名（序号与明细表一一对应）\r\n'
+   +'（例如 03_20260912_86.00.jpg 就是明细表里第 3 条那笔的凭证）\r\n';
 }
 
 // ---------------- 导出文件包 / 打印 ----------------
@@ -4425,7 +4492,7 @@ function expDoPackage(list, s){
         const ext=m?m[1].toLowerCase():'jpg';
         const nm=String(idx).padStart(2,'0')+'_'+String(r.date||'').replace(/-/g,'')+'_'+eNum(r.amount).toFixed(2)+'.'+ext;
         names.push(nm);
-        invFiles.push({name:'发票/'+nm, data:dataUrlToU8(f.dataUrl)});
+        invFiles.push({name:'凭证/'+nm, data:dataUrlToU8(f.dataUrl)});
       });
       invoiceNames.push(names);
     });
@@ -4433,7 +4500,8 @@ function expDoPackage(list, s){
     const zipFiles=[
       {name:'报账明细.csv',    data:enc.encode('\ufeff'+expCsv(list, invoiceNames))},
       {name:'报账明细单.html', data:enc.encode(expPrintHtml(list, s, scope, false))},
-      {name:'说明.txt',        data:enc.encode(expReadmeTxt(list, s, scope))}
+      {name:'说明.txt',        data:enc.encode(expReadmeTxt(list, s, scope))},
+      {name:'凭证/',           data:new Uint8Array(0)}   // 显式建目录：这批即使没有凭证照片，文件夹也在
     ].concat(invFiles);
     const blob=zipStore(zipFiles);
     const url=URL.createObjectURL(blob);
@@ -4467,6 +4535,124 @@ document.getElementById('btnExpSave').addEventListener('click',saveExpRecord);
 document.getElementById('btnExpCancel').addEventListener('click',()=>closeModal('modalExp'));
 
 // 示例数据（首次打开就能看到效果）
+// 生成一张示例凭证图片（canvas 画的假凭证，只为演示"凭证怎么放、怎么打包"）
+function makeSampleVoucher(rec){
+  try{
+    if(typeof document==='undefined') return null;
+    const W=440,H=620;
+    const cv=document.createElement('canvas');
+    cv.width=W; cv.height=H;
+    const g=cv.getContext('2d');
+    if(!g) return null;
+    const rr=(x,y,w,h,r)=>{ g.beginPath(); g.moveTo(x+r,y); g.lineTo(x+w-r,y); g.quadraticCurveTo(x+w,y,x+w,y+r);
+      g.lineTo(x+w,y+h-r); g.quadraticCurveTo(x+w,y+h,x+w-r,y+h); g.lineTo(x+r,y+h);
+      g.quadraticCurveTo(x,y+h,x,y+h-r); g.lineTo(x,y+r); g.quadraticCurveTo(x,y,x+r,y); g.closePath(); };
+    const money=n=>{ const v=eNum(n).toFixed(2).split('.'); return v[0].replace(/\B(?=(\d{3})+(?!\d))/g,',')+'.'+v[1]; };
+    const CFG={
+      '快递费':  {t:'快递运费凭证',  c:'#0e7490', unit:'顺丰速运'},
+      '样品费':  {t:'样品费收款收据',c:'#b45309', unit:'制衣厂'},
+      '交通':    {t:'出租车电子发票',c:'#1d4ed8', unit:'出租车客运'},
+      '办公用品':{t:'增值税普通发票',c:'#7c3aed', unit:'文教用品商店'},
+      '差旅':    {t:'差旅费报销凭证',c:'#0f766e', unit:'' },
+      '招待':    {t:'业务招待费凭证',c:'#be123c', unit:'' },
+      '其他':    {t:'费用凭证',      c:'#475569', unit:'' }
+    };
+    const cfg=CFG[rec.category]||CFG['其他'];
+    const unit=rec.payee||cfg.unit||'收款单位';
+
+    g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
+    g.strokeStyle='#e2e8f0'; g.lineWidth=2; g.strokeRect(1,1,W-2,H-2);
+
+    // 顶部色带 + 标题
+    g.fillStyle=cfg.c; g.fillRect(0,0,W,96);
+    g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='alphabetic';
+    g.font='700 23px "Microsoft YaHei","PingFang SC",sans-serif';
+    g.fillText(cfg.t,W/2,46);
+    g.font='400 12px "Microsoft YaHei",sans-serif';
+    g.fillStyle='rgba(255,255,255,.85)';
+    g.fillText('示例凭证 · 仅供演示',W/2,71);
+
+    // 编号
+    g.textAlign='left'; g.fillStyle='#94a3b8'; g.font='400 11.5px Consolas,monospace';
+    g.fillText('NO. '+String(rec.date||'').replace(/-/g,'')+'-'+String(Math.round(eNum(rec.amount))).padStart(4,'0'),26,126);
+
+    // 信息行
+    const rows=[
+      ['日　　期', rec.date||''],
+      ['收 款 方', unit],
+      ['事　　由', rec.desc||''],
+      ['备　　注', rec.note||'—']
+    ];
+    let y=164;
+    rows.forEach(r0=>{
+      g.textAlign='left'; g.fillStyle='#94a3b8'; g.font='400 12px "Microsoft YaHei",sans-serif';
+      g.fillText(r0[0],26,y);
+      let txt=String(r0[1]);
+      g.font='600 13px "Microsoft YaHei",sans-serif';
+      while(txt.length>1 && g.measureText(txt).width>252) txt=txt.slice(0,-2)+'…';
+      g.fillStyle='#0f172a'; g.fillText(txt,116,y);
+      g.strokeStyle='#eef2f6'; g.lineWidth=1;
+      g.beginPath(); g.moveTo(26,y+13); g.lineTo(W-26,y+13); g.stroke();
+      y+=42;
+    });
+
+    // 金额框
+    const by=y+8;
+    g.fillStyle='#f8fafc'; rr(26,by,W-52,74,10); g.fill();
+    g.strokeStyle='#e2e8f0'; g.lineWidth=1; rr(26,by,W-52,74,10); g.stroke();
+    g.textAlign='left'; g.fillStyle='#64748b'; g.font='400 12px "Microsoft YaHei",sans-serif';
+    g.fillText('金额（小写）',44,by+30);
+    g.fillStyle='#94a3b8'; g.font='400 11.5px "Microsoft YaHei",sans-serif';
+    g.fillText('币种：人民币',44,by+52);
+    g.textAlign='right'; g.fillStyle='#0f172a'; g.font='700 26px "Microsoft YaHei",sans-serif';
+    g.fillText('¥ '+money(rec.amount), W-44, by+44);
+
+    // 红色印章
+    g.save();
+    g.translate(W-104, by+152);
+    g.rotate(-0.16);
+    g.strokeStyle='rgba(220,38,38,.85)'; g.lineWidth=3.5;
+    g.beginPath(); g.arc(0,0,54,0,Math.PI*2); g.stroke();
+    g.strokeStyle='rgba(220,38,38,.45)'; g.lineWidth=1;
+    g.beginPath(); g.arc(0,0,47,0,Math.PI*2); g.stroke();
+    g.fillStyle='rgba(220,38,38,.85)';
+    g.beginPath();
+    for(let k=0;k<10;k++){
+      const ang=-Math.PI/2 + k*Math.PI/5;
+      const rad=k%2===0?10:4.2;
+      const px=Math.cos(ang)*rad, py=Math.sin(ang)*rad-21;
+      if(k===0) g.moveTo(px,py); else g.lineTo(px,py);
+    }
+    g.closePath(); g.fill();
+    g.fillStyle='rgba(220,38,38,.9)'; g.textAlign='center';
+    g.font='700 12.5px "Microsoft YaHei",sans-serif';
+    g.fillText('凭证专用章',0,17);
+    g.restore();
+
+    // 页脚
+    g.textAlign='center'; g.fillStyle='#cbd5e1'; g.font='400 10.5px "Microsoft YaHei",sans-serif';
+    g.fillText('本凭证为系统示例数据，仅用于演示，不具有任何法律效力', W/2, H-20);
+
+    const dataUrl=cv.toDataURL('image/jpeg',0.85);
+    if(!dataUrl || dataUrl.length<200) return null;
+    return {name:'示例凭证-'+String(rec.category||'费用')+'.jpg', type:'image/jpeg',
+            size:Math.round(dataUrl.length*0.75), dataUrl:dataUrl};
+  }catch(e){ return null; }
+}
+
+// 给没有凭证的「示例记录」补上示例凭证（只动 _sample 记录，绝不碰真实数据）
+function expAttachSampleVouchers(){
+  let changed=0;
+  expenses.forEach(r=>{
+    if(!r._sample) return;
+    if((r.files||[]).length) return;
+    const v=makeSampleVoucher(r);
+    if(v){ r.files=[v]; changed++; }
+  });
+  if(changed) saveAll();
+  return changed;
+}
+
 function seedExpSample(){
   const d=new Date();
   const day=n=>{const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')};
@@ -4481,6 +4667,7 @@ function seedExpSample(){
     mk(day(-3),'langges',86,'交通','去客户处谈订单往返打车','',false,''),
     mk(day(-20),'zz',1200,'办公用品','部门打印纸和墨盒','文具店',true,'已交财务（示例）')
   );
+  expAttachSampleVouchers();   // 示例记录自带一张示例凭证，方便看清「凭证」文件夹长什么样
 }
 
 // ============================================================
@@ -4595,6 +4782,8 @@ function init(){
     localStorage.setItem(STORAGE_PREFIX+'exp_seeded','1');
     saveAll();
   }
+  // 老用户兜底：示例记录是旧版本种的（不带凭证），补一张示例凭证；只动 _sample，不碰真实记录
+  expAttachSampleVouchers();
 
   // Auto-postpone yesterday's tasks
   autoPostpone();
