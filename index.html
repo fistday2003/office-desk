@@ -457,6 +457,9 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .exp-selbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;margin-bottom:10px;background:var(--warning-light);border:1px solid #fde68a;border-radius:8px;font-size:13px;color:#92400e;flex-wrap:wrap}
 .exp-selbar label{display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer}
 .exp-selbar .exp-selinfo{font-variant-numeric:tabular-nums;white-space:nowrap}
+.exp-sel-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.exp-selbar .exp-acts{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}
+.exp-selbar .exp-acts .btn svg{width:14px;height:14px}
 .exp-check{display:inline-flex;align-items:center;margin-right:7px;cursor:pointer;flex-shrink:0}
 .exp-check input{width:16px;height:16px;cursor:pointer;accent-color:var(--primary)}
 .exp-group{border:1px solid var(--border);border-radius:9px;margin-bottom:9px;background:var(--card-bg);overflow:hidden}
@@ -480,6 +483,9 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .exp-item{padding:11px 12px;gap:10px;flex-wrap:wrap}
   .exp-item-main{flex:1 1 100%}
   .exp-right{width:100%;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .exp-selbar{flex-direction:column;align-items:stretch}
+  .exp-selbar .exp-acts{margin-left:0;width:100%}
+  .exp-selbar .exp-acts .btn{flex:1;justify-content:center}
 }
 </style>
 </head>
@@ -600,7 +606,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6 · 2026-09-16</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.1 · 2026-09-16</div>
     </div>
   </aside>
 
@@ -654,27 +660,11 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 
     <!-- TAB: 报账整理 -->
     <div class="tab-panel" id="tab-expenses">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-        <div class="section-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
-          报账整理
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn" id="btnExpPrint">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            打印明细单
-          </button>
-          <button class="btn" id="btnExpPackage">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
-            导出报账文件包
-          </button>
-          <button class="btn btn-primary" id="btnAddExp">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            记一笔
-          </button>
-        </div>
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
+        报账整理
       </div>
-      <p class="section-subtitle">随手记下每一笔垫付/支出，发票拍照传上来；月底一键打包（明细表 + 全部发票）发给财务</p>
+      <p class="section-subtitle">随手记下每一笔垫付/支出，发票拍照传上来；勾选后一键打包（明细表 + 全部凭证）发给财务</p>
       <div id="expContent"></div>
     </div>
 
@@ -958,7 +948,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.6';
+const APP_VERSION = 'v1.6.1';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -3989,7 +3979,7 @@ function renderExpenses(){
   if(expenses.length===0){
     box.innerHTML='<div class="exp-empty"><b style="color:var(--text);font-size:15px">还没有报账记录</b><br>'
       +'点右上角「记一笔」，把垫付的钱先记下来<br>'
-      +'发票拍张照传上去，月底点「导出报账文件包」，明细表带全部发票一起打包</div>';
+      +'发票拍张照传上去，月底勾选后点「导出所选项目文件包」，明细表带全部凭证一起打包</div>';
     return;
   }
   const months=expMonths();
@@ -4065,7 +4055,7 @@ function renderExpenses(){
   if(bs.unpaidCount>0){
     html+='<div class="dash-panel" style="background:var(--warning-light);border-color:#fde68a">';
     html+='<div style="font-size:13.5px;color:#92400e;line-height:1.8">当前范围还有 <b>'+bs.unpaidCount+' 笔</b>（'+fmtCNY(bs.unpaid)+'）<b>待报账</b>。<br>'
-      +'在下面明细里勾选要报的条目（支持「全选」，也可去掉暂时不报的），点「导出报账文件包」打包发给财务；报完把它们标记成「已报账」，就会按日期归档。</div>';
+      +'在下面明细里勾选要报的条目（支持「全选」，也可去掉暂时不报的），点「导出所选项目文件包」打包发给财务；报完把它们标记成「已报账」，就会按日期归档。</div>';
     html+='</div>';
   }
 
@@ -4074,17 +4064,31 @@ function renderExpenses(){
   const done=list.filter(r=>r.filed);
   html+='<div class="dash-panel">';
   html+='<div class="dash-panel-head"><div class="dash-panel-title">明细（当前筛选 '+list.length+' 笔）</div>'
-      + '<span class="dm-sub">状态用下拉框直接改 · 勾选后「导出报账文件包」只打包勾选的</span></div>';
+      + '<span class="dm-sub">状态用下拉框直接改 · 勾选后点「导出所选项目文件包」只打包勾选的</span></div>';
+  const selWait=wait.filter(r=>expSel[r.id]);
+  // 操作条：左侧 全选 + 已选统计（无待报账时只给提示），右侧 三个操作按钮（inline onclick，重渲染不丢）
+  html+='<div class="exp-selbar">'
+    +'<div class="exp-sel-left">'
+    +(wait.length
+      ?'<label><input type="checkbox" id="expSelMaster" '+(selWait.length===wait.length?'checked':'')+' onchange="expSelAll(this.checked)"> 全选待报账条目（'+wait.length+' 笔）</label>'
+      +'<span class="exp-selinfo" id="expSelInfo">已选 '+selWait.length+' 笔 · '+fmtCNY(expSum(selWait).total)+'</span>'
+      :'<span class="exp-selinfo">'+(list.length?'当前范围内没有待报账条目':'当前筛选下还没有记录')+'</span>')
+    +'</div>'
+    +'<div class="exp-acts">'
+    +'<button class="btn btn-sm" onclick="expPrintAction()">'
+    +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>'
+    +'打印明细单</button>'
+    +'<button class="btn btn-sm" onclick="expPackageAction()">'
+    +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>'
+    +'导出所选项目文件包</button>'
+    +'<button class="btn btn-sm btn-primary" onclick="openExpModal()">'
+    +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+    +'记一笔</button>'
+    +'</div>'
+    +'</div>';
   if(list.length===0){
     html+='<div style="text-align:center;padding:22px 10px;color:var(--text-muted);font-size:13.5px">这个筛选条件下没有记录</div>';
   } else {
-    const selWait=wait.filter(r=>expSel[r.id]);
-    if(wait.length){
-      html+='<div class="exp-selbar">'
-        +'<label><input type="checkbox" id="expSelMaster" onchange="expSelAll(this.checked)"> 全选待报账条目（'+wait.length+' 笔）</label>'
-        +'<span class="exp-selinfo" id="expSelInfo">已选 '+selWait.length+' 笔 · '+fmtCNY(expSum(selWait).total)+'</span>'
-        +'</div>';
-    }
     wait.forEach(r=>{ html+=expItemHtml(r,true); });
     if(done.length){
       // 按 filedAt（老数据用发生日期兜底）分组归档
@@ -4600,7 +4604,8 @@ function expReadmeTxt(list, s, scope){
 }
 
 // ---------------- 导出文件包 / 打印 ----------------
-document.getElementById('btnExpPackage').addEventListener('click',()=>{
+// 按钮在明细操作条里随 renderExpenses 重渲染，必须用 inline onclick + 具名函数（不能用初始化时绑定）
+function expPackageAction(){
   const picked=expFiltered().filter(r=>!r.filed && expSel[r.id]);
   if(!picked.length){ showToast('先在明细里勾选要报账的条目（可点「全选待报账条目」一次选完）'); return; }
   const s=expSum(picked);
@@ -4615,7 +4620,7 @@ document.getElementById('btnExpPackage').addEventListener('click',()=>{
         showToast('✓ 已归档 '+picked.length+' 笔到「'+todayStr()+' 报账」', 'info');
       });
     });
-});
+}
 
 function expDoPackage(list, s){
   try{
@@ -4661,7 +4666,7 @@ function expDoPackage(list, s){
   }
 }
 
-document.getElementById('btnExpPrint').addEventListener('click',()=>{
+function expPrintAction(){
   const list=expFiltered();
   if(!list.length){ showToast('当前筛选没有记录'); return; }
   const s=expSum(list);
@@ -4669,9 +4674,8 @@ document.getElementById('btnExpPrint').addEventListener('click',()=>{
   const w=window.open('','_blank');
   if(!w){ showToast('浏览器拦住了新窗口，请允许弹出窗口后重试'); return; }
   w.document.open(); w.document.write(html); w.document.close();
-});
+}
 
-document.getElementById('btnAddExp').addEventListener('click',()=>openExpModal());
 document.getElementById('btnExpSave').addEventListener('click',saveExpRecord);
 document.getElementById('btnExpCancel').addEventListener('click',()=>closeModal('modalExp'));
 
