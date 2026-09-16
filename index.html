@@ -448,12 +448,26 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .exp-line2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:5px;font-size:12px;color:var(--text-muted)}
 .exp-amt{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums;flex-shrink:0}
 .exp-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.exp-status{padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:600;border:1px solid;cursor:pointer;background:none;white-space:nowrap}
-.exp-status.wait{background:var(--warning-light);color:#b45309;border-color:#fde68a}
-.exp-status.done{background:var(--success-light);color:#047857;border-color:#a7f3d0}
 .exp-thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
 .exp-thumbs img{width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;background:#f1f5f9}
 .exp-empty{text-align:center;padding:34px 20px;color:var(--text-muted);font-size:14px;line-height:1.9;background:var(--card-bg);border:1px dashed var(--border);border-radius:var(--radius)}
+.exp-status{padding:2px 4px;border-radius:8px;font-size:11.5px;font-weight:600;border:1px solid;cursor:pointer;white-space:nowrap;background:none;font-family:inherit;width:70px;flex-shrink:0}
+.exp-status.wait{background:var(--warning-light);color:#b45309;border-color:#fde68a}
+.exp-status.done{background:var(--success-light);color:#047857;border-color:#a7f3d0}
+.exp-selbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;margin-bottom:10px;background:var(--warning-light);border:1px solid #fde68a;border-radius:8px;font-size:13px;color:#92400e;flex-wrap:wrap}
+.exp-selbar label{display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer}
+.exp-selbar .exp-selinfo{font-variant-numeric:tabular-nums;white-space:nowrap}
+.exp-check{display:inline-flex;align-items:center;margin-right:7px;cursor:pointer;flex-shrink:0}
+.exp-check input{width:16px;height:16px;cursor:pointer;accent-color:var(--primary)}
+.exp-group{border:1px solid var(--border);border-radius:9px;margin-bottom:9px;background:var(--card-bg);overflow:hidden}
+.exp-group-head{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none;background:#f8fafc;flex-wrap:wrap}
+.exp-group-head:hover{background:#eef2f7}
+.exp-caret{font-size:12px;color:var(--text-muted);width:14px;flex-shrink:0}
+.exp-group-title{font-size:13.5px;font-weight:700;color:var(--text)}
+.exp-group-sub{margin-left:auto;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.exp-group-body{padding:8px 10px 4px}
+.exp-group-body .exp-item{margin-bottom:8px}
+button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:inherit}
 .exp-drop{border:1px dashed var(--border);border-radius:8px;padding:14px;text-align:center;font-size:12.5px;color:var(--text-muted);cursor:pointer;background:#f8fafc;transition:var(--transition)}
 .exp-drop:hover{border-color:var(--primary);color:var(--primary-dark)}
 
@@ -586,7 +600,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.5.2 · 2026-09-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6 · 2026-09-16</div>
     </div>
   </aside>
 
@@ -833,6 +847,20 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   </div>
 </div>
 
+<!-- ====== 凭证预览弹窗 ====== -->
+<div class="modal-overlay" id="modalExpView" style="display:none">
+  <div class="modal" style="width:min(900px,94vw)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <h3 id="expViewTitle" style="margin:0;font-size:15px;word-break:break-all">凭证预览</h3>
+      <div style="display:flex;gap:8px">
+        <a class="btn" id="expViewDl" download style="cursor:pointer;text-decoration:none">下载</a>
+        <button class="btn" onclick="closeModal('modalExpView')">关闭</button>
+      </div>
+    </div>
+    <div id="expViewBody" style="min-height:120px"></div>
+  </div>
+</div>
+
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
 <div class="modal-overlay" id="modalDash" style="display:none">
   <div class="modal">
@@ -930,7 +958,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.5.2';
+const APP_VERSION = 'v1.6';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -3870,6 +3898,8 @@ let expSelStatus = 'all';
 let editingExpId = null;
 let expModalFiles = [];
 let expModalPending = 0;
+let expSel = {};        // 提交报账勾选：id -> true（只对「待报账」条目有意义）
+let expGroupOpen = {};  // 已报账分组展开状态：gid -> true
 
 const ICON_FILE='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
 
@@ -3899,6 +3929,9 @@ function expHeal(){
     else if(a!==r.account){ r.account=a; changed=true; }
     if(!r.date){ r.date=todayStr(); changed=true; }
     if(typeof r.filed !== 'boolean'){ r.filed=false; changed=true; }
+    // filedAt：标记「已报账」那天的日期，用于按次归档；老数据补记（用发生日期兜底）
+    if(r.filed && !r.filedAt){ r.filedAt=r.date||todayStr(); changed=true; }
+    if(!r.filed && r.filedAt){ delete r.filedAt; changed=true; }
     if(!Array.isArray(r.files)){ r.files=[]; changed=true; }
   });
   expenses=expenses.filter(r=>r && r.date);
@@ -4032,65 +4065,144 @@ function renderExpenses(){
   if(bs.unpaidCount>0){
     html+='<div class="dash-panel" style="background:var(--warning-light);border-color:#fde68a">';
     html+='<div style="font-size:13.5px;color:#92400e;line-height:1.8">当前范围还有 <b>'+bs.unpaidCount+' 笔</b>（'+fmtCNY(bs.unpaid)+'）<b>待报账</b>。<br>'
-      +'点「导出报账文件包」打包发给财务后，可以把它们标记成「已报账」，下个月就不会重复报了。</div>';
+      +'在下面明细里勾选要报的条目（支持「全选」，也可去掉暂时不报的），点「导出报账文件包」打包发给财务；报完把它们标记成「已报账」，就会按日期归档。</div>';
     html+='</div>';
   }
 
-  // ---- 明细列表 ----
+  // ---- 明细列表：待报账平铺（可勾选打包）+ 已报账按日期分组归档 ----
+  const wait=list.filter(r=>!r.filed);
+  const done=list.filter(r=>r.filed);
   html+='<div class="dash-panel">';
   html+='<div class="dash-panel-head"><div class="dash-panel-title">明细（当前筛选 '+list.length+' 笔）</div>'
-      + '<span class="dm-sub">点状态切换「待报账 / 已报账」</span></div>';
+      + '<span class="dm-sub">状态用下拉框直接改 · 勾选后「导出报账文件包」只打包勾选的</span></div>';
   if(list.length===0){
     html+='<div style="text-align:center;padding:22px 10px;color:var(--text-muted);font-size:13.5px">这个筛选条件下没有记录</div>';
   } else {
-    list.forEach(r=>{
-      const a=expAcct(r.account);
-      const nf=(r.files||[]).length;
-      html+='<div class="exp-item'+(r.filed?' filed':'')+'">';
-      html+='<div class="exp-item-main">';
-      html+='<div class="exp-line1"><span class="exp-title">'+escHtml(r.desc||'（未填事由）')+'</span></div>';
-      html+='<div class="exp-line2">';
-      html+='<span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span>';
-      html+='<span>'+escHtml(r.date||'')+'</span>';
-      if(r.category) html+='<span>· '+escHtml(r.category)+'</span>';
-      if(r.payee)    html+='<span>· 付给 '+escHtml(r.payee)+'</span>';
-      if(nf)         html+='<span>· 发票 '+nf+' 张</span>';
-      html+='</div>';
-      if(r.note) html+='<div class="exp-line2"><span>备注：'+escHtml(r.note)+'</span></div>';
-      if(nf){
-        html+='<div class="exp-thumbs">';
-        (r.files||[]).forEach((f,i)=>{
-          const isImg=(f.type||'').indexOf('image/')===0;
-          if(isImg && f.dataUrl) html+='<img src="'+f.dataUrl+'" onclick="viewExpFile(\''+r.id+'\','+i+')" title="点击放大">';
-        });
-        (r.files||[]).forEach((f,i)=>{
-          const isImg=(f.type||'').indexOf('image/')===0;
-          if(!isImg && f.dataUrl) html+='<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">'+escHtml(f.name)+'</a>';
-        });
+    const selWait=wait.filter(r=>expSel[r.id]);
+    if(wait.length){
+      html+='<div class="exp-selbar">'
+        +'<label><input type="checkbox" id="expSelMaster" onchange="expSelAll(this.checked)"> 全选待报账条目（'+wait.length+' 笔）</label>'
+        +'<span class="exp-selinfo" id="expSelInfo">已选 '+selWait.length+' 笔 · '+fmtCNY(expSum(selWait).total)+'</span>'
+        +'</div>';
+    }
+    wait.forEach(r=>{ html+=expItemHtml(r,true); });
+    if(done.length){
+      // 按 filedAt（老数据用发生日期兜底）分组归档
+      const groups={};
+      done.forEach(r=>{
+        const k=String(r.filedAt||r.date||'日期未知');
+        (groups[k]=groups[k]||[]).push(r);
+      });
+      const keys=Object.keys(groups).sort((a,b)=>a<b?1:-1);
+      html+='<div style="font-size:12.5px;font-weight:600;color:var(--text-secondary);margin:14px 0 8px">已报账归档（点标题展开当期明细）</div>';
+      keys.forEach(k=>{
+        const g=groups[k];
+        const gs=expSum(g);
+        const gid='expg_'+k.replace(/[^0-9]/g,'')+'_'+g[0].id.slice(0,4);
+        const open=!!expGroupOpen[gid];
+        html+='<div class="exp-group">';
+        html+='<div class="exp-group-head" onclick="expToggleGroup(\''+gid+'\')">';
+        html+='<span class="exp-caret">'+(open?'▾':'▸')+'</span>';
+        html+='<span class="exp-group-title">'+escHtml(k)+' 报账</span>';
+        html+='<span class="exp-group-sub">'+gs.count+' 笔 · '+fmtCNY(gs.total)+' · 凭证 '+gs.files+' 张</span>';
         html+='</div>';
-      }
-      html+='</div>';
-      html+='<div class="exp-right">';
-      html+='<div class="exp-amt">'+fmtCNY(r.amount)+'</div>';
-      html+='<button class="exp-status '+(r.filed?'done':'wait')+'" onclick="toggleExpFiled(\''+r.id+'\')" title="点一下切换状态">'+(r.filed?'已报账':'待报账')+'</button>';
-      html+='<div style="display:flex;gap:2px">';
-      html+='<button class="btn-icon" onclick="openExpModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
-      html+='<button class="btn-icon" onclick="deleteExpRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
-      html+='</div></div>';
-      html+='</div>';
-    });
+        html+='<div class="exp-group-body" id="'+gid+'" style="display:'+(open?'block':'none')+'">';
+        g.forEach(r=>{ html+=expItemHtml(r,false); });
+        html+='</div></div>';
+      });
+    }
   }
   html+='</div>';
 
   box.innerHTML=html;
 }
 
-function toggleExpFiled(id){
+// 单条记录渲染（withCheck：待报账条目带打包勾选框；已报账条目不带）
+function expItemHtml(r, withCheck){
+  const a=expAcct(r.account);
+  const nf=(r.files||[]).length;
+  let h='<div class="exp-item'+(r.filed?' filed':'')+'">';
+  h+='<div class="exp-item-main">';
+  h+='<div class="exp-line1">';
+  if(withCheck) h+='<label class="exp-check"><input type="checkbox" '+(expSel[r.id]?'checked':'')+' onchange="expPick(\''+r.id+'\',this.checked)" title="勾选后一起打包报账"></label>';
+  h+='<span class="exp-title">'+escHtml(r.desc||'（未填事由）')+'</span></div>';
+  h+='<div class="exp-line2">';
+  h+='<span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span>';
+  h+='<span>'+escHtml(r.date||'')+'</span>';
+  if(r.filed && r.filedAt) h+='<span>· 报账于 '+escHtml(r.filedAt)+'</span>';
+  if(r.category) h+='<span>· '+escHtml(r.category)+'</span>';
+  if(r.payee)    h+='<span>· 付给 '+escHtml(r.payee)+'</span>';
+  if(nf)         h+='<span>· 凭证 '+nf+' 张</span>';
+  h+='</div>';
+  if(r.note) h+='<div class="exp-line2"><span>备注：'+escHtml(r.note)+'</span></div>';
+  if(nf){
+    h+='<div class="exp-thumbs">';
+    (r.files||[]).forEach((f,i)=>{
+      const isImg=(f.type||'').indexOf('image/')===0;
+      if(isImg && f.dataUrl) h+='<img src="'+f.dataUrl+'" onclick="viewExpFile(\''+r.id+'\','+i+')" title="点击预览">';
+    });
+    (r.files||[]).forEach((f,i)=>{
+      const isImg=(f.type||'').indexOf('image/')===0;
+      if(!isImg && f.dataUrl) h+='<button class="file-dl" onclick="viewExpFile(\''+r.id+'\','+i+')" title="点击预览 / 下载">'+escHtml(f.name)+'</button>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="exp-right">';
+  h+='<div class="exp-amt">'+fmtCNY(r.amount)+'</div>';
+  h+='<select class="exp-status '+(r.filed?'done':'wait')+'" onchange="setExpFiled(\''+r.id+'\',this.value)" title="改成已报账会按今天归档">';
+  h+='<option value="0"'+(!r.filed?' selected':'')+'>待报账</option>';
+  h+='<option value="1"'+(r.filed?' selected':'')+'>已报账</option>';
+  h+='</select>';
+  h+='<div style="display:flex;gap:2px">';
+  h+='<button class="btn-icon" onclick="openExpModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
+  h+='<button class="btn-icon" onclick="deleteExpRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
+  h+='</div></div>';
+  h+='</div>';
+  return h;
+}
+
+// 状态下拉：手动改待报账 / 已报账；标记已报账时记下 filedAt（归档日期）
+function setExpFiled(id, v){
   const r=expenses.find(x=>x.id===id);
   if(!r) return;
-  r.filed=!r.filed;
+  const filed=String(v)==='1';
+  if(!!r.filed===filed) return;
+  r.filed=filed;
+  if(filed){ r.filedAt=todayStr(); } else { delete r.filedAt; }
   saveAll(); renderExpenses();
-  showToast(r.filed?'已标记为「已报账」':'已改回「待报账」','info');
+  showToast(filed?'✓ 已报账，归档到「'+todayStr()+' 报账」':'已改回「待报账」','info');
+}
+// 提交报账勾选
+function expPick(id, checked){
+  if(checked) expSel[id]=true; else delete expSel[id];
+  expSyncSelUI();
+}
+function expSelAll(checked){
+  expFiltered().forEach(r=>{ if(!r.filed){ if(checked) expSel[r.id]=true; else delete expSel[r.id]; } });
+  renderExpenses();
+}
+function expSyncSelUI(){
+  const selWait=expFiltered().filter(r=>!r.filed && expSel[r.id]);
+  const info=document.getElementById('expSelInfo');
+  if(info) info.textContent='已选 '+selWait.length+' 笔 · '+fmtCNY(expSum(selWait).total);
+  const master=document.getElementById('expSelMaster');
+  if(master){
+    const allWait=expFiltered().filter(r=>!r.filed);
+    master.checked = allWait.length>0 && selWait.length===allWait.length;
+  }
+}
+function expToggleGroup(gid){
+  const body=document.getElementById(gid);
+  if(!body) return;
+  const open=!expGroupOpen[gid];
+  expGroupOpen[gid]=open;
+  body.style.display=open?'block':'none';
+  const head=body.previousElementSibling;
+  if(head && head.classList.contains('exp-group-head')){
+    const c=head.querySelector('.exp-caret');
+    if(c) c.textContent=open?'▾':'▸';
+  }
 }
 function deleteExpRecord(id){
   const r=expenses.find(x=>x.id===id);
@@ -4102,10 +4214,40 @@ function deleteExpRecord(id){
     showToast('已删除');
   });
 }
-function viewExpFile(id,idx){
+
+// ---------------- 凭证预览 ----------------
+function expShowPreview(f){
+  if(!f || !f.dataUrl) return;
+  document.getElementById('expViewTitle').textContent = f.name||'凭证预览';
+  const dl=document.getElementById('expViewDl');
+  dl.href=f.dataUrl;
+  dl.setAttribute('download', f.name||'凭证');
+  const t=String(f.type||'');
+  const body=document.getElementById('expViewBody');
+  if(t.indexOf('image/')===0){
+    body.innerHTML='<img src="'+f.dataUrl+'" alt="" style="max-width:100%;max-height:66vh;display:block;margin:0 auto;border-radius:8px">';
+  } else if(t==='application/pdf'){
+    body.innerHTML='<iframe src="'+f.dataUrl+'" style="width:100%;height:66vh;border:1px solid var(--border);border-radius:8px;background:#fff" title="PDF 预览"></iframe>';
+  } else if(t.indexOf('text/')===0 || t==='application/json' || t==='text/html' || /\.txt$/i.test(String(f.name||''))){
+    let txt='';
+    try{
+      const b64=f.dataUrl.slice(f.dataUrl.indexOf(',')+1);
+      const bin=atob(b64);
+      try{ txt=decodeURIComponent(escape(bin)); }catch(e2){ txt=bin; }
+    }catch(e){ txt='（内容无法解码）'; }
+    body.innerHTML='<pre style="white-space:pre-wrap;word-break:break-all;font-size:13px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:66vh;overflow:auto;margin:0">'+escHtml(txt.slice(0,20000))+'</pre>';
+  } else {
+    body.innerHTML='<div class="exp-empty"><b>该格式暂不支持在线预览</b><br>'+escHtml(f.name||'')+'<br>点右上角「下载」，用电脑上对应的软件（Excel / Word 等）打开</div>';
+  }
+  document.getElementById('modalExpView').style.display='flex';
+}
+function viewExpFile(id, idx){
   const r=expenses.find(x=>x.id===id);
-  if(!r||!r.files||!r.files[idx]||!r.files[idx].dataUrl) return;
-  window.open(r.files[idx].dataUrl,'_blank');
+  if(!r||!r.files||!r.files[idx]) return;
+  expShowPreview(r.files[idx]);
+}
+function viewExpModalFile(i){
+  if(expModalFiles[i]) expShowPreview(expModalFiles[i]);
 }
 
 // ---------------- 录入 / 编辑弹窗 ----------------
@@ -4159,10 +4301,11 @@ function saveExpRecord(){
     if(i>=0){
       rec.createdAt=expenses[i].createdAt||Date.now();
       rec.filed=!!expenses[i].filed;
+      if(expenses[i].filedAt) rec.filedAt=expenses[i].filedAt;
       expenses[i]=rec;
     }
   } else {
-    rec.filed=false;
+    rec.filed=false;   // 新建条目默认「待报账」
     expenses.push(rec);
   }
   editingExpId=null;
@@ -4210,7 +4353,7 @@ function renderExpModalFiles(){
   expModalFiles.forEach((f,i)=>{
     const isImg=(f.type||'').indexOf('image/')===0;
     html+='<div class="task-file-item">';
-    if(isImg && f.dataUrl) html+='<img src="'+f.dataUrl+'" onclick="window.open(this.src,\'_blank\')" title="点击放大">';
+    if(isImg && f.dataUrl) html+='<img src="'+f.dataUrl+'" onclick="viewExpModalFile('+i+')" title="点击预览">';
     else html+='<span class="file-ic">'+ICON_FILE+'</span>';
     html+='<div class="file-info"><span class="file-name">'+escHtml(f.name||'发票')+'</span>'
         + '<span class="file-size">'+fmtSize(f.size||0)+'</span></div>';
@@ -4458,22 +4601,19 @@ function expReadmeTxt(list, s, scope){
 
 // ---------------- 导出文件包 / 打印 ----------------
 document.getElementById('btnExpPackage').addEventListener('click',()=>{
-  const list=expFiltered();
-  if(!list.length){ showToast('当前筛选没有记录可导出'); return; }
-  const s=expSum(list);
-  showConfirm('把当前范围的 '+list.length+' 笔打包成 zip？\n'
-    +'范围：'+expScopeLabel()+'\n'
-    +'合计 '+fmtCNY(s.total)+'，发票 '+s.files+' 张', ()=>{
-      const ok = expDoPackage(list, s);
+  const picked=expFiltered().filter(r=>!r.filed && expSel[r.id]);
+  if(!picked.length){ showToast('先在明细里勾选要报账的条目（可点「全选待报账条目」一次选完）'); return; }
+  const s=expSum(picked);
+  showConfirm('把勾选的 '+picked.length+' 笔打包成 zip？\n'
+    +'合计 '+fmtCNY(s.total)+'，凭证 '+s.files+' 张', ()=>{
+      const ok = expDoPackage(picked, s);
       if(!ok) return;
-      const unpaid=list.filter(r=>!r.filed);
-      if(unpaid.length){
-        showConfirm('已导出。\n要把这 '+unpaid.length+' 笔标记成「已报账」吗？\n（标记后就不会再重复报了）', ()=>{
-          unpaid.forEach(r=>{ const x=expenses.find(y=>y.id===r.id); if(x) x.filed=true; });
-          saveAll(); renderExpenses();
-          showToast('✓ 已标记 '+unpaid.length+' 笔为已报账', 'info');
-        });
-      }
+      expSel={}; renderExpenses();
+      showConfirm('已导出。\n要把这 '+picked.length+' 笔标记成「已报账」吗？\n（会归档到「'+todayStr()+' 报账」下，不会再重复报）', ()=>{
+        picked.forEach(r=>{ const x=expenses.find(y=>y.id===r.id); if(x){ x.filed=true; x.filedAt=todayStr(); } });
+        saveAll(); renderExpenses();
+        showToast('✓ 已归档 '+picked.length+' 笔到「'+todayStr()+' 报账」', 'info');
+      });
     });
 });
 
@@ -4660,6 +4800,7 @@ function seedExpSample(){
   const mk=(date,account,amount,category,desc,payee,filed,note)=>({
     id:uid(), date:date, amount:amount, account:account, category:category,
     desc:desc, payee:payee||'', note:note||'', files:[], filed:!!filed,
+    filedAt:filed?date:undefined,
     createdAt:Date.now(), _sample:true
   });
   expenses.push(
