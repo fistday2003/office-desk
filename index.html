@@ -418,6 +418,11 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
    报账整理（v1.5）
    ============================================================ */
 .exp-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.exp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.exp-head-left{min-width:260px;flex:1 1 320px}
+.exp-filterwrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-wrap:wrap;padding-top:4px}
+.exp-filterwrap .exp-toolbar{margin-bottom:0;justify-content:flex-end}
+.exp-filterwrap .exp-select{min-height:32px;padding:5px 10px}
 .exp-select{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text);width:auto;min-height:36px}
 .exp-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:600;background:var(--card-bg);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;transition:var(--transition)}
 .exp-chip:hover{border-color:var(--primary);color:var(--primary-dark)}
@@ -486,6 +491,10 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .exp-selbar{flex-direction:column;align-items:stretch}
   .exp-selbar .exp-acts{margin-left:0;width:100%}
   .exp-selbar .exp-acts .btn{flex:1;justify-content:center}
+  .exp-head{flex-direction:column;align-items:stretch}
+  .exp-head-left{flex:none}
+  .exp-filterwrap{align-items:flex-start}
+  .exp-filterwrap .exp-toolbar{justify-content:flex-start}
 }
 </style>
 </head>
@@ -606,7 +615,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.1 · 2026-09-16</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.2 · 2026-09-17</div>
     </div>
   </aside>
 
@@ -660,11 +669,16 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 
     <!-- TAB: 报账整理 -->
     <div class="tab-panel" id="tab-expenses">
-      <div class="section-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
-        报账整理
+      <div class="exp-head">
+        <div class="exp-head-left">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
+            报账整理
+          </div>
+          <p class="section-subtitle">随手记下每一笔垫付/支出，发票拍照传上来；勾选后一键打包（明细表 + 全部凭证）发给财务</p>
+        </div>
+        <div class="exp-filterwrap" id="expFilterBar"></div>
       </div>
-      <p class="section-subtitle">随手记下每一笔垫付/支出，发票拍照传上来；勾选后一键打包（明细表 + 全部凭证）发给财务</p>
       <div id="expContent"></div>
     </div>
 
@@ -948,7 +962,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.6.1';
+const APP_VERSION = 'v1.6.2';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -3977,8 +3991,10 @@ function renderExpenses(){
   if(!box) return;
   expRenderBadge();
   if(expenses.length===0){
+    const fb0=document.getElementById('expFilterBar');
+    if(fb0) fb0.innerHTML='';
     box.innerHTML='<div class="exp-empty"><b style="color:var(--text);font-size:15px">还没有报账记录</b><br>'
-      +'点右上角「记一笔」，把垫付的钱先记下来<br>'
+      +'点「记一笔」，把垫付的钱先记下来<br>'
       +'发票拍张照传上去，月底勾选后点「导出所选项目文件包」，明细表带全部凭证一起打包</div>';
     return;
   }
@@ -3991,26 +4007,27 @@ function renderExpenses(){
 
   let html='';
 
-  // ---- 工具条：月份 + 报账状态 ----
-  html+='<div class="exp-toolbar">';
-  html+='<select class="exp-select" id="expMonthSel" onchange="expPickMonth(this.value)">';
-  html+='<option value="all"'+(expSelMonth==='all'?' selected':'')+'>全部月份</option>';
+  // ---- 筛选条：月份 + 报账状态 + 记账账户（渲染到标题行右侧的 expFilterBar）----
+  let fhtml='';
+  fhtml+='<div class="exp-toolbar">';
+  fhtml+='<select class="exp-select" id="expMonthSel" onchange="expPickMonth(this.value)">';
+  fhtml+='<option value="all"'+(expSelMonth==='all'?' selected':'')+'>全部月份</option>';
   months.slice().reverse().forEach(m=>{
-    html+='<option value="'+m+'"'+(m===expSelMonth?' selected':'')+'>'+fmtMonthLabel(m)+'</option>';
+    fhtml+='<option value="'+m+'"'+(m===expSelMonth?' selected':'')+'>'+fmtMonthLabel(m)+'</option>';
   });
-  html+='</select>';
-  html+='<span class="exp-chip'+(expSelStatus==='all'?' active':'')+'" onclick="expPickStatus(\'all\')">全部</span>';
-  html+='<span class="exp-chip'+(expSelStatus==='wait'?' active':'')+'" onclick="expPickStatus(\'wait\')">待报账</span>';
-  html+='<span class="exp-chip'+(expSelStatus==='done'?' active':'')+'" onclick="expPickStatus(\'done\')">已报账</span>';
-  html+='</div>';
+  fhtml+='</select>';
+  fhtml+='<span class="exp-chip'+(expSelStatus==='all'?' active':'')+'" onclick="expPickStatus(\'all\')">全部</span>';
+  fhtml+='<span class="exp-chip'+(expSelStatus==='wait'?' active':'')+'" onclick="expPickStatus(\'wait\')">待报账</span>';
+  fhtml+='<span class="exp-chip'+(expSelStatus==='done'?' active':'')+'" onclick="expPickStatus(\'done\')">已报账</span>';
+  fhtml+='</div>';
 
-  // ---- 工具条：记账账户 ----
-  html+='<div class="exp-toolbar" style="margin-top:-6px">';
-  html+='<span class="exp-chip'+(expSelAccount==='all'?' active':'')+'" onclick="expPickAccount(\'all\')">全部账户</span>';
+  // ---- 筛选条：记账账户 ----
+  fhtml+='<div class="exp-toolbar">';
+  fhtml+='<span class="exp-chip'+(expSelAccount==='all'?' active':'')+'" onclick="expPickAccount(\'all\')">全部账户</span>';
   EXP_ACCOUNTS.forEach(a=>{
-    html+='<span class="exp-chip'+(expSelAccount===a.key?' active':'')+'" onclick="expPickAccount(\''+a.key+'\')">'+escHtml(a.name)+'</span>';
+    fhtml+='<span class="exp-chip'+(expSelAccount===a.key?' active':'')+'" onclick="expPickAccount(\''+a.key+'\')">'+escHtml(a.name)+'</span>';
   });
-  html+='</div>';
+  fhtml+='</div>';
 
   // ---- 汇总卡 ----
   html+='<div class="exp-sums">';
@@ -4119,6 +4136,8 @@ function renderExpenses(){
   html+='</div>';
 
   box.innerHTML=html;
+  const fb=document.getElementById('expFilterBar');
+  if(fb) fb.innerHTML=fhtml;
 }
 
 // 单条记录渲染（withCheck：待报账条目带打包勾选框；已报账条目不带）
