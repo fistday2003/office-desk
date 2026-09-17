@@ -447,6 +447,10 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .exp-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card-bg);margin-bottom:9px;transition:var(--transition)}
 .exp-item:hover{border-color:#cbd5e1;box-shadow:var(--shadow)}
 .exp-item.filed{opacity:.6}
+.exp-item.income{border-left:3px solid #34d399;background:#f7fefb}
+.exp-item.income.filed{opacity:.6}
+.exp-tag-income{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;flex-shrink:0}
+.exp-amt.income{color:#15803d}
 .exp-item-main{flex:1;min-width:0}
 .exp-line1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .exp-title{font-size:14.5px;font-weight:600;color:var(--text);word-break:break-word}
@@ -615,7 +619,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.2 · 2026-09-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.3 · 2026-09-17</div>
     </div>
   </aside>
 
@@ -829,8 +833,13 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
     <h3 id="modalExpTitle">记一笔</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 130px"><label>日期</label><input type="date" id="expDate"></div>
-      <div class="form-group" style="flex:1 1 130px"><label>金额（元）</label><input type="number" id="expAmount" step="0.01" placeholder="0.00" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>金额（元）</label><input type="number" id="expAmount" step="0.01" placeholder="0.00" inputmode="decimal" oninput="expAmountVisual()"></div>
+      <div class="form-group" style="flex:0 0 auto;justify-content:flex-end">
+        <label>&nbsp;</label>
+        <button type="button" class="btn" id="btnExpSign" onclick="toggleExpSign()" title="支出填正数、收入填负数，点这里快速切换正负" style="min-width:64px;justify-content:center">正 / 负</button>
+      </div>
     </div>
+    <div id="expAmtHint" style="font-size:12px;color:var(--text-muted);margin:-6px 0 10px;line-height:1.6">支出填<b>正数</b>（如 128.5）；收入/退款填<b>负数</b>（如 -200）。也可以先填数字，再点右边「正 / 负」一键翻转。汇总时正负自动相抵。</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 130px"><label>记账账户</label><select id="expAccount"></select></div>
       <div class="form-group" style="flex:1 1 130px"><label>费用类别（可留空）</label><input type="text" id="expCategory" placeholder="如：快递费"></div>
@@ -962,7 +971,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.6.2';
+const APP_VERSION = 'v1.6.3';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -3962,10 +3971,12 @@ function expFiltered(){
     });
 }
 function expSum(list){
-  const o={total:0,count:0,unpaid:0,unpaidCount:0,paid:0,paidCount:0,files:0};
+  const o={total:0,count:0,unpaid:0,unpaidCount:0,paid:0,paidCount:0,files:0,
+           out:0,outCount:0,inc:0,incCount:0};
   (list||[]).forEach(r=>{
     const a=eNum(r.amount);
     o.total+=a; o.count++;
+    if(a<0){ o.inc+=a; o.incCount++; } else { o.out+=a; o.outCount++; }
     if(r.filed){ o.paid+=a; o.paidCount++; } else { o.unpaid+=a; o.unpaidCount++; }
     o.files += (r.files||[]).length;
   });
@@ -4030,8 +4041,9 @@ function renderExpenses(){
   fhtml+='</div>';
 
   // ---- 汇总卡 ----
+  const incFoot = s.incCount ? (' · 含收入 '+fmtCNY(s.inc)) : '';
   html+='<div class="exp-sums">';
-  html+='<div class="exp-sum"><div class="es-label">合计支出</div><div class="es-value">'+fmtCNY(s.total)+'</div><div class="es-foot">'+s.count+' 笔</div></div>';
+  html+='<div class="exp-sum"><div class="es-label">合计支出（净额）</div><div class="es-value">'+fmtCNY(s.total)+'</div><div class="es-foot">'+s.count+' 笔'+incFoot+'</div></div>';
   html+='<div class="exp-sum unpaid"><div class="es-label">待报账</div><div class="es-value">'+fmtCNY(s.unpaid)+'</div><div class="es-foot">'+s.unpaidCount+' 笔 · 还没交给财务</div></div>';
   html+='<div class="exp-sum paid"><div class="es-label">已报账</div><div class="es-value">'+fmtCNY(s.paid)+'</div><div class="es-foot">'+s.paidCount+' 笔</div></div>';
   html+='<div class="exp-sum"><div class="es-label">发票照片</div><div class="es-value">'+s.files+' 张</div><div class="es-foot">打包时会一起带走</div></div>';
@@ -4046,7 +4058,8 @@ function renderExpenses(){
     html+='<div class="exp-acct">';
     html+='<div class="ea-name"><span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span></div>';
     html+='<div class="ea-amt">'+fmtCNY(as.total)+'</div>';
-    html+='<div class="ea-sub">'+as.count+' 笔'+(as.unpaidCount?(' · 待报 '+fmtCNY(as.unpaid)):' · 全部已报')+'</div>';
+    html+='<div class="ea-sub">'+as.count+' 笔'+(as.unpaidCount?(' · 待报 '+fmtCNY(as.unpaid)):' · 全部已报')
+      +(as.incCount?(' · 含收入 '+fmtCNY(as.inc)):'')+'</div>';
     html+='</div>';
   });
   html+='</div></div>';
@@ -4144,17 +4157,19 @@ function renderExpenses(){
 function expItemHtml(r, withCheck){
   const a=expAcct(r.account);
   const nf=(r.files||[]).length;
-  let h='<div class="exp-item'+(r.filed?' filed':'')+'">';
+  const isIncome = eNum(r.amount) < 0;   // 负数 = 收入 / 退款
+  let h='<div class="exp-item'+(r.filed?' filed':'')+(isIncome?' income':'')+'">';
   h+='<div class="exp-item-main">';
   h+='<div class="exp-line1">';
   if(withCheck) h+='<label class="exp-check"><input type="checkbox" '+(expSel[r.id]?'checked':'')+' onchange="expPick(\''+r.id+'\',this.checked)" title="勾选后一起打包报账"></label>';
+  if(isIncome) h+='<span class="exp-tag-income">收入</span>';
   h+='<span class="exp-title">'+escHtml(r.desc||'（未填事由）')+'</span></div>';
   h+='<div class="exp-line2">';
   h+='<span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span>';
   h+='<span>'+escHtml(r.date||'')+'</span>';
   if(r.filed && r.filedAt) h+='<span>· 报账于 '+escHtml(r.filedAt)+'</span>';
   if(r.category) h+='<span>· '+escHtml(r.category)+'</span>';
-  if(r.payee)    h+='<span>· 付给 '+escHtml(r.payee)+'</span>';
+  if(r.payee)    h+='<span>· '+escHtml(isIncome?'收自 ':'付给 ')+escHtml(r.payee)+'</span>';
   if(nf)         h+='<span>· 凭证 '+nf+' 张</span>';
   h+='</div>';
   if(r.note) h+='<div class="exp-line2"><span>备注：'+escHtml(r.note)+'</span></div>';
@@ -4172,7 +4187,7 @@ function expItemHtml(r, withCheck){
   }
   h+='</div>';
   h+='<div class="exp-right">';
-  h+='<div class="exp-amt">'+fmtCNY(r.amount)+'</div>';
+  h+='<div class="exp-amt'+(isIncome?' income':'')+'" title="'+(isIncome?'收入（负数）':'支出')+'">'+fmtCNY(r.amount)+'</div>';
   h+='<select class="exp-status '+(r.filed?'done':'wait')+'" onchange="setExpFiled(\''+r.id+'\',this.value)" title="改成已报账会按今天归档">';
   h+='<option value="0"'+(!r.filed?' selected':'')+'>待报账</option>';
   h+='<option value="1"'+(r.filed?' selected':'')+'>已报账</option>';
@@ -4292,6 +4307,7 @@ function openExpModal(id){
   expModalFiles = (rec && rec.files) ? rec.files.slice() : [];
   expModalPending = 0;
   renderExpModalFiles();
+  expAmountVisual();
   document.getElementById('modalExp').style.display='flex';
   if(!rec) setTimeout(()=>{ try{ document.getElementById('expAmount').focus(); }catch(e){} }, 120);
 }
@@ -4299,12 +4315,41 @@ function expPickCat(c){
   const el=document.getElementById('expCategory');
   el.value = (el.value===c) ? '' : c;
 }
+// 金额正负切换（支出正数 / 收入负数）——操作输入框本身，不丢已经填的数字
+function toggleExpSign(){
+  const el=document.getElementById('expAmount');
+  if(!el) return;
+  const v=String(el.value||'').trim();
+  // 空值：直接给一个能立住的值，而不是光秃秃的 "-"
+  // （input[type=number] 会把 "5-" / "-" 这类残缺值当非法输入吞掉，赋值会变空字符串）
+  if(!v || v==='-'){ el.value='-0.01'; el.select(); expAmountVisual(); return; }
+  const n=parseFloat(v);
+  if(isNaN(n)) return;
+  // 用 0 兜住 -0：JS 里 -0 会被 String() 输出成 "0"，但更稳妥的是直接归零
+  const r=Math.round(-n*100)/100;
+  el.value = String(r===0?0:r);
+  expAmountVisual();
+}
+// 点开弹窗时给金额框一点视觉引导：正数边框正常、负数转绿
+function expAmountVisual(){
+  const el=document.getElementById('expAmount');
+  if(!el) return;
+  const n=parseFloat(String(el.value||'').trim());
+  const isInc = !isNaN(n) && n<0;
+  el.style.color = isInc ? '#15803d' : '';
+  el.style.fontWeight = isInc ? '700' : '';
+  const hint=document.getElementById('expAmtHint');
+  if(hint) hint.innerHTML = isInc
+    ? '已填<b style="color:#15803d">负数 = 收入 / 退款</b>（'+escHtml(fmtCNY(n))+'）。汇总时正负自动相抵。'
+    : '支出填<b>正数</b>（如 128.5）；收入/退款填<b>负数</b>（如 -200）。也可以先填数字，再点右边「正 / 负」一键翻转。汇总时正负自动相抵。';
+}
 function saveExpRecord(){
   const date=document.getElementById('expDate').value || todayStr();
   const amt=parseFloat(document.getElementById('expAmount').value);
   const account=normExpAccount(document.getElementById('expAccount').value)||'langges';
   const desc=String(document.getElementById('expDesc').value||'').trim();
-  if(!amt || amt<=0){ showToast('请先填金额'); try{document.getElementById('expAmount').focus()}catch(e){} return; }
+  // 金额允许负数（收入/退款），只要求「填了数字且不为 0」
+  if(isNaN(amt) || amt===0){ showToast('请先填金额（支出填正数，收入填负数）'); try{document.getElementById('expAmount').focus()}catch(e){} return; }
   if(!desc){ showToast('请填一下事由，方便回看'); try{document.getElementById('expDesc').focus()}catch(e){} return; }
   const rec={
     id: editingExpId || uid(),
@@ -4514,7 +4559,7 @@ function expPrintHtml(list, s, scope, autoPrint){
       + '<td class="c">'+(r.category?escHtml(r.category):'<span class="none">—</span>')+'</td>'
       + '<td class="desc">'+escHtml(r.desc||'')+'</td>'
       + '<td class="c">'+(r.payee?escHtml(r.payee):'<span class="none">—</span>')+'</td>'
-      + '<td class="r amt">'+eNum(r.amount).toFixed(2)+'</td>'
+      + '<td class="r amt'+(eNum(r.amount)<0?' inc':'')+'">'+eNum(r.amount).toFixed(2)+'</td>'
       + '<td class="c">'+(nf?'<span class="vch">'+nf+'</span>':'<span class="none">—</span>')+'</td>'
       + '<td class="c"><span class="st '+(r.filed?'done':'wait')+'">'+(r.filed?'已报账':'待报账')+'</span></td>'
       + '<td class="note">'+escHtml(r.note||'')+'</td>'
@@ -4544,6 +4589,7 @@ function expPrintHtml(list, s, scope, autoPrint){
    +'.card .k{font-size:11px;color:#64748b;margin-bottom:4px}'
    +'.card .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}'
    +'.card.unpaid .v{color:#b45309}.card.paid .v{color:#047857}'
+   +'.card .v.inc-amt{color:#047857}'
    +'.accts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}'
    +'.ac{flex:1 1 150px;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;display:flex;flex-direction:column;gap:3px}'
    +'.ac-name{font-size:12px;font-weight:600;color:#334155}'
@@ -4561,6 +4607,7 @@ function expPrintHtml(list, s, scope, autoPrint){
    +'td.idx{color:#94a3b8}'
    +'td.desc{min-width:150px}'
    +'td.amt{font-weight:600}'
+   +'td.amt.inc{color:#047857}'
    +'td.note{color:#64748b;font-size:11.5px}'
    +'.none{color:#cbd5e1}'
    +'.vch{display:inline-block;min-width:20px;padding:1px 7px;border-radius:9px;background:#f1f5f9;color:#475569;font-size:11px;font-weight:600}'
@@ -4584,18 +4631,20 @@ function expPrintHtml(list, s, scope, autoPrint){
    +'<div class="head"><h1>报账汇总明细单</h1>'
    +'<div class="meta">统计范围：<b>'+escHtml(scope)+'</b> ｜ 共 <b>'+list.length+'</b> 笔 ｜ 凭证 <b>'+invN+'</b> 张 ｜ 生成时间：'+when+'</div></div>'
    +'<div class="cards">'
-   +'<div class="card"><div class="k">合计支出</div><div class="v">'+fmtCNY(s.total)+'</div></div>'
+   +'<div class="card"><div class="k">合计支出（净额）</div><div class="v">'+fmtCNY(s.total)+'</div></div>'
    +'<div class="card unpaid"><div class="k">待报账</div><div class="v">'+fmtCNY(s.unpaid)+'</div></div>'
    +'<div class="card paid"><div class="k">已报账</div><div class="v">'+fmtCNY(s.paid)+'</div></div>'
    +'<div class="card"><div class="k">凭证张数</div><div class="v">'+invN+' 张</div></div>'
    +'</div>'
+   +(s.incCount?('<div class="meta" style="margin:-6px 0 14px">本范围内含收入 <b style="color:#047857">'+fmtCNY(s.inc)+'</b>（'+s.incCount+' 笔，负数记录），已与支出自动相抵。</div>'):'')
    +(acctBits?('<div class="accts">'+acctBits+'</div>'):'')
    +'<table><thead><tr><th>序号</th><th>日期</th><th>类别</th><th>事由</th><th>收款方</th><th>金额(元)</th><th>凭证</th><th>报账状态</th><th>备注</th><th>记账账户</th></tr></thead>'
    +'<tbody>'+rows+'</tbody>'
    +'<tfoot><tr><td colspan="5">合计（共 '+list.length+' 笔）</td>'
    +'<td class="r">'+eNum(s.total).toFixed(2)+'</td>'
    +'<td class="c">'+invN+' 张</td>'
-   +'<td colspan="3" class="tsub">'+(s.unpaidCount?('其中待报账 '+fmtCNY(s.unpaid)+'（'+s.unpaidCount+' 笔）'):'全部已报账')+'</td>'
+   +'<td class="tsub">'+(s.unpaidCount?('其中待报账 '+fmtCNY(s.unpaid)+'（'+s.unpaidCount+' 笔）'):'全部已报账')
+     +(s.incCount?(' ｜ 含收入 '+fmtCNY(s.inc)+'（'+s.incCount+' 笔）'):'')+'</td>'
    +'</tr></tfoot></table>'
    +'<div class="sign"><span>经手人：____________</span><span>审核：____________</span><span>日期：____________</span></div>'
    +'<div class="foot">本明细单由「办公工作台 · 报账整理」自动生成 ｜ 附件凭证见同目录「凭证」文件夹</div>'
@@ -4607,7 +4656,8 @@ function expReadmeTxt(list, s, scope){
    +'========================================\r\n'
    +'统计范围：'+scope+'\r\n'
    +'记录笔数：'+list.length+' 笔\r\n'
-   +'金额合计：'+fmtCNY(s.total)+'\r\n'
+   +'金额合计（净额）：'+fmtCNY(s.total)+'\r\n'
+   +(s.incCount?('其中收入：'+fmtCNY(s.inc)+'（'+s.incCount+' 笔，负数记录，已与支出相抵）\r\n'):'')
    +'待报账金额：'+fmtCNY(s.unpaid)+'（'+s.unpaidCount+' 笔）\r\n'
    +'凭证张数：'+s.files+' 张\r\n'
    +'打包时间：'+new Date().toLocaleString('zh-CN')+'\r\n'
@@ -4629,7 +4679,7 @@ function expPackageAction(){
   if(!picked.length){ showToast('先在明细里勾选要报账的条目（可点「全选待报账条目」一次选完）'); return; }
   const s=expSum(picked);
   showConfirm('把勾选的 '+picked.length+' 笔打包成 zip？\n'
-    +'合计 '+fmtCNY(s.total)+'，凭证 '+s.files+' 张', ()=>{
+    +'合计 '+fmtCNY(s.total)+(s.incCount?('（其中收入 '+fmtCNY(s.inc)+'）'):'')+'，凭证 '+s.files+' 张', ()=>{
       const ok = expDoPackage(picked, s);
       if(!ok) return;
       expSel={}; renderExpenses();
@@ -4830,6 +4880,7 @@ function seedExpSample(){
     mk(day(-12),'langges',128,'快递费','寄样品到深圳货代','顺丰',false,'张运单号待补'),
     mk(day(-8),'fansi',460,'样品费','BJJ 道服打样费','某某制衣厂',false,''),
     mk(day(-3),'langges',86,'交通','去客户处谈订单往返打车','',false,''),
+    mk(day(-5),'langges',-200,'样品费','客户退回多收的样品费','墨西哥客户',false,'负数=收入，会跟支出自动相抵'),
     mk(day(-20),'zz',1200,'办公用品','部门打印纸和墨盒','文具店',true,'已交财务（示例）')
   );
   expAttachSampleVouchers();   // 示例记录自带一张示例凭证，方便看清「凭证」文件夹长什么样
