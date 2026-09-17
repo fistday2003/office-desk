@@ -420,9 +420,11 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .exp-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 .exp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
 .exp-head-left{min-width:260px;flex:1 1 320px}
-.exp-filterwrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-wrap:wrap;padding-top:4px}
-.exp-filterwrap .exp-toolbar{margin-bottom:0;justify-content:flex-end}
+.exp-filterwrap{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:7px;padding-top:4px}
+.exp-filterwrap .exp-toolbar{margin-bottom:0;justify-content:flex-end;gap:6px;flex-wrap:wrap}
 .exp-filterwrap .exp-select{min-height:32px;padding:5px 10px}
+.exp-filterwrap .exp-chip{padding:5px 11px;font-size:12px}
+.exp-filter-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
 .exp-select{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text);width:auto;min-height:36px}
 .exp-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:600;background:var(--card-bg);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;transition:var(--transition)}
 .exp-chip:hover{border-color:var(--primary);color:var(--primary-dark)}
@@ -621,7 +623,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.4 · 2026-09-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.5 · 2026-09-17</div>
     </div>
   </aside>
 
@@ -973,7 +975,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.6.4';
+const APP_VERSION = 'v1.6.5';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4020,7 +4022,7 @@ function renderExpenses(){
 
   let html='';
 
-  // ---- 筛选条：月份 + 报账状态 + 记账账户（渲染到标题行右侧的 expFilterBar）----
+  // ---- 筛选条：月份 + 报账状态 + 记账账户（一行，渲染到标题行右侧的 expFilterBar，v1.6.5）----
   let fhtml='';
   fhtml+='<div class="exp-toolbar">';
   fhtml+='<select class="exp-select" id="expMonthSel" onchange="expPickMonth(this.value)">';
@@ -4032,10 +4034,7 @@ function renderExpenses(){
   fhtml+='<span class="exp-chip'+(expSelStatus==='all'?' active':'')+'" onclick="expPickStatus(\'all\')">全部</span>';
   fhtml+='<span class="exp-chip'+(expSelStatus==='wait'?' active':'')+'" onclick="expPickStatus(\'wait\')">待报账</span>';
   fhtml+='<span class="exp-chip'+(expSelStatus==='done'?' active':'')+'" onclick="expPickStatus(\'done\')">已报账</span>';
-  fhtml+='</div>';
-
-  // ---- 筛选条：记账账户 ----
-  fhtml+='<div class="exp-toolbar">';
+  fhtml+='<span class="exp-filter-sep"></span>';
   fhtml+='<span class="exp-chip'+(expSelAccount==='all'?' active':'')+'" onclick="expPickAccount(\'all\')">全部账户</span>';
   EXP_ACCOUNTS.forEach(a=>{
     fhtml+='<span class="exp-chip'+(expSelAccount===a.key?' active':'')+'" onclick="expPickAccount(\''+a.key+'\')">'+escHtml(a.name)+'</span>';
