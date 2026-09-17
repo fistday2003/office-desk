@@ -435,15 +435,17 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .exp-sum .es-foot{font-size:11.5px;color:var(--text-muted);margin-top:4px}
 .exp-sum.unpaid .es-value{color:var(--danger)}
 .exp-sum.paid .es-value{color:#047857}
-.exp-acct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.exp-acct{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#f8fafc}
-.exp-acct .ea-name{font-size:12px;font-weight:600;color:var(--text-secondary)}
-.exp-acct .ea-amt{font-size:16px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
-.exp-acct .ea-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
 .exp-acct-tag{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap}
 .exp-acct-tag.lg{background:#e0f2fe;color:#0369a1}
 .exp-acct-tag.fs{background:#fef3c7;color:#b45309}
 .exp-acct-tag.zz{background:#e0e7ff;color:#4338ca}
+/* 紧凑小计行（v1.6.4）：标题 + chips 同一行 */
+.exp-mini-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.exp-mini-title{font-size:13.5px;font-weight:700;color:var(--text);flex-shrink:0}
+.exp-mini-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}
+.exp-mini-chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-secondary);padding:3px 10px;border:1px solid var(--border);border-radius:8px;background:#f8fafc;white-space:nowrap;font-variant-numeric:tabular-nums}
+.exp-mini-chip b{font-size:13px;color:var(--text);font-weight:700}
+.exp-mini-chip .inc{font-style:normal;font-size:11px;font-weight:600;color:#15803d}
 .exp-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card-bg);margin-bottom:9px;transition:var(--transition)}
 .exp-item:hover{border-color:#cbd5e1;box-shadow:var(--shadow)}
 .exp-item.filed{opacity:.6}
@@ -488,7 +490,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .mnav-item svg{width:19px;height:19px}
   .exp-sums{grid-template-columns:repeat(2,1fr);gap:10px}
   .exp-sum .es-value{font-size:18px}
-  .exp-acct-grid{grid-template-columns:1fr}
+  .exp-mini-head{align-items:flex-start;flex-direction:column;gap:8px}
   .exp-item{padding:11px 12px;gap:10px;flex-wrap:wrap}
   .exp-item-main{flex:1 1 100%}
   .exp-right{width:100%;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -619,7 +621,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.3 · 2026-09-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.4 · 2026-09-17</div>
     </div>
   </aside>
 
@@ -971,7 +973,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.6.3';
+const APP_VERSION = 'v1.6.4';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4049,20 +4051,22 @@ function renderExpenses(){
   html+='<div class="exp-sum"><div class="es-label">发票照片</div><div class="es-value">'+s.files+' 张</div><div class="es-foot">打包时会一起带走</div></div>';
   html+='</div>';
 
-  // ---- 按记账账户 ----
+  // ---- 按记账账户（紧凑版：标题 + chips 同一行，v1.6.4）----
   html+='<div class="dash-panel">';
-  html+='<div class="dash-panel-title" style="margin-bottom:12px">按记账账户小计（当前统计范围内的全部账户）</div>';
-  html+='<div class="exp-acct-grid">';
+  html+='<div class="exp-mini-head">';
+  html+='<span class="exp-mini-title" title="当前统计范围内的全部账户">按记账账户小计</span>';
+  html+='<span class="exp-mini-chips">';
   EXP_ACCOUNTS.forEach(a=>{
     const as=expSum(base.filter(r=>r.account===a.key));
-    html+='<div class="exp-acct">';
-    html+='<div class="ea-name"><span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span></div>';
-    html+='<div class="ea-amt">'+fmtCNY(as.total)+'</div>';
-    html+='<div class="ea-sub">'+as.count+' 笔'+(as.unpaidCount?(' · 待报 '+fmtCNY(as.unpaid)):' · 全部已报')
-      +(as.incCount?(' · 含收入 '+fmtCNY(as.inc)):'')+'</div>';
-    html+='</div>';
+    html+='<span class="exp-mini-chip" title="'+as.count+' 笔 · '
+      +(as.unpaidCount?('待报 '+fmtCNY(as.unpaid)):'全部已报')
+      +(as.incCount?(' · 含收入 '+fmtCNY(as.inc)):'')+'">'
+      +'<span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span>'
+      +'<b>'+fmtCNY(as.total)+'</b>'
+      +(as.incCount?('<i class="inc">含收'+fmtCNY(as.inc)+'</i>'):'')
+      +'</span>';
   });
-  html+='</div></div>';
+  html+='</span></div></div>';
 
   // ---- 按费用类别 ----
   const catMap={};
@@ -4073,12 +4077,13 @@ function renderExpenses(){
   const cats=Object.keys(catMap).sort((x,y)=>catMap[y]-catMap[x]);
   if(cats.length>1){
     html+='<div class="dash-panel">';
-    html+='<div class="dash-panel-title" style="margin-bottom:12px">按费用类别小计</div>';
-    html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    html+='<div class="exp-mini-head">';
+    html+='<span class="exp-mini-title">按费用类别小计</span>';
+    html+='<span class="exp-mini-chips">';
     cats.forEach(c=>{
       html+='<span class="dash-chip">'+escHtml(c)+' '+fmtCNY(catMap[c])+'</span>';
     });
-    html+='</div></div>';
+    html+='</span></div></div>';
   }
 
   // ---- 待报账提醒 ----
