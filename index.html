@@ -645,7 +645,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.7.0 · 2026-09-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.7.1 · 2026-09-18</div>
     </div>
   </aside>
 
@@ -891,7 +891,10 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px" id="expCatChips"></div>
     <div class="form-group"><label>事由 / 摘要</label><input type="text" id="expDesc" placeholder="这笔钱花在哪了"></div>
-    <div class="form-group"><label>收款方（可留空）</label><input type="text" id="expPayee" placeholder="付给了谁，如 顺丰 / 某供应商"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>收款方（可留空）</label><input type="text" id="expPayee" placeholder="付给了谁，如 顺丰 / 某供应商"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>经手人（可留空）</label><input type="text" id="expHandler" placeholder="谁经手这笔钱，如 孟伊"></div>
+    </div>
     <div class="form-group"><label>备注（可留空）</label><textarea id="expNote" rows="2" placeholder="发票号、补充说明"></textarea></div>
     <div class="form-group">
       <label>发票 / 收据照片（可多张，最多 9 张，也可把文件直接拖进来）</label>
@@ -1058,7 +1061,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.7.0';
+const APP_VERSION = 'v1.7.1';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4283,6 +4286,7 @@ function expItemHtml(r, withCheck){
   if(r.filed && r.filedAt) h+='<span>· 报账于 '+escHtml(r.filedAt)+'</span>';
   if(r.category) h+='<span>· '+escHtml(r.category)+'</span>';
   if(r.payee)    h+='<span>· '+escHtml(isIncome?'收自 ':'付给 ')+escHtml(r.payee)+'</span>';
+  if(r.handler)  h+='<span>· 经手 '+escHtml(r.handler)+'</span>';
   if(nf)         h+='<span>· 凭证 '+nf+' 张</span>';
   h+='</div>';
   if(r.note) h+='<div class="exp-line2"><span>备注：'+escHtml(r.note)+'</span></div>';
@@ -4416,6 +4420,7 @@ function openExpModal(id){
   document.getElementById('expCategory').value = rec ? (rec.category||'') : '';
   document.getElementById('expDesc').value = rec ? (rec.desc||'') : '';
   document.getElementById('expPayee').value = rec ? (rec.payee||'') : '';
+  document.getElementById('expHandler').value = rec ? (rec.handler||'') : '';
   document.getElementById('expNote').value = rec ? (rec.note||'') : '';
   expModalFiles = (rec && rec.files) ? rec.files.slice() : [];
   expModalPending = 0;
@@ -4472,6 +4477,7 @@ function saveExpRecord(){
     category: String(document.getElementById('expCategory').value||'').trim(),
     desc: desc,
     payee: String(document.getElementById('expPayee').value||'').trim(),
+    handler: String(document.getElementById('expHandler').value||'').trim(),
     note: String(document.getElementById('expNote').value||'').trim(),
     files: expModalFiles.slice(),
     createdAt: Date.now()
@@ -5250,16 +5256,16 @@ function expCsv(list, invoiceNames){
     const s=String(v==null?'':v);
     return /[",\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
   };
-  // 列序：序号 / 日期 / 费用类别 / 事由 / 收款方 / 金额 / 报账状态 / 备注 / 凭证文件 / 记账账户（记账账户放最后）
-  let out='序号,日期,费用类别,事由,收款方,金额(元),报账状态,备注,凭证文件,记账账户\n';
+  // 列序：序号 / 日期 / 费用类别 / 事由 / 收款方 / 经手人 / 金额 / 报账状态 / 备注 / 凭证文件 / 记账账户（记账账户放最后）
+  let out='序号,日期,费用类别,事由,收款方,经手人,金额(元),报账状态,备注,凭证文件,记账账户\n';
   let i=0,total=0;
   list.forEach((r,k)=>{
     i++; total+=eNum(r.amount);
-    out+=[i, r.date||'', r.category||'', r.desc||'', r.payee||'',
+    out+=[i, r.date||'', r.category||'', r.desc||'', r.payee||'', r.handler||'',
           eNum(r.amount).toFixed(2), r.filed?'已报账':'待报账', r.note||'',
           (invoiceNames[k]||[]).join(' '), expAcctName(r.account)].map(q).join(',')+'\n';
   });
-  out+=['','','','','合计',total.toFixed(2),'','','',''].map(q).join(',')+'\n';
+  out+=['','','','','合计','',total.toFixed(2),'','','',''].map(q).join(',')+'\n';
   return out;
 }
 function expPrintHtml(list, s, scope, autoPrint){
@@ -5267,7 +5273,7 @@ function expPrintHtml(list, s, scope, autoPrint){
   const two=n=>String(n).padStart(2,'0');
   const when=now.getFullYear()+'-'+two(now.getMonth()+1)+'-'+two(now.getDate())+' '+two(now.getHours())+':'+two(now.getMinutes());
   let rows='', i=0, invN=0;
-  // 列序：序号 / 日期 / 类别 / 事由 / 收款方 / 金额 / 凭证 / 状态 / 备注 / 记账账户（记账账户放最后）
+  // 列序：序号 / 日期 / 类别 / 事由 / 收款方 / 经手人 / 金额 / 凭证 / 状态 / 备注 / 记账账户（记账账户放最后）
   list.forEach(r=>{
     i++;
     const a=expAcct(r.account);
@@ -5278,6 +5284,7 @@ function expPrintHtml(list, s, scope, autoPrint){
       + '<td class="c">'+(r.category?escHtml(r.category):'<span class="none">—</span>')+'</td>'
       + '<td class="desc">'+escHtml(r.desc||'')+'</td>'
       + '<td class="c">'+(r.payee?escHtml(r.payee):'<span class="none">—</span>')+'</td>'
+      + '<td class="c">'+(r.handler?escHtml(r.handler):'<span class="none">—</span>')+'</td>'
       + '<td class="r amt'+(eNum(r.amount)<0?' inc':'')+'">'+eNum(r.amount).toFixed(2)+'</td>'
       + '<td class="c">'+(nf?'<span class="vch">'+nf+'</span>':'<span class="none">—</span>')+'</td>'
       + '<td class="c"><span class="st '+(r.filed?'done':'wait')+'">'+(r.filed?'已报账':'待报账')+'</span></td>'
@@ -5357,9 +5364,9 @@ function expPrintHtml(list, s, scope, autoPrint){
    +'</div>'
    +(s.incCount?('<div class="meta" style="margin:-6px 0 14px">本范围内含收入 <b style="color:#047857">'+fmtCNY(s.inc)+'</b>（'+s.incCount+' 笔，负数记录），已与支出自动相抵。</div>'):'')
    +(acctBits?('<div class="accts">'+acctBits+'</div>'):'')
-   +'<table><thead><tr><th>序号</th><th>日期</th><th>类别</th><th>事由</th><th>收款方</th><th>金额(元)</th><th>凭证</th><th>报账状态</th><th>备注</th><th>记账账户</th></tr></thead>'
+   +'<table><thead><tr><th>序号</th><th>日期</th><th>类别</th><th>事由</th><th>收款方</th><th>经手人</th><th>金额(元)</th><th>凭证</th><th>报账状态</th><th>备注</th><th>记账账户</th></tr></thead>'
    +'<tbody>'+rows+'</tbody>'
-   +'<tfoot><tr><td colspan="5">合计（共 '+list.length+' 笔）</td>'
+   +'<tfoot><tr><td colspan="6">合计（共 '+list.length+' 笔）</td>'
    +'<td class="r">'+eNum(s.total).toFixed(2)+'</td>'
    +'<td class="c">'+invN+' 张</td>'
    +'<td class="tsub">'+(s.unpaidCount?('其中待报账 '+fmtCNY(s.unpaid)+'（'+s.unpaidCount+' 笔）'):'全部已报账')
@@ -5591,15 +5598,15 @@ function expAttachSampleVouchers(){
 function seedExpSample(){
   const d=new Date();
   const day=n=>{const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')};
-  const mk=(date,account,amount,category,desc,payee,filed,note)=>({
+  const mk=(date,account,amount,category,desc,payee,filed,note,handler)=>({
     id:uid(), date:date, amount:amount, account:account, category:category,
-    desc:desc, payee:payee||'', note:note||'', files:[], filed:!!filed,
+    desc:desc, payee:payee||'', handler:handler||'', note:note||'', files:[], filed:!!filed,
     filedAt:filed?date:undefined,
     createdAt:Date.now(), _sample:true
   });
   expenses.push(
-    mk(day(-12),'langges',128,'快递费','寄样品到深圳货代','顺丰',false,'张运单号待补'),
-    mk(day(-8),'fansi',460,'样品费','BJJ 道服打样费','某某制衣厂',false,''),
+    mk(day(-12),'langges',128,'快递费','寄样品到深圳货代','顺丰',false,'张运单号待补','孟伊'),
+    mk(day(-8),'fansi',460,'样品费','BJJ 道服打样费','某某制衣厂',false,'','李雪洋'),
     mk(day(-3),'langges',86,'交通','去客户处谈订单往返打车','',false,''),
     mk(day(-5),'langges',-200,'样品费','客户退回多收的样品费','墨西哥客户',false,'负数=收入，会跟支出自动相抵'),
     mk(day(-20),'zz',1200,'办公用品','部门打印纸和墨盒','文具店',true,'已交财务（示例）')
