@@ -486,6 +486,23 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:inherit}
 .exp-drop{border:1px dashed var(--border);border-radius:8px;padding:14px;text-align:center;font-size:12.5px;color:var(--text-muted);cursor:pointer;background:#f8fafc;transition:var(--transition)}
 .exp-drop:hover{border-color:var(--primary);color:var(--primary-dark)}
+/* ===== 货损 / 客诉登记 ===== */
+.clm-tag{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap}
+.clm-tag-ct{background:#fee2e2;color:#b91c1c}
+.clm-tag-hs{background:#ffedd5;color:#c2410c}
+.clm-tag-ot{background:#e2e8f0;color:#475569}
+.clm-blocktitle{font-size:14px;font-weight:700;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.clm-blocktitle .cnt{font-size:12px;font-weight:600;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:1px 9px}
+.clm-group{border:1px solid var(--border);border-radius:10px;background:var(--card-bg);margin-bottom:10px;overflow:hidden}
+.clm-group-head{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;font-weight:600;font-size:13.5px;transition:var(--transition)}
+.clm-group-head:hover{background:#f8fafc}
+.clm-group-head .clm-arrow{display:inline-block;transition:transform .18s;color:var(--text-muted);font-size:12px}
+.clm-group.open .clm-arrow{transform:rotate(90deg)}
+.clm-group-head .clm-gsum{margin-left:auto;font-size:12px;font-weight:500;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.clm-group-body{display:none;padding:6px 12px 12px;border-top:1px solid var(--border)}
+.clm-group.open .clm-group-body{display:block}
+.clm-line3{font-size:12.5px;color:var(--text-secondary);margin-top:5px;line-height:1.65;word-break:break-word}
+.clm-line3 b{color:var(--text);font-weight:600}
 
 @media (max-width:768px){
   .mnav-item{flex:1 1 0;min-width:0;padding:10px 2px}
@@ -604,6 +621,11 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         报账整理
         <span class="nav-badge" id="expBadge" style="display:none">0</span>
       </button>
+      <button class="nav-item" data-tab="claims">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        货损客诉
+        <span class="nav-badge" id="clmBadge" style="display:none">0</span>
+      </button>
       <button class="nav-item" data-tab="data">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
         数据看板
@@ -623,7 +645,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.6.5 · 2026-09-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.7.0 · 2026-09-17</div>
     </div>
   </aside>
 
@@ -690,6 +712,20 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
       <div id="expContent"></div>
     </div>
 
+    <!-- TAB: 货损客诉 -->
+    <div class="tab-panel" id="tab-claims">
+      <div class="exp-head">
+        <div class="exp-head-left">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            货损 / 客诉登记
+          </div>
+          <p class="section-subtitle">客诉、货损随手登记；汇报过的按日期折叠归档，勾选未汇报条目一键导出 Excel 汇报包（图片直接嵌进表格）</p>
+        </div>
+      </div>
+      <div id="clmContent"></div>
+    </div>
+
     <!-- TAB: 数据看板 -->
     <div class="tab-panel" id="tab-data">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
@@ -753,6 +789,10 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
     报账
   </button>
+  <button class="mnav-item" data-mtab="claims">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    客诉
+  </button>
   <button class="mnav-item" data-mtab="data">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
     数据
@@ -772,6 +812,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 <input type="file" id="projectFileInput" multiple style="display:none" onchange="handleProjectFilePick()">
 <input type="file" id="noteFileInput" multiple style="display:none" onchange="handleNoteFilePick()">
 <input type="file" id="expFileInput" multiple style="display:none" onchange="handleExpFilePick()">
+<input type="file" id="clmFileInput" multiple style="display:none" onchange="handleClmFilePick()">
 
 <!-- ====== MODAL: Task ====== -->
 <div class="modal-overlay" id="modalTask" style="display:none">
@@ -878,6 +919,48 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   </div>
 </div>
 
+<!-- ====== MODAL: 货损/客诉登记 ====== -->
+<div class="modal-overlay" id="modalClm" style="display:none">
+  <div class="modal" data-drop-clm-modal="1">
+    <h3 id="modalClmTitle">登记货损 / 客诉</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>发生日期</label><input type="date" id="clmDate"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>项目</label><select id="clmProject"></select></div>
+      <div class="form-group" style="flex:1 1 110px"><label>问题性质</label><select id="clmNature"></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>负责业务</label><input type="text" id="clmOwner" placeholder="如 孟伊"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>客户名</label><input type="text" id="clmCustomer" placeholder="客户 / 店铺名"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>货损金额（元，可留空）</label><input type="number" id="clmAmount" step="0.01" placeholder="0.00" inputmode="decimal"></div>
+    </div>
+    <div class="form-group"><label>问题描述</label><textarea id="clmDesc" rows="3" placeholder="发生了什么、涉及哪个订单 / 哪批货"></textarea></div>
+    <div class="form-group"><label>解决方案（可留空，后续补充）</label><textarea id="clmSolution" rows="2" placeholder="怎么处理：补发 / 退款 / 折扣补偿…"></textarea></div>
+    <div class="form-group"><label>责任 / 责任部门（手工填写，可留空）</label><input type="text" id="clmResponsibility" placeholder="如 生产部 / 车缝组 / 货代 / 客户自身"></div>
+    <div class="form-group">
+      <label>相关资料（图片 / PDF 等，最多 9 个，也可把文件直接拖进来）</label>
+      <div class="exp-drop" id="clmDropZone" onclick="pickClmModalFiles()">点这里选文件，或把图片 / PDF 拖到这个框里</div>
+      <div class="task-files" id="clmModalFiles"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="btnClmCancel">取消</button>
+      <button class="btn btn-primary" id="btnClmSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 标记已汇报（选汇报日期） ====== -->
+<div class="modal-overlay" id="modalClmReport" style="display:none">
+  <div class="modal" style="width:min(430px,94vw)">
+    <h3>标记为已汇报</h3>
+    <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px">把选中的 <b id="clmReportCount" style="color:var(--text)">0</b> 条登记给上级 / 相关方后，在这里填<b style="color:var(--text)">汇报日期</b>。之后这些记录会折叠到「汇报日期 已汇报」分组下，点标题可展开。</p>
+    <div class="form-group"><label>汇报日期</label><input type="date" id="clmReportDate"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalClmReport')">取消</button>
+      <button class="btn btn-primary" onclick="doClmMarkReported()">确认标记</button>
+    </div>
+  </div>
+</div>
+
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
 <div class="modal-overlay" id="modalDash" style="display:none">
   <div class="modal">
@@ -975,11 +1058,12 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.6.5';
+const APP_VERSION = 'v1.7.0';
 let tasks = [];
 let notes = [];
 let projects = [];
 let expenses = [];
+let claims = [];   // 货损 / 客诉登记
 let currentTab = 'tasks';
 let editingId = null;
 let noteFilterTag = null;
@@ -1000,11 +1084,14 @@ function loadData(){
     projects = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'projects')||'[]');
     dashboard = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'dashboard')||'[]');
     expenses = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'expenses')||'[]');
-  }catch(e){tasks=[];notes=[];projects=[];dashboard=[];expenses=[]}
+    claims = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'claims')||'[]');
+  }catch(e){tasks=[];notes=[];projects=[];dashboard=[];expenses=[];claims=[]}
   if(!Array.isArray(dashboard)) dashboard=[];
   if(!Array.isArray(expenses)) expenses=[];
+  if(!Array.isArray(claims)) claims=[];
   healDashboard();
   expHeal();
+  clmHeal();
 }
 
 // 修复历史脏数据：早期版本把凡适的店铺标识写成了 fanshi / 中文名，
@@ -1038,6 +1125,7 @@ function saveAll(){
     localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(projects));
     localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
     localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(expenses));
+    localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(claims));
   }catch(e){
     showToast('⚠️ 保存失败：本地存储空间已满。请删除部分附件或导出备份后清理');
   }
@@ -1079,11 +1167,11 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + expenses.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + expenses.length + claims.length}
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || expenses.some(e=>e._sample);
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample);
 }
 
 // Clear sample data
@@ -1093,6 +1181,7 @@ function clearSampleData(){
   projects = projects.filter(p=>!p._sample);
   dashboard = dashboard.filter(d=>!d._sample);
   expenses = expenses.filter(e=>!e._sample);
+  claims = claims.filter(c=>!c._sample);
   saveAll();
 }
 
@@ -2102,7 +2191,7 @@ function viewNoteFile(nid, idx){
 
 // ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 速记卡片 / 新建编辑弹窗）=====
 function dropZoneFromEvent(e){
-  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal]') : null;
+  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal],[data-drop-clm-modal]') : null;
 }
 document.addEventListener('dragover', e=>{
   const zone = dropZoneFromEvent(e);
@@ -2124,6 +2213,7 @@ document.addEventListener('drop', e=>{
   const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
   if(files.length===0) return;
   if(zone.dataset.dropExpModal) addExpModalFilesFromList(files);
+  else if(zone.dataset.dropClmModal) addClmModalFilesFromList(files);
   else if(zone.dataset.dropNoteModal) addNoteModalFilesFromList(files);
   else if(zone.dataset.dropNote) addNoteFilesFromList(zone.dataset.dropNote, files);
   else if(zone.dataset.dropModal) addProjectModalFilesFromList(files);
@@ -3004,7 +3094,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,expenses,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,expenses,claims,exportedAt:new Date().toISOString()};
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3036,6 +3126,8 @@ document.getElementById('importFile').addEventListener('change',function(){
         dashboard = data.dashboard || [];
         // 报账数据：旧备份里没有这个字段时，保留本机已有记录，不能清空
         if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = data.expenses || [];
+        // 货损客诉：同样旧备份没有这字段时保留本机
+        if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = data.claims || [];
         saveAll();
         refreshAll();
         showToast('导入成功！共恢复 '+totalItems()+' 条数据', 'info');
@@ -3051,7 +3143,7 @@ document.getElementById('importFile').addEventListener('change',function(){
 // Clear all data
 document.getElementById('btnClearAll').addEventListener('click',()=>{
   showConfirm('确定要清空所有数据吗？此操作不可恢复！建议先导出备份。', ()=>{
-    tasks = []; notes = []; projects = []; dashboard = []; expenses = [];
+    tasks = []; notes = []; projects = []; dashboard = []; expenses = []; claims = [];
     saveAll();
     refreshAll();
     showToast('所有数据已清空');
@@ -3257,7 +3349,7 @@ async function doSyncUpload(){
   showToast('<span class="sync-spinner"></span>正在上传 '+count+' 条数据...', 'info');
 
   // 附件（图片/文件）体积大且只保存在本机，不随同步传输
-  const hasFiles = tasks.some(t=>(t.files||[]).length>0) || projects.some(p=>(p.files||[]).length>0) || notes.some(n=>(n.files||[]).length>0) || expenses.some(e2=>(e2.files||[]).length>0);
+  const hasFiles = tasks.some(t=>(t.files||[]).length>0) || projects.some(p=>(p.files||[]).length>0) || notes.some(n=>(n.files||[]).length>0) || expenses.some(e2=>(e2.files||[]).length>0) || claims.some(c2=>(c2.files||[]).length>0);
   const syncTasks = tasks.map(t=>{
     const c = Object.assign({}, t);
     delete c.files;
@@ -3278,7 +3370,12 @@ async function doSyncUpload(){
     delete c.files;
     return c;
   });
-  const data = {v:5, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, expenses: syncExpenses, syncedAt:new Date().toISOString()};
+  const syncClaims = claims.map(c2=>{
+    const c = Object.assign({}, c2);
+    delete c.files;
+    return c;
+  });
+  const data = {v:6, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
   const jsonStr = JSON.stringify(data);
   const topic = getSyncTopic();
   const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
@@ -3426,7 +3523,7 @@ async function doSyncReceive(){
     return;
   }
 
-  const newTotal = (received.tasks||[]).length + (received.notes||[]).length + (received.projects||[]).length + (received.dashboard||[]).length + (received.expenses||[]).length;
+  const newTotal = (received.tasks||[]).length + (received.notes||[]).length + (received.projects||[]).length + (received.dashboard||[]).length + (received.expenses||[]).length + (received.claims||[]).length;
   const curTotal = totalItems();
   const syncTime = received.syncedAt ? new Date(received.syncedAt).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
 
@@ -3456,6 +3553,15 @@ async function doSyncReceive(){
         if(local && local.files && local.files.length) re.files = local.files;
         else re.files = re.files || [];
         return re;
+      });
+    }
+    // 货损客诉：同报账逻辑，旧包没有这字段则保留本机（含本机附件）
+    if(Object.prototype.hasOwnProperty.call(received,'claims')){
+      claims = (received.claims||[]).map(rc=>{
+        const local = claims.find(x=>x.id===rc.id);
+        if(local && local.files && local.files.length) rc.files = local.files;
+        else rc.files = rc.files || [];
+        return rc;
       });
     }
     saveAll();
@@ -3622,7 +3728,7 @@ function asHashOf(f){
   return f._h;
 }
 
-// 收集全部附件（任务 / 速记 / 项目）
+// 收集全部附件（任务 / 速记 / 项目 / 报账 / 货损客诉）
 function asCollectAttachments(){
   const out = [];
   const add = (ownerType, ownerId, arr)=>{
@@ -3635,6 +3741,7 @@ function asCollectAttachments(){
   notes.forEach(n=>add('note', n.id, n.files));
   projects.forEach(p=>add('project', p.id, p.files));
   expenses.forEach(e2=>add('expense', e2.id, e2.files));
+  claims.forEach(c2=>add('claim', c2.id, c2.files));
   return out;
 }
 
@@ -3660,9 +3767,9 @@ function asSnapshot(){
     _version:APP_VERSION,
     savedAt:new Date().toISOString(),
     counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
-            dashboard:dashboard.length, expenses:expenses.length, attachments:attCount},
+            dashboard:dashboard.length, expenses:expenses.length, claims:claims.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, expenses:light(expenses)
+    dashboard:dashboard, expenses:light(expenses), claims:light(claims)
   };
 }
 
@@ -3774,7 +3881,7 @@ async function asRestore(){
     let data = JSON.parse(await res.text());
     if(typeof data === 'string') data = JSON.parse(data);   // 兼容 v1.4 早期双重编码的快照
     if(!data || !data.tasks || !data.notes || !data.projects){ showToast('云端存档格式不正确'); return; }
-    const n = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length + (data.dashboard||[]).length + (data.expenses||[]).length;
+    const n = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length + (data.dashboard||[]).length + (data.expenses||[]).length + (data.claims||[]).length;
     const when = data.savedAt ? new Date(data.savedAt).toLocaleString('zh-CN') : '';
     showConfirm('云端存档共 ' + n + ' 条内容' + (when?('（'+when+'）'):'') +
       '\n将覆盖本机当前 ' + totalItems() + ' 条数据，本机已有附件不会丢失。确定恢复吗？', async ()=>{
@@ -3793,6 +3900,8 @@ async function asRestore(){
       projects = mergeFiles(projects, data.projects);
       // 报账数据：旧版快照里没有这个字段 → 保留本机，不能清空
       if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = mergeFiles(expenses, data.expenses);
+      // 货损客诉：同报账逻辑
+      if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = mergeFiles(claims, data.claims);
       if(Object.prototype.hasOwnProperty.call(data,'dashboard')) dashboard = data.dashboard || [];
       saveAll(); refreshAll();
       showToast('✓ 已恢复 ' + n + ' 条内容，正在补齐附件...', 'info');
@@ -3810,7 +3919,7 @@ async function asPullAttachments(){
   const cfg = getAsCfg();
   const jobs = [];
   const walk = (arr)=> (arr||[]).forEach(it=> (it.files||[]).forEach(f=>{ if(f && f.path && !f.dataUrl) jobs.push(f); }));
-  walk(tasks); walk(notes); walk(projects); walk(expenses);
+  walk(tasks); walk(notes); walk(projects); walk(expenses); walk(claims);
   if(!jobs.length) return;
   let ok = 0;
   const cache = {};
@@ -4442,6 +4551,612 @@ function removeExpModalFile(i){
   renderExpModalFiles();
 }
 
+// ============================================================
+//  货损 / 客诉登记
+// ============================================================
+const CLM_PROJECTS = ['凡适','朗格斯','其他'];
+const CLM_NATURES  = ['客诉','货损','其他'];
+let clmSel = {};          // 未汇报条目勾选：id -> true
+let clmGroupOpen = {};    // 已汇报分组展开状态：reportedAt -> true
+let editingClmId = null;
+let clmModalFiles = [];
+let clmModalPending = 0;
+let clmReportIds = [];    // 待标记汇报的记录 id 列表
+
+function clmHeal(){
+  let changed=false;
+  claims.forEach(r=>{
+    if(!r) return;
+    if(CLM_PROJECTS.indexOf(r.project)<0){ r.project='其他'; changed=true; }
+    if(CLM_NATURES.indexOf(r.nature)<0){ r.nature='其他'; changed=true; }
+    if(!r.date){ r.date=todayStr(); changed=true; }
+    if(typeof r.reported!=='boolean'){ r.reported=false; changed=true; }
+    if(r.reported && !r.reportedAt){ r.reportedAt=r.date||todayStr(); changed=true; }
+    if(!r.reported && r.reportedAt){ delete r.reportedAt; changed=true; }
+    if(!Array.isArray(r.files)){ r.files=[]; changed=true; }
+  });
+  claims=claims.filter(r=>r && r.date);
+  if(changed) saveAll();
+}
+function clmRenderBadge(){
+  const b=document.getElementById('clmBadge');
+  if(!b) return;
+  const n=claims.filter(r=>!r.reported).length;
+  if(n>0){ b.textContent=n; b.style.display=''; } else { b.style.display='none'; }
+}
+// 项目标签：复用报账三色（朗格斯蓝 / 凡适黄 / 其他靛）
+function clmProjectTag(p){
+  const cls = p==='朗格斯'?'lg':(p==='凡适'?'fs':'zz');
+  return '<span class="exp-acct-tag '+cls+'">'+escHtml(p||'其他')+'</span>';
+}
+// 性质标签：客诉红 / 货损橙 / 其他灰
+function clmNatureTag(n){
+  const cls = n==='客诉'?'clm-tag-ct':(n==='货损'?'clm-tag-hs':'clm-tag-ot');
+  return '<span class="clm-tag '+cls+'">'+escHtml(n||'其他')+'</span>';
+}
+function clmAmountVal(r){
+  const n=parseFloat(r.amount);
+  return isNaN(n)?0:n;
+}
+
+// ---------------- 列表渲染 ----------------
+function clmItemHtml(r, withCheck){
+  const nf=(r.files||[]).length;
+  const amt=clmAmountVal(r);
+  let h='<div class="exp-item">';
+  h+='<div class="exp-item-main">';
+  h+='<div class="exp-line1">';
+  if(withCheck) h+='<label class="exp-check"><input type="checkbox" '+(clmSel[r.id]?'checked':'')+' onchange="clmPick(\''+r.id+'\',this.checked)" title="勾选后一起导出 / 汇报"></label>';
+  h+=clmNatureTag(r.nature);
+  h+='<span class="exp-title">'+escHtml(r.customer||'（未填客户名）')+'</span></div>';
+  h+='<div class="exp-line2">';
+  h+=clmProjectTag(r.project);
+  h+='<span>'+escHtml(r.date||'')+'</span>';
+  if(r.owner) h+='<span>· 业务 '+escHtml(r.owner)+'</span>';
+  if(nf)      h+='<span>· 资料 '+nf+' 个</span>';
+  h+='</div>';
+  if(r.desc)          h+='<div class="clm-line3">'+escHtml(r.desc)+'</div>';
+  if(r.solution)      h+='<div class="clm-line3"><b>解决方案：</b>'+escHtml(r.solution)+'</div>';
+  if(r.responsibility)h+='<div class="clm-line3"><b>责任：</b>'+escHtml(r.responsibility)+'</div>';
+  if(nf){
+    h+='<div class="exp-thumbs">';
+    (r.files||[]).forEach((f,i)=>{
+      const isImg=(f.type||'').indexOf('image/')===0;
+      if(isImg && f.dataUrl) h+='<img src="'+f.dataUrl+'" onclick="viewClmFile(\''+r.id+'\','+i+')" title="点击预览">';
+    });
+    (r.files||[]).forEach((f,i)=>{
+      const isImg=(f.type||'').indexOf('image/')===0;
+      if(!isImg && f.dataUrl) h+='<button class="file-dl" onclick="viewClmFile(\''+r.id+'\','+i+')" title="点击预览 / 下载">'+escHtml(f.name)+'</button>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="exp-right">';
+  if(amt) h+='<div class="exp-amt" title="货损金额">'+fmtCNY(amt)+'</div>';
+  if(r.reported) h+='<div style="font-size:11px;color:var(--text-muted);white-space:nowrap">汇报于 '+escHtml(r.reportedAt||'')+'</div>';
+  h+='<div style="display:flex;gap:2px">';
+  h+='<button class="btn-icon" onclick="openClmModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
+  h+='<button class="btn-icon" onclick="deleteClmRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
+  h+='</div></div></div>';
+  return h;
+}
+function renderClaims(){
+  const box=document.getElementById('clmContent');
+  if(!box) return;
+  clmRenderBadge();
+  if(claims.length===0){
+    box.innerHTML='<div style="text-align:center;padding:46px 20px;color:var(--text-muted)">'
+      +'<p style="margin-bottom:14px">还没有登记过货损 / 客诉</p>'
+      +'<button class="btn btn-primary" onclick="openClmModal()">登记第一条</button></div>';
+    return;
+  }
+  const byTime=(a,b)=>{
+    if(a.date!==b.date) return a.date<b.date?1:-1;
+    return (b.createdAt||0)-(a.createdAt||0);
+  };
+  const unreported=claims.filter(r=>!r.reported).sort(byTime);
+  const reported=claims.filter(r=>r.reported).sort(byTime);
+  const groups={};
+  reported.forEach(r=>{ const g=r.reportedAt||r.date; (groups[g]=groups[g]||[]).push(r); });
+  const gkeys=Object.keys(groups).sort().reverse();
+  const selCount=unreported.filter(r=>clmSel[r.id]).length;
+
+  let h='';
+  // 工具行
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">';
+  h+='<button class="btn btn-primary" onclick="openClmModal()">＋ 登记一条</button>';
+  if(unreported.length){
+    const allSel = selCount===unreported.length;
+    h+='<button class="btn" onclick="clmToggleAll()">'+(allSel?'取消全选':'全选未汇报（'+unreported.length+'）')+'</button>';
+  }
+  if(selCount){
+    h+='<span style="font-size:12.5px;color:var(--text-muted);font-variant-numeric:tabular-nums">已选 '+selCount+' 条</span>';
+    h+='<button class="btn" onclick="clmExportExcelAction()">导出 Excel 汇报包</button>';
+    h+='<button class="btn" onclick="clmMarkReportedAction()">标记已汇报</button>';
+    h+='<button class="btn" onclick="clmClearSel()">清空勾选</button>';
+  }
+  h+='</div>';
+  // 未汇报（平铺，可勾选）
+  h+='<div class="clm-blocktitle">未汇报 <span class="cnt">'+unreported.length+'</span></div>';
+  if(!unreported.length){
+    h+='<div style="font-size:13px;color:var(--text-muted);padding:6px 2px 10px">没有待汇报的记录</div>';
+  } else {
+    unreported.forEach(r=>{ h+=clmItemHtml(r,true); });
+  }
+  // 已汇报（按汇报日期分组折叠，默认收起）
+  if(reported.length){
+    h+='<div class="clm-blocktitle">已汇报 <span class="cnt">'+reported.length+'</span></div>';
+    gkeys.forEach(gk=>{
+      const list=groups[gk];
+      const open=!!clmGroupOpen[gk];
+      const total=list.reduce((s,r)=>s+clmAmountVal(r),0);
+      h+='<div class="clm-group'+(open?' open':'')+'">';
+      h+='<div class="clm-group-head" onclick="clmToggleGroup(\''+gk+'\')">';
+      h+='<span class="clm-arrow">▶</span><span>'+escHtml(fmtDate(gk))+' 已汇报</span><span class="clm-gsum">'+list.length+' 笔'+(total?' · 货损 '+fmtCNY(total):'')+'</span></div>';
+      h+='<div class="clm-group-body">';
+      list.forEach(r=>{ h+=clmItemHtml(r,false); });
+      h+='</div></div>';
+    });
+  }
+  box.innerHTML=h;
+}
+
+// ---------------- 勾选 / 折叠交互 ----------------
+function clmPick(id, checked){
+  if(checked) clmSel[id]=true; else delete clmSel[id];
+  renderClaims();
+}
+function clmToggleAll(){
+  const unreported=claims.filter(r=>!r.reported);
+  const allSel = unreported.length>0 && unreported.every(r=>clmSel[r.id]);
+  if(allSel){ clmSel={}; } else { unreported.forEach(r=>{ clmSel[r.id]=true; }); }
+  renderClaims();
+}
+function clmClearSel(){ clmSel={}; renderClaims(); }
+function clmToggleGroup(gk){
+  clmGroupOpen[gk]=!clmGroupOpen[gk];
+  renderClaims();
+}
+
+// ---------------- 登记弹窗 ----------------
+function openClmModal(id){
+  editingClmId = id || null;
+  const rec = id ? claims.find(r=>r.id===id) : null;
+  document.getElementById('clmProject').innerHTML = CLM_PROJECTS.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
+  document.getElementById('clmNature').innerHTML = CLM_NATURES.map(n=>'<option value="'+n+'">'+n+'</option>').join('');
+  document.getElementById('modalClmTitle').textContent = rec ? '编辑货损 / 客诉记录' : '登记货损 / 客诉';
+  document.getElementById('clmDate').value = rec ? (rec.date||todayStr()) : todayStr();
+  document.getElementById('clmProject').value = rec ? (CLM_PROJECTS.indexOf(rec.project)>=0?rec.project:'其他') : '其他';
+  document.getElementById('clmNature').value = rec ? (CLM_NATURES.indexOf(rec.nature)>=0?rec.nature:'其他') : '其他';
+  document.getElementById('clmOwner').value = rec ? (rec.owner||'') : '';
+  document.getElementById('clmCustomer').value = rec ? (rec.customer||'') : '';
+  const amtEl=document.getElementById('clmAmount');
+  amtEl.value = rec ? (clmAmountVal(rec)||'') : '';
+  amtEl.style.color=''; amtEl.style.fontWeight='';
+  document.getElementById('clmDesc').value = rec ? (rec.desc||'') : '';
+  document.getElementById('clmSolution').value = rec ? (rec.solution||'') : '';
+  document.getElementById('clmResponsibility').value = rec ? (rec.responsibility||'') : '';
+  clmModalFiles = (rec && rec.files) ? rec.files.slice() : [];
+  clmModalPending = 0;
+  renderClmModalFiles();
+  document.getElementById('modalClm').style.display='flex';
+  if(!rec) setTimeout(()=>{ try{ document.getElementById('clmCustomer').focus(); }catch(e){} }, 120);
+}
+function saveClmRecord(){
+  const date=document.getElementById('clmDate').value || todayStr();
+  const customer=String(document.getElementById('clmCustomer').value||'').trim();
+  const desc=String(document.getElementById('clmDesc').value||'').trim();
+  if(!desc){ showToast('请填一下问题描述，方便回看'); try{document.getElementById('clmDesc').focus()}catch(e){} return; }
+  const amtRaw=String(document.getElementById('clmAmount').value||'').trim();
+  let amt='';
+  if(amtRaw!==''){
+    const n=parseFloat(amtRaw);
+    if(!isNaN(n)) amt=Math.round(n*100)/100;
+  }
+  const rec={
+    id: editingClmId || uid(),
+    date: date,
+    project: document.getElementById('clmProject').value || '其他',
+    owner: String(document.getElementById('clmOwner').value||'').trim(),
+    customer: customer,
+    desc: desc,
+    nature: document.getElementById('clmNature').value || '其他',
+    solution: String(document.getElementById('clmSolution').value||'').trim(),
+    amount: amt,
+    responsibility: String(document.getElementById('clmResponsibility').value||'').trim(),
+    files: clmModalFiles.slice(),
+    createdAt: Date.now()
+  };
+  const wasEdit = !!editingClmId;
+  if(wasEdit){
+    const i=claims.findIndex(r=>r.id===editingClmId);
+    if(i>=0){
+      rec.createdAt=claims[i].createdAt||Date.now();
+      rec.reported=!!claims[i].reported;
+      if(claims[i].reportedAt) rec.reportedAt=claims[i].reportedAt;
+      claims[i]=rec;
+    }
+  } else {
+    rec.reported=false;   // 新登记默认「未汇报」
+    claims.push(rec);
+  }
+  editingClmId=null;
+  saveAll();
+  closeModal('modalClm');
+  refreshAll();
+  showToast(wasEdit?'✓ 已更新':'✓ 已登记，默认在「未汇报」里', 'info');
+}
+function deleteClmRecord(id){
+  const r=claims.find(x=>x.id===id);
+  if(!r) return;
+  showConfirm('删除这条「'+(r.customer||r.desc||'未命名')+'」的记录？', ()=>{
+    claims=claims.filter(x=>x.id!==id);
+    delete clmSel[id];
+    saveAll(); refreshAll();
+    showToast('已删除');
+  });
+}
+
+// ---------------- 标记已汇报 ----------------
+function clmMarkReportedAction(){
+  const ids=claims.filter(r=>!r.reported && clmSel[r.id]).map(r=>r.id);
+  if(!ids.length){ showToast('先在「未汇报」里勾选要标记的条目'); return; }
+  clmReportIds=ids;
+  document.getElementById('clmReportCount').textContent=ids.length;
+  document.getElementById('clmReportDate').value=todayStr();
+  document.getElementById('modalClmReport').style.display='flex';
+}
+function doClmMarkReported(){
+  const d=document.getElementById('clmReportDate').value || todayStr();
+  let n=0;
+  clmReportIds.forEach(id=>{
+    const r=claims.find(x=>x.id===id);
+    if(r && !r.reported){ r.reported=true; r.reportedAt=d; n++; }
+  });
+  clmReportIds=[]; clmSel={};
+  saveAll(); closeModal('modalClmReport'); refreshAll();
+  showToast('✓ 已标记 '+n+' 条为「'+fmtDate(d)+' 已汇报」', 'info');
+}
+
+// ---------------- 相关资料附件 ----------------
+function pickClmModalFiles(){
+  const input=document.getElementById('clmFileInput');
+  input.value='';
+  input.click();
+}
+function handleClmFilePick(){
+  const input=document.getElementById('clmFileInput');
+  const files=Array.from(input.files||[]);
+  input.value='';
+  if(files.length===0) return;
+  addClmModalFilesFromList(files);
+}
+function addClmModalFilesFromList(files){
+  if(clmModalFiles.length + files.length > 9){ showToast('每条最多 9 个资料文件'); return; }
+  clmModalPending += files.length;
+  renderClmModalFiles();
+  const results=[];
+  let done=0;
+  files.forEach(f=>{
+    processTaskFile(f).then(r=>{
+      results.push(r); done++; clmModalPending--;
+      if(done>=files.length){ clmModalFiles=clmModalFiles.concat(results); clmModalPending=0; renderClmModalFiles(); }
+    }).catch(e=>{
+      showToast(e.message); done++; clmModalPending--;
+      if(done>=files.length && results.length){ clmModalFiles=clmModalFiles.concat(results); clmModalPending=0; renderClmModalFiles(); }
+      else if(done>=files.length){ clmModalPending=0; renderClmModalFiles(); }
+    });
+  });
+}
+function renderClmModalFiles(){
+  const box=document.getElementById('clmModalFiles');
+  if(!box) return;
+  let html='';
+  clmModalFiles.forEach((f,i)=>{
+    const isImg=(f.type||'').indexOf('image/')===0;
+    html+='<div class="task-file-item">';
+    if(isImg && f.dataUrl) html+='<img src="'+f.dataUrl+'" onclick="viewClmModalFile('+i+')" title="点击预览">';
+    else html+='<span class="file-ic">'+ICON_FILE+'</span>';
+    html+='<div class="file-info"><span class="file-name">'+escHtml(f.name||'附件')+'</span>'
+        + '<span class="file-size">'+fmtSize(f.size||0)+'</span></div>';
+    html+='<button class="task-file-del" onclick="removeClmModalFile('+i+')" title="移除">×</button>';
+    html+='</div>';
+  });
+  if(clmModalPending>0){
+    html+='<div style="font-size:12px;color:var(--text-muted);align-self:center">正在处理 '+clmModalPending+' 个…</div>';
+  }
+  box.innerHTML=html;
+}
+function removeClmModalFile(i){
+  clmModalFiles.splice(i,1);
+  renderClmModalFiles();
+}
+function viewClmModalFile(i){
+  if(clmModalFiles[i]) expShowPreview(clmModalFiles[i]);
+}
+function viewClmFile(id, idx){
+  const r = claims.find(x=>x.id===id);
+  if(!r || !r.files || !r.files[idx]) return;
+  window.open(r.files[idx].dataUrl, '_blank');
+}
+
+// ---------------- 导出 Excel 汇报包（手写 xlsx，图片嵌进表格） ----------------
+function escXml(s){
+  return String(s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+function clmColLetter(n){
+  let s=''; n++;
+  while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=(n-1-m)/26; }
+  return s;
+}
+// val 传数字写数值单元格，传字符串写 inlineStr，空值只带样式
+function clmCell(col,row,val,style){
+  const ref=clmColLetter(col)+row;
+  const st=(style!=null)?(' s="'+style+'"'):'';
+  if(val===''||val==null) return style!=null?('<c r="'+ref+'"'+st+'/>'):'';
+  if(typeof val==='number' && isFinite(val)) return '<c r="'+ref+'"'+st+'><v>'+val+'</v></c>';
+  return '<c r="'+ref+'" t="inlineStr"'+st+'><is><t xml:space="preserve">'+escXml(String(val))+'</t></is></c>';
+}
+function clmImgSize(dataUrl){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>res({w:img.width||1, h:img.height||1});
+    img.onerror=()=>res({w:1, h:1});
+    img.src=dataUrl;
+  });
+}
+function clmExportExcelAction(){
+  const picked=claims.filter(r=>!r.reported && clmSel[r.id]);
+  if(!picked.length){ showToast('先在「未汇报」里勾选要导出的条目'); return; }
+  const nImg=picked.reduce((s,r)=>s+(r.files||[]).filter(f=>f&&f.dataUrl&&(f.type||'').indexOf('image/')===0).length,0);
+  showConfirm('把勾选的 '+picked.length+' 条导出成 Excel 汇报包？\n'
+    +'内嵌图片 '+nImg+' 张'+(picked.some(r=>(r.files||[]).some(f=>f&&f.dataUrl&&(f.type||'').indexOf('image/')!==0))?'，其他格式文件放「附件」文件夹':''), ()=>{
+      clmDoExport(picked);
+    });
+}
+async function clmDoExport(list){
+  try{
+    if(typeof TextEncoder==='undefined'){ showToast('当前浏览器不支持导出，请用电脑上的 Chrome / Edge'); return; }
+    showToast('<span class="sync-spinner"></span>正在生成 Excel...', 'info');
+    const built=await clmBuildXlsx(list);
+    const enc=new TextEncoder();
+    const stamp=todayStr().replace(/-/g,'');
+    // xlsx 本质就是 zip：先把表格内部文件打成 .xlsx，再连同附件放进汇报包
+    const xlsxName='货损客诉登记_'+stamp+'.xlsx';
+    const xlsxU8=new Uint8Array(await zipStore(built.xlsxFiles).arrayBuffer());
+    const zipFiles=[{name:xlsxName, data:xlsxU8}];
+    if(built.attach.length){
+      zipFiles.push({name:'附件/', data:new Uint8Array(0)});
+      built.attach.forEach(a=>zipFiles.push({name:a.name, data:dataUrlToU8(a.dataUrl)}));
+    }
+    zipFiles.push({name:'说明.txt', data:enc.encode(clmReadmeTxt(list, built, xlsxName))});
+    const blob=zipStore(zipFiles);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='货损客诉汇报包_'+stamp+'.zip';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>{ try{URL.revokeObjectURL(url)}catch(e){} }, 5000);
+    showToast('✓ 已导出 '+list.length+' 条（内嵌图片 '+built.imgCount+' 张'+(built.attach.length?'、附件 '+built.attach.length+' 个':'')+'）', 'info');
+    showConfirm('导出完成。要把这 '+list.length+' 条标记为「已汇报」吗？\n（会折叠到汇报日期分组下）', ()=>{
+      clmReportIds=list.map(r=>r.id);
+      document.getElementById('clmReportCount').textContent=clmReportIds.length;
+      document.getElementById('clmReportDate').value=todayStr();
+      document.getElementById('modalClmReport').style.display='flex';
+    });
+  }catch(e){
+    showToast('导出失败：'+((e&&e.message)||e));
+  }
+}
+// 生成 xlsx（返回 Promise）：图片 oneCellAnchor 从 M 列起横向贴到对应条目行上
+async function clmBuildXlsx(list){
+  // 1. 分拣附件：图片进 media（准备嵌表），其他进 attach（放 zip 的「附件/」文件夹）
+  const media=[], attach=[], rowImgs=[], fileNames=[];
+  let aIdx=0;
+  list.forEach(r=>{
+    const imgs=[], names=[];
+    (r.files||[]).forEach(f=>{
+      if(!f || !f.dataUrl) return;
+      names.push(f.name||'附件');
+      const mime=(String(f.dataUrl).slice(0,80).match(/^data:([^;,]+)/)||[])[1]||'';
+      const mm=mime.toLowerCase();
+      let ext=null;
+      if(mm==='image/jpeg'||mm==='image/jpg') ext='jpeg';
+      else if(mm==='image/png') ext='png';
+      else if(mm==='image/gif') ext='gif';
+      else if(mm==='image/bmp') ext='bmp';
+      if(ext){ media.push({dataUrl:f.dataUrl, ext:ext}); imgs.push(media.length-1); }
+      else{
+        aIdx++;
+        const safe=String(f.name||('附件'+aIdx)).replace(/[\\\/:*?"<>|]/g,'_');
+        attach.push({name:'附件/'+String(aIdx).padStart(2,'0')+'_'+safe, dataUrl:f.dataUrl});
+      }
+    });
+    rowImgs.push(imgs); fileNames.push(names);
+  });
+  // 2. 读图片真实尺寸（保宽高比放进 60×60 盒子）
+  const dims=await Promise.all(media.map(m=>clmImgSize(m.dataUrl)));
+  // 3. 计算每张图的锚点：数据行 k（0 基）→ 表格行 k+2（1 基）→ 锚 row 索引 k+1（0 基）；列从 M（索引 12）起每图占 2 列
+  const anchors=[];
+  list.forEach((r,k)=>{
+    let col=12;
+    rowImgs[k].forEach(j=>{
+      const d=dims[j]||{w:1,h:1};
+      let w=60, h=60;
+      if(d.w && d.h){
+        if(d.w>=d.h){ w=60; h=Math.max(10, Math.round(60*d.h/d.w)); }
+        else { h=60; w=Math.max(10, Math.round(60*d.w/d.h)); }
+      }
+      anchors.push({col:col, row0:k+1, cx:Math.round(w*9525), cy:Math.round(h*9525), rel:j+1});
+      col+=2;
+    });
+  });
+  const hasDrawing = anchors.length>0;
+  // 4. sheet1.xml
+  const head=['日期','项目','负责业务','客户名','问题描述','问题性质','解决方案','货损金额(元)','责任 / 责任部门','状态','汇报日期','资料文件'];
+  let rows='<row r="1" ht="24" customHeight="1">'+head.map((t,i)=>clmCell(i,1,t,1)).join('')+'</row>';
+  list.forEach((r,k)=>{
+    const rn=k+2;
+    const hasImg=rowImgs[k].length>0;
+    const amt=parseFloat(r.amount);
+    rows+='<row r="'+rn+'"'+(hasImg?' ht="64" customHeight="1"':'')+'>'
+      +clmCell(0,rn,r.date||'')
+      +clmCell(1,rn,r.project||'')
+      +clmCell(2,rn,r.owner||'')
+      +clmCell(3,rn,r.customer||'')
+      +clmCell(4,rn,r.desc||'')
+      +clmCell(5,rn,r.nature||'')
+      +clmCell(6,rn,r.solution||'')
+      +(isNaN(amt)?'':clmCell(7,rn,Math.round(amt*100)/100))
+      +clmCell(8,rn,r.responsibility||'')
+      +clmCell(9,rn,r.reported?'已汇报':'未汇报')
+      +clmCell(10,rn,r.reported?(r.reportedAt||''):'')
+      +clmCell(11,rn,(fileNames[k]||[]).join('、'))
+      +'</row>';
+  });
+  const cols='<cols>'
+    +'<col min="1" max="1" width="11" customWidth="1"/>'
+    +'<col min="2" max="2" width="8" customWidth="1"/>'
+    +'<col min="3" max="3" width="10" customWidth="1"/>'
+    +'<col min="4" max="4" width="16" customWidth="1"/>'
+    +'<col min="5" max="5" width="34" customWidth="1"/>'
+    +'<col min="6" max="6" width="9" customWidth="1"/>'
+    +'<col min="7" max="7" width="34" customWidth="1"/>'
+    +'<col min="8" max="8" width="13" customWidth="1"/>'
+    +'<col min="9" max="9" width="16" customWidth="1"/>'
+    +'<col min="10" max="10" width="9" customWidth="1"/>'
+    +'<col min="11" max="11" width="11" customWidth="1"/>'
+    +'<col min="12" max="12" width="26" customWidth="1"/>'
+    +'</cols>';
+  const sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    +'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    +cols
+    +'<sheetData>'+rows+'</sheetData>'
+    +'<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>'
+    +(hasDrawing?'<drawing r:id="rId1"/>':'')
+    +'</worksheet>';
+  // 5. drawing1.xml（有图才有）
+  let drawingXml='';
+  if(hasDrawing){
+    const anch=anchors.map((a,i)=>'<xdr:oneCellAnchor>'
+      +'<xdr:from><xdr:col>'+a.col+'</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>'+a.row0+'</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>'
+      +'<xdr:ext cx="'+a.cx+'" cy="'+a.cy+'"/>'
+      +'<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="'+(i+1)+'" name="图片'+(i+1)+'"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
+      +'<xdr:blipFill><a:blip r:embed="rId'+a.rel+'"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>'
+      +'<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+a.cx+'" cy="'+a.cy+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr>'
+      +'</xdr:pic><xdr:clientData/></xdr:oneCellAnchor>').join('');
+    drawingXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+      +anch+'</xdr:wsDr>';
+  }
+  // 6. 组装 xlsx 内部文件
+  const xlsxFiles=[
+    {name:'[Content_Types].xml', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      +'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+      +'<Default Extension="xml" ContentType="application/xml"/>'
+      +'<Default Extension="png" ContentType="image/png"/>'
+      +'<Default Extension="jpeg" ContentType="image/jpeg"/>'
+      +'<Default Extension="jpg" ContentType="image/jpeg"/>'
+      +'<Default Extension="gif" ContentType="image/gif"/>'
+      +'<Default Extension="bmp" ContentType="image/bmp"/>'
+      +'<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      +'<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+      +'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+      +(hasDrawing?'<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>':'')
+      +'</Types>'},
+    {name:'_rels/.rels', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+      +'</Relationships>'},
+    {name:'xl/workbook.xml', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+      +'<sheets><sheet name="货损客诉" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+      +'<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+      +'</Relationships>'},
+    {name:'xl/styles.xml', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+      +'<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>'
+      +'<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDF2F7"/><bgColor indexed="64"/></patternFill></fill></fills>'
+      +'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'
+      +'<border><left style="thin"><color rgb="FFD9E2EC"/></left><right style="thin"><color rgb="FFD9E2EC"/></right><top style="thin"><color rgb="FFD9E2EC"/></top><bottom style="thin"><color rgb="FFD9E2EC"/></bottom><diagonal/></border></borders>'
+      +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+      +'<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+      +'<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/></cellXfs>'
+      +'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
+      +'</styleSheet>'},
+    {name:'xl/worksheets/sheet1.xml', data:sheet}
+  ];
+  if(hasDrawing){
+    xlsxFiles.push({name:'xl/worksheets/_rels/sheet1.xml.rels', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>'
+      +'</Relationships>'});
+    xlsxFiles.push({name:'xl/drawings/drawing1.xml', data:drawingXml});
+    xlsxFiles.push({name:'xl/drawings/_rels/drawing1.xml.rels', data:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +media.map((m,j)=>'<Relationship Id="rId'+(j+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image'+(j+1)+'.'+m.ext+'"/>').join('')
+      +'</Relationships>'});
+    media.forEach((m,j)=>{
+      xlsxFiles.push({name:'xl/media/image'+(j+1)+'.'+m.ext, data:dataUrlToU8(m.dataUrl)});
+    });
+  }
+  return {xlsxFiles:xlsxFiles, attach:attach, imgCount:media.length};
+}
+function clmReadmeTxt(list, built, xlsxName){
+  const amt=list.reduce((s,r)=>s+clmAmountVal(r),0);
+  return '货损 / 客诉汇报包\r\n'
+    +'========================================\r\n'
+    +'导出条数：'+list.length+' 条\r\n'
+    +'货损金额合计：'+fmtCNY(amt)+'\r\n'
+    +'内嵌图片：'+built.imgCount+' 张（已贴在表格对应行的「资料文件」列后面）\r\n'
+    +(built.attach.length?('其他附件：'+built.attach.length+' 个（在「附件」文件夹里，文件名前缀序号与表格行对应）\r\n'):'')
+    +'打包时间：'+new Date().toLocaleString('zh-CN')+'\r\n'
+    +'\r\n'
+    +'包里有什么\r\n'
+    +'----------------------------------------\r\n'
+    +(xlsxName||'货损客诉登记.xlsx')+' —— 用 Excel / WPS 打开，图片直接嵌在表格里\r\n'
+    +(built.attach.length?'附件\\            —— 非图片类资料（PDF / 文档等）原件\r\n':'')
+    +'说明.txt           —— 本文件\r\n';
+}
+
+// ---------------- 示例数据 ----------------
+function seedClmSample(){
+  const d=new Date();
+  const day=n=>{const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')};
+  const mk=o=>Object.assign({
+    id:uid(), date:todayStr(), project:'其他', owner:'', customer:'', desc:'',
+    nature:'其他', solution:'', amount:'', responsibility:'', files:[],
+    reported:false, reportedAt:undefined, createdAt:Date.now(), _sample:true
+  }, o);
+  claims.push(
+    mk({date:day(-6), project:'凡适', owner:'孟伊', customer:'David Schultz',
+        desc:'BJJ 道服第一批大货有 12 件裤绳车缝歪斜，客户拍照反馈拒收', nature:'货损',
+        solution:'返工重车后补发，运费我方承担', amount:860, responsibility:'生产部（车缝组）'}),
+    mk({date:day(-14), project:'朗格斯', owner:'Shirley Li', customer:'墨西哥客户',
+        desc:'泳装面料色差投诉，客户提供与确认样的对比照片', nature:'客诉',
+        solution:'协商按 5% 折扣在下个订单补偿', amount:'', responsibility:'面料供应商'}),
+    mk({date:day(-30), project:'朗格斯', owner:'李雪洋', customer:'德国客户',
+        desc:'快递途中包装破损，2 套样品被水浸无法使用', nature:'货损',
+        solution:'已补寄新样品并更换防水包装', amount:150, responsibility:'货代（迅驰达）',
+        reported:true, reportedAt:day(-25)})
+  );
+}
+
 // ---------------- ZIP 打包（自己写，零依赖） ----------------
 let _crcTbl=null;
 function crc32(u8){
@@ -4751,6 +5466,8 @@ function expPrintAction(){
 
 document.getElementById('btnExpSave').addEventListener('click',saveExpRecord);
 document.getElementById('btnExpCancel').addEventListener('click',()=>closeModal('modalExp'));
+document.getElementById('btnClmSave').addEventListener('click',saveClmRecord);
+document.getElementById('btnClmCancel').addEventListener('click',()=>closeModal('modalClm'));
 
 // 示例数据（首次打开就能看到效果）
 // 生成一张示例凭证图片（canvas 画的假凭证，只为演示"凭证怎么放、怎么打包"）
@@ -4920,6 +5637,7 @@ function renderCurrentTab(){
   else if(currentTab==='archive') renderArchive();
   else if(currentTab==='data') renderDash();
   else if(currentTab==='expenses') renderExpenses();
+  else if(currentTab==='claims') renderClaims();
 }
 
 function refreshAll(){
@@ -4928,6 +5646,7 @@ function refreshAll(){
   renderArchive();
   updateClearDemoBtn();
   expRenderBadge();
+  clmRenderBadge();
 }
 
 function updateClearDemoBtn(){
@@ -5000,6 +5719,13 @@ function init(){
   if(expenses.length===0 && !localStorage.getItem(STORAGE_PREFIX+'exp_seeded')){
     seedExpSample();
     localStorage.setItem(STORAGE_PREFIX+'exp_seeded','1');
+    saveAll();
+  }
+
+  // 货损/客诉：首次打开若为空，载入 3 条示例（2 未汇报 + 1 已汇报折叠示例）
+  if(claims.length===0 && !localStorage.getItem(STORAGE_PREFIX+'clm_seeded')){
+    seedClmSample();
+    localStorage.setItem(STORAGE_PREFIX+'clm_seeded','1');
     saveAll();
   }
   // 老用户兜底：示例记录是旧版本种的（不带凭证），补一张示例凭证；只动 _sample，不碰真实记录
