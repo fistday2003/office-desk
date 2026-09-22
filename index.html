@@ -7070,6 +7070,16 @@ function bizFetchPaint(){
   if(unknown) h+='<div class="biz-note">有 '+unknown+' 笔没能判定店铺（业务员和买家都不在已知名单里），已标「待确认」，导出时保留。</div>';
   box.innerHTML=h;
 }
+// 判断当前页面是不是「非本机」打开（线上链接、或手机上的链接）。
+// 浏览器禁止这类页面访问本机 127.0.0.1，所以取数失败的原因完全不同，提示也要分开。
+function bizFetchIsRemote(){
+  try{
+    if(location.protocol==='file:') return false;
+    const h=location.hostname;
+    return !(h==='127.0.0.1'||h==='localhost'||h==='::1'||h==='');
+  }catch(e){ return false; }
+}
+
 async function bizFetchHealth(){
   const el=document.getElementById('bizFetchDot');
   if(!el) return;
@@ -7079,7 +7089,9 @@ async function bizFetchHealth(){
     if(!j.ok) throw new Error('bad');
     el.innerHTML='<span class="biz-dot ok"></span>取数服务在线'+(j.okki?'':'（小满插件未就绪）');
   }catch(e){
-    el.innerHTML='<span class="biz-dot bad"></span>取数服务未启动（双击运行 启动取数服务.bat 后再点获取）';
+    el.innerHTML='<span class="biz-dot bad"></span>'+(bizFetchIsRemote()
+      ? '线上版连不到本机取数服务（浏览器硬性限制，服务本身可能好好的）→ 请用「从文件导入」'
+      : '取数服务未启动（双击运行 启动取数服务.bat 后再点获取）');
   }
 }
 async function bizFetchRun(force){
@@ -7106,10 +7118,13 @@ async function bizFetchRun(force){
   }catch(e){
     const m=String((e&&e.message)||e);
     f.rows=[]; f.at=''; f.source='';
-    f.err = /Failed to fetch|NetworkError|Load failed|fetch/i.test(m)
-      ? '连不上本机取数服务（127.0.0.1:5011）。请先在电脑上双击运行「06-工具脚本 > 获取订单列表 > 启动取数服务.bat」，看到黑窗口里出现「取数服务已启动」再回来点获取。'
-        +'（若用的是线上链接，浏览器可能弹「是否允许访问本地网络设备」，点允许即可；实在不行就用本机那份 HTML 打开）'
-      : m;
+    if(/Failed to fetch|NetworkError|Load failed|fetch/i.test(m)){
+      f.err = bizFetchIsRemote()
+        ? '连不上本机取数服务（127.0.0.1:5011）——原因是【浏览器限制】：Chrome/Edge 不允许线上网页访问你本机，跟取数服务有没有启动无关，授权也拦。'
+          +'两个办法任选：① 改用电脑上那份 HTML 打开工作台（本机文件不受此限制，可直接一键取）；'
+          +'② 点旁边的「从文件导入」——先在电脑上跑一次 启动取数服务.bat，取数结果会自动存到「办公平台 > 07-数据备份 > 取数结果 > 取数结果_最新.json」，把它选进来即可，效果一样。'
+        : '连不上本机取数服务（127.0.0.1:5011）。请先双击运行「06-工具脚本 > 获取订单列表 > 启动取数服务.bat」，看到黑窗口里出现「取数服务已启动」再回来点获取。';
+    } else { f.err = m; }
     bizFetchState('取数失败', false);
   }finally{
     clearInterval(tick);
