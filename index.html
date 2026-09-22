@@ -521,6 +521,70 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .exp-filterwrap{align-items:flex-start}
   .exp-filterwrap .exp-toolbar{justify-content:flex-start}
 }
+
+/* ========== 国际站经营分析（v1.8）========== */
+.biz-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.biz-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.biz-tools .btn{font-size:12.5px}
+.biz-chip{padding:5px 11px;border:1px solid var(--border);background:var(--card-bg);border-radius:14px;font-size:12px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;font-family:inherit;line-height:1.4}
+.biz-chip:hover{border-color:var(--primary);color:var(--primary)}
+.biz-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.biz-filterbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.biz-sep{width:1px;height:18px;background:var(--border);margin:0 3px}
+.biz-range{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary)}
+.biz-range input[type=date]{padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;color:var(--text);background:var(--card-bg)}
+.biz-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.biz-metric{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--card-bg)}
+.biz-metric .k{font-size:11.5px;color:var(--text-secondary);margin-bottom:6px}
+.biz-metric .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text);line-height:1.3}
+.biz-metric .s{font-size:11px;color:var(--text-muted);margin-top:5px;line-height:1.5}
+.biz-metric.hl{background:var(--primary-light);border-color:#bae6fd}
+.biz-metric.hl .v{color:var(--primary-dark)}
+.biz-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.biz-panel h4{margin:0 0 10px;font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.biz-panel h4 .tag{font-size:11px;font-weight:600;color:var(--text-muted);background:#f1f5f9;padding:2px 7px;border-radius:8px}
+.biz-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.biz-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.biz-tbl th{text-align:left;padding:8px;background:#f8fafc;color:var(--text-secondary);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.biz-tbl td{padding:7px 8px;border-bottom:1px solid #f1f5f9;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.biz-tbl tr:last-child td{border-bottom:none}
+.biz-tbl .r{text-align:right}
+.biz-tbl .c{text-align:center}
+.biz-tbl tfoot td{background:var(--primary-light);font-weight:700;color:var(--primary-dark);border-top:1px solid #bae6fd}
+.biz-shop{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap}
+.biz-shop.lg{background:#e0f2fe;color:#0369a1}
+.biz-shop.fs{background:#fef3c7;color:#b45309}
+.biz-type{display:inline-block;padding:1px 8px;border-radius:9px;font-size:11px;font-weight:600;white-space:nowrap}
+.biz-type.new{background:#dcfce7;color:#15803d}
+.biz-type.old{background:#e2e8f0;color:#475569}
+.biz-type.na{background:#f1f5f9;color:#94a3b8}
+.biz-drop{border:2px dashed var(--border);border-radius:10px;padding:24px 16px;text-align:center;color:var(--text-secondary);font-size:13px;cursor:pointer;background:var(--card-bg);transition:var(--transition);line-height:1.9}
+.biz-drop:hover,.biz-drop.over{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark)}
+.biz-drop b{color:var(--primary-dark)}
+.biz-log{font-size:12px;color:var(--text-secondary);line-height:1.95;margin-top:10px}
+.biz-log .ok{color:var(--success);font-weight:600}
+.biz-log .dup{color:var(--warning);font-weight:600}
+.biz-log .bad{color:var(--danger);font-weight:600}
+.biz-empty{text-align:center;color:var(--text-secondary);padding:38px 20px;font-size:13.5px;line-height:2}
+.biz-chart{width:100%;height:auto;display:block}
+.biz-note{font-size:11.5px;color:var(--text-muted);line-height:1.85;margin-top:8px}
+.biz-srv{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border:1px solid #99f6e4;border-left:3px solid var(--accent);border-radius:8px;padding:11px 14px;background:var(--accent-light);font-size:12.5px;color:var(--text-secondary);margin-bottom:12px}
+.biz-srv b{color:var(--accent)}
+.biz-mini{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary)}
+.biz-mini b{color:var(--text);font-variant-numeric:tabular-nums}
+@media (max-width:768px){
+  .biz-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .biz-metric{padding:10px}
+  .biz-metric .v{font-size:16px}
+  .biz-metric .s{font-size:10.5px}
+  .biz-panel{padding:12px}
+  .biz-srv{display:none}
+  .biz-head{flex-direction:column}
+  .biz-tools{width:100%}
+  .biz-tools .btn{flex:1;justify-content:center}
+  .biz-filterbar{gap:5px}
+  .biz-chip{padding:5px 9px;font-size:11.5px}
+}
 </style>
 </head>
 <body>
@@ -630,6 +694,11 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
         数据看板
       </button>
+      <button class="nav-item" data-tab="biz">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
+        经营分析
+        <span class="nav-badge" id="bizBadge" style="display:none">0</span>
+      </button>
       <button class="nav-item" data-tab="review">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         每周复盘
@@ -645,7 +714,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.7.1 · 2026-09-18</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v1.8 · 2026-09-18</div>
     </div>
   </aside>
 
@@ -749,6 +818,29 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
       <div id="dashContent"></div>
     </div>
 
+    <!-- TAB: 经营分析（国际站订单/收款） -->
+    <div class="tab-panel" id="tab-biz">
+      <div class="biz-head">
+        <div>
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
+            国际站经营分析
+          </div>
+          <p class="section-subtitle">导入阿里后台导出的「订单列表」和「收款明细」，自动算双店实收、新老客户、业务员提成（参考值）与市场分布</p>
+        </div>
+        <div class="biz-tools">
+          <label class="btn btn-primary" for="bizFileInput" style="cursor:pointer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导入订单 / 收款表
+          </label>
+          <button class="btn" id="btnBizExport" onclick="bizExport()">导出分析</button>
+          <button class="btn" id="btnBizClear" onclick="bizClearAll()">清空经营数据</button>
+        </div>
+      </div>
+      <div id="bizContent"></div>
+      <input type="file" id="bizFileInput" multiple accept=".xlsx,.xls,.csv" style="display:none" onchange="handleBizFilePick()">
+    </div>
+
     <!-- TAB: 每周复盘 -->
     <div class="tab-panel" id="tab-review">
       <div class="section-title">
@@ -796,6 +888,10 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   <button class="mnav-item" data-mtab="data">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
     数据
+  </button>
+  <button class="mnav-item" data-mtab="biz">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
+    经营
   </button>
   <button class="mnav-item" data-mtab="review">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
@@ -1061,7 +1157,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v1.7.1';
+const APP_VERSION = 'v1.8';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1088,10 +1184,17 @@ function loadData(){
     dashboard = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'dashboard')||'[]');
     expenses = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'expenses')||'[]');
     claims = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'claims')||'[]');
-  }catch(e){tasks=[];notes=[];projects=[];dashboard=[];expenses=[];claims=[]}
+    const _bz = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'biz')||'null');
+    if(_bz && typeof _bz==='object') biz = Object.assign(bizBlank(), _bz);
+  }catch(e){tasks=[];notes=[];projects=[];dashboard=[];expenses=[];claims=[];biz=bizBlank()}
   if(!Array.isArray(dashboard)) dashboard=[];
   if(!Array.isArray(expenses)) expenses=[];
   if(!Array.isArray(claims)) claims=[];
+  if(!biz || !Array.isArray(biz.orders)) biz = bizBlank();
+  if(!Array.isArray(biz.pays)) biz.pays=[];
+  if(!biz.firstPay || typeof biz.firstPay!=='object') biz.firstPay={};
+  if(!biz.fixCountry || typeof biz.fixCountry!=='object') biz.fixCountry={};
+  if(!Array.isArray(biz.uploads)) biz.uploads=[];
   healDashboard();
   expHeal();
   clmHeal();
@@ -1129,6 +1232,7 @@ function saveAll(){
     localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
     localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(expenses));
     localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(claims));
+    localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
   }catch(e){
     showToast('⚠️ 保存失败：本地存储空间已满。请删除部分附件或导出备份后清理');
   }
@@ -1170,7 +1274,7 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + expenses.length + claims.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + expenses.length + claims.length + biz.orders.length + biz.pays.length}
 
 // Check if sample data exists
 function hasSampleData(){
@@ -3097,7 +3201,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,expenses,claims,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,expenses,claims,biz,exportedAt:new Date().toISOString()};
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3131,6 +3235,10 @@ document.getElementById('importFile').addEventListener('change',function(){
         if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = data.expenses || [];
         // 货损客诉：同样旧备份没有这字段时保留本机
         if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = data.claims || [];
+        // 经营分析：旧备份没有这字段时保留本机（已导入的订单/收款表不能因为导个旧备份就没了）
+        if(Object.prototype.hasOwnProperty.call(data,'biz') && data.biz && typeof data.biz==='object'){
+          biz = Object.assign(bizBlank(), data.biz);
+        }
         saveAll();
         refreshAll();
         showToast('导入成功！共恢复 '+totalItems()+' 条数据', 'info');
@@ -3146,7 +3254,7 @@ document.getElementById('importFile').addEventListener('change',function(){
 // Clear all data
 document.getElementById('btnClearAll').addEventListener('click',()=>{
   showConfirm('确定要清空所有数据吗？此操作不可恢复！建议先导出备份。', ()=>{
-    tasks = []; notes = []; projects = []; dashboard = []; expenses = []; claims = [];
+    tasks = []; notes = []; projects = []; dashboard = []; expenses = []; claims = []; biz = bizBlank();
     saveAll();
     refreshAll();
     showToast('所有数据已清空');
@@ -3378,16 +3486,27 @@ async function doSyncUpload(){
     delete c.files;
     return c;
   });
-  const data = {v:6, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
-  const jsonStr = JSON.stringify(data);
+  const buildSync = (withBiz)=>{
+    const d = {v:7, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
+    if(withBiz) d.biz = biz;
+    return d;
+  };
   const topic = getSyncTopic();
   const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 
   // 分片：每片内容不超过 3000 字节（服务器上限 4096，留足余量）
-  const chunks = chunkByBytes(jsonStr, 3000);
+  // 经营分析（订单+收款）体量很大，容易把分片撑爆；超限时自动降级成「本次不带它」，
+  // 先保证待办/报账/货损这些主力模块的同步不被拖垮。
+  let withBiz = true;
+  let chunks = chunkByBytes(JSON.stringify(buildSync(true)), 3000);
   if(chunks.length > 10){
-    showToast('数据量过大（需分 '+chunks.length+' 段，上限 10 段），建议精简数据或使用「导出文件」备份');
-    return;
+    withBiz = false;
+    chunks = chunkByBytes(JSON.stringify(buildSync(false)), 3000);
+    if(chunks.length > 10){
+      showToast('数据量过大（需分 '+chunks.length+' 段，上限 10 段），建议精简数据或使用「导出文件」备份');
+      return;
+    }
+    showToast('经营分析数据体积较大，本次同步不带它（其余模块照常同步）。经营数据请走「导出文件」或云端存档', 'warning');
   }
   const parts = chunks.map((c,i)=>'WBO4|'+batchId+'|'+(i+1)+'/'+chunks.length+'|'+c);
 
@@ -3526,7 +3645,8 @@ async function doSyncReceive(){
     return;
   }
 
-  const newTotal = (received.tasks||[]).length + (received.notes||[]).length + (received.projects||[]).length + (received.dashboard||[]).length + (received.expenses||[]).length + (received.claims||[]).length;
+  const newTotal = (received.tasks||[]).length + (received.notes||[]).length + (received.projects||[]).length + (received.dashboard||[]).length + (received.expenses||[]).length + (received.claims||[]).length
+    + ((received.biz && received.biz.orders)?received.biz.orders.length:0) + ((received.biz && received.biz.pays)?received.biz.pays.length:0);
   const curTotal = totalItems();
   const syncTime = received.syncedAt ? new Date(received.syncedAt).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
 
@@ -3566,6 +3686,10 @@ async function doSyncReceive(){
         else rc.files = rc.files || [];
         return rc;
       });
+    }
+    // 经营分析：旧包没有这字段则保留本机（本机已导入的订单/收款表不能丢）
+    if(Object.prototype.hasOwnProperty.call(received,'biz') && received.biz && typeof received.biz==='object'){
+      biz = Object.assign(bizBlank(), received.biz);
     }
     saveAll();
     refreshAll();
@@ -3770,9 +3894,12 @@ function asSnapshot(){
     _version:APP_VERSION,
     savedAt:new Date().toISOString(),
     counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
-            dashboard:dashboard.length, expenses:expenses.length, claims:claims.length, attachments:attCount},
+            dashboard:dashboard.length, expenses:expenses.length, claims:claims.length,
+            bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, expenses:light(expenses), claims:light(claims)
+    dashboard:dashboard, expenses:light(expenses), claims:light(claims),
+    biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, fixCountry:biz.fixCountry,
+         uploads:(biz.uploads||[]).slice(-20), seeded:!!biz.seeded}
   };
 }
 
@@ -5615,12 +5742,986 @@ function seedExpSample(){
 }
 
 // ============================================================
+//  国际站经营分析（v1.8）—— 纯前端解析阿里后台导出的订单/收款表
+//  口径与「国际站经营分析系统（5010）」保持一致：
+//   · 实收 = 收款明细里「交易类型=放款&收款 且 币种=USD 且 金额>0」
+//   · 新老客户 = (买家+业务员) 组合的首笔收款起 12 个月内=新客户(4%)，超过=老客户(2%)
+//   · 提成基数 = 实收 ×(1−运费/订单总价)，算不出运费时按实收全额
+//   · 样品单 ≤ $500、大货单 > $500；大货转化率 = 大货单数 ÷ 样品单数
+//   · 目的地显示「中国」= 货代中转仓，排到最后并标「待确认」
+// ============================================================
+
+function bizBlank(){ return {orders:[], pays:[], firstPay:{}, fixCountry:{}, uploads:[], seeded:false}; }
+let biz = bizBlank();
+let bizRange = {kind:'cur', start:'', end:'', label:'本月'};
+let bizDetailLimit = 200;
+
+// 业务员英文名 → 中文名（与 5010 系统 SELLER_MAP 对齐）
+const BIZ_SELLERS = {'salima lignes':'王梦莹','salima':'王梦莹','nancy lignes':'陈曦','nancy':'陈曦','alyssa lignes':'孟伊','alyssa':'孟伊','lilian lignes':'李楠','lilian':'李楠','phoebe lignes':'李雪洋','phoebe':'李雪洋','lignes apparel':'朗格斯(店铺)','ella fans':'乔萌萌','eva fanshi':'乔萌萌','eva':'乔萌萌','vivian fanshi':'周文怡','vivian':'周文怡','victor fanshi':'凡适(Victor)','凡适(victor)':'凡适(Victor)'};
+
+// 国家中英映射（紧凑写法，初始化时展开成对象）
+const BIZ_COUNTRY_RAW = 'US=美国|USA=美国|United States=美国|United States of America=美国|GB=英国|UK=英国|United Kingdom=英国|Great Britain=英国|SA=沙特阿拉伯|Saudi Arabia=沙特阿拉伯|Saudi=沙特阿拉伯|AE=阿联酋|UAE=阿联酋|United Arab Emirates=阿联酋|EG=埃及|Egypt=埃及|MY=马来西亚|Malaysia=马来西亚|ID=印度尼西亚|Indonesia=印度尼西亚|NG=尼日利亚|Nigeria=尼日利亚|SN=塞内加尔|Senegal=塞内加尔|DE=德国|Germany=德国|FR=法国|France=法国|GP=法国|ES=西班牙|Spain=西班牙|AU=澳大利亚|Australia=澳大利亚|CA=加拿大|Canada=加拿大|CH=瑞士|Switzerland=瑞士|RU=俄罗斯|Russia=俄罗斯|Russian Federation=俄罗斯|NL=荷兰|Netherlands=荷兰|IT=意大利|Italy=意大利|BE=比利时|Belgium=比利时|NZ=新西兰|New Zealand=新西兰|ZA=南非|South Africa=南非|BR=巴西|Brazil=巴西|KR=韩国|Korea=韩国|South Korea=韩国|JP=日本|Japan=日本|SG=新加坡|Singapore=新加坡|TR=土耳其|Turkey=土耳其|IN=印度|India=印度|PK=巴基斯坦|Pakistan=巴基斯坦|BD=孟加拉国|Bangladesh=孟加拉国|PH=菲律宾|Philippines=菲律宾|VN=越南|Vietnam=越南|TH=泰国|Thailand=泰国|MA=摩洛哥|Morocco=摩洛哥|DZ=阿尔及利亚|Algeria=阿尔及利亚|KW=科威特|Kuwait=科威特|QA=卡塔尔|Qatar=卡塔尔|OM=阿曼|Oman=阿曼|BH=巴林|Bahrain=巴林|JO=约旦|Jordan=约旦|IQ=伊拉克|Iraq=伊拉克|YE=也门|Yemen=也门|LB=黎巴嫩|Lebanon=黎巴嫩|SD=苏丹|Sudan=苏丹|LY=利比亚|Libya=利比亚|TN=突尼斯|Tunisia=突尼斯|KE=肯尼亚|Kenya=肯尼亚|TZ=坦桑尼亚|Tanzania=坦桑尼亚|GH=加纳|Ghana=加纳|CI=科特迪瓦|Ivory Coast=科特迪瓦|CM=喀麦隆|Cameroon=喀麦隆|ET=埃塞俄比亚|Ethiopia=埃塞俄比亚|UG=乌干达|Uganda=乌干达|ZM=赞比亚|Zambia=赞比亚|MZ=莫桑比克|Mozambique=莫桑比克|AO=安哥拉|Angola=安哥拉|MX=墨西哥|Mexico=墨西哥|AR=阿根廷|Argentina=阿根廷|CO=哥伦比亚|Colombia=哥伦比亚|CL=智利|Chile=智利|PE=秘鲁|Peru=秘鲁|SE=瑞典|Sweden=瑞典|NO=挪威|Norway=挪威|DK=丹麦|Denmark=丹麦|FI=芬兰|Finland=芬兰|PL=波兰|Poland=波兰|CZ=捷克|Czech Republic=捷克|AT=奥地利|Austria=奥地利|PT=葡萄牙|Portugal=葡萄牙|GR=希腊|Greece=希腊|IE=爱尔兰|Ireland=爱尔兰|UA=乌克兰|Ukraine=乌克兰|IL=以色列|Israel=以色列|SI=斯洛文尼亚|Slovenia=斯洛文尼亚|LU=卢森堡|Luxembourg=卢森堡|LT=立陶宛|Lithuania=立陶宛|PR=波多黎各|Puerto Rico=波多黎各|CN=中国|China=中国|HK=中国香港|Hong Kong=中国香港|TW=中国台湾|Taiwan=中国台湾|Unknown=未知国家|None=未知国家|=未知国家';
+let BIZ_COUNTRY = null;
+function bizCountryMap(){
+  if(!BIZ_COUNTRY){
+    BIZ_COUNTRY = {};
+    BIZ_COUNTRY_RAW.split('|').forEach(p=>{ const i=p.indexOf('='); if(i>=0) BIZ_COUNTRY[p.slice(0,i)] = p.slice(i+1); });
+  }
+  return BIZ_COUNTRY;
+}
+const BIZ_CN_COUNTRIES = new Set('中国|美国|英国|沙特阿拉伯|沙特|阿联酋|埃及|马来西亚|印度尼西亚|印尼|尼日利亚|塞内加尔|德国|法国|西班牙|澳大利亚|澳洲|加拿大|瑞士|俄罗斯|荷兰|意大利|比利时|新西兰|南非|巴西|韩国|日本|新加坡|土耳其|印度|巴基斯坦|孟加拉国|菲律宾|越南|泰国|摩洛哥|阿尔及利亚|科威特|卡塔尔|阿曼|巴林|约旦|伊拉克|也门|黎巴嫩|苏丹|利比亚|突尼斯|肯尼亚|坦桑尼亚|加纳|科特迪瓦|喀麦隆|埃塞俄比亚|乌干达|赞比亚|莫桑比克|安哥拉|墨西哥|阿根廷|哥伦比亚|智利|秘鲁|瑞典|挪威|丹麦|芬兰|波兰|捷克|奥地利|葡萄牙|希腊|爱尔兰|乌克兰|以色列|中国香港|中国台湾|未知国家|斯洛文尼亚|卢森堡|立陶宛|波多黎各'.split('|'));
+const BIZ_SHOPS = {langges:'朗格斯', fansi:'凡适'};
+function bizShopName(k){ return BIZ_SHOPS[k]||k||'未知店铺'; }
+function bizCountryCn(v){
+  if(v===undefined||v===null) return '未知国家';
+  const s=String(v).trim();
+  if(!s||s==='None') return '未知国家';
+  if(BIZ_CN_COUNTRIES.has(s)) return s;
+  const m=bizCountryMap();
+  return m[s] || m[s.toUpperCase()] || s;
+}
+function bizSellerCn(raw){
+  const s=String(raw==null?'':raw).replace(/\xa0/g,' ').replace(/\u3000/g,' ').trim();
+  if(!s) return '未知';
+  return BIZ_SELLERS[s.toLowerCase()] || s;
+}
+function bizNum(v){
+  if(v===undefined||v===null||v==='') return 0;
+  const n=parseFloat(String(v).replace(/[,\s$¥]/g,''));
+  return isNaN(n)?0:n;
+}
+// 日期统一成 'YYYY-MM-DD HH:MM:SS'（文本日期 + Excel 序列号都吃）
+const BIZ_EPOCH = Date.UTC(1899,11,30);
+function bizDate(v){
+  if(v===undefined||v===null||v==='') return '';
+  const s=String(v).trim();
+  if(!s||s==='None') return '';
+  const m=/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(s);
+  const two=x=>String(x).padStart(2,'0');
+  if(m) return m[1]+'-'+two(m[2])+'-'+two(m[3])+' '+two(m[4]||0)+':'+two(m[5]||0)+':'+two(m[6]||0);
+  const n=parseFloat(s.replace(/,/g,''));
+  if(!isNaN(n)&&n>20000&&n<80000){
+    const d=new Date(BIZ_EPOCH+Math.round(n*86400000));
+    if(isNaN(d.getTime())) return '';
+    return d.getUTCFullYear()+'-'+two(d.getUTCMonth()+1)+'-'+two(d.getUTCDate())+' '+two(d.getUTCHours())+':'+two(d.getUTCMinutes())+':'+two(d.getUTCSeconds());
+  }
+  return '';
+}
+function bizPayKey(p){ return [p.shop,p.ts,p.amount,p.buyer,p.orderNo].join('|'); }
+function bizCustKey(p){ const b=String(p.buyer||'').trim(), s=String(p.sellerRaw||'').trim(); return (b&&s)?(b+'|||'+s):''; }
+
+// ---------------- 零依赖 xlsx 读取 ----------------
+function bizXmlUnesc(s){
+  return String(s).replace(/&#x([0-9a-fA-F]+);/g,(_,h)=>{try{return String.fromCodePoint(parseInt(h,16))}catch(e){return ''}})
+                  .replace(/&#(\d+);/g,(_,d)=>{try{return String.fromCodePoint(+d)}catch(e){return ''}})
+                  .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+}
+function bizColIdx(letters){ let n=0; for(let i=0;i<letters.length;i++) n=n*26+(letters.charCodeAt(i)-64); return n-1; }
+// 纯 JS inflate（DEFLATE），微信内置内核没有 DecompressionStream 时兜底
+function bizInflate(u8){
+  let bitPos=0, bytePos=0;
+  const out=[];
+  function bits(n){
+    let v=0;
+    for(let i=0;i<n;i++){
+      if(bytePos>=u8.length) throw new Error('文件解压中断（数据不完整）');
+      v |= ((u8[bytePos]>>bitPos)&1)<<i;
+      bitPos++; if(bitPos===8){ bitPos=0; bytePos++; }
+    }
+    return v;
+  }
+  function buildHuff(lengths){
+    let maxBits=1;
+    for(let i=0;i<lengths.length;i++) if(lengths[i]>maxBits) maxBits=lengths[i];
+    const counts=new Array(maxBits+1).fill(0);
+    for(let i=0;i<lengths.length;i++) if(lengths[i]>0) counts[lengths[i]]++;
+    const offs=new Array(maxBits+2).fill(0);
+    for(let i=1;i<=maxBits;i++) offs[i+1]=offs[i]+counts[i];
+    const symbols=new Array(lengths.length);
+    for(let i=0;i<lengths.length;i++) if(lengths[i]>0) symbols[offs[lengths[i]]++]=i;
+    return {counts:counts, symbols:symbols, maxBits:maxBits};
+  }
+  function decode(h){
+    let code=0, first=0, index=0;
+    for(let len=1;len<=h.maxBits;len++){
+      code |= bits(1);
+      const count=h.counts[len];
+      if(code-first < count) return h.symbols[index+(code-first)];
+      index+=count; first=(first+count)<<1; code<<=1;
+    }
+    throw new Error('文件解压校验失败');
+  }
+  const LBASE=[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+  const LEXTRA=[0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+  const DBASE=[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+  const DEXTRA=[0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+  function inflateBlock(hl,hd){
+    for(;;){
+      const sym=decode(hl);
+      if(sym<256){ out.push(sym); continue; }
+      if(sym===256) return;
+      const li=sym-257;
+      const len=LBASE[li]+bits(LEXTRA[li]);
+      const dsym=decode(hd);
+      const dist=DBASE[dsym]+bits(DEXTRA[dsym]);
+      const start=out.length-dist;
+      if(start<0) throw new Error('文件解压越界');
+      for(let i=0;i<len;i++) out.push(out[start+i]);
+    }
+  }
+  let last=false;
+  while(!last){
+    last = bits(1)===1;
+    const type=bits(2);
+    if(type===0){
+      if(bitPos>0){ bitPos=0; bytePos++; }
+      if(bytePos+4>u8.length) throw new Error('文件解压中断');
+      const len=u8[bytePos] | (u8[bytePos+1]<<8);
+      bytePos+=4;
+      for(let i=0;i<len;i++) out.push(u8[bytePos+i]);
+      bytePos+=len;
+    } else if(type===1){
+      const litLen=new Array(288);
+      for(let i=0;i<144;i++) litLen[i]=8;
+      for(let i=144;i<256;i++) litLen[i]=9;
+      for(let i=256;i<280;i++) litLen[i]=7;
+      for(let i=280;i<288;i++) litLen[i]=8;
+      inflateBlock(buildHuff(litLen), buildHuff(new Array(30).fill(5)));
+    } else if(type===2){
+      const hlit=bits(5)+257, hdist=bits(5)+1, hclen=bits(4)+4;
+      const order=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
+      const clen=new Array(19).fill(0);
+      for(let i=0;i<hclen;i++) clen[order[i]]=bits(3);
+      const hc=buildHuff(clen);
+      const lens=[];
+      while(lens.length<hlit+hdist){
+        const sym=decode(hc);
+        if(sym<16) lens.push(sym);
+        else if(sym===16){ const prev=lens[lens.length-1]||0; const n=3+bits(2); for(let i=0;i<n;i++) lens.push(prev); }
+        else if(sym===17){ const n=3+bits(3); for(let i=0;i<n;i++) lens.push(0); }
+        else { const n=11+bits(7); for(let i=0;i<n;i++) lens.push(0); }
+        if(lens.length>hlit+hdist) break;
+      }
+      inflateBlock(buildHuff(lens.slice(0,hlit)), buildHuff(lens.slice(hlit,hlit+hdist)));
+    } else throw new Error('文件解压格式不支持');
+  }
+  return new Uint8Array(out);
+}
+async function bizInflateRaw(u8){
+  if(typeof DecompressionStream!=='function') return bizInflate(u8);
+  try{
+    const st=new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    const buf=await new Response(st).arrayBuffer();
+    return new Uint8Array(buf);
+  }catch(e){ return bizInflate(u8); }
+}
+// 读 zip：只看中央目录，只解开要用的 xml（收款表里那张 489KB 的 logo 图不会被解）
+function bizUnzip(u8){
+  const dv=new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let eocd=-1;
+  const from=Math.max(0, u8.length-66000);
+  for(let i=u8.length-22;i>=from;i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd=i; break; } }
+  if(eocd<0) throw new Error('不是有效的 xlsx 文件（请确认是从阿里后台下载的 .xlsx）');
+  const total=dv.getUint16(eocd+10,true);
+  let p=dv.getUint32(eocd+16,true);
+  const need={}; const dec=new TextDecoder('utf-8');
+  for(let i=0;i<total;i++){
+    if(p+46>u8.length || dv.getUint32(p,true)!==0x02014b50) break;
+    const method=dv.getUint16(p+10,true);
+    const compSize=dv.getUint32(p+20,true);
+    const nameLen=dv.getUint16(p+28,true), extraLen=dv.getUint16(p+30,true), cmtLen=dv.getUint16(p+32,true);
+    const lho=dv.getUint32(p+42,true);
+    const name=dec.decode(u8.subarray(p+46,p+46+nameLen));
+    if(name==='xl/sharedStrings.xml' || /^xl\/worksheets\/sheet\d+\.xml$/.test(name)){
+      const lNameLen=dv.getUint16(lho+26,true), lExtraLen=dv.getUint16(lho+28,true);
+      const start=lho+30+lNameLen+lExtraLen;
+      need[name]={method:method, data:u8.subarray(start,start+compSize)};
+    }
+    p += 46+nameLen+extraLen+cmtLen;
+  }
+  return need;
+}
+function bizSharedStrings(xml){
+  const out=[]; const re=/<si>([\s\S]*?)<\/si>/g; let m;
+  while((m=re.exec(xml))){
+    let s=''; const tre=/<t[^>]*>([\s\S]*?)<\/t>/g; let t;
+    while((t=tre.exec(m[1]))) s+=t[1];
+    out.push(bizXmlUnesc(s));
+  }
+  return out;
+}
+function bizSheetRows(xml, shared){
+  const rows=[];
+  const rowRe=/<row\b[^>]*?(\/>|>([\s\S]*?)<\/row>)/g;
+  let m;
+  while((m=rowRe.exec(xml))){
+    const tag=m[0], body=m[2]||'';
+    const rm=/r="(\d+)"/.exec(tag);
+    const rIdx=rm?parseInt(rm[1],10):(rows.length+1);
+    const arr=[];
+    if(body){
+      const cellRe=/<c\b([^>]*?)(\/>|>([\s\S]*?)<\/c>)/g;
+      let c, auto=0;
+      while((c=cellRe.exec(body))){
+        const attrs=c[1]||'', inner=c[3]||'';
+        const rm2=/r="([A-Z]+)\d+"/.exec(attrs);
+        let ci = rm2 ? bizColIdx(rm2[1]) : auto;
+        auto = ci+1;
+        const tm=/t="([^"]+)"/.exec(attrs);
+        const type=tm?tm[1]:'n';
+        let val='';
+        if(type==='s'){ const vm=/<v>([\s\S]*?)<\/v>/.exec(inner); const si=vm?parseInt(vm[1],10):-1; val=(shared[si]!==undefined?String(shared[si]):''); }
+        else if(type==='inlineStr'){ const ire=/<is>([\s\S]*?)<\/is>/.exec(inner); let s=''; if(ire){ const tre=/<t[^>]*>([\s\S]*?)<\/t>/g; let t; while((t=tre.exec(ire[1]))) s+=t[1]; } val=bizXmlUnesc(s); }
+        else { const vm=/<v>([\s\S]*?)<\/v>/.exec(inner); val=vm?bizXmlUnesc(vm[1]):''; }
+        arr[ci]=val;
+      }
+    }
+    while(rows.length<rIdx-1) rows.push([]);
+    rows[rIdx-1]=arr;
+  }
+  return rows;
+}
+async function bizReadXlsx(buf){
+  const u8=(buf instanceof Uint8Array)?buf:new Uint8Array(buf);
+  const zip=bizUnzip(u8);
+  const sheets=Object.keys(zip).filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort();
+  if(!sheets.length) throw new Error('xlsx 里没有工作表（可能是不完整下载）');
+  const cache={};
+  const text=async n=>{
+    if(cache[n]!==undefined) return cache[n];
+    const e=zip[n];
+    const data=e.method===0?e.data:await bizInflateRaw(e.data);
+    cache[n]=new TextDecoder('utf-8').decode(data);
+    return cache[n];
+  };
+  const shared = zip['xl/sharedStrings.xml'] ? bizSharedStrings(await text('xl/sharedStrings.xml')) : [];
+  return bizSheetRows(await text(sheets[0]), shared);
+}
+
+// ---------------- 认表 / 认店铺 ----------------
+function bizDetectKind(rows){
+  const h=(rows[0]||[]).map(x=>String(x==null?'':x)).join('|');
+  if(/订单编号|Order Number/i.test(h)) return 'orders';
+  if(/交易时间|收款时间|放款时间/.test(h) || /交易金额/.test(h)) return 'pays';
+  if(/订单号/.test(h) && /客户/.test(h)) return 'combined';
+  return 'unknown';
+}
+function bizDetectShop(fileName, rows){
+  const n=String(fileName||'');
+  if(/朗格斯|lignes|langges/i.test(n)) return 'langges';
+  if(/凡适|fansi|fanshi/i.test(n)) return 'fansi';
+  if(rows && rows.length>1){
+    const probe=[];
+    for(let i=1;i<Math.min(rows.length,40);i++) probe.push((rows[i]||[]).join(' '));
+    const joined=probe.join(' ');
+    if(/Lignes|朗格斯/i.test(joined)) return 'langges';
+    if(/Fanshi|Fans|凡适/i.test(joined)) return 'fansi';
+  }
+  return null;
+}
+function bizParseOrders(rows, shop){
+  const header=(rows[0]||[]).map(x=>String(x==null?'':x));
+  const idx={};
+  header.forEach((h,i)=>{
+    if(idx.orderNo===undefined && /订单编号|Order Number/i.test(h)) idx.orderNo=i;
+    else if(idx.ts===undefined && /订单创建时间|下单时间|Order Create/i.test(h)) idx.ts=i;
+    else if(idx.buyer===undefined && /买家名称|Buyer Name|买家名/i.test(h)) idx.buyer=i;
+    else if(idx.seller===undefined && /卖家名称|Seller Name/i.test(h)) idx.seller=i;
+    else if(idx.amount===undefined && /订单总价|Order Amount|订单总金额|总金额/i.test(h)) idx.amount=i;
+    else if(idx.shipping===undefined && /运费|Shipping/i.test(h)) idx.shipping=i;
+    else if(idx.status===undefined && /状态|Status/i.test(h)) idx.status=i;
+    else if(idx.country===undefined && /买家国家|Buyer Country/i.test(h)) idx.country=i;
+    else if(idx.currency===undefined && /订单币种|Order Currency|币种/i.test(h)) idx.currency=i;
+  });
+  const g=(r,i)=> (!r||i===undefined||r[i]===undefined||r[i]===null) ? '' : String(r[i]).trim();
+  const out=[];
+  rows.slice(1).forEach(r=>{
+    if(!r) return;
+    const orderNo=g(r,idx.orderNo), buyer=g(r,idx.buyer), seller=g(r,idx.seller);
+    if(!orderNo && !buyer && !seller) return;      // 同一订单的第二行产品明细，跳过
+    const countryRaw=g(r,idx.country);
+    out.push({
+      shop:shop, orderNo:orderNo, ts:bizDate(g(r,idx.ts)), buyer:buyer, sellerRaw:seller, sellerCn:bizSellerCn(seller),
+      amount:bizNum(g(r,idx.amount)), shipping:bizNum(g(r,idx.shipping)), status:g(r,idx.status),
+      countryRaw:countryRaw, country:bizCountryCn(countryRaw), currency:g(r,idx.currency)||'USD'
+    });
+  });
+  return out;
+}
+function bizParsePays(rows, shop, orderMap){
+  const header=(rows[0]||[]).map(x=>String(x==null?'':x));
+  let iT=0, iType=3, iCur=5, iAmt=6, iOid=9;
+  header.forEach((h,i)=>{
+    if(/交易时间|收款时间|放款时间|收汇时间/.test(h)) iT=i;
+    else if(/业务类型|交易类型|^类型$/.test(h)) iType=i;
+    else if(/^币种$|币种/.test(h)) iCur=i;
+    else if(/交易金额|订单金额/.test(h) || (/金额/.test(h) && !/余额/.test(h))) iAmt=i;
+    else if(/订单/.test(h)) iOid=i;
+  });
+  const out=[];
+  rows.slice(1).forEach(r=>{
+    if(!r) return;
+    const type=String(r[iType]===undefined||r[iType]===null?'':r[iType]).trim();
+    const cur=String(r[iCur]===undefined||r[iCur]===null?'':r[iCur]).trim()||'USD';
+    const amt=bizNum(r[iAmt]);
+    const ts=bizDate(r[iT]);
+    if(type!=='放款&收款' || cur!=='USD' || !(amt>0) || !ts) return;
+    const oid=String(r[iOid]===undefined||r[iOid]===null?'':r[iOid]).trim();
+    const o=orderMap[oid]||{};
+    const countryRaw=o.countryRaw||'';
+    out.push({
+      shop:shop, orderNo:oid, ts:ts, amount:Math.round(amt*100)/100,
+      buyer:o.buyer||'未知客户', sellerRaw:o.sellerRaw||'', sellerCn:o.sellerCn||'未知业务员',
+      orderAmount:bizNum(o.amount), shipping:bizNum(o.shipping),
+      countryRaw:countryRaw, country:o.country||bizCountryCn(countryRaw)
+    });
+  });
+  return out;
+}
+// 首笔收款历史库：只增不减（跨批次累积，老基准比新算出来的更早时沿用旧的）
+function bizRebuildFirstPay(){
+  const fp={};
+  Object.keys(biz.firstPay||{}).forEach(k=>{ if(biz.firstPay[k]) fp[k]=biz.firstPay[k]; });
+  biz.pays.slice().sort((a,b)=>String(a.ts).localeCompare(String(b.ts))).forEach(p=>{
+    const k=bizCustKey(p); if(!k) return;
+    const d=String(p.ts).slice(0,10); if(!d) return;
+    if(!fp[k]||d<fp[k]) fp[k]=d;
+  });
+  biz.firstPay=fp;
+}
+async function handleBizFilePick(){
+  const input=document.getElementById('bizFileInput');
+  const files=Array.from(input.files||[]);
+  input.value='';
+  if(!files.length){ showToast('没有选到文件，请重新点一次「导入订单/收款表」'); return; }
+  await bizImportFiles(files);
+}
+async function bizImportFiles(files){
+  const log=[]; let addO=0,dupO=0,addP=0,dupP=0;
+  for(const f of files){
+    const name=f.name||'(未命名)';
+    try{
+      if(/\.(csv|txt)$/i.test(name)){
+        log.push({name:name, text:'CSV 暂不支持，请在阿里后台选「导出 Excel」(xlsx) 再导入', cls:'bad'});
+        continue;
+      }
+      const rows=await bizReadXlsx(await f.arrayBuffer());
+      const kind=bizDetectKind(rows);
+      if(kind==='unknown'){ log.push({name:name, text:'认不出这是什么表（表头里既没有「订单编号」也没有「交易时间」）', cls:'bad'}); continue; }
+      if(kind==='combined'){ log.push({name:name, text:'这是小满「双店订单明细」（含客户国家），暂未启用；不影响订单/收款导入', cls:'dup'}); continue; }
+      const shop=bizDetectShop(name, rows);
+      if(!shop){ log.push({name:name, text:'看不出属于哪个店（文件名里请带「朗格斯」或「凡适」）', cls:'bad'}); continue; }
+      if(kind==='orders'){
+        const list=bizParseOrders(rows, shop);
+        // 订单按「店铺+订单号」去重：同一个订单的多行产品明细会被合并成一条
+        // （靠 o.shop 前缀区分两个店，避免跨店订单号撞车）
+        const seen={}; biz.orders.forEach(o=>{ seen[o.shop+'|'+o.orderNo]=1; });
+        let a=0,d=0;
+        list.forEach(o=>{ if(!o.orderNo) return; const k=o.shop+'|'+o.orderNo; if(seen[k]){ d++; return; } seen[k]=1; biz.orders.push(o); a++; });
+        addO+=a; dupO+=d;
+        log.push({name:name, text:'订单表 · '+bizShopName(shop)+' · 共 '+list.length+' 行，新增 '+a+' 条'+(d?('，跳过重复 '+d+' 条'):''), cls:'ok'});
+      } else {
+        const omap={}; biz.orders.forEach(o=>{ omap[o.orderNo]=o; });
+        const list=bizParsePays(rows, shop, omap);
+        // 同一订单可能有多笔金额、时间完全相同的收款（分期付款），不能按「值」简单去重，
+        // 否则会少记一笔。这里按「出现次数」做多重集去重：文件里有 2 条就存 2 条，
+        // 同一个文件再导一次也不会有新增。
+        const have={}; biz.pays.forEach(p=>{ const k=bizPayKey(p); have[k]=(have[k]||0)+1; });
+        const inc={};
+        let a=0,d=0;
+        list.forEach(p=>{
+          const k=bizPayKey(p); inc[k]=(inc[k]||0)+1;
+          if((have[k]||0)>=inc[k]){ d++; return; }
+          have[k]=(have[k]||0)+1; biz.pays.push(p); a++;
+        });
+        addP+=a; dupP+=d;
+        log.push({name:name, text:'收款表 · '+bizShopName(shop)+' · 共 '+list.length+' 笔「放款&收款(USD)」，新增 '+a+' 笔'+(d?('，跳过重复 '+d+' 笔'):''), cls:'ok'});
+      }
+    }catch(e){
+      log.push({name:name, text:'解析失败：'+((e&&e.message)||e), cls:'bad'});
+    }
+  }
+  bizRebuildFirstPay();
+  biz.uploads=biz.uploads||[];
+  log.forEach(l=>biz.uploads.push({name:l.name, text:l.text, cls:l.cls, ts:Date.now()}));
+  if(biz.uploads.length>60) biz.uploads=biz.uploads.slice(-60);
+  saveAll();
+  renderBiz();
+  const got=addO+addP;
+  showToast(got? ('✓ 导入完成：订单 +'+addO+'（重复 '+dupO+'），收款 +'+addP+'（重复 '+dupP+')') : '⚠️ 没有新增数据（可能这些文件已经导过了）', got?'info':'warning');
+}
+
+// ---------------- 计算 ----------------
+function bizUsd(n, dec){
+  const v=bizNum(n);
+  const d=(dec===undefined)?2:dec;
+  const s=Math.abs(v).toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return (v<0?'-$':'$')+s;
+}
+function bizPct(v,d){ return (bizNum(v)*100).toFixed(d===undefined?1:d)+'%'; }
+function bizMonthDiff(d1, d2){
+  const a=String(d1||'').split('-'), b=String(d2||'').split('-');
+  if(a.length<2||b.length<2) return 0;
+  const y1=parseInt(a[0],10), m1=parseInt(a[1],10), y2=parseInt(b[0],10), m2=parseInt(b[1],10);
+  if(isNaN(y1)||isNaN(m1)||isNaN(y2)||isNaN(m2)) return 0;
+  return (y2-y1)*12+(m2-m1);
+}
+function bizRangeBounds(){
+  const d=new Date(), y=d.getFullYear(), m=d.getMonth()+1;
+  const pad=n=>String(n).padStart(2,'0');
+  const K=bizRange.kind;
+  if(K==='prev'){ const yy=m===1?y-1:y, mm=m===1?12:m-1; return {start:yy+'-'+pad(mm)+'-01', end:yy+'-'+pad(mm)+'-31', label:yy+'年'+mm+'月'}; }
+  if(K==='quarter'){ const q=Math.floor((m-1)/3); return {start:y+'-'+pad(q*3+1)+'-01', end:y+'-'+pad(q*3+3)+'-31', label:y+'年 Q'+(q+1)}; }
+  if(K==='year') return {start:y+'-01-01', end:y+'-12-31', label:y+'年'};
+  if(K==='all') return {start:'', end:'', label:'全部导入数据'};
+  if(K==='custom') return {start:bizRange.start||'', end:bizRange.end||'', label:(bizRange.start||'最早')+' ~ '+(bizRange.end||'今天')};
+  return {start:y+'-'+pad(m)+'-01', end:y+'-'+pad(m)+'-31', label:y+'年'+m+'月'};
+}
+// 新老客户判定 + 提成（与 5010 系统同口径；金额仅作内部参考）
+function bizLabeled(){
+  const r=bizRangeBounds(), out=[];
+  biz.pays.forEach(p=>{
+    const day=String(p.ts||'').slice(0,10);
+    if(r.start && day<r.start) return;
+    if(r.end && day>r.end) return;
+    const q=Object.assign({}, p);
+    const k=bizCustKey(p);
+    if(!k){ q.type='无法判断'; q.rate=0; q.base=0; q.comm=0; q.why='缺买家或业务员，无法判定'; out.push(q); return; }
+    const first=biz.firstPay[k]||day;
+    const months=bizMonthDiff(first, day);
+    if(months<12){ q.type='新客户'; q.rate=0.04; q.why='首款 '+first+'，距今 '+months+' 个月'; }
+    else { q.type='老客户'; q.rate=0.02; q.why='首款 '+first+'，已满 12 个月'; }
+    const pay=bizNum(p.amount), oAmt=bizNum(p.orderAmount), ship=bizNum(p.shipping);
+    let base=pay;
+    if(oAmt>0 && ship>0) base=pay*(1-ship/oAmt);
+    q.base=Math.round(base*100)/100;
+    q.comm=Math.round(q.base*q.rate*100)/100;
+    out.push(q);
+  });
+  return out.sort((a,b)=>String(b.ts).localeCompare(String(a.ts)));
+}
+function bizStats(list){
+  const s={count:list.length, amount:0, comm:0, base:0, newAmt:0, newCnt:0, oldAmt:0, oldCnt:0, naCnt:0,
+           sample:0, bulk:0, bulkAmt:0, buyers:{}, newCust:{}, oldCust:{}, lg:{amount:0,cnt:0,comm:0}, fs:{amount:0,cnt:0,comm:0}};
+  list.forEach(p=>{
+    const amt=bizNum(p.amount);
+    s.amount+=amt; s.comm+=bizNum(p.comm); s.base+=bizNum(p.base);
+    const g = p.shop==='langges' ? s.lg : (p.shop==='fansi' ? s.fs : null);
+    if(g){ g.amount+=amt; g.cnt++; g.comm+=bizNum(p.comm); }
+    if(p.type==='新客户'){ s.newAmt+=amt; s.newCnt++; if(p.buyer) s.newCust[p.buyer]=1; }
+    else if(p.type==='老客户'){ s.oldAmt+=amt; s.oldCnt++; if(p.buyer) s.oldCust[p.buyer]=1; }
+    else s.naCnt++;
+    if(amt<=500) s.sample++; else { s.bulk++; s.bulkAmt+=amt; }
+    if(p.buyer) s.buyers[p.buyer]=1;
+  });
+  s.buyerN=Object.keys(s.buyers).length;
+  s.newCustN=Object.keys(s.newCust).length;
+  s.oldCustN=Object.keys(s.oldCust).length;
+  s.avg=s.count? s.amount/s.count : 0;
+  s.newRatio=s.amount? s.newAmt/s.amount : 0;
+  s.oldRatio=s.amount? s.oldAmt/s.amount : 0;
+  s.bulkRatio=s.amount? s.bulkAmt/s.amount : 0;
+  s.bulkConv=s.sample? s.bulk/s.sample : 0;
+  const byBuyer={};
+  list.forEach(p=>{ byBuyer[p.buyer]=(byBuyer[p.buyer]||0)+bizNum(p.amount); });
+  const vals=Object.values(byBuyer).sort((a,b)=>b-a);
+  s.top3=s.amount? (vals.slice(0,3).reduce((x,y)=>x+y,0)/s.amount) : 0;
+  return s;
+}
+function bizSellers(list){
+  const m={};
+  list.forEach(p=>{
+    const k=p.sellerCn||'未知';
+    const o=m[k]||(m[k]={name:k, shop:p.shop, count:0, amount:0, comm:0, newAmt:0, oldAmt:0, sample:0, bulk:0, buyers:{}});
+    o.count++; o.amount+=bizNum(p.amount); o.comm+=bizNum(p.comm);
+    if(p.type==='新客户') o.newAmt+=bizNum(p.amount); else if(p.type==='老客户') o.oldAmt+=bizNum(p.amount);
+    if(bizNum(p.amount)<=500) o.sample++; else o.bulk++;
+    if(p.buyer) o.buyers[p.buyer]=1;
+  });
+  return Object.values(m).map(o=>{
+    o.buyerN=Object.keys(o.buyers).length;
+    o.newRatio=o.amount?o.newAmt/o.amount:0;
+    o.bulkConv=o.sample?o.bulk/o.sample:0;
+    o.avg=o.buyerN?o.amount/o.buyerN:0;
+    o.judge=(o.bulkConv>=1&&o.newRatio>=0.4)?'开发转化型':(o.bulkConv>=1?'大货转化型':(o.newRatio>=0.5?'新客开发型':'老客维护型'));
+    return o;
+  }).sort((a,b)=>b.amount-a.amount);
+}
+function bizCountryOf(p){ return (biz.fixCountry&&biz.fixCountry[p.buyer]) ? biz.fixCountry[p.buyer] : (p.country||'未知国家'); }
+function bizCountries(list, shop){
+  const m={};
+  list.filter(p=>!shop||p.shop===shop).forEach(p=>{
+    const c=bizCountryOf(p);
+    const o=m[c]||(m[c]={name:c, count:0, amount:0, buyers:{}});
+    o.count++; o.amount+=bizNum(p.amount); o.buyers[p.buyer]=1;
+  });
+  const arr=Object.values(m).map(o=>{ o.buyerN=Object.keys(o.buyers).length; o.avg=o.count?o.amount/o.count:0; return o; });
+  const total=arr.reduce((x,o)=>x+o.amount,0);
+  arr.forEach(o=>{ o.share=total?o.amount/total:0; });
+  const avgTicket=total/Math.max(1,arr.reduce((x,o)=>x+o.count,0));
+  arr.forEach(o=>{ o.quality = o.avg>=avgTicket ? '高客单' : '常规'; });
+  arr.sort((a,b)=>b.amount-a.amount);
+  const china=arr.filter(o=>o.name==='中国'), rest=arr.filter(o=>o.name!=='中国');
+  return {rows:rest.concat(china), total:total, chinaCount:china.length?china[0].count:0};
+}
+function bizTrend(months){
+  const map={};
+  biz.pays.forEach(p=>{
+    const mm=String(p.ts||'').slice(0,7); if(!mm) return;
+    const o=map[mm]||(map[mm]={m:mm, lg:0, fs:0});
+    if(p.shop==='langges') o.lg+=bizNum(p.amount); else if(p.shop==='fansi') o.fs+=bizNum(p.amount);
+  });
+  let keys=Object.keys(map).sort();
+  if(!keys.length) return [];
+  const last=keys[keys.length-1];
+  const y=parseInt(last.slice(0,4),10), mo=parseInt(last.slice(5,7),10);
+  const out=[];
+  const N=months||12;
+  for(let i=N-1;i>=0;i--){
+    const d=new Date(y, mo-1-i, 1);
+    const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    out.push(map[k]||{m:k, lg:0, fs:0});
+  }
+  return out;
+}
+function bizBands(list){
+  const b={'0-500':0,'500-1000':0,'1000-3000':0,'3000-10000':0,'10000+':0};
+  list.forEach(p=>{
+    const a=bizNum(p.amount);
+    if(a<=500) b['0-500']++; else if(a<=1000) b['500-1000']++; else if(a<=3000) b['1000-3000']++; else if(a<=10000) b['3000-10000']++; else b['10000+']++;
+  });
+  return b;
+}
+function bizBadge(){
+  const el=document.getElementById('bizBadge');
+  if(!el) return;
+  const n=biz.pays.filter(p=>bizCountryOf(p)==='中国').length;
+  if(n){ el.textContent=n; el.style.display=''; } else el.style.display='none';
+}
+
+// ---------------- 渲染 ----------------
+function bizShopTag(k){ return '<span class="biz-shop '+(k==='langges'?'lg':'fs')+'">'+escHtml(bizShopName(k))+'</span>'; }
+function bizTypeTag(t){
+  const cls = t==='新客户'?'new':(t==='老客户'?'old':'na');
+  return '<span class="biz-type '+cls+'">'+escHtml(t)+'</span>';
+}
+let bizDetail={shop:'all', seller:'all', type:'all', limit:200};
+function bizFilteredDetail(list){
+  return list.filter(p=>
+    (bizDetail.shop==='all'||p.shop===bizDetail.shop) &&
+    (bizDetail.seller==='all'||(p.sellerCn||'未知')===bizDetail.seller) &&
+    (bizDetail.type==='all'||p.type===bizDetail.type)
+  );
+}
+function bizTrendSvg(trend){
+  if(!trend.length) return '';
+  const W=680, H=200, PL=52, PR=14, PT=16, PB=28;
+  const iw=W-PL-PR, ih=H-PT-PB;
+  const max=Math.max.apply(null, trend.map(t=>Math.max(t.lg,t.fs,t.lg+t.fs)).concat([1]));
+  const step=trend.length>1? iw/(trend.length-1) : 0;
+  const x=i=>PL+step*i;
+  const y=v=>PT+ih-(v/max)*ih;
+  const path=key=>trend.map((t,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(t[key]).toFixed(1)).join(' ');
+  let grid='';
+  for(let g=0;g<=4;g++){
+    const v=max*g/4, yy=y(v);
+    grid+='<line x1="'+PL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+yy.toFixed(1)+'" stroke="#eef2f6" stroke-width="1"/>';
+    grid+='<text x="'+(PL-6)+'" y="'+(yy+3.5).toFixed(1)+'" text-anchor="end" font-size="9.5" fill="#94a3b8">'+Math.round(v/1000)+'k</text>';
+  }
+  let labels='';
+  trend.forEach((t,i)=>{
+    if(trend.length>8 && i%2===1) return;
+    labels+='<text x="'+x(i).toFixed(1)+'" y="'+(H-9)+'" text-anchor="middle" font-size="9.5" fill="#94a3b8">'+t.m.slice(5)+'月</text>';
+  });
+  const dots=key=>trend.map((t,i)=>'<circle cx="'+x(i).toFixed(1)+'" cy="'+y(t[key]).toFixed(1)+'" r="2.6" fill="'+key+'"/>').join('');
+  const COL={lg:'#0369a1', fs:'#d97706'};
+  return '<svg class="biz-chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="月度实收趋势">'
+    + grid + labels
+    + '<path d="'+path('lg')+'" fill="none" stroke="'+COL.lg+'" stroke-width="2" stroke-linejoin="round"/>'
+    + '<path d="'+path('fs')+'" fill="none" stroke="'+COL.fs+'" stroke-width="2" stroke-linejoin="round"/>'
+    + dots('lg') + dots('fs')
+    + '<text x="'+(W-PR)+'" y="'+(PT+2)+'" text-anchor="end" font-size="10" fill="#94a3b8">峰值 '+bizUsd(max,0)+'</text>'
+    + '</svg>';
+}
+function bizUploadLog(){
+  const us=(biz.uploads||[]).slice(-5).reverse();
+  if(!us.length) return '';
+  return '<div class="biz-log">'+us.map(u=>'<div>· '+escHtml(u.name)+' — <span class="'+(u.cls||'')+'">'+escHtml(u.text||'')+'</span></div>').join('')+'</div>';
+}
+function bizSrvBar(){
+  return '<div class="biz-srv"><span>需要出「完整 Excel 报告」（多 sheet + 图表）？用本机那套 <b>国际站经营分析系统</b>（先运行 run_server.py）</span>'
+    +'<a class="btn" href="http://127.0.0.1:5010" target="_blank" rel="noopener" style="font-size:12.5px">打开服务器版</a></div>';
+}
+function bizDropZone(){
+  return '<div class="biz-drop" ondragover="bizDragOver(event)" ondragleave="bizDragLeave(event)" ondrop="bizDrop(event)" onclick="document.getElementById(\'bizFileInput\').click()">'
+    + '<b>把「订单列表」和「收款明细」的 Excel 直接拖进来</b><br>'
+    + '文件名里带「朗格斯」或「凡适」就能自动分店；订单表和收款表会自动认出来<br>'
+    + '<span style="font-size:12px;color:var(--text-muted)">也可以点这里选文件（一次可以选多个）</span></div>';
+}
+function bizDragOver(e){ e.preventDefault(); try{ e.currentTarget.classList.add('over'); }catch(x){} }
+function bizDragLeave(e){ try{ e.currentTarget.classList.remove('over'); }catch(x){} }
+function bizDrop(e){
+  e.preventDefault();
+  try{ e.currentTarget.classList.remove('over'); }catch(x){}
+  const files=Array.from((e.dataTransfer&&e.dataTransfer.files)||[]);
+  if(!files.length) return;
+  bizImportFiles(files);
+}
+function renderBiz(){
+  const box=document.getElementById('bizContent');
+  if(!box) return;
+  bizBadge();
+  const hasData = biz.pays.length || biz.orders.length;
+  const hi='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--primary);vertical-align:-3px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>';
+  if(!hasData){
+    box.innerHTML='<div class="biz-empty">'+hi+' 还没有导入经营数据<br>'
+      + '<span style="font-size:12.5px;color:var(--text-muted)">从阿里国际站后台导出两个店的「订单列表」和「收款明细」（Excel），拖进来就能出分析<br>'
+      + '数据只存在你自己的浏览器里，会自动跟着工作台同步存档</span></div>'
+      + bizDropZone()
+      + bizSrvBar();
+    return;
+  }
+  const labeled=bizLabeled();
+  const s=bizStats(labeled);
+  const r=bizRangeBounds();
+  const sellers=bizSellers(labeled);
+  const lgC=bizCountries(labeled,'langges');
+  const fsC=bizCountries(labeled,'fansi');
+  const trend=bizTrend(12);
+  const bands=bizBands(labeled);
+  const monthOfData = (biz.pays.map(p=>String(p.ts).slice(0,7)).sort().pop())||'';
+  const chips=[['cur','本月'],['prev','上月'],['quarter','本季'],['year','今年'],['all','全部'],['custom','自定义']];
+  let filter='<div class="biz-filterbar">';
+  filter+=chips.map(c=>'<button class="biz-chip'+(bizRange.kind===c[0]?' on':'')+'" onclick="bizSetRange(\''+c[0]+'\')">'+c[1]+'</button>').join('');
+  if(bizRange.kind==='custom'){
+    filter+='<span class="biz-sep"></span><span class="biz-range">从 <input type="date" id="bizStart" value="'+(bizRange.start||'')+'" onchange="bizCustomRange()"> 到 <input type="date" id="bizEnd" value="'+(bizRange.end||'')+'" onchange="bizCustomRange()"></span>';
+  }
+  filter+='<span class="biz-sep"></span><span style="font-size:12px;color:var(--text-muted)">'+escHtml(r.label)+' · '+s.count+' 笔</span>';
+  filter+='</div>';
+
+  let h=filter;
+
+  // 服务器版入口（仅电脑端显示；手机上 display:none，点了也连不上本机 5010）
+  h+=bizSrvBar();
+
+  // 指标卡
+  h+='<div class="biz-grid">'
+    + '<div class="biz-metric hl"><div class="k">双店实收</div><div class="v">'+bizUsd(s.amount)+'</div><div class="s">朗格斯 '+bizUsd(s.lg.amount)+' · 凡适 '+bizUsd(s.fs.amount)+'</div></div>'
+    + '<div class="biz-metric"><div class="k">实收订单笔数</div><div class="v">'+s.count+'</div><div class="s">朗格斯 '+s.lg.cnt+' · 凡适 '+s.fs.cnt+'</div></div>'
+    + '<div class="biz-metric"><div class="k">提成合计（参考值）</div><div class="v">'+bizUsd(s.comm)+'</div><div class="s">新客 4% · 老客 2%，已扣运费</div></div>'
+    + '<div class="biz-metric"><div class="k">平均客单价</div><div class="v">'+bizUsd(s.avg)+'</div><div class="s">实收 ÷ 笔数</div></div>'
+    + '<div class="biz-metric"><div class="k">新客收汇贡献</div><div class="v">'+bizPct(s.newRatio)+'</div><div class="s">'+bizUsd(s.newAmt)+' · 新客 '+s.newCustN+' 位</div></div>'
+    + '<div class="biz-metric"><div class="k">大货订单贡献</div><div class="v">'+bizPct(s.bulkRatio)+'</div><div class="s">大货 '+s.bulk+' 单 / 样品 '+s.sample+' 单</div></div>'
+    + '<div class="biz-metric"><div class="k">大货转化率</div><div class="v">'+bizPct(s.bulkConv,0)+'</div><div class="s">大货单数 ÷ 样品单数</div></div>'
+    + '<div class="biz-metric"><div class="k">前 3 客户集中度</div><div class="v">'+bizPct(s.top3)+'</div><div class="s">越高越依赖大客户</div></div>'
+    + '</div>';
+
+  // 月度趋势
+  const sum12=trend.reduce((x,t)=>x+t.lg+t.fs,0);
+  h+='<div class="biz-panel"><h4>月度实收趋势 <span class="tag">'+(trend.length?trend[0].m+' ~ '+trend[trend.length-1].m:'无数据')+'</span>'
+    + '<span style="margin-left:auto;font-size:12px;color:var(--text-secondary);font-weight:600">'
+    + '<span style="color:#0369a1">■</span> 朗格斯　<span style="color:#d97706">■</span> 凡适</span></h4>'
+    + (sum12? bizTrendSvg(trend) : '<div style="font-size:12.5px;color:var(--text-muted);padding:10px 0">暂无月度数据</div>')
+    + '<div class="biz-note">近 12 个月实收（含所有运费）· 单位为美元</div></div>';
+
+  // 业务员业绩
+  h+='<div class="biz-panel"><h4>业务员业绩 <span class="tag">'+sellers.length+' 人</span></h4><div class="biz-tbl-wrap"><table class="biz-tbl">'
+    + '<thead><tr><th>业务员</th><th>店铺</th><th class="r">收款笔数</th><th class="r">实收(USD)</th><th class="r">新客实收</th><th class="r">提成(参考)</th><th class="r">样品/大货</th><th class="r">大货转化</th><th class="r">成交客户</th><th>结构判断</th></tr></thead><tbody>';
+  if(!sellers.length) h+='<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:16px">本时段没有收款记录</td></tr>';
+  sellers.forEach(o=>{
+    h+='<tr><td><b>'+escHtml(o.name)+'</b></td><td>'+bizShopTag(o.shop)+'</td>'
+      + '<td class="r">'+o.count+'</td><td class="r">'+bizUsd(o.amount)+'</td><td class="r">'+bizUsd(o.newAmt)+'</td>'
+      + '<td class="r"><b>'+bizUsd(o.comm)+'</b></td><td class="r">'+o.sample+' / '+o.bulk+'</td>'
+      + '<td class="r">'+bizPct(o.bulkConv,0)+'</td><td class="r">'+o.buyerN+'</td><td>'+escHtml(o.judge)+'</td></tr>';
+  });
+  if(sellers.length){
+    h+='</tbody><tfoot><tr><td>合计</td><td></td><td class="r">'+s.count+'</td><td class="r">'+bizUsd(s.amount)+'</td><td class="r">'+bizUsd(s.newAmt)+'</td><td class="r">'+bizUsd(s.comm)+'</td><td class="r">'+s.sample+' / '+s.bulk+'</td><td class="r">'+bizPct(s.bulkConv,0)+'</td><td class="r">'+s.buyerN+'</td><td></td></tr></tfoot>';
+  } else h+='</tbody>';
+  h+='</table></div><div class="biz-note">提成为按公司现行方案（新客 4%、老客 2%，基数=实收扣除运费）算出的<b>参考值</b>，最终以财务确认为准。</div></div>';
+
+  // 国家分布
+  const countryTbl=(title, cs)=>{
+    let t='<div style="flex:1 1 300px;min-width:280px"><div style="font-size:13px;font-weight:700;margin:2px 0 8px">'+title
+      + '<span style="font-size:11.5px;color:var(--text-muted);font-weight:500">　合计 '+bizUsd(cs.total)+'</span></div>'
+      + '<div class="biz-tbl-wrap"><table class="biz-tbl"><thead><tr><th>国家/地区</th><th class="r">笔数</th><th class="r">实收</th><th class="r">客单均价</th><th class="r">占比</th><th>市场</th></tr></thead><tbody>';
+    if(!cs.rows.length) t+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:14px">无数据</td></tr>';
+    cs.rows.forEach(o=>{
+      const isCn=o.name==='中国';
+      t+='<tr'+(isCn?' style="background:#fffbeb"':'')+'><td><b>'+escHtml(o.name)+'</b>'
+        + (isCn?' <span class="biz-type na" title="收货地在中国通常是货代中转仓，真实国家待确认">待确认</span>':'')+'</td>'
+        + '<td class="r">'+o.count+'</td><td class="r">'+bizUsd(o.amount)+'</td><td class="r">'+bizUsd(o.avg)+'</td>'
+        + '<td class="r">'+bizPct(o.share)+'</td><td>'+escHtml(o.quality)+'</td></tr>';
+    });
+    t+='</tbody></table></div>';
+    if(cs.chinaCount) t+='<div class="biz-note">有 '+cs.chinaCount+' 笔收货地显示「中国」（多为货代中转仓），真实国家待确认——<a href="javascript:void(0)" onclick="bizFixCountry()" style="color:var(--primary)">点这里修正</a></div>';
+    t+='</div>';
+    return t;
+  };
+  h+='<div class="biz-panel"><h4>目的地国家分布</h4><div style="display:flex;gap:18px;flex-wrap:wrap">'
+    + countryTbl('朗格斯 · 目的地', lgC)
+    + countryTbl('凡适 · 目的地', fsC)
+    + '</div></div>';
+
+  // 金额结构
+  h+='<div class="biz-panel"><h4>订单金额结构 <span class="tag">样品 ≤ $500 ／ 大货 > $500</span></h4><div class="biz-tbl-wrap"><table class="biz-tbl">'
+    + '<thead><tr><th>金额带</th><th class="r">笔数</th><th class="r">占比</th><th>结构解读</th></tr></thead><tbody>';
+  const bandNotes={'0-500':'样品 / 试单为主','500-1000':'中小单成交核心区','1000-3000':'中小单成交核心区','3000-10000':'大货与重点客户','10000+':'大货与重点客户'};
+  Object.keys(bands).forEach(k=>{
+    const n=bands[k];
+    h+='<tr><td><b>'+k+'</b></td><td class="r">'+n+'</td><td class="r">'+(s.count?bizPct(n/s.count):'0%')+'</td><td>'+bandNotes[k]+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+
+  // 明细
+  const det=bizFilteredDetail(labeled);
+  const sellersAll=[...new Set(labeled.map(p=>p.sellerCn||'未知'))].sort();
+  h+='<div class="biz-panel"><h4>收款及提成明细 <span class="tag">共 '+det.length+' 笔</span>'
+    + '<span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">'
+    + '<button class="biz-chip'+(bizDetail.shop==='all'?' on':'')+'" onclick="bizSetDet(\'shop\',\'all\')">全部店</button>'
+    + '<button class="biz-chip'+(bizDetail.shop==='langges'?' on':'')+'" onclick="bizSetDet(\'shop\',\'langges\')">朗格斯</button>'
+    + '<button class="biz-chip'+(bizDetail.shop==='fansi'?' on':'')+'" onclick="bizSetDet(\'shop\',\'fansi\')">凡适</button>'
+    + '<span class="biz-sep"></span>'
+    + '<select id="bizDetSeller" onchange="bizSetDet(\'seller\',this.value)" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit">'
+    + '<option value="all">全部业务员</option>'+sellersAll.map(x=>'<option value="'+escHtml(x)+'"'+(bizDetail.seller===x?' selected':'')+'>'+escHtml(x)+'</option>').join('')+'</select>'
+    + '<select id="bizDetType" onchange="bizSetDet(\'type\',this.value)" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit">'
+    + ['all','新客户','老客户','无法判断'].map(x=>'<option value="'+x+'"'+(bizDetail.type===x?' selected':'')+'>'+(x==='all'?'全部身份':x)+'</option>').join('')+'</select>'
+    + '</span></h4>';
+  h+='<div class="biz-tbl-wrap"><table class="biz-tbl"><thead><tr><th>店铺</th><th>订单号</th><th>买家</th><th>业务员</th><th>收款时间</th><th class="r">收款(USD)</th><th>身份</th><th class="r">提成基数</th><th class="r">比例</th><th class="r">提成(参考)</th><th>判定依据</th></tr></thead><tbody>';
+  if(!det.length) h+='<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:16px">没有符合条件的记录</td></tr>';
+  det.slice(0,bizDetail.limit).forEach(p=>{
+    h+='<tr><td>'+bizShopTag(p.shop)+'</td><td>'+escHtml(p.orderNo||'—')+'</td><td>'+escHtml(p.buyer||'—')+'</td><td>'+escHtml(p.sellerCn||'未知')+'</td>'
+      + '<td>'+escHtml(String(p.ts||'').slice(0,16))+'</td><td class="r">'+bizUsd(p.amount)+'</td><td>'+bizTypeTag(p.type)+'</td>'
+      + '<td class="r">'+bizUsd(p.base)+'</td><td class="r">'+(p.rate?(p.rate*100)+'%':'—')+'</td><td class="r"><b>'+(p.rate?bizUsd(p.comm):'—')+'</b></td>'
+      + '<td style="color:var(--text-muted);font-size:11.5px">'+escHtml(p.why||'')+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  if(det.length>bizDetail.limit){
+    h+='<div style="text-align:center;margin-top:10px"><button class="btn" onclick="bizMoreDetail()">显示更多（还有 '+(det.length-bizDetail.limit)+' 笔）</button></div>';
+  }
+  h+='<div class="biz-note">只显示最近 '+Math.min(bizDetail.limit,det.length)+' 笔，导出会有全部。新老客户判定单位=(买家+业务员)，以首笔收款起 12 个月为界。</div></div>';
+
+  // 导入记录 + 拖拽区
+  h+='<div class="biz-panel"><h4>导入数据 <span class="tag">订单 '+biz.orders.length+' 条 · 收款 '+biz.pays.length+' 笔</span>'
+    + '<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">全部数据落在本机浏览器，并自动同步存档</span></h4>'
+    + bizDropZone() + bizUploadLog() + '</div>';
+
+  box.innerHTML=h;
+}
+function bizSetRange(kind){ bizRange.kind=kind; renderBiz(); }
+function bizCustomRange(){
+  const a=document.getElementById('bizStart'), b=document.getElementById('bizEnd');
+  bizRange.kind='custom';
+  if(a) bizRange.start=a.value;
+  if(b) bizRange.end=b.value;
+  renderBiz();
+}
+function bizSetDet(k,v){ bizDetail[k]=v; if(k!=='limit') bizDetail.limit=200; renderBiz(); }
+function bizMoreDetail(){ bizDetail.limit+=500; renderBiz(); }
+function bizFixCountry(){
+  const list=biz.pays.filter(p=>bizCountryOf(p)==='中国');
+  const buyers=[...new Set(list.map(p=>p.buyer))];
+  if(!buyers.length) return;
+  const name=window.prompt('要修正哪个客户的真实国家？\n（当前待确认客户：'+buyers.slice(0,8).join('、')+(buyers.length>8?' 等'+buyers.length+'位':'')+'）', buyers[0]);
+  if(!name) return;
+  const hit=buyers.indexOf(name)>=0;
+  if(!hit){ showToast('没有找到这个买家，请复制列表里的名字再试'); return; }
+  const c=window.prompt('「'+name+'」的真实国家是？例如：法国', '');
+  if(!c) return;
+  biz.fixCountry=biz.fixCountry||{};
+  biz.fixCountry[name]=bizCountryCn(c);
+  saveAll(); renderBiz();
+  showToast('✓ 已把「'+name+'」记为 '+bizCountryCn(c),'info');
+}
+
+function bizExport(){
+  if(!biz.pays.length && !biz.orders.length){ showToast('还没有数据，先导入两个店的订单表和收款表'); return; }
+  try{
+    if(typeof TextEncoder==='undefined'){ showToast('当前浏览器不支持导出，请用电脑上的 Chrome / Edge'); return; }
+    showToast('<span class="sync-spinner"></span>正在生成 Excel...', 'info');
+    const blob=zipStore(bizBuildXlsx(bizExportSheets()));
+    const d=new Date(), p=n=>String(n).padStart(2,'0');
+    const stamp=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes());
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='国际站经营分析_'+stamp+'.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>{ try{URL.revokeObjectURL(url)}catch(e){} }, 5000);
+    showToast('✓ 已导出 6 个工作表（总览 / 业务员 / 国家 / 明细 / 趋势 / 口径说明）','info');
+  }catch(e){
+    showToast('导出失败：'+((e&&e.message)||e));
+  }
+}
+function bizClearAll(){
+  if(!biz.pays.length && !biz.orders.length){ showToast('当前没有经营数据'); return; }
+  showConfirm('确定清空国际站经营数据吗？\n订单 '+biz.orders.length+' 条、收款 '+biz.pays.length+' 笔、'
+    +Object.keys(biz.fixCountry||{}).length+' 条手工国家修正都会一起删掉。\n（其他模块的数据不受影响）', ()=>{
+    biz=bizBlank();
+    saveAll();
+    refreshAll();
+    showToast('经营数据已清空');
+  });
+}
+// 组织导出用的工作表数据（提成为参考值，口径写在最后一个 sheet）
+function bizExportSheets(){
+  const r=bizRangeBounds();
+  const labeled=bizLabeled();
+  const s=bizStats(labeled);
+  const sellers=bizSellers(labeled);
+  const trend=bizTrend(12);
+  const money=v=>Math.round(bizNum(v)*100)/100;
+  const pctS=v=>bizPct(v);
+
+  // 1 总览
+  const ov=[['指标','数值 / 说明']];
+  ov.push(['统计区间', r.label]);
+  ov.push(['双店实收 (USD)', money(s.amount)]);
+  ov.push(['　其中：朗格斯', money(s.lg.amount)]);
+  ov.push(['　其中：凡适', money(s.fs.amount)]);
+  ov.push(['实收笔数', s.count]);
+  ov.push(['　朗格斯笔数', s.lg.cnt]);
+  ov.push(['　凡适笔数', s.fs.cnt]);
+  ov.push(['提成合计（参考值, USD）', money(s.comm)]);
+  ov.push(['平均客单价 (USD)', money(s.avg)]);
+  ov.push(['新客收汇额 (USD)', money(s.newAmt)]);
+  ov.push(['新客收汇占比', pctS(s.newRatio)]);
+  ov.push(['老客收汇额 (USD)', money(s.oldAmt)]);
+  ov.push(['老客收汇占比', pctS(s.oldRatio)]);
+  ov.push(['大货订单占比', pctS(s.bulkRatio)]);
+  ov.push(['大货转化率', pctS(s.bulkConv)]);
+  ov.push(['样品单 / 大货单', s.sample+' / '+s.bulk]);
+  ov.push(['前 3 客户集中度', pctS(s.top3)]);
+  ov.push(['成交客户数', s.buyerN]);
+  ov.push(['新客户数 / 老客户数', s.newCustN+' / '+s.oldCustN]);
+  ov.push(['无法判定身份的笔数', s.naCnt]);
+  ov.push(['已导入订单表条数', biz.orders.length]);
+  ov.push(['已导入收款表笔数', biz.pays.length]);
+  ov.push(['导出时间', new Date().toLocaleString('zh-CN')]);
+
+  // 2 业务员业绩
+  const sh2=[['业务员','店铺','收款笔数','实收(USD)','新客实收(USD)','老客实收(USD)','提成(参考值,USD)','样品单','大货单','大货转化率','成交客户数','结构判断']];
+  sellers.forEach(o=>sh2.push([o.name, bizShopName(o.shop), o.count, money(o.amount), money(o.newAmt), money(o.oldAmt),
+    money(o.comm), o.sample, o.bulk, bizPct(o.bulkConv), o.buyerN, o.judge]));
+  if(sellers.length) sh2.push(['合计','', s.count, money(s.amount), money(s.newAmt), money(s.oldAmt), money(s.comm), s.sample, s.bulk, bizPct(s.bulkConv), s.buyerN, '']);
+
+  // 3 目的地国家
+  const sh3=[['店铺','国家/地区','笔数','实收(USD)','客单均价(USD)','占本店比','市场质量','备注']];
+  [['langges','朗格斯'],['fansi','凡适']].forEach(pair=>{
+    const cs=bizCountries(labeled, pair[0]);
+    cs.rows.forEach(o=>sh3.push([pair[1], o.name, o.count, money(o.amount), money(o.avg), bizPct(o.share), o.quality,
+      o.name==='中国'?'收货地在中国，多为货代中转仓，真实国家待确认':'']));
+  });
+
+  // 4 收款及提成明细
+  const sh4=[['店铺','订单号','买家','业务员','收款时间','收款(USD)','订单总价(USD)','运费(USD)','客户身份','提成基数(USD)','提成比例','提成(参考值,USD)','判定依据']];
+  labeled.forEach(p=>sh4.push([bizShopName(p.shop), p.orderNo||'', p.buyer||'', p.sellerCn||'未知',
+    String(p.ts||'').slice(0,19), money(p.amount), p.orderAmount?money(p.orderAmount):'', p.shipping?money(p.shipping):'',
+    p.type, money(p.base), p.rate?(p.rate*100)+'%':'', p.rate?money(p.comm):'', p.why||'']));
+
+  // 5 月度趋势
+  const sh5=[['月份','朗格斯(USD)','凡适(USD)','合计(USD)']];
+  trend.forEach(t=>sh5.push([t.m, money(t.lg), money(t.fs), money(t.lg+t.fs)]));
+
+  // 6 口径说明
+  const sh6=[['项目','口径']];
+  [['实收金额','收款明细里「交易类型 = 放款&收款」且「币种 = USD」且金额大于 0 的才计入'],
+   ['新老客户判定','以「买家 + 业务员」为一个单位，从该单位首笔收款那天算起；不满 12 个月 = 新客户，满 12 个月 = 老客户'],
+   ['提成比例','新客户 4%，老客户 2%（公司现行方案）'],
+   ['提成基数','订单总价和运费都能取到时 = 实收 ×(1 − 运费 ÷ 订单总价)；取不到运费时按实收全额'],
+   ['提成金额','= 提成基数 × 提成比例，四舍五入到分。本表金额是「参考值」，最终以财务确认为准'],
+   ['样品单 / 大货单','按单笔收款金额判定：≤ 500 美元算样品单，> 500 美元算大货单'],
+   ['大货转化率','大货单数 ÷ 样品单数'],
+   ['结构判断','大货转化率 ≥ 1 且新客占比 ≥ 40% = 开发转化型；大货转化率 ≥ 1 = 大货转化型；新客占比 ≥ 50% = 新客开发型；其余 = 老客维护型'],
+   ['市场质量','某国客单均价 ≥ 本店平均客单价 → 高客单，否则常规'],
+   ['显示「中国」','收货地填中国的多为货代中转仓，不代表真实市场，在表里单独标注待确认'],
+   ['数据来源','阿里国际站后台导出的「订单列表」与「收款明细」Excel，页面内解析，数据只存在本机浏览器']
+  ].forEach(x=>sh6.push(x));
+
+  return [
+    {name:'总览', head:ov[0], rows:ov.slice(1), widths:[26,44]},
+    {name:'业务员业绩', head:sh2[0], rows:sh2.slice(1), widths:[12,9,10,15,15,15,17,9,9,12,12,14]},
+    {name:'目的地国家', head:sh3[0], rows:sh3.slice(1), widths:[9,16,8,14,14,11,10,42]},
+    {name:'收款提成明细', head:sh4[0], rows:sh4.slice(1), widths:[9,20,22,11,20,12,14,11,10,14,10,17,34]},
+    {name:'月度趋势', head:sh5[0], rows:sh5.slice(1), widths:[10,15,15,15]},
+    {name:'口径说明', head:sh6[0], rows:sh6.slice(1), widths:[16,96]}
+  ];
+}
+// 通用多 sheet xlsx 生成（手写，零依赖；xlsx 本质就是 zip）
+function bizSheetXml(sheet){
+  const head=sheet.head||[];
+  let rows='';
+  if(head.length) rows+='<row r="1" ht="22" customHeight="1">'+head.map((t,i)=>clmCell(i,1,t,1)).join('')+'</row>';
+  (sheet.rows||[]).forEach((r,k)=>{
+    const rn=k+2;
+    rows+='<row r="'+rn+'">'+r.map((v,i)=>clmCell(i,rn,v,(typeof v==='number'&&isFinite(v))?2:null)).join('')+'</row>';
+  });
+  const widths=sheet.widths||[];
+  const cols=widths.length ? ('<cols>'+widths.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('')+'</cols>') : '';
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    +'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    +cols+'<sheetData>'+rows+'</sheetData>'
+    +'<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>'
+    +'</worksheet>';
+}
+function bizBuildXlsx(sheets){
+  const safeName=n=>escXml(String(n).replace(/[\[\]:*?\/\\]/g,'').slice(0,31));
+  const overrides=sheets.map((s,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('');
+  const wbSheets=sheets.map((s,i)=>'<sheet name="'+safeName(s.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('');
+  const wbRels=sheets.map((s,i)=>'<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')
+    +'<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>';
+  const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    +'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    +'<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>'
+    +'<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDF2F7"/><bgColor indexed="64"/></patternFill></fill></fills>'
+    +'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'
+    +'<border><left style="thin"><color rgb="FFD9E2EC"/></left><right style="thin"><color rgb="FFD9E2EC"/></right><top style="thin"><color rgb="FFD9E2EC"/></top><bottom style="thin"><color rgb="FFD9E2EC"/></bottom><diagonal/></border></borders>'
+    +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    +'<cellXfs count="3">'
+    +'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    +'<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>'
+    +'<xf numFmtId="4" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>'
+    +'</cellXfs>'
+    +'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
+    +'</styleSheet>';
+  const files=[
+    {name:'[Content_Types].xml', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      +'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+      +'<Default Extension="xml" ContentType="application/xml"/>'
+      +'<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      +overrides
+      +'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+      +'</Types>'},
+    {name:'_rels/.rels', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+      +'</Relationships>'},
+    {name:'xl/workbook.xml', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+      +'<sheets>'+wbSheets+'</sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+wbRels+'</Relationships>'},
+    {name:'xl/styles.xml', data:styles}
+  ];
+  sheets.forEach((s,i)=>files.push({name:'xl/worksheets/sheet'+(i+1)+'.xml', data:bizSheetXml(s)}));
+  return files;
+}
+
+// ---BIZ-BLOCK-B-END---
+
+
+// ============================================================
 //  TOAST
 // ============================================================
 function showToast(msg, type='warning'){
   const toast = document.createElement('div');
   toast.className = 'toast '+type;
-  toast.textContent = msg;
+  // 文案里允许带一个加载小圈（<span class="sync-spinner"></span>），其余内容一律转义，
+  // 避免客户名/文件名里的符号被当成 HTML 渲染（以前这里会把尖括号原样显示出来）
+  const SP='@@SPIN@@';
+  toast.innerHTML = escHtml(String(msg).split('<span class="sync-spinner"></span>').join(SP)).split(SP).join('<span class="sync-spinner"></span>');
   document.body.appendChild(toast);
   setTimeout(()=>{toast.style.opacity='0';toast.style.transition='opacity .3s';setTimeout(()=>toast.remove(),300)},2500);
 }
@@ -5645,6 +6746,7 @@ function renderCurrentTab(){
   else if(currentTab==='data') renderDash();
   else if(currentTab==='expenses') renderExpenses();
   else if(currentTab==='claims') renderClaims();
+  else if(currentTab==='biz') renderBiz();
 }
 
 function refreshAll(){
@@ -5654,6 +6756,7 @@ function refreshAll(){
   updateClearDemoBtn();
   expRenderBadge();
   clmRenderBadge();
+  bizBadge();
 }
 
 function updateClearDemoBtn(){
