@@ -522,6 +522,15 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .exp-filterwrap .exp-toolbar{justify-content:flex-start}
 }
 
+
+/* ===== v2.3：数据源/切店提醒/一键分析 ===== */
+.biz-switch{margin:8px 0 4px;padding:10px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:12.5px;line-height:1.65}
+.biz-switch b{display:block;margin-bottom:3px;font-size:13px}
+.biz-ana{border-color:var(--primary)}
+.biz-ana .biz-chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.biz-ana-tbl td{font-size:12.5px}
+body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
+
 /* ========== 国际站经营分析（v1.8）========== */
 .biz-path{cursor:pointer;font-family:Consolas,'Courier New',monospace;font-size:11px;color:var(--text-secondary);word-break:break-all}
 .biz-path:hover{color:var(--primary);text-decoration:underline}
@@ -734,7 +743,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.2 · 2026-09-22</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.3 · 2026-09-22</div>
     </div>
   </aside>
 
@@ -1179,7 +1188,7 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.2';
+const APP_VERSION = 'v2.3';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -5845,7 +5854,8 @@ function seedExpSample(){
 // ============================================================
 
 function bizBlank(){ return {orders:[], pays:[], firstPay:{}, fixCountry:{}, uploads:[], chats:null, seeded:false,
-    fetch:{rows:[], at:'', source:'', shop:'all', kind:'prev', start:'', end:'', limit:200}}; }
+    fetch:{rows:[], at:'', source:'', src:'okki', shop:'all', kind:'prev', start:'', end:'', limit:200, staff:[], aliTotal:null, needSwitch:null},
+    ana:{kind:'prev', start:'', end:'', at:''}, analyses:[]}; }
 let biz = bizBlank();
 let bizRange = {kind:'cur', start:'', end:'', label:'本月'};
 let bizDetailLimit = 200;
@@ -6882,9 +6892,11 @@ function bzF(){
   if(!biz.fetch || typeof biz.fetch!=='object') biz.fetch={rows:[],at:'',source:'',shop:'all',kind:'prev',start:'',end:'',limit:200};
   const f=biz.fetch;
   if(!f.rows) f.rows=[];
+  if(!f.src) f.src='okki';
   if(!f.shop) f.shop='all';
   if(!f.kind) f.kind='prev';
   if(!f.limit) f.limit=200;
+  if(!f.staff) f.staff=[];
   return f;
 }
 // 业务员英文名 → 店铺
@@ -6928,13 +6940,33 @@ function bizFetchPanel(){
   const f=bzF(), k=f.kind, bd=bizFetchBounds();
   let h='<div class="biz-fetch"><h4>'
     +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--primary)"><path d="M3 7h13l-3-3"/><path d="M21 17H8l3 3"/></svg>'
-    +'获取订单列表 <span class="tag">小满 CRM 自动取数 · 双店一起出</span>'
+    +'获取订单列表 <span class="tag">'+(f.src==='ali'?'阿里后台 · 带真实收款':'小满 CRM · 双店一起出')+'</span>'
     +'<span id="bizFetchDot" class="biz-fetch-hint" style="margin-left:auto">正在检查取数服务…</span></h4>';
+  // 数据源
+  h+='<div class="biz-fetch-row"><span class="biz-fetch-lb">数据源</span>'
+    +[['okki','小满 CRM'],['ali','阿里后台（真实收款）']].map(x=>
+      '<button class="biz-chip'+(f.src===x[0]?' on':'')+'" onclick="bizFetchSet(\'src\',\''+x[0]+'\')">'+x[1]+'</button>').join('')
+    +'<span class="biz-fetch-hint">'+(f.src==='ali'
+      ? '回款金额取自阿里后台真实的到账数（小满那边「已回款金额」多数订单没填，所以显示 0）。代价是一次只能取一个店'
+      : '两店数据天然打通、一次出双店，带业务员和是否首单；但回款金额不可信')+'</span></div>';
   // 店铺
-  h+='<div class="biz-fetch-row"><span class="biz-fetch-lb">店铺</span>'
-    +[['all','双店一起'],['langges','朗格斯'],['fansi','凡适']].map(x=>
-      '<button class="biz-chip'+(f.shop===x[0]?' on':'')+'" onclick="bizFetchSet(\'shop\',\''+x[0]+'\')">'+x[1]+'</button>').join('')
-    +'<span class="biz-fetch-hint">小满两店数据是打通的，一次查询就同时出两个店；店铺归属按业务员自动判定</span></div>';
+  if(f.src==='ali'){
+    h+='<div class="biz-fetch-row"><span class="biz-fetch-lb">店铺</span>'
+      +[['langges','朗格斯'],['fansi','凡适']].map(x=>
+        '<button class="biz-chip'+(f.shop===x[0]?' on':'')+'" onclick="bizFetchSet(\'shop\',\''+x[0]+'\')">'+x[1]+'</button>').join('')
+      +'<span class="biz-fetch-hint">阿里数据参谋一次只认 Accio Desktop 里绑定的那<b>一个</b>店；点取数会先核对，不对会提醒你切店</span></div>';
+  } else {
+    h+='<div class="biz-fetch-row"><span class="biz-fetch-lb">店铺</span>'
+      +[['all','双店一起'],['langges','朗格斯'],['fansi','凡适']].map(x=>
+        '<button class="biz-chip'+(f.shop===x[0]?' on':'')+'" onclick="bizFetchSet(\'shop\',\''+x[0]+'\')">'+x[1]+'</button>').join('')
+      +'<span class="biz-fetch-hint">小满两店数据是打通的，一次查询就同时出两个店；店铺归属按业务员自动判定</span></div>';
+  }
+  // 店铺切换提醒（阿里模式且上次取数被挡下时）
+  if(f.src==='ali' && f.needSwitch){
+    h+='<div class="biz-switch"><b>⚠ 先切换店铺再取</b>'
+      +'<div>'+escHtml(f.needSwitch.message||'')+'</div>'
+      +'<div class="biz-fetch-hint">切换位置：Accio Desktop 左上角店铺头像 → 选「'+(f.needSwitch.wantLabel||'')+'」→ 切完回这里再点一次「获取订单列表」。</div></div>';
+  }
   // 时间
   h+='<div class="biz-fetch-row"><span class="biz-fetch-lb">时间</span>'
     +BIZ_FETCH_CHIPS.map(c=>'<button class="biz-chip'+(k===c[0]?' on':'')+'" onclick="bizFetchSet(\'kind\',\''+c[0]+'\')">'+c[1]+'</button>').join('');
@@ -6950,6 +6982,15 @@ function bizFetchPanel(){
     +'<input type="file" id="bizFetchFile" accept=".json,application/json" style="display:none" onchange="bizFetchImportFile(this)">'
     +'<span class="biz-fetch-hint" id="bizFetchMsg" style="margin-left:auto"></span></div>';
   h+='<div id="bizFetchRes"></div>';
+  if(f.src==='ali'){
+    h+='<div class="biz-note">数据来自<b>阿里国际站后台</b>（订单列表接口），每笔订单的「实际收款」就是后台真实的到账金额，与平台月报能对上。'
+      +'同一次取数还会顺带拉一张<b>按业务员统计的当期实际收款</b>表。<br>'
+      +'「导入到经营分析」会把订单（含真实收款、买家国家、新老客标签）并入分析口径。店铺维度需要分开导两次（先朗格斯、再凡适）。</div>'
+      +'<div class="biz-note">本机文件版本可直接一键取；线上链接版本受浏览器限制，走「从文件导入」——'
+      +'启动取数服务后结果会自动存到 <span style="font-family:Consolas,monospace">办公平台\\07-数据备份\\取数结果\\阿里订单_最新.json</span>。</div>'
+      +'</div>';
+    return h;
+  }
   h+='<div class="biz-note">数据来自小满 CRM，含<b>业绩归属人、是否首单、已回款金额、首次/最近回款日期、订单状态</b>。'
     +'同一个时间段 30 分钟内取第二次直接读缓存，不重复占用小满查询。<br>'
     +'① <b>一键取</b>：先双击 <span style="font-family:Consolas,monospace">06-工具脚本\\获取订单列表\\启动取数服务.bat</span>，再点上面的「获取订单列表」。'
@@ -6991,6 +7032,8 @@ function bizFetchSet(k,v){
   const f=bzF(); f[k]=v;
   if(k==='kind') f.limit=200;
   if(k==='shop') f.limit=200;
+  // 切到「阿里后台」时店铺不能是「双店一起」，默认落到凡适（可再点别的店）
+  if(k==='src'){ f.limit=200; f.needSwitch=null; if(v==='ali' && f.shop==='all') f.shop='fansi'; }
   saveAll(); renderBiz();
 }
 function bizFetchCustom(){
@@ -7013,6 +7056,7 @@ function bizFetchPaint(){
     box.innerHTML='<div class="biz-fetch-fail"><b>取数失败：</b>'+escHtml(f.err)+'</div>';
     return;
   }
+  if(f.src==='ali'){ bizFetchAliPaint(box, f); return; }
   if(!f.rows.length){
     box.innerHTML = f.at ? '<div class="biz-fetch-hint" style="margin:10px 0 2px">这个时间段没有取到订单（可能确实没有订单，也可能该月数据还没同步进小满）。</div>' : '';
     return;
@@ -7070,6 +7114,84 @@ function bizFetchPaint(){
   if(unknown) h+='<div class="biz-note">有 '+unknown+' 笔没能判定店铺（业务员和买家都不在已知名单里），已标「待确认」，导出时保留。</div>';
   box.innerHTML=h;
 }
+// 阿里后台订单状态 → 中文
+const BIZ_ALI_STATUS={
+  wait_confirm_receipt:'待买家确认收货', wait_seller_confirmed:'待卖家确认', wait_buyer_pay:'待买家付款',
+  wait_seller_send:'待发货', send_goods:'已发货', in_transit:'运输中', trade_success:'交易成功',
+  trade_close:'交易关闭', undeliver:'未发货', cancel:'已取消', wait_confirm_order:'待确认订单'
+};
+function bizAliStatus(s){ const k=String(s||'').trim(); return BIZ_ALI_STATUS[k]||k||'—'; }
+// 统一下载
+function bizSaveBlob(blob, name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>{ try{ URL.revokeObjectURL(url); }catch(e){} }, 5000);
+}
+// 阿里后台取数结果渲染
+function bizFetchAliPaint(box, f){
+  if(!f.rows.length){
+    box.innerHTML = f.at ? '<div class="biz-fetch-hint" style="margin:10px 0 2px">这个时间段没有取到订单（可能确实没有订单，也可能该月数据还没同步）。</div>' : '';
+    return;
+  }
+  const list=f.rows;
+  const sum=list.reduce((a,r)=>a+(r.amount||0),0);
+  const paid=list.reduce((a,r)=>a+(r.paid||0),0);
+  const oldN=list.filter(r=>r.isOld).length;
+  const shopK=(f.shop==='all'?'fansi':f.shop);
+  let h='<div class="biz-fetch-sum">'
+    +'<span>订单 <b>'+list.length+'</b> 笔</span>'
+    +'<span>订单金额 <b>'+bizUsd(sum)+'</b></span>'
+    +'<span>实际收款 <b style="color:var(--primary)">'+bizUsd(paid)+'</b></span>'
+    +'<span>未收 <b>'+bizUsd(sum-paid)+'</b></span>'
+    +'<span>老客单 <b>'+oldN+'</b> 笔</span>'
+    +'<span style="margin-left:auto">'+escHtml(bizShopName(shopK))+' · 阿里后台 · '+(f.cached?'缓存':'实取')+' '+escHtml(String(f.at).slice(0,16).replace('T',' '))+'</span></div>';
+  // 业务员实际收款（同一次取数顺带拉的）
+  if(f.staff && f.staff.length){
+    const sAll=f.staff.filter(x=>x.isAll)[0];
+    const persons=f.staff.filter(x=>!x.isAll && (x.rcvdAmt||x.ordCnt)).sort((a,b)=>b.rcvdAmt-a.rcvdAmt);
+    h+='<div class="biz-panel" style="margin:10px 0 0"><h4>业务员实际收款 <span class="tag">阿里数据参谋 · 与上面同期</span></h4>'
+      +'<div class="biz-tbl-wrap"><table class="biz-tbl"><thead><tr><th>业务员</th><th class="r">实际收款(USD)</th>'
+      +'<th class="r">成交订单</th><th class="r">询盘人数</th><th class="r">接待极速率</th></tr></thead><tbody>';
+    persons.forEach(x=>{
+      h+='<tr><td>'+escHtml(x.name)+'</td><td class="r"><b>'+bizUsd(x.rcvdAmt)+'</b></td>'
+        +'<td class="r">'+x.ordCnt+'</td><td class="r">'+x.inquiry+'</td>'
+        +'<td class="r">'+(x.quickReply?x.quickReply+'%':'—')+'</td></tr>';
+    });
+    if(sAll) h+='<tr><td><b>店铺合计</b></td><td class="r"><b>'+bizUsd(sAll.rcvdAmt)+'</b></td>'
+      +'<td class="r">'+sAll.ordCnt+'</td><td class="r">'+sAll.inquiry+'</td>'
+      +'<td class="r">'+(sAll.quickReply?sAll.quickReply+'%':'—')+'</td></tr>';
+    h+='</tbody></table></div><div class="biz-note">这是阿里后台按业务员统计的<b>当期实际收款</b>（店铺合计口径），与上面按订单加总的口径会有小差异：'
+      +'订单口径只统计「这个时间段创建的订单」的累计到账，可能含更早或更晚月份的钱。<b>对外报数请用本表的店铺合计。</b></div></div>';
+  }
+  h+='<div class="biz-tbl-wrap"><table class="biz-tbl"><thead><tr>'
+    +'<th>店铺</th><th>订单编号</th><th>下单时间</th><th>客户</th><th>国家</th>'
+    +'<th class="r">订单金额</th><th class="r">实际收款</th><th>新老客</th><th>状态</th></tr></thead><tbody>';
+  list.slice(0,f.limit).forEach(r=>{
+    h+='<tr><td>'+(r.shop?bizShopTag(r.shop):escHtml(bizShopName(shopK)))+'</td>'
+      +'<td style="font-family:Consolas,monospace;font-size:11.5px">'+escHtml(r.orderNo||'—')+'</td>'
+      +'<td>'+escHtml(String(r.ts||'').slice(0,16))+'</td>'
+      +'<td>'+escHtml(r.buyer||'—')+'</td><td>'+escHtml(r.country||'—')+'</td>'
+      +'<td class="r">'+bizUsd(r.amount)+'</td>'
+      +'<td class="r"><b style="color:'+(r.paid>0?'var(--primary)':'var(--text-muted)')+'">'+bizUsd(r.paid)+'</b></td>'
+      +'<td>'+(r.isOld?'<span class="biz-type old">老客</span>':'<span class="biz-type new">新客</span>')+'</td>'
+      +'<td>'+escHtml(bizAliStatus(r.status))+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  if(list.length>f.limit){
+    h+='<div style="text-align:center;margin-top:9px"><button class="btn" onclick="bizFetchMore()">显示更多（还有 '+(list.length-f.limit)+' 笔）</button></div>';
+  }
+  h+='<div class="biz-fetch-row" style="margin-top:10px">'
+    +'<button class="btn" onclick="bizFetchExport()">导出 CSV</button>'
+    +'<button class="btn" onclick="bizFetchMerge()">导入到经营分析</button>'
+    +'<button class="btn" onclick="bizFetchUseAsRange()">用这段时间看分析</button>'
+    +'<button class="btn" onclick="bizFetchClear()" style="background:var(--card-bg);color:var(--text-secondary);border:1px solid var(--border)">清空本次结果</button>'
+    +'</div>';
+  h+='<div class="biz-note">订单编号是国际站原始订单号（<b>全精度、可用于对账</b>）；「实际收款」是后台真实到账金额。'
+    +'「新客/老客」用的是平台自带的 old_buyer / reorder 标签，与「首单」口径略有差别。</div>';
+  box.innerHTML=h;
+}
 // 判断当前页面是不是「非本机」打开（线上链接、或手机上的链接）。
 // 浏览器禁止这类页面访问本机 127.0.0.1，所以取数失败的原因完全不同，提示也要分开。
 function bizFetchIsRemote(){
@@ -7107,12 +7229,40 @@ async function bizFetchRun(force){
   bizFetchState('正在向小满取数，大月份通常 1~3 分钟，请别关页面…', true);
   const tick=setInterval(()=>{ bizFetchState('正在向小满取数…已等 '+Math.round((Date.now()-t0)/1000)+' 秒，请别关页面', true); }, 1000);
   try{
+    if(f.src==='ali'){
+      const shopK=(f.shop==='all'?'fansi':f.shop);
+      bizFetchState('正在向阿里后台取数（先核对店铺，再拉订单和业务员收款）…', true);
+      const u=BIZ_FETCH_URL+'/ali/orders?shop='+encodeURIComponent(shopK)+'&start='+encodeURIComponent(bd.start)+'&end='+encodeURIComponent(bd.end)+(force?'&force=1':'');
+      const rs=await fetch(u,{cache:'no-store'});
+      const j=await rs.json();
+      if(j && j.needSwitch){
+        f.rows=[]; f.at=''; f.source=''; f.staff=[]; f.needSwitch=j; f.err='';
+        saveAll(); renderBiz(); bizFetchPaint();
+        bizFetchState('店铺不对，先切店', false);
+        return;
+      }
+      if(!j||j.ok!==true) throw new Error((j&&j.error)||('HTTP '+rs.status));
+      f.needSwitch=null;
+      f.rows=j.rows||[]; f.at=new Date().toISOString(); f.source='阿里后台';
+      f.limit=200; f.err='';
+      f.aliTotal={amount:j.amountTotal, paid:j.paidTotal};
+      f.cached=!!j.cached;
+      f.staff=[];
+      try{
+        const rs2=await fetch(BIZ_FETCH_URL+'/ali/staff?shop='+encodeURIComponent(shopK)+'&start='+encodeURIComponent(bd.start)+'&end='+encodeURIComponent(bd.end),{cache:'no-store'});
+        const j2=await rs2.json();
+        if(j2 && j2.ok) f.staff=j2.rows||[];
+      }catch(e2){ /* 业务员表取不到不影响订单主表 */ }
+      saveAll(); renderBiz(); bizFetchPaint();
+      bizFetchState('✔ 取到 '+f.rows.length+' 笔 · 实际收款 '+bizUsd(j.paidTotal)+'（阿里后台'+(j.cached?' · 30 分钟内缓存':'')+'），耗时 '+Math.round((Date.now()-t0)/1000)+' 秒', false);
+      return;
+    }
     const u=BIZ_FETCH_URL+'/orders?start='+encodeURIComponent(bd.start)+'&end='+encodeURIComponent(bd.end)+(force?'&force=1':'');
     const rs=await fetch(u,{cache:'no-store'});
     const j=await rs.json();
     if(!j||j.ok!==true) throw new Error((j&&j.error)||('HTTP '+rs.status));
     f.rows=j.rows||[]; f.at=new Date().toISOString(); f.source=(j.source==='csv'?'小满表格':(j.source||''));
-    f.limit=200; f.err='';
+    f.limit=200; f.err=''; f.staff=[]; f.needSwitch=null;
     saveAll();
     bizFetchState('✔ 取到 '+f.rows.length+' 笔'+(j.cached?'（30 分钟内缓存）':'')+'，耗时 '+Math.round((Date.now()-t0)/1000)+' 秒', false);
   }catch(e){
@@ -7142,27 +7292,32 @@ function bizFetchRowsFiltered(){
 function bizFetchExport(){
   const f=bzF();
   if(!f.rows.length){ showToast('还没有取到订单，先点「获取订单列表」'); return; }
-  const list=bizFetchRowsFiltered();
-  const bd=bizFetchBounds();
-  const head=['店铺','订单编号','下单时间','客户','业务员','订单金额USD','已回款USD','是否首单','首次回款日期','最近回款日期','订单状态'];
   const q=v=>{ const s=String(v==null?'':v); return /[",\n]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s; };
-  const lines=[head.join(',')];
-  list.forEach(x=>{ const r=x.r;
-    lines.push([x.shop?bizShopName(x.shop):'待确认', r.orderNo, r.ts, r.buyer, r.seller, r.amount, r.paid, r.first, r.paidFirst, r.paidLast, r.status].map(q).join(','));
-  });
+  const bd=bizFetchBounds();
+  const lines=[];
+  if(f.src==='ali'){
+    lines.push(['店铺','订单编号','下单时间','客户','国家','订单金额USD','实际收款USD','未收USD','新老客','商品数','订单状态'].join(','));
+    f.rows.forEach(r=>{
+      lines.push([bizShopName(r.shop||f.shop), r.orderNo, r.ts, r.buyer, r.country, r.amount, r.paid,
+        (Math.round(((r.amount||0)-(r.paid||0))*100)/100), (r.isOld?'老客':'新客'), (r.items||[]).length,
+        bizAliStatus(r.status)].map(q).join(','));
+    });
+  } else {
+    const list=bizFetchRowsFiltered();
+    lines.push(['店铺','订单编号','下单时间','客户','业务员','订单金额USD','已回款USD','是否首单','首次回款日期','最近回款日期','订单状态'].join(','));
+    list.forEach(x=>{ const r=x.r;
+      lines.push([x.shop?bizShopName(x.shop):'待确认', r.orderNo, r.ts, r.buyer, r.seller, r.amount, r.paid, r.first, r.paidFirst, r.paidLast, r.status].map(q).join(','));
+    });
+  }
   const csv='\uFEFF'+lines.join('\r\n')+'\r\n';
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='订单列表_'+(f.shop==='all'?'双店':bizShopName(f.shop))+'_'+bd.start+'_'+bd.end+'.csv';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>{ try{URL.revokeObjectURL(url)}catch(e){} },5000);
-  showToast('已导出 '+list.length+' 笔订单 CSV','info');
+  bizSaveBlob(blob, '订单列表_'+(f.src==='ali'?'阿里_':'')+(f.shop==='all'?'双店':bizShopName(f.shop))+'_'+bd.start+'_'+bd.end+'.csv');
+  showToast('已导出 '+f.rows.length+' 笔订单 CSV','info');
 }
 function bizFetchMerge(){
   const f=bzF();
   if(!f.rows.length){ showToast('还没有取到订单，先点「获取订单列表」'); return; }
+  if(f.src==='ali'){ bizFetchMergeAli(f); return; }
   const idx=bizFetchBuyerShop();
   const target=f.shop;
   // 去重键：优先用小满订单编号（精确），没有才退回国际站订单号
@@ -7196,6 +7351,31 @@ function bizFetchMerge(){
   if(outOfShop) msg+='，'+outOfShop+' 笔不属于所选店铺';
   showToast(msg, add?'info':'');
 }
+// 把阿里后台取的订单并入经营分析（含真实收款、买家国家、平台新老客标签）
+function bizFetchMergeAli(f){
+  const shopK=(f.shop==='all'?'fansi':f.shop);
+  const seen={};
+  (biz.orders||[]).forEach(o=>{ if(o.orderNo) seen[o.shop+'|'+o.orderNo]=1; });
+  let add=0, skip=0;
+  f.rows.forEach(r=>{
+    if(!r.orderNo){ skip++; return; }
+    const shop=r.shop||shopK;
+    const k=shop+'|'+r.orderNo;
+    if(seen[k]){ skip++; return; }
+    seen[k]=1;
+    biz.orders.push({shop:shop, orderNo:r.orderNo, crmId:'', ts:r.ts,
+      buyer:r.buyer||'未知客户', sellerRaw:'', sellerCn:'',
+      amount:r.amount, shipping:0, status:bizAliStatus(r.status),
+      countryRaw:r.country||'', country:r.country||'', currency:'USD',
+      paid:r.paid, paidFirst:'', paidLast:'',
+      first:(r.isOld?'否':'是'), fromAli:1, aliTags:(r.tags||[]) });
+    add++;
+  });
+  if(add){ saveAll(); renderBiz(); }
+  let msg='已从阿里后台导入 '+add+' 笔订单（含真实收款）';
+  if(skip) msg+='，跳过重复/无单号 '+skip+' 笔';
+  showToast(msg, add?'info':'');
+}
 function bizFetchUseAsRange(){
   const bd=bizFetchBounds();
   if(!bd.start||!bd.end){ showToast('请先选好时间区间'); return; }
@@ -7210,6 +7390,162 @@ function bizFetchClear(){
   showToast('已清空本次取数结果（经营分析里已导入的订单不受影响）');
 }
 
+// ============================================================
+// 一键分析（v2.3）：选时间段 → 生成参考文档格式报告 → 可下载 + 工具内留存
+// ============================================================
+const BIZ_ANA_CHIPS=[['cur','本月'],['prev','上月'],['quarter','本季'],['year','今年'],['all','全部'],['custom','自定义']];
+function bizAna(){
+  if(!biz.ana || typeof biz.ana!=='object') biz.ana={kind:'prev', start:'', end:'', at:''};
+  if(!biz.analyses) biz.analyses=[];
+  return biz.ana;
+}
+function bizAnaBounds(){
+  const d=new Date(), y=d.getFullYear(), m=d.getMonth()+1, pad=n=>String(n).padStart(2,'0');
+  const a=bizAna(), K=a.kind;
+  if(K==='prev'){ const yy=m===1?y-1:y, mm=m===1?12:m-1; return {start:yy+'-'+pad(mm)+'-01', end:yy+'-'+pad(mm)+'-31', label:yy+'年'+mm+'月'}; }
+  if(K==='quarter'){ const q=Math.floor((m-1)/3); return {start:y+'-'+pad(q*3+1)+'-01', end:y+'-'+pad(q*3+3)+'-31', label:y+'年 Q'+(q+1)}; }
+  if(K==='year') return {start:y+'-01-01', end:y+'-12-31', label:y+'年'};
+  if(K==='all') return {start:'', end:'', label:'全部数据'};
+  if(K==='custom') return {start:a.start||'', end:a.end||'', label:(a.start||'最早')+' ~ '+(a.end||'今天')};
+  return {start:y+'-'+pad(m)+'-01', end:y+'-'+pad(m)+'-31', label:y+'年'+m+'月'};
+}
+function bizAnaSet(k,v){ const a=bizAna(); a[k]=v; saveAll(); renderBiz(); }
+function bizAnaCustom(){
+  const a=bizAna(), x=document.getElementById('bizAnaStart'), y=document.getElementById('bizAnaEnd');
+  if(x) a.start=x.value;
+  if(y) a.end=y.value;
+  a.kind='custom'; saveAll();
+}
+function bizAnaSnap(bd){
+  const inR=d=>{ const x=String(d||'').slice(0,10); if(!x) return true; if(bd.start&&x<bd.start) return false; if(bd.end&&x>bd.end) return false; return true; };
+  const snap={pays:(biz.pays||[]).filter(p=>inR(p.ts)), orders:(biz.orders||[]).filter(o=>inR(o.ts)),
+              firstPay:biz.firstPay||{}, fixCountry:biz.fixCountry||{}};
+  try{ if(JSON.stringify(snap).length>400000) return null; }catch(e){ return null; }
+  return snap;
+}
+function bizAnaSize(n){ return n<1024?(n+' B'):(n<1048576?(Math.round(n/1024)+' KB'):((n/1048576).toFixed(1)+' MB')); }
+function bizAnaPanel(){
+  const a=bizAna(), bd=bizAnaBounds(), hasData=(biz.pays.length||biz.orders.length||bizChatTotal());
+  let h='<div class="biz-panel biz-ana"><h4>'
+    +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--primary)"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l3-4 3 3 4-6"/></svg>'
+    +'一键分析 <span class="tag">选时间段 → 出报告</span>'
+    +'<span class="biz-fetch-hint" style="margin-left:auto">'+(hasData?('当前可选 '+biz.orders.length+' 笔订单 / '+biz.pays.length+' 笔收款'):'还没有数据，先往下拖入订单表和收款表')+'</span></h4>';
+  h+='<div class="biz-fetch-row"><span class="biz-fetch-lb">时间段</span>'
+    +BIZ_ANA_CHIPS.map(c=>'<button class="biz-chip'+(a.kind===c[0]?' on':'')+'" onclick="bizAnaSet(\'kind\',\''+c[0]+'\')">'+c[1]+'</button>').join('');
+  if(a.kind==='custom'){
+    h+='<span class="biz-sep"></span><span class="biz-range">从 <input type="date" id="bizAnaStart" value="'+escHtml(a.start||'')+'" onchange="bizAnaCustom()"> 到 <input type="date" id="bizAnaEnd" value="'+escHtml(a.end||'')+'" onchange="bizAnaCustom()"></span>';
+  }
+  h+='<span class="biz-sep"></span><span class="biz-fetch-hint">'+escHtml(bd.label)+(bd.start?('（'+bd.start+' ~ '+bd.end+'）'):'')+'</span></div>';
+  h+='<div class="biz-fetch-row">'
+    +'<button class="btn" id="bizAnaBtn" onclick="bizAnaRun()">开始分析</button>'
+    +'<button class="btn" onclick="bizAnaRun(1)" style="background:var(--card-bg);color:var(--primary);border:1px solid var(--primary)">只下载报告</button>'
+    +'<span class="biz-fetch-hint" id="bizAnaMsg" style="margin-left:auto"></span></div>';
+  const list=(biz.analyses||[]).slice().reverse();
+  h+='<div class="biz-fetch-hint" style="margin:4px 0 6px">分析完成后会自动下载报告，同时在下面留存一份，随时可以重新下载。</div>';
+  if(list.length){
+    h+='<div class="biz-tbl-wrap"><table class="biz-tbl biz-ana-tbl"><thead><tr>'
+      +'<th>分析时间</th><th>统计区间</th><th class="r">订单</th><th class="r">收款笔数</th><th class="r">实收</th><th class="r">提成(参考)</th><th class="r">文件</th><th>操作</th></tr></thead><tbody>';
+    list.forEach(r=>{
+      h+='<tr><td>'+escHtml(String(r.at||'').slice(0,16).replace('T',' '))+'</td>'
+        +'<td><b>'+escHtml(r.label||'')+'</b><div style="font-size:10.5px;color:var(--text-muted)">'+escHtml((r.start||'最早')+' ~ '+(r.end||'今天'))+'</div></td>'
+        +'<td class="r">'+(r.orders||0)+'</td><td class="r">'+(r.pays||0)+'</td>'
+        +'<td class="r"><b>'+bizUsd(r.amount||0)+'</b></td><td class="r">'+bizUsd(r.comm||0)+'</td>'
+        +'<td class="r">'+bizAnaSize(r.size||0)+(r.snap?'':'<div style="font-size:10.5px;color:var(--text-muted)">数据量大，未存快照</div>')+'</td>'
+        +'<td><button class="btn" style="font-size:11.5px;padding:3px 9px" onclick="bizAnaDown(\''+r.id+'\')">重新下载</button> '
+        +'<button class="btn" style="font-size:11.5px;padding:3px 9px;background:var(--card-bg);color:var(--text-secondary);border:1px solid var(--border)" onclick="bizAnaDel(\''+r.id+'\')">删除</button></td></tr>';
+    });
+    h+='</tbody></table></div>';
+  } else {
+    h+='<div class="biz-fetch-hint" style="padding:8px 0">还没有分析记录。选好时间段点「开始分析」就会生成第一份。</div>';
+  }
+  h+='<div class="biz-note">生成的报告与 7 月参考文档<b>同结构</b>：8 个工作表（大盘 / 收款提成明细 / 业务员业绩 / 月度趋势 / 目的地国家 / 需关注客户 / 经营建议 / 店铺前台），图表是<b>静态图片</b>，别人电脑打开不会走样。'
+    +'分析结果会跟着工作台一起自动存档，换设备也在。</div></div>';
+  return h;
+}
+function bizAnaRun(onlyDownload){
+  const a=bizAna(), bd=bizAnaBounds();
+  if(!biz.pays.length && !biz.orders.length && !bizChatTotal()){ showToast('还没有数据，先在下面拖入两个店的订单表和收款表'); return; }
+  if(bd.start && bd.end && bd.start>bd.end){ showToast('开始日期不能晚于结束日期'); return; }
+  if(typeof TextEncoder==='undefined'){ showToast('当前浏览器不支持生成文件，请用电脑上的 Chrome / Edge'); return; }
+  const btn=document.getElementById('bizAnaBtn');
+  const setMsg=t=>{ const el=document.getElementById('bizAnaMsg'); if(el) el.innerHTML=escHtml(t||''); };
+  if(btn){ btn.disabled=true; btn.style.opacity='.6'; }
+  setMsg('正在生成报告…');
+  const kk=bizRange.kind, ks=bizRange.start, ke=bizRange.end;
+  setTimeout(()=>{
+    try{
+      bizRange.kind='custom'; bizRange.start=bd.start; bizRange.end=bd.end;
+      const labeled=bizLabeled();
+      const s=bizStats(labeled);
+      const blob=zipStore(bizBuildXlsx(bizExportSheets()));
+      const name='国际站经营分析_'+bd.label.replace(/[^\u4e00-\u9fa5A-Za-z0-9]/g,'')+'_'+(bd.start||'全部')+'_'+(bd.end||'今天')+'.xlsx';
+      const rec={id:'a'+Date.now(), at:new Date().toISOString(), label:bd.label,
+        start:bd.start, end:bd.end, orders:(biz.orders||[]).filter(o=>{
+          const x=String(o.ts||'').slice(0,10); if(!x) return true;
+          if(bd.start&&x<bd.start) return false; if(bd.end&&x>bd.end) return false; return true; }).length,
+        pays:labeled.length, amount:Math.round(s.amount*100)/100, comm:Math.round(s.comm*100)/100,
+        size:blob.size, snap:bizAnaSnap(bd), file:name};
+      bizSaveBlob(blob, name);
+      if(!onlyDownload){
+        biz.analyses=(biz.analyses||[]).filter(x=>!(x.start===rec.start && x.end===rec.end && x.label===rec.label));
+        biz.analyses.push(rec);
+        while(biz.analyses.length>12) biz.analyses.shift();
+        saveAll();
+      }
+      if(!onlyDownload) renderBiz();
+      setMsg('✔ 已生成'+(onlyDownload?'并下载':'、下载并留存')+'（'+bizAnaSize(blob.size)+'）');
+      showToast('分析完成：'+(onlyDownload?'报告已下载':'报告已下载，并留存在下方列表里')+'（'+bd.label+' · 实收 '+bizUsd(s.amount)+'）','info');
+    }catch(e){
+      setMsg('生成失败');
+      showToast('分析失败：'+((e&&e.message)||e));
+    }finally{
+      bizRange.kind=kk; bizRange.start=ks; bizRange.end=ke;
+      const b2=document.getElementById('bizAnaBtn');
+      if(b2){ b2.disabled=false; b2.style.opacity=''; }
+    }
+  }, 60);
+}
+function bizAnaDown(id){
+  const rec=(biz.analyses||[]).filter(r=>r.id===id)[0];
+  if(!rec){ showToast('找不到这条分析记录'); return; }
+  try{
+    let blob=null;
+    if(rec.snap){
+      const ko=biz.orders, kp=biz.pays, kf=biz.firstPay, kc=biz.fixCountry;
+      const kk=bizRange.kind, ks=bizRange.start, ke=bizRange.end;
+      try{
+        biz.orders=rec.snap.orders||[]; biz.pays=rec.snap.pays||[];
+        biz.firstPay=rec.snap.firstPay||{}; biz.fixCountry=rec.snap.fixCountry||{};
+        bizRange.kind='custom'; bizRange.start=rec.start; bizRange.end=rec.end;
+        blob=zipStore(bizBuildXlsx(bizExportSheets()));
+      }finally{
+        biz.orders=ko; biz.pays=kp; biz.firstPay=kf; biz.fixCountry=kc;
+        bizRange.kind=kk; bizRange.start=ks; bizRange.end=ke;
+      }
+    } else {
+      showToast('这条记录没存快照（当时数据量太大），只能用当前数据重新生成一份');
+      const kk=bizRange.kind, ks=bizRange.start, ke=bizRange.end;
+      try{
+        bizRange.kind='custom'; bizRange.start=rec.start; bizRange.end=rec.end;
+        blob=zipStore(bizBuildXlsx(bizExportSheets()));
+      }finally{ bizRange.kind=kk; bizRange.start=ks; bizRange.end=ke; }
+    }
+    const name=rec.file||('国际站经营分析_'+(rec.start||'全部')+'_'+(rec.end||'今天')+'.xlsx');
+    bizSaveBlob(blob, name);
+    showToast('已重新生成并下载：'+rec.label,'info');
+  }catch(e){
+    showToast('生成失败：'+((e&&e.message)||e));
+  }
+}
+function bizAnaDel(id){
+  const rec=(biz.analyses||[]).filter(r=>r.id===id)[0];
+  if(!rec) return;
+  showConfirm('删除这条分析记录？\n'+rec.label+'（'+rec.at.slice(0,16).replace('T',' ')+'）\n已经下载到电脑上的文件不受影响。', ()=>{
+    biz.analyses=(biz.analyses||[]).filter(r=>r.id!==id);
+    saveAll(); renderBiz();
+    showToast('已删除这条分析记录');
+  });
+}
 function bizSrvBar(){
   return '<div class="biz-srv"><span>「导出分析」出的 Excel 已与 7 月参考报告<b>同结构（8 个工作表，导入聊天记录后自动多一个「💬 聊天分析」表）</b>；历史文件清单见下方「历史资料档案」。老助版 5010 服务器仍可作备用入口</span>'
     +'<a class="btn" href="http://127.0.0.1:5010" target="_blank" rel="noopener" style="font-size:12.5px">打开服务器版</a></div>';
@@ -7242,6 +7578,7 @@ function renderBiz(){
       + bizDropZone()
       + bizSrvBar()
       + bizFetchPanel()
+      + bizAnaPanel()
       + bizArchiveBlock();
     bizFetchPaint(); bizFetchHealth();
     return;
@@ -7269,8 +7606,11 @@ function renderBiz(){
   // 服务器版入口（仅电脑端显示；手机上 display:none，点了也连不上本机 5010）
   h+=bizSrvBar();
 
-  // 获取订单列表（小满 CRM 自动取数）
+  // 获取订单列表（小满 CRM / 阿里后台自动取数）
   h+=bizFetchPanel();
+
+  // 一键分析
+  h+=bizAnaPanel();
 
   // 指标卡
   h+='<div class="biz-grid">'
