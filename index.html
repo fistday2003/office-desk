@@ -6946,13 +6946,47 @@ function bizFetchPanel(){
   h+='<div class="biz-fetch-row">'
     +'<button class="btn" id="bizFetchBtn" onclick="bizFetchRun()">获取订单列表</button>'
     +'<button class="btn" onclick="bizFetchRun(1)" style="background:var(--card-bg);color:var(--primary);border:1px solid var(--primary)">强制重新取</button>'
+    +'<button class="btn" onclick="document.getElementById(\'bizFetchFile\').click()" title="服务连不上时用：先跑一次取数服务，再把导出的文件选进来" style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--border)">从文件导入</button>'
+    +'<input type="file" id="bizFetchFile" accept=".json,application/json" style="display:none" onchange="bizFetchImportFile(this)">'
     +'<span class="biz-fetch-hint" id="bizFetchMsg" style="margin-left:auto"></span></div>';
   h+='<div id="bizFetchRes"></div>';
   h+='<div class="biz-note">数据来自小满 CRM，含<b>业绩归属人、是否首单、已回款金额、首次/最近回款日期、订单状态</b>。'
-    +'需要本机「取数服务」在运行（<span style="font-family:Consolas,monospace">06-工具脚本\\获取订单列表\\启动取数服务.bat</span>）；'
-    +'同一个时间段 30 分钟内取第二次直接读缓存，不重复占用小满查询。</div></div>';
+    +'同一个时间段 30 分钟内取第二次直接读缓存，不重复占用小满查询。<br>'
+    +'① <b>一键取</b>：先双击 <span style="font-family:Consolas,monospace">06-工具脚本\\获取订单列表\\启动取数服务.bat</span>，再点上面的「获取订单列表」。'
+    +'<b>这条只能在本机那份 HTML 上打开时用</b> —— 浏览器（Chrome/Edge）不允许线上 https 网页访问本机 127.0.0.1，'
+    +'所以从线上链接打开时按钮会提示连不上，这是浏览器策略，不是工具坏了。<br>'
+    +'② <b>从文件导入</b>：任何打开方式都能用。双击那个 bat 会边取数边把结果存到 '
+    +'<span style="font-family:Consolas,monospace">办公平台\\07-数据备份\\取数结果\\取数结果_最新.json</span>，'
+    +'回到这里点「从文件导入」选它即可，效果和 ① 完全一样。</div></div>';
   return h;
 }
+// 从「取数服务」导出的 JSON 文件读入结果。
+// 用途：线上 https 页面被浏览器禁止访问本机 127.0.0.1 时，改走文件这条路。
+function bizFetchImportFile(input){
+  const file=input.files&&input.files[0];
+  if(!file){ return; }
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      const j=JSON.parse(e.target.result);
+      const rows = (j && Array.isArray(j.rows)) ? j.rows : null;
+      if(!rows){ showToast('这个文件里没有订单数据（挑「取数结果_最新.json」这类文件）'); input.value=''; return; }
+      const f=bzF();
+      f.rows=rows;
+      f.at=j.at||new Date().toISOString();
+      f.source=(j.source==='csv'?'小满表格':(j.source||'取数结果文件'));
+      f.limit=200; f.err='';
+      if(j.start && j.end){ f.start=j.start; f.end=j.end; f.kind='custom'; }
+      saveAll(); renderBiz();
+      showToast('已从文件读入 '+rows.length+' 笔订单'+(j.start?('（'+j.start+' ~ '+j.end+'）'):'')+'，可以接着「导入到经营分析」','info');
+    }catch(err){
+      showToast('文件解析失败，请重新选一次（要选取数服务导出的 json）');
+    }
+    input.value='';
+  };
+  r.readAsText(file);
+}
+
 function bizFetchSet(k,v){
   const f=bzF(); f[k]=v;
   if(k==='kind') f.limit=200;
