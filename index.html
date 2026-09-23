@@ -7700,7 +7700,9 @@ function renderBiz(){
   h+='<div class="biz-tbl-wrap"><table class="biz-tbl"><thead><tr><th>店铺</th><th>订单号</th><th>买家</th><th>业务员</th><th>收款时间</th><th class="r">收款(USD)</th><th>身份</th><th class="r">提成基数</th><th class="r">比例</th><th class="r">提成(参考)</th><th>判定依据</th></tr></thead><tbody>';
   if(!det.length) h+='<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:16px">没有符合条件的记录</td></tr>';
   det.slice(0,bizDetail.limit).forEach(p=>{
-    h+='<tr><td>'+bizShopTag(p.shop)+'</td><td>'+escHtml(p.orderNo||'—')+'</td><td>'+escHtml(p.buyer||'—')+'</td><td>'+escHtml(p.sellerCn||'未知')+'</td>'
+    const rowBg = p.type==='新客户' ? ' style="background:rgba(59,130,246,.10)"'
+      : (p.type==='老客户' ? ' style="background:rgba(16,185,129,.10)"' : '');
+    h+='<tr'+rowBg+'><td>'+bizShopTag(p.shop)+'</td><td>'+escHtml(p.orderNo||'—')+'</td><td>'+escHtml(p.buyer||'—')+'</td><td>'+escHtml(p.sellerCn||'未知')+'</td>'
       + '<td>'+escHtml(String(p.ts||'').slice(0,16))+'</td><td class="r">'+bizUsd(p.amount)+'</td><td>'+bizTypeTag(p.type)+'</td>'
       + '<td class="r">'+bizUsd(p.base)+'</td><td class="r">'+(p.rate?(p.rate*100)+'%':'—')+'</td><td class="r"><b>'+(p.rate?bizUsd(p.comm):'—')+'</b></td>'
       + '<td style="color:var(--text-muted);font-size:11.5px">'+escHtml(p.why||'')+'</td></tr>';
@@ -7709,7 +7711,9 @@ function renderBiz(){
   if(det.length>bizDetail.limit){
     h+='<div style="text-align:center;margin-top:10px"><button class="btn" onclick="bizMoreDetail()">显示更多（还有 '+(det.length-bizDetail.limit)+' 笔）</button></div>';
   }
-  h+='<div class="biz-note">只显示最近 '+Math.min(bizDetail.limit,det.length)+' 笔，导出会有全部。新老客户判定单位=(买家+业务员)，以首笔收款起 12 个月为界。</div></div>';
+  h+='<div class="biz-note">只显示最近 '+Math.min(bizDetail.limit,det.length)+' 笔，导出会有全部。新老客户判定单位=(买家+业务员)，以首笔收款起 12 个月为界。'
+    +'底色：<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(59,130,246,.35);vertical-align:-1px"></span> 新客户 · '
+    +'<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(16,185,129,.35);vertical-align:-1px"></span> 老客户 · 无底色=无法判断。</div></div>';
 
   // 导入记录 + 拖拽区
   h+='<div class="biz-panel"><h4>导入数据 <span class="tag">订单 '+biz.orders.length+' 条 · 收款 '+biz.pays.length+' 笔</span>'
@@ -7942,7 +7946,8 @@ function bizChartPie(title, items, total, note){
 //                7文本 8整数 9金额 10百分比1位 11百分比2位 12一位小数
 //                13合计(金额) 14段落
 // ============================================================
-const BIZ_XL_ST={title:1, sub:2, sec:3, head:4, totalT:5, note:6, txt:7, int:8, money:9, pct1:10, pct2:11, dec1:12, totalN:13, para:14};
+const BIZ_XL_ST={title:1, sub:2, sec:3, head:4, totalT:5, note:6, txt:7, int:8, money:9, pct1:10, pct2:11, dec1:12, totalN:13, para:14,
+  rowNewTxt:15, rowNewMoney:16, rowOldTxt:17, rowOldMoney:18};
 // ---- 导出用工作表数据 ----
 function bizExportSheets(){
   const r=bizRangeBounds();
@@ -8030,22 +8035,31 @@ function bizExportSheets(){
   const s2=[];
   s2.push({c:[t(period+' 实际收款新老客户判定与提成明细表（以实际到账为准）', BIZ_XL_ST.title)], h:24});
   s2.push(['店铺','订单号','买家名称','业务员','收款时间','收款金额(USD)','订单总金额','订单运费','提成基数(不含税费运费)','客户身份','提成比例','应发提成(USD)','新老判定依据'].map(v=>t(v,BIZ_XL_ST.head)));
+  // 收款及提成明细（按 店铺+订单号 去重）
   const byAmt=labeled.slice().sort((a,b)=>bizNum(b.amount)-bizNum(a.amount));
   byAmt.forEach(p=>{
-    s2.push([t(bizShopName(p.shop)), t(p.orderNo||''), t(p.buyer||''), t(p.sellerCn||'未知'),
-      t(String(p.ts||'').slice(0,10)), n(bizNum(p.amount),BIZ_XL_ST.money),
-      p.orderAmount?n(money(p.orderAmount),BIZ_XL_ST.money):{v:null,s:BIZ_XL_ST.money},
-      p.shipping?n(money(p.shipping),BIZ_XL_ST.money):{v:null,s:BIZ_XL_ST.money},
-      n(money(p.base),BIZ_XL_ST.money), t(p.type||''), t(p.rate?(Math.round(p.rate*10000)/100)+'%':''),
-      p.rate?n(money(p.comm),BIZ_XL_ST.money):{v:null,s:BIZ_XL_ST.money}, t(p.why||'')]);
+    // 整行配色：新客户=淡蓝底，老客户=淡绿底，无法判断=不着色
+    const isNew=p.type==='新客户', isOld=p.type==='老客户';
+    const ST_T=isNew?BIZ_XL_ST.rowNewTxt:(isOld?BIZ_XL_ST.rowOldTxt:BIZ_XL_ST.txt);
+    const ST_M=isNew?BIZ_XL_ST.rowNewMoney:(isOld?BIZ_XL_ST.rowOldMoney:BIZ_XL_ST.money);
+    const rT=v=>t(v,ST_T), rM=v=>n(v,ST_M);
+    s2.push([rT(bizShopName(p.shop)), rT(p.orderNo||''), rT(p.buyer||''), rT(p.sellerCn||'未知'),
+      rT(String(p.ts||'').slice(0,10)), rM(bizNum(p.amount)),
+      p.orderAmount?rM(money(p.orderAmount)):{v:null,s:ST_M},
+      p.shipping?rM(money(p.shipping)):{v:null,s:ST_M},
+      rM(money(p.base)), rT(p.type||''), rT(p.rate?(Math.round(p.rate*10000)/100)+'%':''),
+      p.rate?rM(money(p.comm)):{v:null,s:ST_M}, rT(p.why||'')]);
   });
   s2.push([]);
   const subRowLast=s2.length+1;
   s2.push([{v:'本期小计',s:BIZ_XL_ST.totalT},{v:null,s:BIZ_XL_ST.totalT},{v:null,s:BIZ_XL_ST.totalT},{v:null,s:BIZ_XL_ST.totalT},
     {v:null,s:BIZ_XL_ST.totalT},{v:money(s.amount),s:BIZ_XL_ST.totalN},{v:null,s:BIZ_XL_ST.totalT},{v:null,s:BIZ_XL_ST.totalT},
     {v:money(s.base),s:BIZ_XL_ST.totalN},{v:null,s:BIZ_XL_ST.totalT},{v:null,s:BIZ_XL_ST.totalT},{v:money(s.comm),s:BIZ_XL_ST.totalN},{v:null,s:BIZ_XL_ST.totalT}]);
+  s2.push([]);
+  const note2Row=s2.length+1;
+  s2.push([t('注：本表按实际到账时间（收款时间）排序与归期，不以订单下单时间为准。整行底色区分客户身份——淡蓝色行 = 新客户（提成 4%）、淡绿色行 = 老客户（提成 2%）；无底色行表示缺买家或业务员，身份无法判断，提成计 0。', BIZ_XL_ST.note)]);
   sheets.push({name:'👥 收款及提成明细', data:s2, widths:[9,20,19,9,12,14,12,11,14,9,null,12,32],
-    merges:['A1:M1','A'+subRowLast+':D'+subRowLast], freeze:2});
+    merges:['A1:M1','A'+subRowLast+':D'+subRowLast,'A'+note2Row+':M'+note2Row], freeze:2});
 
   // ================= Sheet3 👤 业务员业绩对比 =================
   const s3=[];
@@ -8324,15 +8338,17 @@ function bizBuildXlsx(sheets){
     +'<font><b/><sz val="14"/><name val="Calibri"/></font>'
     +'<font><i/><sz val="10"/><color rgb="FF64748B"/><name val="Calibri"/></font>'
     +'</fonts>'
-    +'<fills count="4">'
+    +'<fills count="6">'
     +'<fill><patternFill patternType="none"/></fill>'
     +'<fill><patternFill patternType="gray125"/></fill>'
     +'<fill><patternFill patternType="solid"><fgColor rgb="FFEDF2F7"/><bgColor indexed="64"/></patternFill></fill>'
     +'<fill><patternFill patternType="solid"><fgColor rgb="FFF2F7FA"/><bgColor indexed="64"/></patternFill></fill>'
+    +'<fill><patternFill patternType="solid"><fgColor rgb="FFE4F0FD"/><bgColor indexed="64"/></patternFill></fill>'
+    +'<fill><patternFill patternType="solid"><fgColor rgb="FFE8F5E9"/><bgColor indexed="64"/></patternFill></fill>'
     +'</fills>'
     +'<borders count="2">'+NB+B+'</borders>'
     +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-    +'<cellXfs count="15">'
+    +'<cellXfs count="19">'
     +txtXf(0,0,0,'vertical="center"')                                                        //0 默认
     +txtXf(2,0,0,'vertical="center"')                                                        //1 标题
     +txtXf(3,0,0,'vertical="center" wrapText="1"')                                           //2 副标题/注释
@@ -8348,6 +8364,10 @@ function bizBuildXlsx(sheets){
     +numXf(165,0,0,1,RH)                                                                     //12 一位小数
     +numXf(4,1,3,1,RH)                                                                       //13 合计(金额)
     +txtXf(0,0,0,'vertical="top" wrapText="1"')                                              //14 段落
+    +txtXf(0,4,1,'vertical="center"')                                                        //15 新客户行·文本
+    +numXf(4,0,4,1,RH)                                                                       //16 新客户行·金额
+    +txtXf(0,5,1,'vertical="center"')                                                        //17 老客户行·文本
+    +numXf(4,0,5,1,RH)                                                                       //18 老客户行·金额
     +'</cellXfs>'
     +'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
     +'</styleSheet>';
