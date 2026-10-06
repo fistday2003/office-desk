@@ -6206,11 +6206,26 @@ function bizRebuildFirstPay(){
 // 首单库：(买家+业务员) → 该业务员接到该客户的最早一笔订单下单日（只增不减，取更早）
 // 口径（2026-09-23 李主任定）：新老客从「业务员接到该客户第一个订单」起算，一年内都是新客户订单；
 // 不是按首笔收款、也不是按客户在店铺的首单算。缺首单记录时退回首笔收款日。
+// ⚠️ 防改绑污染（2026-10-06）：客户转交后 CRM 会把历史订单的归属人整体改掉（如 fathim diarra
+// 2025-09 的单在 CRM 里已显示为 alyssa），早于业务员入职日的「首单证据」一定是别人的单，必须丢弃。
+const BIZ_SELLER_START = {'孟伊':'2026-01-01','李雪洋':'2026-06-09'};   // 入职日期（中文规范名），发现新的改绑就往这里加
 function bizRebuildFirstOrder(){
-  const fo=(biz.firstOrder&&typeof biz.firstOrder==='object')?biz.firstOrder:{};
+  const today=new Date(), pad=n=>String(n).padStart(2,'0');
+  const tToday=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+  // 先清掉库里的脏条目（自愈：旧版本写入的改绑污染/未来日期），再从订单证据重建
+  const fo0=(biz.firstOrder&&typeof biz.firstOrder==='object')?biz.firstOrder:{};
+  const fo={};
+  Object.keys(fo0).forEach(k=>{
+    const d=fo0[k]; if(!d||d<'2000-01-01'||d>tToday) return;
+    const st=BIZ_SELLER_START[bizSellerCn(String(k).split('|||')[1])];
+    if(st&&d<st) return;
+    fo[k]=d;
+  });
   (biz.orders||[]).forEach(o=>{
     const b=String(o.buyer||'').trim(), s=String(o.sellerRaw||'').trim(), d=String(o.ts||'').slice(0,10);
-    if(!b||!s||!d||d<'2000-01-01') return;
+    if(!b||!s||!d||d<'2000-01-01'||d>tToday) return;
+    const st=BIZ_SELLER_START[bizSellerCn(s)];
+    if(st&&d<st) return;
     const k=b+'|||'+s;
     if(!fo[k]||d<fo[k]) fo[k]=d;
   });
