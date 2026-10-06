@@ -197,10 +197,35 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-mini{height:4px;border-radius:2px;background:rgba(15,23,42,.10);margin-top:5px;overflow:hidden}
 .plan-mini span{display:block;height:100%;border-radius:2px;background:currentColor}
 .plan-cell.over span{background:#0f766e}
+/* —— v2.5：项目小计列 / 季度合计行 / 合计格（计划 vs 实际 对比）—— */
+.plan-tbl th.sub{background:#f1f5f9;color:var(--text);border-left:2px solid var(--border)}
+.plan-tbl td.sub{background:#fbfdff}
+.plan-tbl tr.qsum td{background:#eef6ff}
+.plan-tbl tr.qsum td.mth{background:#dbeafe;color:#1e40af}
+.plan-tbl tr.qsum td.sub{background:#e6f0fc}
+.plan-tbl tr.qsum td.tot{background:#dbeafe}
+.plan-tbl tr.sum td.sub{background:#eaf0f6}
+.plan-totcell{display:block;padding:7px 9px;text-align:left;line-height:1.35;min-height:44px}
+.plan-totcell .plan-cv{font-size:12.5px;font-weight:700;color:var(--text);display:block}
+.plan-totcell .plan-cs{font-size:10.5px;color:var(--text-secondary);margin-top:1px;display:block}
+.plan-totcell .plan-df{font-size:10.5px;font-weight:700;margin-top:1px;display:block;color:var(--text-secondary)}
+.plan-totcell.none .plan-cv{color:var(--text-muted);font-weight:500}
+.plan-totcell.strong .plan-cv{font-size:13.5px;color:var(--primary-dark)}
+.plan-pjcard{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--card-bg)}
+.plan-pjcard h4{margin:0 0 8px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.plan-pjcard .taglg,.plan-pjcard .tagfs{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px}
+.plan-pjcard .taglg{background:#e0f2fe;color:#0369a1}
+.plan-pjcard .tagfs{background:#fef3c7;color:#b45309}
+.plan-pjgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin-bottom:8px}
+.plan-pjgrid div span{display:block;font-size:10.5px;color:var(--text-muted)}
+.plan-pjgrid div b{font-size:13px;font-weight:700}
+.plan-pjrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-secondary);padding:3px 0;border-top:1px dashed var(--border)}
+@media (max-width:768px){.plan-pjgrid{grid-template-columns:repeat(2,1fr)}}
 .plan-mcard{display:none}
 .plan-mitem{border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-bottom:10px}
 .plan-mrow{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--border)}
 .plan-mrow:last-child{border-bottom:none}
+.plan-mrow.subline{font-weight:700;color:var(--text);background:rgba(15,23,42,.02)}
 @media (max-width:768px){
   .plan-tbl-wrap{display:none}
   .plan-mcard{display:block}
@@ -799,7 +824,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.4 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.5 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -889,7 +914,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         </div>
         <span class="dm-sub" id="planSyncHint"></span>
       </div>
-      <p class="section-subtitle">按「<b>项目 × 业务员 × 月份</b>」跟踪<b>计划</b>与<b>实际完成</b>。实际完成可从「经营分析」的收款流水一键抓取，也可以手工填写——底色和角标会区分来源（⚡ 自动 / ✎ 手工）。<b>点表格里任意格子即可修改</b>。</p>
+      <p class="section-subtitle">按「<b>项目 × 业务员 × 月份</b>」跟踪<b>计划金额</b>与<b>实际金额</b>（<b>金额统一按人民币 ¥ 显示</b>，按 1 美元 ≈ 6.8 元估算）。表格带<b>月合计 / 季度合计 / 年合计 / 项目合计</b>。实际金额可从「经营分析」的收款流水一键抓取，也可以手工填写——底色和角标会区分来源（⚡ 自动 / ✎ 手工）。<b>点表格里任意格子即可修改</b>。</p>
       <div id="dashContent"></div>
       <input type="file" id="planImportInput" accept=".json,.csv,.txt" style="display:none" onchange="handlePlanImport()">
     </div>
@@ -1156,11 +1181,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 150px"><label>计划收款额（$）</label><input type="number" id="planPlan" placeholder="0" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>计划金额（¥ 人民币）</label><input type="number" id="planPlan" placeholder="0" inputmode="decimal"></div>
       <div class="form-group" style="flex:1 1 150px"><label>计划订单数（笔）</label><input type="number" id="planPlanQ" placeholder="0" inputmode="numeric"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 150px"><label>实际收款额（$）</label><input type="number" id="planActual" placeholder="留空则跟自动值" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>实际金额（¥ 人民币）</label><input type="number" id="planActual" placeholder="留空则跟自动值" inputmode="decimal"></div>
       <div class="form-group" style="flex:1 1 150px"><label>实际订单数（笔）</label><input type="number" id="planActualQ" placeholder="留空则跟自动值" inputmode="numeric"></div>
     </div>
     <div id="planAutoHint" style="font-size:12px;color:var(--text-secondary);line-height:1.8;background:var(--bg);border:1px dashed var(--border);border-radius:8px;padding:9px 11px;margin-bottom:12px"></div>
@@ -1236,7 +1261,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.4';
+const APP_VERSION = 'v2.5';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1486,7 +1511,18 @@ function seedSampleData(){
 // ============================================================
 // —— 公共小工具（v2.4 起由本模块提供：报账、货损、复盘等模块也在用）——
 function dNum(v){ const n=parseFloat(v); return isNaN(n)?0:n; }
-function fmtMoney(v){ return '$'+Math.round(v).toLocaleString('en-US'); }
+// —— 金额口径（v2.5）：内部一律以美元存储（与「经营分析」收款流水同源，不动历史数据），
+//    显示 / 输入 / 导出全部换算成人民币。汇率要调只改 PLAN_FX 这一处。 ——
+const PLAN_FX = 6.8;                       // 估算汇率：1 美元 ≈ 6.8 元人民币
+const PLAN_FX_NOTE = '金额单位：人民币（¥）· 按 1 美元 ≈ 6.8 元估算';
+function usd2cny(v){ return dNum(v)*PLAN_FX; }
+function cny2usd(v){ return dNum(v)/PLAN_FX; }
+function fmtCny(vUsd){ return '¥'+Math.round(usd2cny(vUsd)).toLocaleString('en-US'); }
+function fmtCny2(vUsd){ const c=usd2cny(vUsd); return '¥'+c.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+function fmtCnySigned(vUsd){ const c=Math.round(usd2cny(vUsd)); return (c>0?'+¥':(c<0?'-¥':'¥'))+Math.abs(c).toLocaleString('en-US'); }
+function planCsvNum(vUsd){ return String(Math.round(usd2cny(vUsd)*100)/100); }
+// 兼容旧调用：本模块所有金额统一走人民币
+function fmtMoney(v){ return fmtCny(v); }
 function fmtMonthLabel(m){ const p=String(m).split('-'); return p[0]+'年'+parseInt(p[1])+'月'; }
 function fmtMonthShort(m){ const p=String(m).split('-'); return parseInt(p[1])+'月'; }
 const ICON_EDIT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
@@ -1514,6 +1550,9 @@ const PLAN_PROJECTS = {langges:{name:'朗格斯',tag:'lg'}, fansi:{name:'凡适'
 const PLAN_PROJECT_KEYS = ['langges','fansi'];
 const PLAN_SELLERS_BASE = ['陈曦','孟伊','李雪洋','乔萌萌','周文怡','Shirley Li','王梦莹'];
 const PLAN_METRICS = [{key:'amt',label:'收款额'},{key:'qty',label:'订单数'},{key:'rate',label:'完成率'}];
+// 季度分组（1~3 月=一季度 …），用于「季度合计」行
+const PLAN_QUARTERS = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]];
+const PLAN_QNAME = ['一季度','二季度','三季度','四季度'];
 const PLAN_COLOR = ['#0891b2','#f59e0b','#8b5cf6','#10b981','#ef4444','#3b82f6','#ec4899','#14b8a6','#f97316','#6366f1'];
 // 预置「实际完成」：真实收款流水汇总（2024-07 ~ 2026-08，741 笔），格式 月份|项目|业务员|金额|笔数
 const PLAN_SEED_RAW = '2024-07|langges|bella bella|311|4;2024-08|langges|mia mia|196|1;2024-11|langges|Shirley Li|90|1;2024-11|langges|bella bella|80|1;2024-11|langges|陈曦|95|1;2024-12|langges|Shirley Li|265|2;2024-12|langges|bella bella|456.7|3;2025-01|langges|Shirley Li|2696.2|8;2025-01|langges|bella bella|130|1;2025-02|langges|Molly Yang|148|1;2025-02|langges|Shirley Li|7427.16|12;2025-02|langges|bella bella|395|2;2025-03|langges|Aria Wang|138|1;2025-03|langges|Molly Yang|2473|3;2025-03|langges|Shirley Li|6590.62|9;2025-03|langges|bella bella|120|1;2025-04|langges|Aria Wang|41.94|1;2025-04|langges|Hannah|109|1;2025-04|langges|Molly Yang|504.2|2;2025-04|langges|Natiya Jin|560|5;2025-04|langges|Shirley Li|9592.18|16;2025-04|langges|bella bella|580|1;2025-05|langges|Aria Wang|1301.54|3;2025-05|langges|Hannah|366|1;2025-05|langges|Shirley Li|2946.55|6;2025-05|langges|bella bella|110|1;2025-05|langges|王梦莹|806.05|1;2025-06|langges|Hannah|405|2;2025-06|langges|未分配|373.45|3;2025-06|langges|王梦莹|130|2;2025-07|langges|Hannah|2496.8|6;2025-07|langges|未分配|86.45|1;2025-07|langges|王梦莹|1658.5|10;2025-08|langges|Hannah|4215.81|8;2025-08|langges|王梦莹|1500|3;2025-09|langges|Hannah|1096.56|6;2025-09|langges|未分配|86.42|3;2025-09|langges|王梦莹|7963.82|21;2025-10|langges|Hannah|3640.5|4;2025-10|langges|未分配|216.19|2;2025-10|langges|王梦莹|4522|9;2025-11|langges|Hannah|4659.5|10;2025-11|langges|王梦莹|10487.5|22;2025-12|langges|Hannah|195|2;2025-12|langges|王梦莹|31592.5|15;2025-12|langges|陈曦|580|5;2026-01|fansi|乔萌萌|420|3;2026-01|langges|孟伊|316|3;2026-01|langges|王梦莹|9517.51|15;2026-01|langges|陈曦|5352.5|20;2026-02|fansi|乔萌萌|628|5;2026-02|langges|孟伊|1802|6;2026-02|langges|王梦莹|464.98|5;2026-02|langges|陈曦|6631.41|10;2026-03|fansi|乔萌萌|3724.5|9;2026-03|langges|孟伊|3478|16;2026-03|langges|王梦莹|4167|15;2026-03|langges|陈曦|8776.94|28;2026-04|fansi|乔萌萌|4002|10;2026-04|langges|孟伊|11158.1|13;2026-04|langges|王梦莹|17195|19;2026-04|langges|陈曦|14052.41|26;2026-05|fansi|乔萌萌|348|6;2026-05|langges|孟伊|7436.2|8;2026-05|langges|李楠|300|3;2026-05|langges|王梦莹|14361|16;2026-05|langges|陈曦|16439.51|23;2026-06|fansi|乔萌萌|3146|16;2026-06|langges|孟伊|13678.7|25;2026-06|langges|李楠|200|2;2026-06|langges|李雪洋|456|7;2026-06|langges|王梦莹|16938|22;2026-06|langges|陈曦|5460.4|24;2026-07|fansi|乔萌萌|3921|11;2026-07|langges|Shirley Li|75|1;2026-07|langges|孟伊|15634.5|24;2026-07|langges|李雪洋|5733|19;2026-07|langges|王梦莹|7963.5|10;2026-07|langges|陈曦|13478|19;2026-08|fansi|乔萌萌|4455|15;2026-08|fansi|周文怡|50|1;2026-08|langges|孟伊|8622.9|22;2026-08|langges|李雪洋|2621.5|13;2026-08|langges|王梦莹|1730|4;2026-08|langges|陈曦|44486|24';
@@ -1722,10 +1761,11 @@ function planSrcOf(a){
   return a.autoA&&a.manA?'mixed':(a.autoA?'auto':(a.manA?'manual':'none'));
 }
 function planBdg(src){ return src==='auto'?'⚡':(src==='manual'?'✎':(src==='mixed'?'⚡✎':'')); }
+// —— 主值 = 实际完成；副值 = 计划金额 + 完成率（就是"计划 vs 实际"的对比）——
 function planMainVal(a){
   if(planMetric==='qty')  return a.actualQ?Math.round(a.actualQ)+' 笔':'—';
   if(planMetric==='rate') return (a.plan>0&&a.actual>0)?(Math.round(a.actual/a.plan*1000)/10)+'%':'—';
-  return a.actual?fmtMoney(a.actual):'—';
+  return a.actual?fmtCny(a.actual):'—';
 }
 function planSubVal(a){
   if(planMetric==='qty'){
@@ -1734,12 +1774,23 @@ function planSubVal(a){
     return s;
   }
   if(planMetric==='rate'){
-    if(a.plan>0||a.actual>0) return fmtMoney(a.actual)+' / 计划 '+fmtMoney(a.plan);
+    if(a.plan>0||a.actual>0) return '实际 '+fmtCny(a.actual)+' / 计划 '+fmtCny(a.plan);
     return '未填计划与实际';
   }
-  let s='计划 '+(a.plan?fmtMoney(a.plan):'—');
-  if(a.plan>0&&a.actual>0) s+=' · '+Math.round(a.actual/a.plan*100)+'%';
+  let s='计划 '+(a.plan?fmtCny(a.plan):'—');
+  if(a.plan>0&&a.actual>0) s+=' · 完成 '+Math.round(a.actual/a.plan*100)+'%';
   return s;
+}
+// 差额（人民币，正=超额 / 负=缺口），合计行与项目对比卡用；计划没填时不硬算
+function planDiffVal(a){
+  if(planMetric==='qty'){
+    if(a.planQ<=0) return a.actualQ?'计划未定':'—';
+    const d=a.actualQ-a.planQ; return d?((d>0?'+':'')+Math.round(d)+' 笔'):'持平';
+  }
+  if(planMetric==='rate') return a.plan>0?((a.actual>=a.plan?'超额 ':'缺口 ')+fmtCny(Math.abs(a.actual-a.plan))):'—';
+  if(a.plan<=0) return a.actual?'计划未定':'—';
+  const d=a.actual-a.plan;
+  return Math.abs(d)<0.005?'刚好达标':fmtCnySigned(d);
 }
 function planPctOf(a){
   if(planMetric==='qty') return a.planQ>0?(a.actualQ/a.planQ*100):0;
@@ -1759,85 +1810,152 @@ function planCellHtml(month,project,seller){
   }
   return '<div class="plan-cell '+src+'" onclick="'+escAttr(call)+'" title="点击录入 / 修改">'+inner+'</div>';
 }
-function planSumCellHtml(list){
+// 合计格（月合计 / 季度合计 / 年合计 / 项目合计都用它）：实际（主值）+ 计划 + 完成率 + 差额
+function planTotCellHtml(list,strong){
   const a=planSum(list);
-  if(!a.n||!(a.plan||a.actual||a.planQ||a.actualQ)) return '<div class="plan-cell none" style="cursor:default"><span class="plan-cv">—</span></div>';
-  let inner='<span class="plan-cv">'+escHtml(planMainVal(a))+'</span><span class="plan-cs">'+escHtml(planSubVal(a))+'</span>';
-  if(planMetric!=='rate' && planPctOf(a)>0){
-    inner+='<span class="plan-mini"><span style="width:'+Math.min(100,planPctOf(a)).toFixed(1)+'%"></span></span>';
-  }
-  return '<div class="plan-cell" style="cursor:default;background:transparent;border-left-color:transparent">'+inner+'</div>';
+  if(!a.n||!(a.plan||a.actual||a.planQ||a.actualQ)) return '<div class="plan-totcell none"><span class="plan-cv">—</span></div>';
+  let inner='<span class="plan-cv">'+escHtml(planMainVal(a))+'</span>'
+    + '<span class="plan-cs">'+escHtml(planSubVal(a))+'</span>'
+    + '<span class="plan-df">'+escHtml(planDiffVal(a))+'</span>';
+  return '<div class="plan-totcell'+(strong?' strong':'')+'">'+inner+'</div>';
 }
+// 兼容旧调用
+function planSumCellHtml(list){ return planTotCellHtml(list); }
+function planEmptyCellHtml(){ return '<td class="sub"><div class="plan-totcell none"><span class="plan-cv">—</span></div></td>'; }
+// 表格：行=月（每月后跟季度合计），列=项目分组下的业务员 + 项目小计 + 全月合计
 function planTableHtml(months){
   const projs = planSelProject==='all' ? PLAN_PROJECT_KEYS.slice() : [planSelProject];
   const cols={};
   projs.forEach(pj=>{ cols[pj]=planSellerCols(pj); });
   if(planSelSeller!=='all') projs.forEach(pj=>{ cols[pj]=cols[pj].filter(s=>s===planSelSeller); });
   const multi=projs.length>1;
+  const spanOf=pj=>Math.max(1,cols[pj].length)+1;   // 业务员列 + 该项目小计列
   let h='<div class="dash-table-wrap plan-tbl-wrap"><table class="plan-tbl"><thead>';
   if(multi){
     h+='<tr><th class="mth" rowspan="2">月份</th>';
-    projs.forEach(pj=>{ h+='<th class="pj '+PLAN_PROJECTS[pj].tag+'" colspan="'+Math.max(1,cols[pj].length)+'">'+escHtml(planProjName(pj))+'</th>'; });
-    h+='<th class="tot" rowspan="2">合计</th></tr><tr>';
+    projs.forEach(pj=>{ h+='<th class="pj '+PLAN_PROJECTS[pj].tag+'" colspan="'+spanOf(pj)+'">'+escHtml(planProjName(pj))+'</th>'; });
+    h+='<th class="tot" rowspan="2">全月合计</th></tr><tr>';
     projs.forEach(pj=>{
-      if(!cols[pj].length) h+='<th>—</th>';
-      cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
+      if(cols[pj].length) cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
+      else h+='<th>—</th>';
+      h+='<th class="sub">'+escHtml(planProjName(pj))+'小计</th>';
     });
     h+='</tr>';
   } else {
     const pj=projs[0];
     h+='<tr><th class="mth">月份</th>';
-    if(!cols[pj].length) h+='<th>—</th>';
-    cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
-    h+='<th class="tot">合计</th></tr>';
+    if(cols[pj].length) cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
+    else h+='<th>—</th>';
+    h+='<th class="sub">'+escHtml(planProjName(pj))+'小计</th><th class="tot">合计</th></tr>';
   }
   h+='</thead><tbody>';
+  // 某一行的业务员格 + 项目小计格（picker(项目,业务员) 返回该格要汇总的记录）
+  const rowCells=(picker)=>{
+    let r='';
+    projs.forEach(pj=>{
+      if(planSelSeller!=='all' && !cols[pj].length) r+=planEmptyCellHtml();
+      else if(cols[pj].length) cols[pj].forEach(s=>{ r+='<td>'+picker(pj,s)+'</td>'; });
+      else r+='<td>'+picker(pj,'')+'</td>';
+      r+='<td class="sub">'+picker(pj,'__sub')+'</td>';
+    });
+    return r;
+  };
+  const inPj=(pj,extra)=>plan.filter(r=>r.project===pj&&extra(r)&&planInScope(r));
   months.forEach(m=>{
     h+='<tr><td class="mth">'+fmtMonthShort(m)+'</td>';
-    projs.forEach(pj=>{
-      if(!cols[pj].length){ h+='<td>'+planCellHtml(m,pj,'')+'</td>'; return; }
-      cols[pj].forEach(s=>{ h+='<td>'+planCellHtml(m,pj,s)+'</td>'; });
+    h+=rowCells((pj,s)=>{
+      if(s==='__sub') return planTotCellHtml(inPj(pj,r=>r.month===m));
+      return planCellHtml(m,pj,s);
     });
-    h+='<td>'+planSumCellHtml(plan.filter(r=>r.month===m&&planInScope(r)))+'</td></tr>';
+    h+='<td class="tot">'+planTotCellHtml(plan.filter(r=>r.month===m&&planInScope(r)))+'</td></tr>';
   });
+  // 季度合计行
+  PLAN_QUARTERS.forEach((qs,qi)=>{
+    const qm=qs.map(n=>planYear+'-'+String(n).padStart(2,'0')).filter(m=>months.indexOf(m)>=0);
+    if(!qm.length) return;
+    const inQ=r=>qm.indexOf(r.month)>=0;
+    h+='<tr class="qsum"><td class="mth">'+PLAN_QNAME[qi]+'合计</td>';
+    h+=rowCells((pj,s)=>{
+      if(s==='__sub') return planTotCellHtml(inPj(pj,inQ));
+      return planTotCellHtml(plan.filter(r=>r.project===pj&&(r.seller||'')===s&&inQ(r)));
+    });
+    h+='<td class="tot">'+planTotCellHtml(plan.filter(r=>inQ(r)&&planInScope(r)))+'</td></tr>';
+  });
+  // 全年合计行（每业务员 + 项目小计 = 项目年合计 + 总计）
   h+='<tr class="sum"><td class="mth">全年合计</td>';
-  projs.forEach(pj=>{
-    if(!cols[pj].length){ h+='<td>'+planSumCellHtml(plan.filter(r=>r.project===pj&&months.indexOf(r.month)>=0&&planInScope(r)))+'</td>'; return; }
-    cols[pj].forEach(s=>{ h+='<td>'+planSumCellHtml(plan.filter(r=>r.project===pj&&(r.seller||'')===s&&months.indexOf(r.month)>=0&&planInScope(r)))+'</td>'; });
+  h+=rowCells((pj,s)=>{
+    if(s==='__sub') return planTotCellHtml(inPj(pj,r=>months.indexOf(r.month)>=0),true);
+    return planTotCellHtml(plan.filter(r=>r.project===pj&&(r.seller||'')===s&&months.indexOf(r.month)>=0));
   });
-  h+='<td>'+planSumCellHtml(plan.filter(r=>months.indexOf(r.month)>=0&&planInScope(r)))+'</td></tr>';
+  h+='<td class="tot">'+planTotCellHtml(plan.filter(r=>months.indexOf(r.month)>=0&&planInScope(r)),true)+'</td></tr>';
   h+='</tbody></table></div>';
   return h;
 }
+// 手机端：按月卡片（含项目小计）→ 季度合计卡 → 全年合计卡（含项目合计）
 function planMCardHtml(months){
   const projs = planSelProject==='all' ? PLAN_PROJECT_KEYS.slice() : [planSelProject];
+  const pickerSellers=pj=>{ let sc=planSellerCols(pj); if(planSelSeller!=='all') sc=sc.filter(s=>s===planSelSeller); return sc; };
+  const rowLine=(label,a,badge,cls)=>{
+    let right=escHtml(planMainVal(a));
+    if(badge) right+=' <span class="plan-bdg '+badge+'">'+planBdg(badge)+'</span>';
+    if(a.plan||a.planQ) right+=' · 计划 '+escHtml(planMetric==='qty'?(Math.round(a.planQ)+' 笔'):fmtCny(a.plan));
+    if(a.plan>0||a.planQ>0) right+=' · '+escHtml(planDiffVal(a));
+    return '<div class="plan-mrow'+(cls?(' '+cls):'')+'"><span>'+escHtml(label)+'</span><span>'+right+'</span></div>';
+  };
   let h='<div class="plan-mcard">';
+  // ① 每月卡片（含每个项目的当月小计 = 项目合计的月度视图）
   months.forEach(m=>{
     const a=planSum(plan.filter(r=>r.month===m&&planInScope(r)));
     if(!a.n) return;
     h+='<div class="plan-mitem">';
-    h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">'+fmtMonthShort(m)+'</strong></span>';
+    h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">'+fmtMonthShort(m)+'</strong> <span style="font-size:10.5px;color:var(--text-muted)">月合计</span></span>';
     h+='<span style="font-size:12px;color:var(--text-secondary)">'+escHtml(planMainVal(a))+' · '+escHtml(planSubVal(a))+'</span></div>';
     projs.forEach(pj=>{
-      let sellers=planSellerCols(pj);
-      if(planSelSeller!=='all') sellers=sellers.filter(s=>s===planSelSeller);
-      sellers.forEach(s=>{
+      h+=rowLine(planProjName(pj)+'小计', planSum(plan.filter(r=>r.month===m&&r.project===pj&&planInScope(r))), null, 'subline');
+      pickerSellers(pj).forEach(s=>{
         const b=planSum(plan.filter(r=>r.month===m&&r.project===pj&&(r.seller||'')===s));
         if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
-        const src=planSrcOf(b);
-        h+='<div class="plan-mrow"><span>'+escHtml(planProjName(pj)+' · '+(s||'未分配'))+'</span>';
-        h+='<span>'+escHtml(planMainVal(b))+' <span class="plan-bdg '+src+'">'+planBdg(src)+'</span></span></div>';
+        h+=rowLine('　'+planProjName(pj)+' · '+(s||'未分配'), b, planSrcOf(b));
       });
     });
     h+='</div>';
   });
+  // ② 季度合计卡
+  h+='<div class="plan-mitem">';
+  h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">季度合计</strong></span></div>';
+  PLAN_QUARTERS.forEach((qs,qi)=>{
+    const qm=qs.map(n=>planYear+'-'+String(n).padStart(2,'0')).filter(m=>months.indexOf(m)>=0);
+    if(!qm.length) return;
+    const a=planSum(plan.filter(r=>qm.indexOf(r.month)>=0&&planInScope(r)));
+    if(!a.n||!(a.plan||a.actual||a.planQ||a.actualQ)) return;
+    h+=rowLine(PLAN_QNAME[qi]+'合计', a, null, 'subline');
+    projs.forEach(pj=>{
+      const b=planSum(plan.filter(r=>r.project===pj&&qm.indexOf(r.month)>=0&&planInScope(r)));
+      if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
+      h+=rowLine('　'+planProjName(pj), b, null);
+    });
+  });
+  h+='</div>';
+  // ③ 全年合计卡（每项目 = 项目年合计）
+  const T=planSum(plan.filter(r=>months.indexOf(r.month)>=0&&planInScope(r)));
+  if(T.n){
+    h+='<div class="plan-mitem">';
+    h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">全年合计</strong></span></div>';
+    projs.forEach(pj=>{
+      const b=planSum(plan.filter(r=>r.project===pj&&months.indexOf(r.month)>=0&&planInScope(r)));
+      if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
+      h+=rowLine('　'+planProjName(pj), b, null);
+    });
+    h+=rowLine('年计划 / 年实际', T, null);
+    h+='</div>';
+  }
   h+='</div>';
   return h;
 }
 function fmtAxisMoney(v){
-  if(Math.abs(v)>=1000000) return '$'+(v/1000000).toFixed(1)+'M';
-  if(Math.abs(v)>=1000) return '$'+(v/1000).toFixed(0)+'k';
-  return '$'+Math.round(v);
+  const c=usd2cny(v), a=Math.abs(c);
+  if(a>=10000) return '¥'+(c/10000).toFixed(a>=100000?1:2).replace(/\.0+$/,'')+'万';
+  return '¥'+Math.round(c);
 }
 function planChartSeries(months){
   const kind = planMetric==='amt'?'money':(planMetric==='qty'?'count':'rate');
@@ -1941,11 +2059,11 @@ function renderDash(){
     box.innerHTML=html;
     return;
   }
-  // 关键指标
+  // 关键指标（金额一律人民币）
   const grid=[];
-  grid.push({label:'年计划合计', val:fmtMoney(T.plan), foot:months.filter(m=>plan.some(r=>r.month===m&&(r.plan||0)>0)).length+' 个月已定计划'});
-  grid.push({label:'年实际完成', val:fmtMoney(T.actual), foot:(T.autoA||T.autoQ)?'含自动抓取':'手工填写'});
-  grid.push({label:'完成率', val:T.plan>0?(Math.round(rate*10)/10)+'%':'—', foot:T.plan>0?('差额 '+fmtMoney(T.actual-T.plan)):'先填计划才能算完成率', bar:T.plan>0?Math.min(100,rate):0});
+  grid.push({label:'年计划金额', val:fmtCny(T.plan), foot:months.filter(m=>plan.some(r=>r.month===m&&(r.plan||0)>0)).length+' 个月已定计划'});
+  grid.push({label:'年实际金额', val:fmtCny(T.actual), foot:'计划 '+fmtCny(T.plan)+(T.plan>0?('（完成 '+Math.round(rate)+'%）'):'')});
+  grid.push({label:'计划 vs 实际差额', val:T.plan>0?fmtCnySigned(T.actual-T.plan):'—', foot:T.plan>0?(rate>=100?'已超额完成 ✓':'缺口 '+(100-rate).toFixed(1)+'%'):'先填计划才能算差额', bar:T.plan>0?Math.min(100,rate):0});
   grid.push({label:'订单数（实际/计划）', val:Math.round(T.actualQ)+' / '+Math.round(T.planQ), foot:T.planQ>0?('完成 '+Math.round(T.actualQ/T.planQ*100)+'%'):'未定订单计划'});
   html+='<div class="dash-grid" style="grid-template-columns:repeat(4,1fr)">';
   grid.forEach(g=>{
@@ -1955,10 +2073,32 @@ function renderDash(){
     html+='</div>';
   });
   html+='</div>';
+  // 项目合计（每个项目一张对比卡：计划 / 实际 / 完成率 / 差额）
+  const pjCards=PLAN_PROJECT_KEYS.map(k=>{
+    const a=planSum(plan.filter(r=>r.project===k&&String(r.month).slice(0,4)===String(planYear)));
+    return {key:k,a:a};
+  });
+  html+='<div class="dash-panel"><div class="dash-panel-head"><div class="dash-panel-title">项目合计 · '+planYear+' 年</div>'
+      + '<span class="dm-sub">'+escHtml(PLAN_FX_NOTE)+'</span></div>';
+  html+='<div style="display:grid;grid-template-columns:repeat('+pjCards.length+',1fr);gap:12px">';
+  pjCards.forEach(c=>{
+    const a=c.a, rt=a.plan>0?(a.actual/a.plan*100):0;
+    html+='<div class="plan-pjcard"><h4>'+escHtml(planProjName(c.key))+'<span class="tag'+PLAN_PROJECTS[c.key].tag+'">店铺项目</span></h4>';
+    html+='<div class="plan-pjgrid">'
+      + '<div><span>年计划</span><b>'+escHtml(fmtCny(a.plan))+'</b></div>'
+      + '<div><span>年实际</span><b>'+escHtml(fmtCny(a.actual))+'</b></div>'
+      + '<div><span>完成率</span><b>'+(a.plan>0?(Math.round(rt*10)/10)+'%':'—')+'</b></div>'
+      + '<div><span>差额</span><b>'+escHtml(planDiffVal(a))+'</b></div>'
+      + '</div>';
+    html+='<div class="plan-pjrow"><span>订单数（实际/计划）</span><span>'+Math.round(a.actualQ)+' / '+Math.round(a.planQ)+'</span></div>';
+    if(a.plan>0) html+='<div class="dash-bar"><span style="width:'+Math.min(100,rt).toFixed(1)+'%"></span></div>';
+    html+='</div>';
+  });
+  html+='</div></div>';
   // 表格
   html+='<div class="dash-panel">';
   html+='<div class="dash-panel-head"><div class="dash-panel-title">月度销售计划 vs 实际完成 · '+planYear+' 年</div>'
-      + '<span class="dm-sub">点任意格子录入 / 修改</span></div>';
+      + '<span class="dm-sub">点任意格子录入 / 修改 · '+(planMetric==='qty'?'单位：笔':(planMetric==='rate'?'完成率':'单位：¥ 人民币'))+'</span></div>';
   html+=planTableHtml(months);
   html+=planMCardHtml(months);
   html+='<div class="plan-legend">'
@@ -1966,14 +2106,17 @@ function renderDash(){
       + '<b><span class="plan-sw manual"></span>✎ 手工填写</b>'
       + '<b><span class="plan-sw mixed"></span>⚡✎ 自动+手工混合</b>'
       + '<b><span class="plan-sw none"></span>未填</b>'
-      + '<span style="flex:1 1 100%">实际完成=「经营分析」里按到账时间归月的收款流水（业务员取业绩归属人）；计划=手工填写，「分线显示」可切换 项目 / 业务员 各自一条线。</span>'
+      + '<span style="flex:1 1 100%">实际完成=「经营分析」里按到账时间归月的收款流水（业务员取业绩归属人）；计划=手工填写，「分线显示」可切换 项目 / 业务员 各自一条线。'
+      + '每格上排是<b>实际金额</b>、下排是<b>计划金额 + 完成率 + 差额</b>。</span>'
+      + '<span style="flex:1 1 100%">合计口径：<b>月合计</b>=每月行最右列；<b>季度合计</b>=每季度末行；<b>年合计</b>=「全年合计」行；<b>项目合计</b>=各项目分组下的「小计」列（全年合计行即该项目全年数）。</span>'
+      + '<span style="flex:1 1 100%">'+escHtml(PLAN_FX_NOTE)+'（显示与录入均按人民币，内部仍按美元存原始数）。</span>'
       + '</div>';
   html+='</div>';
   // 曲线
   const cs=planChartSeries(months);
   html+='<div class="dash-panel">';
-  html+='<div class="dash-panel-head"><div class="dash-panel-title">趋势曲线 · '+(planMetric==='rate'?'完成率':(planMetric==='qty'?'订单数':'收款额'))+'</div>'
-      + '<span class="dm-sub">'+(planSplit?'已分线：'+((planSelProject==='all')?'按项目':'按业务员'):'合计两条线（虚线=计划，实线=实际）')+'</span></div>';
+  html+='<div class="dash-panel-head"><div class="dash-panel-title">趋势曲线 · '+(planMetric==='rate'?'完成率':(planMetric==='qty'?'订单数':'收款额（¥）'))+'</div>'
+      + '<span class="dm-sub">'+(planSplit?'已分线：'+((planSelProject==='all')?'按项目':'按业务员'):'合计两条线（虚线=计划，实线=实际；金额为人民币）')+'</span></div>';
   html+=planChartSvg(months, cs.kind, cs.series);
   html+='<div class="dash-legend">'+cs.series.map(se=>'<span><i style="background:'+se.color+(se.dash?';height:0;border-top:2px dashed '+se.color+';vertical-align:4px':';height:3px;border-radius:2px')+'"></i>'+escHtml(se.name)+'</span>').join('')+'</div>';
   html+='</div>';
@@ -1984,7 +2127,7 @@ function renderDash(){
     const autos=plan.filter(r=>r.srcAmt==='auto'||r.srcQty==='auto');
     const at=autos.reduce((a,r)=>Math.max(a,dNum(r.autoAt)),0);
     const preset=autos.some(r=>r.autoFrom==='预置');
-    let t=plan.length+' 组记录';
+    let t=plan.length+' 组记录 · 金额按人民币（1 美元≈6.8 元）';
     if(autos.length) t+=' · 自动来源 '+autos.length+' 组'+(at?('（最近 '+new Date(at).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+'）'):'')+(preset?'（含预置快照）':'');
     hint.textContent=t;
   }
@@ -2004,10 +2147,10 @@ function planRefreshAutoHint(){
   const el=document.getElementById('planAutoHint');
   let t;
   if(auto.from==='live'){
-    t='⚡ 自动值（来自经营分析收款流水）：<b>'+fmtMoney(auto.amt)+'</b> / <b>'+Math.round(auto.qty)+' 笔</b><br>'
-     +'实际值留空=跟着自动值走（角标 ⚡）；填了数字就记为手工填写（角标 ✎），下次抓取不会被覆盖。';
+    t='⚡ 自动值（来自经营分析收款流水）：<b>'+fmtCny2(auto.amt)+'</b> / <b>'+Math.round(auto.qty)+' 笔</b>（原始美元 $'+Math.round(auto.amt).toLocaleString('en-US')+'）<br>'
+     +'实际金额留空=跟着自动值走（角标 ⚡）；填了数字就记为手工填写（角标 ✎），下次抓取不会被覆盖。<b>输入的是人民币</b>。';
   } else if(auto.from==='preset'||auto.from==='stored'){
-    t='⚡ 当前实际值来自已保存的历史汇总（'+(auto.from==='preset'?'预置快照':'上次抓取')+'）：<b>'+fmtMoney(auto.amt)+'</b> / <b>'+Math.round(auto.qty)+' 笔</b><br>'
+    t='⚡ 当前实际值来自已保存的历史汇总（'+(auto.from==='preset'?'预置快照':'上次抓取')+'）：<b>'+fmtCny2(auto.amt)+'</b> / <b>'+Math.round(auto.qty)+' 笔</b>（原始美元 $'+Math.round(auto.amt).toLocaleString('en-US')+'）<br>'
      +'留空=继续沿用这份汇总（角标 ⚡）；到「经营分析」导入收款表后点「⚡ 从经营分析抓取实际」就能用最新流水刷新。';
   } else {
     t='⚡ 目前没有可用的自动值（经营分析里没有收款流水，这里也没有历史汇总）<br>'
@@ -2034,9 +2177,10 @@ function openPlanModalAt(month,project,seller){
   mSel.value=String(month).slice(5,7);
   document.getElementById('planProjectInput').value=project;
   document.getElementById('planSellerInput').value=seller||'';
-  document.getElementById('planPlan').value=(r&&dNum(r.plan))?r.plan:'';
+  // 金额框按人民币显示（内部美元 → ×6.8），保存时再除回去
+  document.getElementById('planPlan').value=(r&&dNum(r.plan))?Math.round(usd2cny(r.plan)*100)/100:'';
   document.getElementById('planPlanQ').value=(r&&dNum(r.planQ))?r.planQ:'';
-  document.getElementById('planActual').value=(r&&r.srcAmt==='manual')?r.actual:'';
+  document.getElementById('planActual').value=(r&&r.srcAmt==='manual')?(Math.round(usd2cny(r.actual)*100)/100):'';
   document.getElementById('planActualQ').value=(r&&r.srcQty==='manual')?r.actualQ:'';
   document.getElementById('planNote').value=(r&&r.note)?r.note:'';
   document.getElementById('modalPlanTitle').textContent=r?'修改：'+planProjName(project)+' · '+(seller||'未分配')+' · '+fmtMonthLabel(month):'新增销售计划 / 实际完成';
@@ -2052,7 +2196,8 @@ function savePlanRecord(){
   const month=y+'-'+String(m).padStart(2,'0');
   const project=document.getElementById('planProjectInput').value;
   const seller=String(document.getElementById('planSellerInput').value||'').trim();
-  const planV=dNum(document.getElementById('planPlan').value);
+  // 弹窗里填的是人民币 → 存之前换算回美元（内部口径不变）
+  const planV=Math.round(cny2usd(document.getElementById('planPlan').value)*100)/100;
   const planQ=dNum(document.getElementById('planPlanQ').value);
   const aRaw=String(document.getElementById('planActual').value).trim();
   const qRaw=String(document.getElementById('planActualQ').value).trim();
@@ -2065,7 +2210,7 @@ function savePlanRecord(){
   const auto=planAutoEff(month,project,seller);
   const patch={
     plan:planV, planQ:planQ,
-    actual: aRaw===''?Math.round(auto.amt*100)/100:dNum(aRaw),
+    actual: aRaw===''?Math.round(auto.amt*100)/100:Math.round(cny2usd(aRaw)*100)/100,
     actualQ: qRaw===''?auto.qty:dNum(qRaw),
     srcAmt: aRaw===''?'auto':'manual',
     srcQty: qRaw===''?'auto':'manual',
@@ -2126,13 +2271,14 @@ function planDownload(name, text, withBom){
   setTimeout(()=>{ URL.revokeObjectURL(url); if(a.parentNode) a.parentNode.removeChild(a); },500);
 }
 function planCsvEsc(v){ const s=String(v==null?'':v); return /[",\n]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s; }
+// 导出：金额按人民币（¥），列名带 (¥) 让导入端能认出币种
 function planExportCsv(){
-  const rows=[['月份','项目','业务员','计划收款额','实际收款额','实际来源','计划订单数','实际订单数','订单来源','备注']];
+  const rows=[['月份','项目','业务员','计划金额(¥)','实际金额(¥)','实际来源','计划订单数','实际订单数','订单来源','备注']];
   plan.slice().sort((a,b)=>(a.month<b.month?-1:(a.month>b.month?1:(a.project<b.project?-1:((a.seller||'')<(b.seller||'')?-1:1)))))
-    .forEach(r=>rows.push([r.month,planProjName(r.project),r.seller||'未分配',dNum(r.plan),dNum(r.actual),
+    .forEach(r=>rows.push([r.month,planProjName(r.project),r.seller||'未分配',planCsvNum(r.plan),planCsvNum(r.actual),
       r.srcAmt==='auto'?'自动':'手工',dNum(r.planQ),dNum(r.actualQ),r.srcQty==='auto'?'自动':'手工',r.note||'']));
-  planDownload('数据看板_月度计划与实际_'+planYear+'.csv', rows.map(r=>r.map(planCsvEsc).join(',')).join('\r\n'), true);
-  showToast('✓ 已导出 CSV（'+plan.length+' 条）','info');
+  planDownload('数据看板_月度计划与实际_'+planYear+'_人民币.csv', rows.map(r=>r.map(planCsvEsc).join(',')).join('\r\n'), true);
+  showToast('✓ 已导出 CSV（'+plan.length+' 条，金额单位人民币，汇率 1 美元≈6.8 元）','info');
 }
 function planNumFromCsv(v){ const s=String(v==null?'':v).replace(/[^0-9.\-]/g,''); const n=parseFloat(s); return isNaN(n)?0:n; }
 function planSplitCsvLine(line){
@@ -2156,20 +2302,24 @@ function handlePlanImport(){
   reader.onerror=function(){ showToast('文件读取失败，换个文件试试'); input.value=''; };
   reader.onload=function(e){
     const txt=String(e.target.result||'').replace(/^\ufeff/,'');
-    let recs=null, src='';
+    let recs=null, src='', cny=false;
     if(/\.json$/i.test(file.name) || txt.trim().charAt(0)==='[' || txt.trim().charAt(0)==='{'){
       let d=null;
       try{ d=JSON.parse(txt); }catch(err){ showToast('JSON 解析失败：'+((err&&err.message)||err)); input.value=''; return; }
       const arr = Array.isArray(d)?d:(d.plan||d.records||d.rows||null);
       if(!arr||!arr.length){ showToast('文件里没找到记录（需要 plan / records / rows 数组）'); input.value=''; return; }
+      // JSON 里声明了币种就按它来（没有就按美元原值，兼容老文件）
+      const cur=String((d&&!Array.isArray(d)&&(d.currency||d.unit))||'').toUpperCase();
+      cny = (cur==='CNY'||cur==='RMB'||cur==='¥'||txt.indexOf('人民币')>=0);
+      const toUsd=v=>cny?Math.round(cny2usd(v)*100)/100:v;
       recs=arr.map(r=>{
         const m=normMonth(r.month||r.ym||r.date)||normMonth(r['月份']);
         const pj=PLAN_PROJECTS[r.project]?r.project:(PLAN_PROJECTS[normShop(r.project||r.shop||r['项目'])]?normShop(r.project||r.shop||r['项目']):'');
         const seller=String(r.seller||r['业务员']||'').trim();
         return {
           month:m, project:pj, seller:seller,
-          plan:planNumFromCsv(r.plan!=null?r.plan:(r.revenue!=null?r.revenue:r['计划'])),
-          actual:planNumFromCsv(r.actual!=null?r.actual:(r.revenue!=null?r.revenue:r['实际'])),
+          plan:toUsd(planNumFromCsv(r.plan!=null?r.plan:(r.revenue!=null?r.revenue:r['计划']))),
+          actual:toUsd(planNumFromCsv(r.actual!=null?r.actual:(r.revenue!=null?r.revenue:r['实际']))),
           actualQ:planNumFromCsv(r.actualQ!=null?r.actualQ:(r.orders!=null?r.orders:r['实际订单数'])),
           planQ:planNumFromCsv(r.planQ!=null?r.planQ:r['计划订单数']),
           note:String(r.note||'').trim(),
@@ -2185,13 +2335,16 @@ function handlePlanImport(){
       const find=(...names)=>{ for(let i=0;i<head.length;i++){ for(let j=0;j<names.length;j++){ if(head[i].replace(/\s/g,'').indexOf(names[j])>=0) return i; } } return -1; };
       const iM=find('月份'), iP=find('项目','店铺'), iS=find('业务员','销售'), iPl=find('计划收款','计划金额','计划'), iAc=find('实际收款','实际金额','实际'), iPlQ=find('计划订单'), iAcQ=find('实际订单'), iN=find('备注');
       if(iM<0||iP<0){ showToast('CSV 缺少「月份」或「项目」列'); input.value=''; return; }
+      // 表头带 ¥ / 人民币 / CNY 就按人民币解析（÷6.8 存），否则按美元原值（兼容老文件）
+      cny = /¥|人民币|CNY|RMB/i.test(lines[0]);
+      const toUsd=v=>cny?Math.round(cny2usd(v)*100)/100:v;
       recs=[];
       lines.slice(1).forEach(line=>{
         const c=planSplitCsvLine(line);
         recs.push({
           month:normMonth(c[iM]), project:normShop(c[iP]), seller:iS>=0?String(c[iS]||'').trim():'',
-          plan:iPl>=0?planNumFromCsv(c[iPl]):0,
-          actual:iAc>=0?planNumFromCsv(c[iAc]):0,
+          plan:toUsd(iPl>=0?planNumFromCsv(c[iPl]):0),
+          actual:toUsd(iAc>=0?planNumFromCsv(c[iAc]):0),
           planQ:iPlQ>=0?planNumFromCsv(c[iPlQ]):0,
           actualQ:iAcQ>=0?planNumFromCsv(c[iAcQ]):0,
           note:iN>=0?String(c[iN]||''):'',
@@ -2199,7 +2352,7 @@ function handlePlanImport(){
           hasQty:iAcQ>=0 && String(c[iAcQ]||'').trim()!==''
         });
       });
-      src='CSV';
+      src='CSV'+(cny?'（人民币）':'（美元）');
     }
     const good=recs.filter(r=>r.month&&r.project);
     const orphan=recs.filter(r=>!(r.month&&r.project));   // 认不出月份/项目的：隔离保留，不丢
@@ -2208,6 +2361,7 @@ function handlePlanImport(){
     let msg='将导入 '+good.length+' 条记录';
     if(bad) msg+='，另有 '+bad+' 条认不出会跳过';
     const willSet=good.filter(r=>r.hasActual||r.hasQty).length;
+    msg+='（金额按'+(cny?'人民币，÷6.8 换算后入库':'美元原值入库')+'）';
     msg+=(willSet?('。其中 '+willSet+' 条带实际值，会记为「手工填写」并覆盖同名记录的自动值'):'')+'。确定导入吗？';
     showConfirm(msg,()=>{
       let add=0, upd=0;
