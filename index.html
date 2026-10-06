@@ -1244,12 +1244,15 @@ function loadData(){
   if(!Array.isArray(biz.orders)) biz.orders=[];
   if(!Array.isArray(biz.pays)) biz.pays=[];
   if(!biz.firstPay || typeof biz.firstPay!=='object') biz.firstPay={};
+  if(!biz.firstOrder || typeof biz.firstOrder!=='object') biz.firstOrder={};
   if(!biz.fixCountry || typeof biz.fixCountry!=='object') biz.fixCountry={};
   if(!Array.isArray(biz.uploads)) biz.uploads=[];
   if(!biz.chats||typeof biz.chats!=='object') biz.chats=bizChatBlank();
   if(!Array.isArray(biz.chats.files)) biz.chats.files=[];
   // 首笔收款库：载入时就并入老助版历史库（BIZ_FP_SEED），不必等导入订单
   try{ bizRebuildFirstPay(); }catch(e){}
+  // 首单库：载入时就从已导入订单里取每个(买家+业务员)的最早下单日
+  try{ bizRebuildFirstOrder(); }catch(e){}
   healDashboard();
   expHeal();
   clmHeal();
@@ -4000,7 +4003,7 @@ function asSnapshot(){
             bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
     dashboard:dashboard, expenses:light(expenses), claims:light(claims),
-    biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, fixCountry:biz.fixCountry,
+    biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded}
   };
 }
@@ -5847,13 +5850,13 @@ function seedExpSample(){
 //  国际站经营分析（v1.8）—— 纯前端解析阿里后台导出的订单/收款表
 //  口径与「国际站经营分析系统（5010）」保持一致：
 //   · 实收 = 收款明细里「交易类型=放款&收款 且 币种=USD 且 金额>0」
-//   · 新老客户 = (买家+业务员) 组合的首笔收款起 12 个月内=新客户(4%)，超过=老客户(2%)
+//   · 新老客户 = (买家+业务员) 组合，从该业务员接到该客户第一笔订单(下单日)起 12 个月内=新客户(4%)，超过=老客户(2%)；缺首单记录退回首笔收款日（2026-09-23 定版）
 //   · 提成基数 = 实收 ×(1−运费/订单总价)，算不出运费时按实收全额
 //   · 样品单 ≤ $500、大货单 > $500；大货转化率 = 大货单数 ÷ 样品单数
 //   · 目的地显示「中国」= 货代中转仓，排到最后并标「待确认」
 // ============================================================
 
-function bizBlank(){ return {orders:[], pays:[], firstPay:{}, fixCountry:{}, uploads:[], chats:null, seeded:false,
+function bizBlank(){ return {orders:[], pays:[], firstPay:{}, firstOrder:{}, fixCountry:{}, uploads:[], chats:null, seeded:false,
     fetch:{rows:[], at:'', source:'', src:'okki', shop:'all', kind:'prev', start:'', end:'', limit:200, staff:[], aliTotal:null, needSwitch:null},
     ana:{kind:'prev', start:'', end:'', at:''}, analyses:[]}; }
 let biz = bizBlank();
@@ -6200,6 +6203,19 @@ function bizRebuildFirstPay(){
   });
   biz.firstPay=fp;
 }
+// 首单库：(买家+业务员) → 该业务员接到该客户的最早一笔订单下单日（只增不减，取更早）
+// 口径（2026-09-23 李主任定）：新老客从「业务员接到该客户第一个订单」起算，一年内都是新客户订单；
+// 不是按首笔收款、也不是按客户在店铺的首单算。缺首单记录时退回首笔收款日。
+function bizRebuildFirstOrder(){
+  const fo=(biz.firstOrder&&typeof biz.firstOrder==='object')?biz.firstOrder:{};
+  (biz.orders||[]).forEach(o=>{
+    const b=String(o.buyer||'').trim(), s=String(o.sellerRaw||'').trim(), d=String(o.ts||'').slice(0,10);
+    if(!b||!s||!d||d<'2000-01-01') return;
+    const k=b+'|||'+s;
+    if(!fo[k]||d<fo[k]) fo[k]=d;
+  });
+  biz.firstOrder=fo;
+}
 async function handleBizFilePick(){
   const input=document.getElementById('bizFileInput');
   const files=Array.from(input.files||[]);
@@ -6263,6 +6279,7 @@ async function bizImportFiles(files){
     }
   }
   bizRebuildFirstPay();
+  bizRebuildFirstOrder();
   biz.uploads=biz.uploads||[];
   log.forEach(l=>biz.uploads.push({name:l.name, text:l.text, cls:l.cls, ts:Date.now()}));
   if(biz.uploads.length>60) biz.uploads=biz.uploads.slice(-60);
@@ -6308,10 +6325,13 @@ function bizLabeled(){
     const q=Object.assign({}, p);
     const k=bizCustKey(p);
     if(!k){ q.type='无法判断'; q.rate=0; q.base=0; q.comm=0; q.why='缺买家或业务员，无法判定'; out.push(q); return; }
-    const first=biz.firstPay[k]||day;
+    const fo=(biz.firstOrder||{})[k], fpd=biz.firstPay[k];
+    // 起点取「首单日」；若首单记录反常地晚于首笔收款（订单数据不全），取更早者防误判
+    const first=(fo&&fpd)?(fo<fpd?fo:fpd):(fo||fpd||day);
+    const src=(fo&&(!fpd||fo<=fpd))?'首单日':(fo?'首款日（早于首单记录，取更早）':(fpd?'首款日（缺首单记录）':'本期首见'));
     const months=bizMonthDiff(first, day);
-    if(months<12){ q.type='新客户'; q.rate=0.04; q.why='首款日 '+first+'，距今 '+months+' 个月'+(months===0&&first===day?'（本期首次成交）':''); }
-    else { q.type='老客户'; q.rate=0.02; q.why='首款日 '+first+'，已满 12 个月'; }
+    if(months<12){ q.type='新客户'; q.rate=0.04; q.why=src+' '+first+'，距今 '+months+' 个月'+(months===0&&first===day?'（本期首次成交）':''); }
+    else { q.type='老客户'; q.rate=0.02; q.why=src+' '+first+'，已满 12 个月'; }
     const pay=bizNum(p.amount), oAmt=bizNum(p.orderAmount), ship=bizNum(p.shipping);
     let base=pay;
     if(oAmt>0 && ship>0) base=pay*(1-ship/oAmt);
@@ -7343,7 +7363,7 @@ function bizFetchMerge(){
       paid:r.paid, paidFirst:r.paidFirst, paidLast:r.paidLast, first:r.first, fromCrm:1});
     add++;
   });
-  if(add){ saveAll(); renderBiz(); }
+  if(add){ saveAll(); bizRebuildFirstOrder(); renderBiz(); }
   let msg='已导入 '+add+' 笔订单到经营分析';
   if(skip) msg+='，跳过重复 '+skip+' 笔';
   if(forced) msg+='，'+forced+' 笔按所选店铺「'+bizShopName(target)+'」归属';
@@ -7371,7 +7391,7 @@ function bizFetchMergeAli(f){
       first:(r.isOld?'否':'是'), fromAli:1, aliTags:(r.tags||[]) });
     add++;
   });
-  if(add){ saveAll(); renderBiz(); }
+  if(add){ saveAll(); bizRebuildFirstOrder(); renderBiz(); }
   let msg='已从阿里后台导入 '+add+' 笔订单（含真实收款）';
   if(skip) msg+='，跳过重复/无单号 '+skip+' 笔';
   showToast(msg, add?'info':'');
@@ -7419,7 +7439,7 @@ function bizAnaCustom(){
 function bizAnaSnap(bd){
   const inR=d=>{ const x=String(d||'').slice(0,10); if(!x) return true; if(bd.start&&x<bd.start) return false; if(bd.end&&x>bd.end) return false; return true; };
   const snap={pays:(biz.pays||[]).filter(p=>inR(p.ts)), orders:(biz.orders||[]).filter(o=>inR(o.ts)),
-              firstPay:biz.firstPay||{}, fixCountry:biz.fixCountry||{}};
+              firstPay:biz.firstPay||{}, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry||{}};
   try{ if(JSON.stringify(snap).length>400000) return null; }catch(e){ return null; }
   return snap;
 }
@@ -7511,15 +7531,15 @@ function bizAnaDown(id){
   try{
     let blob=null;
     if(rec.snap){
-      const ko=biz.orders, kp=biz.pays, kf=biz.firstPay, kc=biz.fixCountry;
+      const ko=biz.orders, kp=biz.pays, kf=biz.firstPay, kfo=biz.firstOrder, kc=biz.fixCountry;
       const kk=bizRange.kind, ks=bizRange.start, ke=bizRange.end;
       try{
         biz.orders=rec.snap.orders||[]; biz.pays=rec.snap.pays||[];
-        biz.firstPay=rec.snap.firstPay||{}; biz.fixCountry=rec.snap.fixCountry||{};
+        biz.firstPay=rec.snap.firstPay||{}; biz.firstOrder=rec.snap.firstOrder||{}; biz.fixCountry=rec.snap.fixCountry||{};
         bizRange.kind='custom'; bizRange.start=rec.start; bizRange.end=rec.end;
         blob=zipStore(bizBuildXlsx(bizExportSheets()));
       }finally{
-        biz.orders=ko; biz.pays=kp; biz.firstPay=kf; biz.fixCountry=kc;
+        biz.orders=ko; biz.pays=kp; biz.firstPay=kf; biz.firstOrder=kfo; biz.fixCountry=kc;
         bizRange.kind=kk; bizRange.start=ks; bizRange.end=ke;
       }
     } else {
@@ -7711,7 +7731,7 @@ function renderBiz(){
   if(det.length>bizDetail.limit){
     h+='<div style="text-align:center;margin-top:10px"><button class="btn" onclick="bizMoreDetail()">显示更多（还有 '+(det.length-bizDetail.limit)+' 笔）</button></div>';
   }
-  h+='<div class="biz-note">只显示最近 '+Math.min(bizDetail.limit,det.length)+' 笔，导出会有全部。新老客户判定单位=(买家+业务员)，以首笔收款起 12 个月为界。'
+  h+='<div class="biz-note">只显示最近 '+Math.min(bizDetail.limit,det.length)+' 笔，导出会有全部。新老客户判定单位=(买家+业务员)，从该业务员接到该客户第一笔订单起 12 个月为界（缺首单记录按首笔收款推算）。'
     +'底色：<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(59,130,246,.35);vertical-align:-1px"></span> 新客户 · '
     +'<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(16,185,129,.35);vertical-align:-1px"></span> 老客户 · 无底色=无法判断。</div></div>';
 
@@ -8014,8 +8034,8 @@ function bizExportSheets(){
   s1.push([t('新客收汇贡献占比'), n(lg.amount?lg.newAmt/lg.amount:0,BIZ_XL_ST.pct2), n(fs.amount?fs.newAmt/fs.amount:0,BIZ_XL_ST.pct2), n(s.newRatio,BIZ_XL_ST.pct2), t('新客户实收金额 ÷ 总实收金额')]);
   s1.push([t('大货订单贡献占比'), n(lg.amount?lg.bulkAmt/lg.amount:0,BIZ_XL_ST.pct2), n(fs.amount?fs.bulkAmt/fs.amount:0,BIZ_XL_ST.pct2), n(s.bulkRatio,BIZ_XL_ST.pct2), t('大货收款金额 ÷ 总实收金额')]);
   s1.push([t('前3客户收汇集中度'), n(lg.top3,BIZ_XL_ST.pct2), n(fs.top3,BIZ_XL_ST.pct2), n(s.top3,BIZ_XL_ST.pct2), t('前3客户贡献金额 ÷ 总实收金额，越高说明依赖越集中')]);
-  s1.push([t('实收覆盖新客户数'), n(lg.newCustN), n(fs.newCustN), n(s.newCustN), t('判定为首笔收款12个月内的成交客户数')]);
-  s1.push([t('实收覆盖老客户数'), n(lg.oldCustN), n(fs.oldCustN), n(s.oldCustN), t('判定为首笔收款超过12个月的成交客户数')]);
+  s1.push([t('实收覆盖新客户数'), n(lg.newCustN), n(fs.newCustN), n(s.newCustN), t('判定为该业务员首单12个月内的成交客户数')]);
+  s1.push([t('实收覆盖老客户数'), n(lg.oldCustN), n(fs.oldCustN), n(s.oldCustN), t('判定为该业务员首单超过12个月的成交客户数')]);
   s1.push([]);
   s1.push([t('  二、订单金额结构分析', BIZ_XL_ST.sec)]);
   s1.push(['订单金额带','朗格斯订单数','凡适订单数','双店合计','结构解读'].map(v=>t(v,BIZ_XL_ST.head)));
@@ -8057,7 +8077,7 @@ function bizExportSheets(){
     {v:money(s.base),s:BIZ_XL_ST.totalN},{v:null,s:BIZ_XL_ST.totalT},{v:null,s:BIZ_XL_ST.totalT},{v:money(s.comm),s:BIZ_XL_ST.totalN},{v:null,s:BIZ_XL_ST.totalT}]);
   s2.push([]);
   const note2Row=s2.length+1;
-  s2.push([t('注：本表按实际到账时间（收款时间）排序与归期，不以订单下单时间为准。整行底色区分客户身份——淡蓝色行 = 新客户（提成 4%）、淡绿色行 = 老客户（提成 2%）；无底色行表示缺买家或业务员，身份无法判断，提成计 0。', BIZ_XL_ST.note)]);
+  s2.push([t('注：本表按实际到账时间（收款时间）排序与归期，不以订单下单时间为准。新老客户判定：以「该业务员接到该客户的第一笔订单」起 12 个月为界，一年内都算新客户订单（判定依据列的「首单日」即该起点；个别缺首单记录的按首笔收款日推算）。整行底色区分客户身份——淡蓝色行 = 新客户（提成 4%）、淡绿色行 = 老客户（提成 2%）；无底色行表示缺买家或业务员，身份无法判断，提成计 0。', BIZ_XL_ST.note)]);
   sheets.push({name:'👥 收款及提成明细', data:s2, widths:[9,20,19,9,12,14,12,11,14,9,null,12,32],
     merges:['A1:M1','A'+subRowLast+':D'+subRowLast,'A'+note2Row+':M'+note2Row], freeze:2});
 
