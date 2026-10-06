@@ -866,7 +866,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.9 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.10 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -1290,8 +1290,15 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
       <button class="btn btn-ghost" id="btnAsSyncNow" style="flex:1 1 46%;justify-content:center">立即同步一次</button>
-      <button class="btn btn-ghost" id="btnAsRestore" style="flex:1 1 46%;justify-content:center">从云端恢复</button>
+      <button class="btn btn-ghost" id="btnAsRestore" style="flex:1 1 46%;justify-content:center">从云端恢复（合并）</button>
     </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+      <button class="btn btn-ghost" id="btnAsUndo" style="flex:1 1 100%;justify-content:center">⏪ 回退到上次恢复/同步前</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:6px" id="asSnapHint"></p>
+    <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">
+      「恢复」和「接收同步」都是<b>合并式（只增不减）</b>：本机已有、对方没有的记录一律保留，不会再把新登记的内容抹掉。
+    </p>
     <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">
       本地资料包由「自动同步存档」计划任务每 15 分钟自动拉取一次，路径：D:\BaiduSyncdisk\工作文件\自研软件\办公平台
     </p>
@@ -1321,7 +1328,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.9';
+const APP_VERSION = 'v2.10';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4648,52 +4655,10 @@ async function doSyncReceive(){
   const curTotal = totalItems();
   const syncTime = received.syncedAt ? new Date(received.syncedAt).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
 
-  showConfirm('已接收 '+newTotal+' 条数据'+(curTotal>0?'（当前 '+curTotal+' 条将被覆盖）':'')+(syncTime?'\n数据同步时间：'+syncTime:'')+'，确认导入？', ()=>{
-    // 附件只存本机不随同步传输：导入时保留本机已有任务/项目的附件，避免丢失
-    tasks = (received.tasks||[]).map(rt=>{
-      const local = tasks.find(t=>t.id===rt.id);
-      if(local && local.files && local.files.length) rt.files = local.files;
-      return rt;
-    });
-    notes = (received.notes||[]).map(rn=>{
-      const local = notes.find(n=>n.id===rn.id);
-      if(local && local.files && local.files.length) rn.files = local.files;
-      return rn;
-    });
-    projects = (received.projects||[]).map(rp=>{
-      const local = projects.find(p=>p.id===rp.id);
-      if(local && local.files && local.files.length) rp.files = local.files;
-      return rp;
-    });
-    // 看板数据：对方的数据包里有这个字段才覆盖；对方是旧版本上传的（没这个字段）则保留本机数据
-    if(Object.prototype.hasOwnProperty.call(received,'dashboard')) dashboard = received.dashboard || [];
-    // 数据看板（月度计划/实际）：对方有这字段才覆盖，旧版本数据包没有则保留本机
-    if(Object.prototype.hasOwnProperty.call(received,'plan')) plan = received.plan || [];
-    // 报账数据：对方有这字段才覆盖；旧版本数据包没有则保留本机（同样保留本机发票）
-    if(Object.prototype.hasOwnProperty.call(received,'expenses')){
-      expenses = (received.expenses||[]).map(re=>{
-        const local = expenses.find(x=>x.id===re.id);
-        if(local && local.files && local.files.length) re.files = local.files;
-        else re.files = re.files || [];
-        return re;
-      });
-    }
-    // 货损客诉：同报账逻辑，旧包没有这字段则保留本机（含本机附件）
-    if(Object.prototype.hasOwnProperty.call(received,'claims')){
-      claims = (received.claims||[]).map(rc=>{
-        const local = claims.find(x=>x.id===rc.id);
-        if(local && local.files && local.files.length) rc.files = local.files;
-        else rc.files = rc.files || [];
-        return rc;
-      });
-    }
-    // 经营分析：旧包没有这字段则保留本机（本机已导入的订单/收款表不能丢）
-    if(Object.prototype.hasOwnProperty.call(received,'biz') && received.biz && typeof received.biz==='object'){
-      biz = Object.assign(bizBlank(), received.biz);
-    }
-    saveAll();
+  showConfirm('已接收 '+newTotal+' 条数据'+(curTotal>0?('（将与本机当前 '+curTotal+' 条【合并】，只增不减）'):'')+(syncTime?'\n数据同步时间：'+syncTime:'')+'\n合并前会自动给本机留一份快照，随时可回退。确认？', ()=>{
+    const st = applyIncoming(received, '设备同步前');
     refreshAll();
-    showToast('✓ 同步成功！已导入 '+newTotal+' 条数据', 'info');
+    showToast('✓ 同步成功！已合并 '+newTotal+' 条，本机独有 '+st.kept+' 条已保留', 'info');
   });
 }
 
@@ -4911,6 +4876,134 @@ function jsonCaseDedupe(v,seen){
   Object.keys(v).forEach(k=>{ v[k]=jsonCaseDedupe(v[k],seen); });
   return v;
 }
+/* ===== v2.10：云端恢复 / 设备同步改成「合并 · 只增不减」，并在操作前自动留本机快照 =====
+   背景（2026-10-06 真实教训）：以前这两个动作是"整包覆盖本机"，本机刚登记、还没上传的记录
+   会被云端旧数据直接抹掉（事后查云端 100 多个历史版本都找不到那笔报账）。
+   现在改成按 id 合并：对方有的照收，本机独有的全部保留。 */
+function syncMergeById(localArr, incomingArr, kind){
+  const local = Array.isArray(localArr) ? localArr.slice() : [];
+  const incoming = Array.isArray(incomingArr) ? incomingArr.slice() : [];
+  const byId = {}, list = [], used = {};
+  local.forEach(r=>{ if(r && r.id) byId[r.id] = r; });
+  let incomingNew = 0, updated = 0, keepLocal = 0;
+  incoming.forEach(r=>{
+    if(!r || !r.id) return;
+    const old = byId[r.id];
+    if(!old){ byId[r.id] = r; list.push(r); used[r.id] = 1; incomingNew++; return; }
+    const m = Object.assign({}, old, r);
+    if(old.files && old.files.length) m.files = old.files;                 // 附件只存本机，以本机为准
+    else if(r.files && r.files.length) m.files = r.files.filter(f=>f && f.path);
+    if((kind === 'expense' || kind === 'claim') && old.filed && !r.filed){ // 「已报账」状态不可逆
+      m.filed = true; if(old.filedAt) m.filedAt = old.filedAt;
+    }
+    byId[r.id] = m; list.push(m); used[r.id] = 1; updated++;
+  });
+  local.forEach(r=>{
+    if(!r) return;
+    if(!r.id){ list.push(r); return; }              // 没有 id 的也一并保留
+    if(!used[r.id]){ list.push(r); keepLocal++; }
+  });
+  return {list:list, incomingNew:incomingNew, updated:updated, keepLocal:keepLocal};
+}
+// 并集去重（订单/收款流水这类没有统一 id 的数组）：按整条内容比较，只增不减
+function syncUnion(localArr, incomingArr){
+  const local = Array.isArray(localArr) ? localArr : [];
+  const incoming = Array.isArray(incomingArr) ? incomingArr : [];
+  const seen = {}, out = [];
+  const push = (r)=>{
+    if(r === undefined || r === null) return;
+    let k; try{ k = JSON.stringify(r); }catch(e){ k = String(r); }
+    if(seen[k]) return;
+    seen[k] = 1; out.push(r);
+  };
+  local.forEach(push);
+  const before = out.length;
+  incoming.forEach(push);
+  return {list:out, added:out.length - before};
+}
+// 键值对合并（总计划 / 国家修正表等）：对方为主，本机独有的键保留
+function syncMergeMap(localMap, incomingMap){
+  const out = Object.assign({}, localMap || {});
+  Object.keys(incomingMap || {}).forEach(k=>{ out[k] = incomingMap[k]; });
+  return out;
+}
+// 执行「恢复 / 同步」前，先给本机数据留一份快照（附件只留索引，不占空间）
+function localSnapSave(tag){
+  try{
+    const strip = arr => (arr||[]).map(r=>{
+      const c = Object.assign({}, r);
+      if(c.files && c.files.length) c.files = c.files.map(f=>({name:(f&&f.name)||'', type:(f&&f.type)||'', size:(f&&f.size)||0, path:(f&&f.path)||''}));
+      return c;
+    });
+    const snap = {at:Date.now(), tag:String(tag||''), ver:APP_VERSION,
+      tasks:strip(tasks), notes:strip(notes), projects:strip(projects), dashboard:dashboard,
+      plan:plan, planGoals:planGoals, expenses:strip(expenses), claims:strip(claims)};
+    localStorage.setItem(STORAGE_PREFIX+'pre_restore', JSON.stringify(snap));
+    return true;
+  }catch(e){ return false; }
+}
+function localSnapGet(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_PREFIX+'pre_restore') || 'null'); }catch(e){ return null; }
+}
+function localSnapInfo(){
+  const s = localSnapGet();
+  if(!s) return null;
+  const n = (s.tasks||[]).length + (s.notes||[]).length + (s.projects||[]).length + (s.dashboard||[]).length
+          + (s.plan||[]).length + Object.keys(s.planGoals||{}).length + (s.expenses||[]).length + (s.claims||[]).length;
+  return {at:s.at, tag:s.tag, n:n};
+}
+// 把一份「外来数据」（云端快照 / 另一台设备的同步包 / 本机快照）合并进本机，只增不减
+function applyIncoming(data, label){
+  const stat = {kept:0, newFromIncoming:0, bizAdded:0, snap:false};
+  if(label) stat.snap = localSnapSave(label);
+  const arr = (key, kind, getter, setter)=>{
+    if(!data || !Object.prototype.hasOwnProperty.call(data, key)) return;
+    const r = syncMergeById(getter(), data[key] || [], kind);
+    setter(r.list);
+    stat.kept += r.keepLocal;
+    stat.newFromIncoming += r.incomingNew;
+  };
+  arr('tasks','task', ()=>tasks, v=>{tasks=v;});
+  arr('notes','note', ()=>notes, v=>{notes=v;});
+  arr('projects','project', ()=>projects, v=>{projects=v;});
+  arr('dashboard','dash', ()=>dashboard, v=>{dashboard=v;});
+  arr('plan','plan', ()=>plan, v=>{plan=v;});
+  arr('expenses','expense', ()=>expenses, v=>{expenses=v;});
+  arr('claims','claim', ()=>claims, v=>{claims=v;});
+  if(data && data.planGoals && typeof data.planGoals === 'object') planGoals = syncMergeMap(planGoals, data.planGoals);
+  if(data && data.biz && typeof data.biz === 'object'){
+    const ib = data.biz, lb = biz;
+    const u1 = syncUnion(lb.orders, ib.orders), u2 = syncUnion(lb.pays, ib.pays);
+    biz.orders = u1.list; biz.pays = u2.list;
+    biz.firstPay   = jsonMergeDeep(lb.firstPay || {}, ib.firstPay || {});     // 同键取更早那天
+    biz.firstOrder = jsonMergeDeep(lb.firstOrder || {}, ib.firstOrder || {});
+    biz.fixCountry = Object.assign({}, ib.fixCountry || {}, lb.fixCountry || {});
+    biz.uploads  = syncUnion((lb.uploads||[]).slice(-40), ib.uploads || []).list;
+    biz.analyses = syncUnion(lb.analyses, ib.analyses).list;
+    biz.seeded = !!(lb.seeded || ib.seeded);
+    const lc = lb.chats ? JSON.stringify(lb.chats).length : 0;
+    const ic = ib.chats ? JSON.stringify(ib.chats).length : 0;
+    biz.chats = ic > lc ? ib.chats : (lb.chats || ib.chats || null);
+    if(ib.fetch && typeof ib.fetch === 'object' && ((ib.fetch.rows||[]).length > (((lb.fetch&&lb.fetch.rows)||[]).length))) biz.fetch = ib.fetch;
+    if(ib.ana && typeof ib.ana === 'object') biz.ana = Object.assign({}, ib.ana, lb.ana || {});
+    stat.bizAdded = u1.added + u2.added;
+  }
+  saveAll();
+  return stat;
+}
+// 一键回退到上次「恢复 / 同步」之前（同样只增不减，不会删掉现在的记录）
+function localSnapRestore(){
+  const s = localSnapGet();
+  if(!s){ showToast('本机还没有可回退的快照（执行过一次云端恢复或设备同步后才会生成）'); return; }
+  const info = localSnapInfo();
+  showConfirm('把本机数据回退到「' + (s.tag || '上次同步前') + '」那一刻吗？\n' +
+    new Date(s.at).toLocaleString('zh-CN') + ' · 共 ' + info.n + ' 条\n' +
+    '（只增不减：现在有的记录不会被删掉）', ()=>{
+    const st = applyIncoming(s, '');
+    refreshAll();
+    showToast('✓ 已回退并合并（补回本机独有 ' + st.kept + ' 条）', 'info');
+  });
+}
 function asSnapshot(){
   const cfg = getAsCfg();
   const light = (arr)=>{
@@ -5058,32 +5151,14 @@ async function asRestore(){
     const n = (data.tasks||[]).length + (data.notes||[]).length + (data.projects||[]).length + (data.dashboard||[]).length + (data.expenses||[]).length + (data.claims||[]).length;
     const when = data.savedAt ? new Date(data.savedAt).toLocaleString('zh-CN') : '';
     showConfirm('云端存档共 ' + n + ' 条内容' + (when?('（'+when+'）'):'') +
-      '\n将覆盖本机当前 ' + totalItems() + ' 条数据，本机已有附件不会丢失。确定恢复吗？', async ()=>{
-      const mergeFiles = (localArr, incoming)=>{
-        return (incoming||[]).map(it=>{
-          const local = localArr.find(x=>x.id===it.id);
-          if(local && local.files && local.files.length){ it.files = local.files; }
-          else if(it.files && it.files.length){
-            it.files = it.files.filter(f=>f && f.path);
-          } else { it.files = it.files || []; }
-          return it;
-        });
-      };
-      tasks    = mergeFiles(tasks, data.tasks);
-      notes    = mergeFiles(notes, data.notes);
-      projects = mergeFiles(projects, data.projects);
-      // 报账数据：旧版快照里没有这个字段 → 保留本机，不能清空
-      if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = mergeFiles(expenses, data.expenses);
-      // 货损客诉：同报账逻辑
-      if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = mergeFiles(claims, data.claims);
-      if(Object.prototype.hasOwnProperty.call(data,'dashboard')) dashboard = data.dashboard || [];
-      if(Object.prototype.hasOwnProperty.call(data,'plan')) plan = data.plan || [];
-      if(Object.prototype.hasOwnProperty.call(data,'planGoals') && data.planGoals && typeof data.planGoals==='object') planGoals = data.planGoals;
-      saveAll(); refreshAll();
-      showToast('✓ 已恢复 ' + n + ' 条内容，正在补齐附件...', 'info');
+      '\n将与本机当前 ' + totalItems() + ' 条数据【合并】（只增不减）：本机已有、云端没有的记录一律保留。\n' +
+      '合并前会自动给本机留一份快照，随时可一键回退。确认合并吗？', async ()=>{
+      const st = applyIncoming(data, '从云端恢复前');
+      refreshAll();
+      showToast('✓ 已合并云端存档（本机独有 '+st.kept+' 条已保留，正在补齐附件…）', 'info');
       await asPullAttachments();
       saveAll(); refreshAll();
-      showToast('✓ 云端存档恢复完成', 'info');
+      showToast('✓ 云端存档合并完成（本机独有 '+st.kept+' 条未被覆盖）', 'info');
     });
   }catch(e){
     showToast('读取云端存档失败：' + ((e && e.message) || e));
@@ -5146,6 +5221,13 @@ function asRenderStatus(state){
     } else {
       el.innerHTML = '<span class="wait">等待首次同步…</span>';
     }
+    const sh = document.getElementById('asSnapHint');
+    if(sh){
+      const si = localSnapInfo();
+      sh.innerHTML = si
+        ? ('本机快照：' + new Date(si.at).toLocaleString('zh-CN') + ' · ' + si.n + ' 条（' + escHtml(si.tag || '') + '）')
+        : '本机快照：暂无（执行过一次「恢复 / 接收同步」后自动生成，可用于回退）';
+    }
   }catch(e){}
 }
 
@@ -5172,6 +5254,10 @@ document.getElementById('asToken').addEventListener('blur', function(){
 });
 document.getElementById('btnAsSyncNow').addEventListener('click', ()=>{ asRun(true); });
 document.getElementById('btnAsRestore').addEventListener('click', ()=>{ asRestore(); });
+(function(){
+  const bu = document.getElementById('btnAsUndo');
+  if(bu) bu.addEventListener('click', ()=>{ localSnapRestore(); });
+})();
 
 // ---- 触发时机 ----
 document.addEventListener('visibilitychange', ()=>{
