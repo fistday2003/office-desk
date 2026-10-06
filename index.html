@@ -221,6 +221,46 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-pjgrid div b{font-size:13px;font-weight:700}
 .plan-pjrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-secondary);padding:3px 0;border-top:1px dashed var(--border)}
 @media (max-width:768px){.plan-pjgrid{grid-template-columns:repeat(2,1fr)}}
+/* ===== v2.7：字号放大 + 项目上下分屏 + 手填总计划 ===== */
+.plan-blk{margin-bottom:20px}
+.plan-blk:last-child{margin-bottom:0}
+.plan-blk-head{display:flex;align-items:center;gap:9px;margin:0 0 9px;flex-wrap:wrap}
+.plan-blk-name{font-size:15.5px;font-weight:700;padding:3px 11px;border-radius:7px;letter-spacing:.3px}
+.plan-blk-name.lg{background:#e0f2fe;color:#0369a1}
+.plan-blk-name.fs{background:#fef3c7;color:#b45309}
+.plan-blk-name.all{background:#e2e8f0;color:#334155}
+.plan-blk-sub{font-size:12.5px;color:var(--text-muted)}
+.plan-tbl{font-size:15px}
+.plan-tbl th{font-size:13px;padding:10px 10px}
+.plan-tbl td.mth{font-size:15px;padding:11px 13px}
+.plan-cell{padding:10px 12px;min-height:58px}
+.plan-cv{font-size:16.5px}
+.plan-cs{font-size:12.5px;margin-top:2px}
+.plan-bdg{font-size:11px;line-height:17px;padding:0 5px;border-radius:5px}
+.plan-bdg.goal{background:#DCFCE7;color:#15803d}
+.plan-totcell{padding:10px 12px;min-height:58px;border-left:3px solid transparent}
+.plan-totcell .plan-cv{font-size:16.5px}
+.plan-totcell .plan-cs{font-size:12.5px}
+.plan-totcell strong,.plan-totcell.strong .plan-cv{font-size:17px}
+.plan-totcell.goal{cursor:pointer}
+.plan-totcell.goal:hover{filter:brightness(.97)}
+.plan-totcell.hasgo{background:#F7FEF9;border-left-color:#22c55e}
+.plan-totcell .plan-df{font-size:12.5px}
+.plan-mini{height:5px;margin-top:6px}
+.plan-legend{font-size:12.5px}
+.plan-legend .plan-bdg{margin-right:2px}
+.plan-pjgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plan-pjcard-goal{cursor:pointer;transition:box-shadow .18s,border-color .18s}
+.plan-pjcard-goal:hover{border-color:#22c55e;box-shadow:0 2px 10px rgba(34,197,94,.15)}
+.plan-pjcard .tagon{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:#dcfce7;color:#15803d}
+.plan-pjgrid div span{font-size:11.5px}
+.plan-pjgrid div b{font-size:14.5px}
+.plan-pjrow{font-size:12.5px}
+.dash-metric-click{cursor:pointer}
+.dash-metric-click:hover{border-color:#22c55e}
+@media (max-width:768px){
+  .plan-pjgrid3{grid-template-columns:1fr}
+}
 .plan-mcard{display:none}
 .plan-mitem{border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-bottom:10px}
 .plan-mrow{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--border)}
@@ -824,7 +864,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.6 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.7 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -914,7 +954,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         </div>
         <span class="dm-sub" id="planSyncHint"></span>
       </div>
-      <p class="section-subtitle">按「<b>项目 × 业务员 × 月份</b>」跟踪<b>计划金额</b>与<b>实际金额</b>（<b>金额统一按人民币 ¥ 显示</b>，按 1 美元 ≈ 6.8 元估算）。表格带<b>月合计 / 季度合计 / 年合计 / 项目合计</b>。实际金额可从「经营分析」的收款流水一键抓取，也可以手工填写——底色和角标会区分来源（⚡ 自动 / ✎ 手工）。<b>点表格里任意格子即可修改</b>。</p>
+      <p class="section-subtitle">按「<b>项目 × 业务员 × 月份</b>」跟踪<b>计划金额</b>与<b>实际金额</b>（<b>金额统一按人民币 ¥ 显示</b>，按 1 美元 ≈ 6.8 元估算）。表格分<b>朗格斯 / 凡适 / 全公司总览</b>三块上下排列，带<b>月合计 / 季度合计 / 年合计 / 项目合计</b>。<br><b>计划口径</b>：月 / 季度 / 年度 / 项目 / 全公司的计划都是<b>手填总数</b>（格子里带「总」标记，点一下就能填，不会把个人计划累加成总数）；<b>实际完成永远是相关人员相加</b>。实际金额可从「经营分析」的收款流水一键抓取，也可以手工填写——底色和角标区分来源（⚡ 自动 / ✎ 手工）。</p>
       <div id="dashContent"></div>
       <input type="file" id="planImportInput" accept=".json,.csv,.txt" style="display:none" onchange="handlePlanImport()">
     </div>
@@ -1198,6 +1238,24 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
   </div>
 </div>
 
+<div class="modal-overlay" id="modalGoal" style="display:none">
+  <div class="modal">
+    <h3 id="modalGoalTitle">填写总计划</h3>
+    <div id="planGoalScope" style="font-size:12.5px;color:var(--text-secondary);background:var(--bg);border:1px dashed var(--border);border-radius:8px;padding:9px 11px;margin-bottom:12px;line-height:1.8"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 150px"><label>总计划金额（¥ 人民币）</label><input type="number" id="goalAmt" placeholder="例如 500000" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>总计划订单数（笔）</label><input type="number" id="goalQty" placeholder="例如 300" inputmode="numeric"></div>
+    </div>
+    <div id="goalActualHint" style="font-size:12px;color:var(--text-secondary);line-height:1.8;background:var(--bg);border:1px dashed var(--border);border-radius:8px;padding:9px 11px;margin-bottom:12px"></div>
+    <div class="form-group"><label>备注（可空）</label><input type="text" id="goalNote" placeholder="例如：公司下达目标 / 含新店预算"></div>
+    <div class="modal-actions">
+      <button class="btn" id="btnGoalDel" style="margin-right:auto;color:var(--danger);display:none">清除这项总计划</button>
+      <button class="btn" id="btnGoalCancel">取消</button>
+      <button class="btn btn-primary" id="btnGoalSave">保存总计划</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalSyncSetup" style="display:none">
   <div class="modal">
     <h3 id="syncSetupTitle">设置同步名称</h3>
@@ -1261,13 +1319,14 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.6';
+const APP_VERSION = 'v2.7';
 let tasks = [];
 let notes = [];
 let projects = [];
 let expenses = [];
 let claims = [];   // 货损 / 客诉登记
 let plan = [];     // 数据看板：月度销售计划 / 实际完成（项目×业务员×月份）
+let planGoals = {};     // 数据看板：手填「总计划」（月/季/年 × 项目），与个人计划分开存
 let planOrphans = [];   // 隔离区：认不出项目/月份的看板记录（只隔离不删除）
 let currentTab = 'tasks';
 let editingId = null;
@@ -1309,6 +1368,8 @@ function loadData(){
   projects  = rdStore('projects', [], true);
   dashboard = rdStore('dashboard', [], true);
   plan      = rdStore('plan', [], true);      // 新版数据看板：月度计划/实际
+  planGoals = rdStore('plan_goals', {}, false); // 新版数据看板：手填总计划（月/季/年/项目）
+  if(!planGoals || typeof planGoals!=='object' || Array.isArray(planGoals)) planGoals={};
   expenses  = rdStore('expenses', [], true);
   claims    = rdStore('claims', [], true);
   dashOrphans = rdStore('dash_orphan', [], true);
@@ -1405,6 +1466,7 @@ function saveAll(){
     localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(projects));
     localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
     localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
+    localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
     localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(expenses));
     localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(claims));
     localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
@@ -1449,7 +1511,7 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + expenses.length + claims.length + biz.orders.length + biz.pays.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + claims.length + biz.orders.length + biz.pays.length}
 
 // Check if sample data exists
 function hasSampleData(){
@@ -1554,21 +1616,62 @@ function normMonth(v){
 
 const PLAN_PROJECTS = {langges:{name:'朗格斯',tag:'lg'}, fansi:{name:'凡适',tag:'fs'}};
 const PLAN_PROJECT_KEYS = ['langges','fansi'];
-const PLAN_SELLERS_BASE = ['陈曦','孟伊','李雪洋','乔萌萌','周文怡','Shirley Li','王梦莹'];
+const PLAN_SELLERS_BASE = ['陈曦','孟伊','李雪洋','乔萌萌','周文怡','王梦莹'];
+// 剔除名单（大小写不敏感）：这些人的数据不进看板（记录移入隔离区，不删除，可随时恢复）
+const PLAN_EXCLUDE_SELLERS = ['shirley li'];
+function planSellerExcluded(s){
+  const n=String(s==null?'':s).trim().toLowerCase();
+  return !!n && PLAN_EXCLUDE_SELLERS.indexOf(n)>=0;
+}
 const PLAN_METRICS = [{key:'amt',label:'收款额'},{key:'qty',label:'订单数'},{key:'rate',label:'完成率'}];
 // 季度分组（1~3 月=一季度 …），用于「季度合计」行
 const PLAN_QUARTERS = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]];
 const PLAN_QNAME = ['一季度','二季度','三季度','四季度'];
 const PLAN_COLOR = ['#0891b2','#f59e0b','#8b5cf6','#10b981','#ef4444','#3b82f6','#ec4899','#14b8a6','#f97316','#6366f1'];
 // 预置「实际完成」：真实收款流水汇总（2024-07 ~ 2026-08，741 笔），格式 月份|项目|业务员|金额|笔数
-const PLAN_SEED_RAW = '2024-07|langges|bella bella|311|4;2024-08|langges|mia mia|196|1;2024-11|langges|Shirley Li|90|1;2024-11|langges|bella bella|80|1;2024-11|langges|陈曦|95|1;2024-12|langges|Shirley Li|265|2;2024-12|langges|bella bella|456.7|3;2025-01|langges|Shirley Li|2696.2|8;2025-01|langges|bella bella|130|1;2025-02|langges|Molly Yang|148|1;2025-02|langges|Shirley Li|7427.16|12;2025-02|langges|bella bella|395|2;2025-03|langges|Aria Wang|138|1;2025-03|langges|Molly Yang|2473|3;2025-03|langges|Shirley Li|6590.62|9;2025-03|langges|bella bella|120|1;2025-04|langges|Aria Wang|41.94|1;2025-04|langges|Hannah|109|1;2025-04|langges|Molly Yang|504.2|2;2025-04|langges|Natiya Jin|560|5;2025-04|langges|Shirley Li|9592.18|16;2025-04|langges|bella bella|580|1;2025-05|langges|Aria Wang|1301.54|3;2025-05|langges|Hannah|366|1;2025-05|langges|Shirley Li|2946.55|6;2025-05|langges|bella bella|110|1;2025-05|langges|王梦莹|806.05|1;2025-06|langges|Hannah|405|2;2025-06|langges|未分配|373.45|3;2025-06|langges|王梦莹|130|2;2025-07|langges|Hannah|2496.8|6;2025-07|langges|未分配|86.45|1;2025-07|langges|王梦莹|1658.5|10;2025-08|langges|Hannah|4215.81|8;2025-08|langges|王梦莹|1500|3;2025-09|langges|Hannah|1096.56|6;2025-09|langges|未分配|86.42|3;2025-09|langges|王梦莹|7963.82|21;2025-10|langges|Hannah|3640.5|4;2025-10|langges|未分配|216.19|2;2025-10|langges|王梦莹|4522|9;2025-11|langges|Hannah|4659.5|10;2025-11|langges|王梦莹|10487.5|22;2025-12|langges|Hannah|195|2;2025-12|langges|王梦莹|31592.5|15;2025-12|langges|陈曦|580|5;2026-01|fansi|乔萌萌|420|3;2026-01|langges|孟伊|316|3;2026-01|langges|王梦莹|9517.51|15;2026-01|langges|陈曦|5352.5|20;2026-02|fansi|乔萌萌|628|5;2026-02|langges|孟伊|1802|6;2026-02|langges|王梦莹|464.98|5;2026-02|langges|陈曦|6631.41|10;2026-03|fansi|乔萌萌|3724.5|9;2026-03|langges|孟伊|3478|16;2026-03|langges|王梦莹|4167|15;2026-03|langges|陈曦|8776.94|28;2026-04|fansi|乔萌萌|4002|10;2026-04|langges|孟伊|11158.1|13;2026-04|langges|王梦莹|17195|19;2026-04|langges|陈曦|14052.41|26;2026-05|fansi|乔萌萌|348|6;2026-05|langges|孟伊|7436.2|8;2026-05|langges|李楠|300|3;2026-05|langges|王梦莹|14361|16;2026-05|langges|陈曦|16439.51|23;2026-06|fansi|乔萌萌|3146|16;2026-06|langges|孟伊|13678.7|25;2026-06|langges|李楠|200|2;2026-06|langges|李雪洋|456|7;2026-06|langges|王梦莹|16938|22;2026-06|langges|陈曦|5460.4|24;2026-07|fansi|乔萌萌|3921|11;2026-07|langges|Shirley Li|75|1;2026-07|langges|孟伊|15634.5|24;2026-07|langges|李雪洋|5733|19;2026-07|langges|王梦莹|7963.5|10;2026-07|langges|陈曦|13478|19;2026-08|fansi|乔萌萌|4455|15;2026-08|fansi|周文怡|50|1;2026-08|langges|孟伊|8622.9|22;2026-08|langges|李雪洋|2621.5|13;2026-08|langges|王梦莹|1730|4;2026-08|langges|陈曦|44486|24';
+const PLAN_SEED_RAW = '2024-07|langges|bella bella|311|4;2024-08|langges|mia mia|196|1;2024-11|langges|bella bella|80|1;2024-11|langges|陈曦|95|1;2024-12|langges|bella bella|456.7|3;2025-01|langges|bella bella|130|1;2025-02|langges|Molly Yang|148|1;2025-02|langges|bella bella|395|2;2025-03|langges|Aria Wang|138|1;2025-03|langges|Molly Yang|2473|3;2025-03|langges|bella bella|120|1;2025-04|langges|Aria Wang|41.94|1;2025-04|langges|Hannah|109|1;2025-04|langges|Molly Yang|504.2|2;2025-04|langges|Natiya Jin|560|5;2025-04|langges|bella bella|580|1;2025-05|langges|Aria Wang|1301.54|3;2025-05|langges|Hannah|366|1;2025-05|langges|bella bella|110|1;2025-05|langges|王梦莹|806.05|1;2025-06|langges|Hannah|405|2;2025-06|langges|未分配|373.45|3;2025-06|langges|王梦莹|130|2;2025-07|langges|Hannah|2496.8|6;2025-07|langges|未分配|86.45|1;2025-07|langges|王梦莹|1658.5|10;2025-08|langges|Hannah|4215.81|8;2025-08|langges|王梦莹|1500|3;2025-09|langges|Hannah|1096.56|6;2025-09|langges|未分配|86.42|3;2025-09|langges|王梦莹|7963.82|21;2025-10|langges|Hannah|3640.5|4;2025-10|langges|未分配|216.19|2;2025-10|langges|王梦莹|4522|9;2025-11|langges|Hannah|4659.5|10;2025-11|langges|王梦莹|10487.5|22;2025-12|langges|Hannah|195|2;2025-12|langges|王梦莹|31592.5|15;2025-12|langges|陈曦|580|5;2026-01|fansi|乔萌萌|420|3;2026-01|langges|孟伊|316|3;2026-01|langges|王梦莹|9517.51|15;2026-01|langges|陈曦|5352.5|20;2026-02|fansi|乔萌萌|628|5;2026-02|langges|孟伊|1802|6;2026-02|langges|王梦莹|464.98|5;2026-02|langges|陈曦|6631.41|10;2026-03|fansi|乔萌萌|3724.5|9;2026-03|langges|孟伊|3478|16;2026-03|langges|王梦莹|4167|15;2026-03|langges|陈曦|8776.94|28;2026-04|fansi|乔萌萌|4002|10;2026-04|langges|孟伊|11158.1|13;2026-04|langges|王梦莹|17195|19;2026-04|langges|陈曦|14052.41|26;2026-05|fansi|乔萌萌|348|6;2026-05|langges|孟伊|7436.2|8;2026-05|langges|李楠|300|3;2026-05|langges|王梦莹|14361|16;2026-05|langges|陈曦|16439.51|23;2026-06|fansi|乔萌萌|3146|16;2026-06|langges|孟伊|13678.7|25;2026-06|langges|李楠|200|2;2026-06|langges|李雪洋|456|7;2026-06|langges|王梦莹|16938|22;2026-06|langges|陈曦|5460.4|24;2026-07|fansi|乔萌萌|3921|11;2026-07|langges|孟伊|15634.5|24;2026-07|langges|李雪洋|5733|19;2026-07|langges|王梦莹|7963.5|10;2026-07|langges|陈曦|13478|19;2026-08|fansi|乔萌萌|4455|15;2026-08|fansi|周文怡|50|1;2026-08|langges|孟伊|8622.9|22;2026-08|langges|李雪洋|2621.5|13;2026-08|langges|王梦莹|1730|4;2026-08|langges|陈曦|44486|24';
 let planYear = null;
 let planSelProject = 'all';
 let planSelSeller = 'all';
 let planMetric = 'amt';
 let planSplit = false;
 let editingPlan = null;
+let editingGoal = null;      // 正在编辑的「总计划」范围 {level,period,project,label}
 let planAutoCache = null;
+
+// ===== 总计划（手填汇总）=====
+// 与「个人计划」分开存：月/季/年/项目级的计划数由负责人直接填总数，
+// 不做「张三+李四+王五」的自动相加；实际完成数仍然是相关人员相加而来。
+// key 形态： M|2026-03 、 M|2026-03|langges 、 Q|2026Q1 、 Q|2026Q1|fansi 、 Y|2026 、 Y|2026|langges
+function planGoalKey(level,period,project){ return level+'|'+period+(project?('|'+project):''); }
+function planGoalRec(level,period,project){ return planGoals[planGoalKey(level,period,project)] || null; }
+function planGoalOf(level,period,project){
+  const g=planGoalRec(level,period,project);
+  return g?{amt:dNum(g.amt),qty:dNum(g.qty),at:dNum(g.at),note:String(g.note||'')}:{amt:0,qty:0,at:0,note:''};
+}
+function planGoalHas(level,period,project){
+  const g=planGoalRec(level,period,project);
+  return !!(g && (dNum(g.amt)||dNum(g.qty)||String(g.note||'').trim()));
+}
+function planGoalSet(level,period,project,amt,qty,note){
+  const k=planGoalKey(level,period,project);
+  const a=Math.round(dNum(amt)*100)/100, q=dNum(qty), nt=String(note==null?'':note).trim();
+  if(!a && !q && !nt) delete planGoals[k];
+  else planGoals[k]={amt:a, qty:q, at:Date.now(), note:nt};
+  planInvalidateAuto();
+  saveAll();
+}
+function planGoalCount(){ return Object.keys(planGoals||{}).length; }
+// 层级中文名（用于弹窗标题 / 说明）
+function planLevelName(lv){ return lv==='M'?'月度':(lv==='Q'?'季度':'年度'); }
+function planPeriodName(lv,period){
+  if(lv==='M') return fmtMonthLabel(period);
+  if(lv==='Q') return String(period).replace(/^(\d{4})Q(\d)$/, '$1年$2季度').replace('1季度','一季度').replace('2季度','二季度').replace('3季度','三季度').replace('4季度','四季度');
+  return period+' 年';
+}
+function planGoalLabel(lv,period,project){
+  return planPeriodName(lv,period)+(project?(' · '+planProjName(project)):' · 全公司');
+}
 
 function planProjName(k){ return (PLAN_PROJECTS[k]&&PLAN_PROJECTS[k].name)||k||'未分类'; }
 function planInvalidateAuto(){ planAutoCache=null; }
@@ -1599,7 +1702,7 @@ function planSellerOfPay(p){
 }
 function planSellersAll(){
   const out=[];
-  const add=n=>{ n=String(n==null?'':n).trim(); if(n&&out.indexOf(n)<0) out.push(n); };
+  const add=n=>{ n=String(n==null?'':n).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
   PLAN_SELLERS_BASE.forEach(add);
   plan.forEach(r=>add(r.seller));
   (biz.pays||[]).forEach(p=>add(planSellerOfPay(p)));
@@ -1607,7 +1710,7 @@ function planSellersAll(){
 }
 function planSellerOptions(){
   const y=String(planYear), out=[];
-  const add=n=>{ n=String(n==null?'':n).trim(); if(n&&out.indexOf(n)<0) out.push(n); };
+  const add=n=>{ n=String(n==null?'':n).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
   plan.forEach(r=>{ if(String(r.month).slice(0,4)===y) add(r.seller); });
   PLAN_SELLERS_BASE.forEach(add);
   return out;
@@ -1623,9 +1726,10 @@ function planYearList(){
 }
 // 表格列 = 该项目本年度真实涉及的业务员（谁有数据列谁），实现「项目分开、业务员分开」；
 // 只有该项目本年一条记录都没有时才用基础名单兜底，避免出现一张空表。
+// 剔除名单（PLAN_EXCLUDE_SELLERS）里的人一律不出现。
 function planSellerCols(proj){
   const y=String(planYear), out=[];
-  const add=n=>{ n=(n==null?'':String(n)).trim(); if(out.indexOf(n)<0) out.push(n); };
+  const add=n=>{ n=(n==null?'':String(n)).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
   let has=false;
   plan.forEach(r=>{ if(r.project===proj && String(r.month).slice(0,4)===y){ has=true; add(r.seller); } });
   if(!has) PLAN_SELLERS_BASE.forEach(add);
@@ -1647,6 +1751,8 @@ function healPlan(){
   });
   const _orph=[];
   plan=plan.filter(r=>{
+    // 剔除名单（如 Shirley Li）：记录移入隔离区，不删除，随时可恢复
+    if(r && planSellerExcluded(r.seller)){ r._reason='已从看板剔除（'+String(r.seller)+'）'; r._orphanAt=Date.now(); _orph.push(r); changed=true; return false; }
     if(r && r.month && PLAN_PROJECTS[r.project]) return true;
     if(r) _orph.push(r);
     return false;
@@ -1674,6 +1780,7 @@ function seedPlanActual(){
     if(p.length<5) return;
     const month=p[0], proj=p[1], seller=p[2], amt=parseFloat(p[3])||0, qty=parseInt(p[4],10)||0;
     if(!/^\d{4}-\d{2}$/.test(month) || !PLAN_PROJECTS[proj]) return;
+    if(planSellerExcluded(seller)) return;          // 剔除名单不入库
     if(planRec(month,proj,seller)) return;
     plan.push({id:uid(),month:month,project:proj,seller:seller,plan:0,actual:amt,planQ:0,actualQ:qty,
                srcAmt:'auto',srcQty:'auto',autoFrom:'预置',autoAt:0,note:'',_seed:true});
@@ -1690,7 +1797,9 @@ function planAutoMap(){
     if(!/^\d{4}-\d{2}$/.test(m)) return;
     const proj=p.shop;
     if(!PLAN_PROJECTS[proj]) return;
-    const k=m+'|'+proj+'|'+planSellerOfPay(p);
+    const sl=planSellerOfPay(p);
+    if(planSellerExcluded(sl)) return;             // 剔除名单不参与汇总
+    const k=m+'|'+proj+'|'+sl;
     if(!map[k]) map[k]={amt:0,qty:0};
     map[k].amt+=dNum(p.amount); map[k].qty++;
   });
@@ -1816,148 +1925,204 @@ function planCellHtml(month,project,seller){
   }
   return '<div class="plan-cell '+src+'" onclick="'+escAttr(call)+'" title="点击录入 / 修改">'+inner+'</div>';
 }
-// 合计格（月合计 / 季度合计 / 年合计 / 项目合计都用它）：实际（主值）+ 计划 + 完成率 + 差额
-function planTotCellHtml(list,strong){
-  const a=planSum(list);
-  if(!a.n||!(a.plan||a.actual||a.planQ||a.actualQ)) return '<div class="plan-totcell none"><span class="plan-cv">—</span></div>';
-  let inner='<span class="plan-cv">'+escHtml(planMainVal(a))+'</span>'
-    + '<span class="plan-cs">'+escHtml(planSubVal(a))+'</span>'
-    + '<span class="plan-df">'+escHtml(planDiffVal(a))+'</span>';
-  return '<div class="plan-totcell'+(strong?' strong':'')+'">'+inner+'</div>';
+// ===== 汇总格（月/季/年/项目/全公司合计）=====
+// 口径：实际完成 = 明细相加；计划 = 手填「总计划」（不再把个人计划累加成总数）
+// scope 有值 = 组织级汇总，计划取自手填总计划；scope 为 null = 个人维度汇总（季度行/年行里的业务员格），计划=该人个人计划之和
+function planGoalClick(level,period,project,label){
+  return 'openGoalModal('+JSON.stringify(level)+','+JSON.stringify(period)+','+JSON.stringify(project||'')+','+JSON.stringify(label||'')+')';
 }
-// 兼容旧调用
-function planSumCellHtml(list){ return planTotCellHtml(list); }
+function planTotCellHtml(list, scope, strong, label){
+  const a=planSum(list);
+  const useGoal=!!scope;
+  const g=useGoal?planGoalOf(scope.level,scope.period,scope.project):{amt:0,qty:0};
+  const b=Object.assign({},a,{plan:useGoal?dNum(g.amt):a.plan, planQ:useGoal?dNum(g.qty):a.planQ});
+  const click=useGoal?planGoalClick(scope.level,scope.period,scope.project,label):'';
+  const att=click?(' onclick="'+escAttr(click)+'" title="点击填写 / 修改总计划"'):' style="cursor:default"';
+  if(!(a.actual||a.actualQ||b.plan||b.planQ)){
+    return '<div class="plan-totcell none"'+att+'><span class="plan-cv">—</span>'
+      + (useGoal?'<span class="plan-cs">点击填总计划</span>':'') + '</div>';
+  }
+  let planTxt='', pct='';
+  if(planMetric==='qty'){
+    if(useGoal){ planTxt = b.planQ?('总计划 '+Math.round(b.planQ)+' 笔'):'总计划未定'; }
+    else       { planTxt = b.planQ?('个人计划 '+Math.round(b.planQ)+' 笔'):'个人计划未填'; }
+    if(b.planQ>0&&a.actualQ>0) pct=' · 完成 '+Math.round(a.actualQ/b.planQ*100)+'%';
+  } else {
+    if(useGoal){ planTxt = b.plan?('总计划 '+fmtCny(b.plan)):'总计划未定'; }
+    else       { planTxt = b.plan?('个人计划 '+fmtCny(b.plan)):'个人计划未填'; }
+    if(b.plan>0&&a.actual>0) pct=' · 完成 '+Math.round(a.actual/b.plan*100)+'%';
+  }
+  let inner='<span class="plan-cv">'+escHtml(planMainVal(b));
+  if(b.plan||b.planQ) inner+='<span class="plan-bdg goal">总</span>';
+  inner+='</span>';
+  inner+='<span class="plan-cs">'+escHtml(planTxt+pct)+'</span>';
+  inner+='<span class="plan-df">'+escHtml(planDiffVal(b))+'</span>';
+  return '<div class="plan-totcell'+(strong?' strong':'')+(useGoal?' goal':'')+(b.plan||b.planQ?' hasgo':'')+'"'+att+'>'+inner+'</div>';
+}
+// 兼容旧调用（无 scope = 个人维度相加）
+function planSumCellHtml(list){ return planTotCellHtml(list,null); }
 function planEmptyCellHtml(){ return '<td class="sub"><div class="plan-totcell none"><span class="plan-cv">—</span></div></td>'; }
-// 表格：行=月（每月后跟季度合计），列=项目分组下的业务员 + 项目小计 + 全月合计
+
+// ===== 上方表格：上下分屏罗列 =====
+// ① 项目明细表：月份 | 各业务员（个人计划/实际，可点改） | 项目合计（总计划手填）
+function planProjectTableHtml(pj, months, cols, hint){
+  let h='<div class="plan-blk">';
+  h+='<div class="plan-blk-head"><span class="plan-blk-name '+PLAN_PROJECTS[pj].tag+'">'+escHtml(planProjName(pj))+'</span>';
+  if(hint) h+='<span class="plan-blk-sub">'+escHtml(hint)+'</span>';
+  h+='</div>';
+  h+='<div class="dash-table-wrap plan-tbl-wrap"><table class="plan-tbl"><thead><tr><th class="mth">月份</th>';
+  if(cols.length) cols.forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
+  else h+='<th>—</th>';
+  h+='<th class="sub">项目合计</th></tr></thead><tbody>';
+  const pjRecs=plan.filter(x=>x.project===pj);
+  const cellsFor=(recOf,sellerOf,goalOf,strong)=>{
+    let r='';
+    if(cols.length) cols.forEach(s=>{ r+='<td>'+sellerOf(s)+'</td>'; });
+    else r+='<td>'+sellerOf('')+'</td>';
+    r+='<td class="sub">'+planTotCellHtml(recOf(),goalOf(),!!strong,planProjName(pj))+'</td>';
+    h+=r;
+  };
+  months.forEach(m=>{
+    h+='<tr><td class="mth">'+fmtMonthShort(m)+'</td>';
+    cellsFor(
+      ()=>pjRecs.filter(x=>x.month===m),
+      s=>planCellHtml(m,pj,s),
+      ()=>({level:'M',period:m,project:pj})
+    );
+    h+='</tr>';
+  });
+  PLAN_QUARTERS.forEach((qs,qi)=>{
+    const qm=qs.map(n=>planYear+'-'+String(n).padStart(2,'0')).filter(m=>months.indexOf(m)>=0);
+    if(!qm.length) return;
+    const inQ=x=>qm.indexOf(x.month)>=0;
+    h+='<tr class="qsum"><td class="mth">'+PLAN_QNAME[qi]+'合计</td>';
+    cellsFor(
+      ()=>pjRecs.filter(inQ),
+      s=>planTotCellHtml(pjRecs.filter(x=>(x.seller||'')===s&&inQ(x)),null,false),
+      ()=>({level:'Q',period:planYear+'Q'+(qi+1),project:pj})
+    );
+    h+='</tr>';
+  });
+  h+='<tr class="sum"><td class="mth">全年合计</td>';
+  cellsFor(
+    ()=>pjRecs.filter(x=>months.indexOf(x.month)>=0),
+    s=>planTotCellHtml(pjRecs.filter(x=>(x.seller||'')===s&&months.indexOf(x.month)>=0),null,false),
+    ()=>({level:'Y',period:String(planYear),project:pj}),
+    true
+  );
+  h+='</tr></tbody></table></div></div>';
+  return h;
+}
+// ② 全公司总览表：月份 | 项目1 | 项目2 | 全公司合计（公司级总计划在这里填）
+function planCompanyTableHtml(months, projs){
+  let h='<div class="plan-blk plan-blk-all">';
+  h+='<div class="plan-blk-head"><span class="plan-blk-name all">全公司总览</span>'
+   + '<span class="plan-blk-sub">月 / 季度 / 年度的<b>总计划在这一列手填</b>；实际完成 = 相关人员相加</span></div>';
+  h+='<div class="dash-table-wrap plan-tbl-wrap"><table class="plan-tbl"><thead><tr><th class="mth">月份</th>';
+  projs.forEach(pj=>{ h+='<th class="pj '+PLAN_PROJECTS[pj].tag+'">'+escHtml(planProjName(pj))+'</th>'; });
+  h+='<th class="tot">全公司合计</th></tr></thead><tbody>';
+  const rowOf=(label,cls,recOf,lv,period,strong)=>{
+    h+='<tr'+(cls?(' class="'+cls+'"'):'')+'><td class="mth">'+label+'</td>';
+    projs.forEach(pj=>{ h+='<td>'+planTotCellHtml(recOf(pj),{level:lv,period:period,project:pj},false,planProjName(pj)+' '+period)+'</td>'; });
+    const allRecs=projs.reduce((arr,pj)=>arr.concat(recOf(pj)),[]);
+    h+='<td class="tot">'+planTotCellHtml(allRecs,{level:lv,period:period,project:''},!!strong,planPeriodName(lv,period))+'</td></tr>';
+  };
+  months.forEach(m=>{
+    rowOf(fmtMonthShort(m),'',pj=>plan.filter(x=>x.project===pj&&x.month===m),'M',m);
+  });
+  PLAN_QUARTERS.forEach((qs,qi)=>{
+    const qm=qs.map(n=>planYear+'-'+String(n).padStart(2,'0')).filter(m=>months.indexOf(m)>=0);
+    if(!qm.length) return;
+    const per=planYear+'Q'+(qi+1), inQ=x=>qm.indexOf(x.month)>=0;
+    rowOf(PLAN_QNAME[qi]+'合计','qsum',pj=>plan.filter(x=>x.project===pj&&inQ(x)),'Q',per);
+  });
+  rowOf('全年合计','sum',pj=>plan.filter(x=>x.project===pj&&months.indexOf(x.month)>=0),'Y',String(planYear),true);
+  h+='</tbody></table></div></div>';
+  return h;
+}
+// 上方表格总入口：选「全部项目」时三块上下排列（朗格斯 / 凡适 / 全公司总览）
 function planTableHtml(months){
   const projs = planSelProject==='all' ? PLAN_PROJECT_KEYS.slice() : [planSelProject];
   const cols={};
   projs.forEach(pj=>{ cols[pj]=planSellerCols(pj); });
   if(planSelSeller!=='all') projs.forEach(pj=>{ cols[pj]=cols[pj].filter(s=>s===planSelSeller); });
-  const multi=projs.length>1;
-  const spanOf=pj=>Math.max(1,cols[pj].length)+1;   // 业务员列 + 该项目小计列
-  let h='<div class="dash-table-wrap plan-tbl-wrap"><table class="plan-tbl"><thead>';
-  if(multi){
-    h+='<tr><th class="mth" rowspan="2">月份</th>';
-    projs.forEach(pj=>{ h+='<th class="pj '+PLAN_PROJECTS[pj].tag+'" colspan="'+spanOf(pj)+'">'+escHtml(planProjName(pj))+'</th>'; });
-    h+='<th class="tot" rowspan="2">全月合计</th></tr><tr>';
-    projs.forEach(pj=>{
-      if(cols[pj].length) cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
-      else h+='<th>—</th>';
-      h+='<th class="sub">'+escHtml(planProjName(pj))+'小计</th>';
-    });
-    h+='</tr>';
-  } else {
-    const pj=projs[0];
-    h+='<tr><th class="mth">月份</th>';
-    if(cols[pj].length) cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
-    else h+='<th>—</th>';
-    h+='<th class="sub">'+escHtml(planProjName(pj))+'小计</th><th class="tot">合计</th></tr>';
-  }
-  h+='</thead><tbody>';
-  // 某一行的业务员格 + 项目小计格（picker(项目,业务员) 返回该格要汇总的记录）
-  const rowCells=(picker)=>{
-    let r='';
-    projs.forEach(pj=>{
-      if(planSelSeller!=='all' && !cols[pj].length) r+=planEmptyCellHtml();
-      else if(cols[pj].length) cols[pj].forEach(s=>{ r+='<td>'+picker(pj,s)+'</td>'; });
-      else r+='<td>'+picker(pj,'')+'</td>';
-      r+='<td class="sub">'+picker(pj,'__sub')+'</td>';
-    });
-    return r;
-  };
-  const inPj=(pj,extra)=>plan.filter(r=>r.project===pj&&extra(r)&&planInScope(r));
-  months.forEach(m=>{
-    h+='<tr><td class="mth">'+fmtMonthShort(m)+'</td>';
-    h+=rowCells((pj,s)=>{
-      if(s==='__sub') return planTotCellHtml(inPj(pj,r=>r.month===m));
-      return planCellHtml(m,pj,s);
-    });
-    h+='<td class="tot">'+planTotCellHtml(plan.filter(r=>r.month===m&&planInScope(r)))+'</td></tr>';
+  let h='';
+  projs.forEach(pj=>{
+    const hint = planSelSeller==='all'
+      ? ('业务员 '+(cols[pj]||[]).length+' 人 · 个人格可填个人计划，点「项目合计」填该店总计划')
+      : ('仅显示：'+escHtml(planSelSeller)+' · 项目合计仍为该店全员口径');
+    h+=planProjectTableHtml(pj, months, cols[pj]||[], hint);
   });
-  // 季度合计行
-  PLAN_QUARTERS.forEach((qs,qi)=>{
-    const qm=qs.map(n=>planYear+'-'+String(n).padStart(2,'0')).filter(m=>months.indexOf(m)>=0);
-    if(!qm.length) return;
-    const inQ=r=>qm.indexOf(r.month)>=0;
-    h+='<tr class="qsum"><td class="mth">'+PLAN_QNAME[qi]+'合计</td>';
-    h+=rowCells((pj,s)=>{
-      if(s==='__sub') return planTotCellHtml(inPj(pj,inQ));
-      return planTotCellHtml(plan.filter(r=>r.project===pj&&(r.seller||'')===s&&inQ(r)));
-    });
-    h+='<td class="tot">'+planTotCellHtml(plan.filter(r=>inQ(r)&&planInScope(r)))+'</td></tr>';
-  });
-  // 全年合计行（每业务员 + 项目小计 = 项目年合计 + 总计）
-  h+='<tr class="sum"><td class="mth">全年合计</td>';
-  h+=rowCells((pj,s)=>{
-    if(s==='__sub') return planTotCellHtml(inPj(pj,r=>months.indexOf(r.month)>=0),true);
-    return planTotCellHtml(plan.filter(r=>r.project===pj&&(r.seller||'')===s&&months.indexOf(r.month)>=0));
-  });
-  h+='<td class="tot">'+planTotCellHtml(plan.filter(r=>months.indexOf(r.month)>=0&&planInScope(r)),true)+'</td></tr>';
-  h+='</tbody></table></div>';
+  if(projs.length>1) h+=planCompanyTableHtml(months, projs);
   return h;
 }
-// 手机端：按月卡片（含项目小计）→ 季度合计卡 → 全年合计卡（含项目合计）
+
+// ===== 手机端：按月卡片 =====
 function planMCardHtml(months){
   const projs = planSelProject==='all' ? PLAN_PROJECT_KEYS.slice() : [planSelProject];
-  const pickerSellers=pj=>{ let sc=planSellerCols(pj); if(planSelSeller!=='all') sc=sc.filter(s=>s===planSelSeller); return sc; };
-  const rowLine=(label,a,badge,cls)=>{
+  const colsOf=pj=>{ let sc=planSellerCols(pj); if(planSelSeller!=='all') sc=sc.filter(s=>s===planSelSeller); return sc; };
+  const line=(label,a,badge,cls,scope,strong)=>{
     let right=escHtml(planMainVal(a));
     if(badge) right+=' <span class="plan-bdg '+badge+'">'+planBdg(badge)+'</span>';
-    if(a.plan||a.planQ) right+=' · 计划 '+escHtml(planMetric==='qty'?(Math.round(a.planQ)+' 笔'):fmtCny(a.plan));
-    if(a.plan>0||a.planQ>0) right+=' · '+escHtml(planDiffVal(a));
-    return '<div class="plan-mrow'+(cls?(' '+cls):'')+'"><span>'+escHtml(label)+'</span><span>'+right+'</span></div>';
+    let planNum = scope?dNum(planGoalOf(scope.level,scope.period,scope.project).amt):dNum(a.plan);
+    let planQn  = scope?dNum(planGoalOf(scope.level,scope.period,scope.project).qty):dNum(a.planQ);
+    const planWord = scope?'总计划':'个人计划';
+    if(planMetric==='qty'){ if(planQn) right+=' · '+planWord+' '+Math.round(planQn)+' 笔'; else right+=' · '+planWord+'未定'; }
+    else { if(planNum) right+=' · '+planWord+' '+escHtml(fmtCny(planNum)); else right+=' · '+planWord+'未定'; }
+    const b=Object.assign({},a,{plan:planNum,planQ:planQn});
+    right+=' · '+escHtml(planDiffVal(b));
+    return '<div class="plan-mrow'+(cls?(' '+cls):'')+(strong?' strong':'')+'"><span>'+escHtml(label)+'</span><span>'+right+'</span></div>';
   };
   let h='<div class="plan-mcard">';
-  // ① 每月卡片（含每个项目的当月小计 = 项目合计的月度视图）
+  // ① 每月卡片
   months.forEach(m=>{
-    const a=planSum(plan.filter(r=>r.month===m&&planInScope(r)));
-    if(!a.n) return;
+    const all=planSum(plan.filter(r=>r.month===m));
+    if(!all.n) return;
     h+='<div class="plan-mitem">';
-    h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">'+fmtMonthShort(m)+'</strong> <span style="font-size:10.5px;color:var(--text-muted)">月合计</span></span>';
-    h+='<span style="font-size:12px;color:var(--text-secondary)">'+escHtml(planMainVal(a))+' · '+escHtml(planSubVal(a))+'</span></div>';
+    h+='<div class="dash-mcard-head"><span><strong style="font-size:14px">'+fmtMonthShort(m)+'</strong> <span style="font-size:11px;color:var(--text-muted)">月合计</span></span>'
+      +'<span style="font-size:12px;color:var(--text-secondary)">'+escHtml(planMainVal(all))+'</span></div>';
     projs.forEach(pj=>{
-      h+=rowLine(planProjName(pj)+'小计', planSum(plan.filter(r=>r.month===m&&r.project===pj&&planInScope(r))), null, 'subline');
-      pickerSellers(pj).forEach(s=>{
-        const b=planSum(plan.filter(r=>r.month===m&&r.project===pj&&(r.seller||'')===s));
+      const recs=plan.filter(r=>r.month===m&&r.project===pj);
+      h+=line(planProjName(pj)+'小计', planSum(recs), null, 'subline', {level:'M',period:m,project:pj});
+      colsOf(pj).forEach(s=>{
+        const b=planSum(recs.filter(r=>(r.seller||'')===s));
         if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
-        h+=rowLine('　'+planProjName(pj)+' · '+(s||'未分配'), b, planSrcOf(b));
+        h+=line('　'+(s||'未分配'), b, planSrcOf(b), null, null);
       });
     });
+    const allRecs=plan.filter(r=>r.month===m);
+    h+=line('月合计（全公司）', all, null, 'subline', {level:'M',period:m,project:''}, true);
     h+='</div>';
   });
-  // ② 季度合计卡
+  // ② 季度合计
   h+='<div class="plan-mitem">';
-  h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">季度合计</strong></span></div>';
+  h+='<div class="dash-mcard-head"><span><strong style="font-size:14px">季度合计</strong></span></div>';
   PLAN_QUARTERS.forEach((qs,qi)=>{
     const qm=qs.map(n=>planYear+'-'+String(n).padStart(2,'0')).filter(m=>months.indexOf(m)>=0);
     if(!qm.length) return;
-    const a=planSum(plan.filter(r=>qm.indexOf(r.month)>=0&&planInScope(r)));
-    if(!a.n||!(a.plan||a.actual||a.planQ||a.actualQ)) return;
-    h+=rowLine(PLAN_QNAME[qi]+'合计', a, null, 'subline');
+    const per=planYear+'Q'+(qi+1), inQ=x=>qm.indexOf(x.month)>=0;
+    const all=planSum(plan.filter(inQ));
+    if(!all.n) return;
     projs.forEach(pj=>{
-      const b=planSum(plan.filter(r=>r.project===pj&&qm.indexOf(r.month)>=0&&planInScope(r)));
-      if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
-      h+=rowLine('　'+planProjName(pj), b, null);
+      h+=line(PLAN_QNAME[qi]+' · '+planProjName(pj), planSum(plan.filter(x=>x.project===pj&&inQ(x))), null, null, {level:'Q',period:per,project:pj});
     });
+    h+=line(PLAN_QNAME[qi]+'合计（全公司）', all, null, 'subline', {level:'Q',period:per,project:''}, true);
   });
   h+='</div>';
-  // ③ 全年合计卡（每项目 = 项目年合计）
-  const T=planSum(plan.filter(r=>months.indexOf(r.month)>=0&&planInScope(r)));
-  if(T.n){
-    h+='<div class="plan-mitem">';
-    h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">全年合计</strong></span></div>';
-    projs.forEach(pj=>{
-      const b=planSum(plan.filter(r=>r.project===pj&&months.indexOf(r.month)>=0&&planInScope(r)));
-      if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
-      h+=rowLine('　'+planProjName(pj), b, null);
-    });
-    h+=rowLine('年计划 / 年实际', T, null);
-    h+='</div>';
-  }
+  // ③ 年度
+  h+='<div class="plan-mitem">';
+  h+='<div class="dash-mcard-head"><span><strong style="font-size:14px">全年合计</strong></span></div>';
+  const yRecs=plan.filter(x=>months.indexOf(x.month)>=0);
+  const T=planSum(yRecs);
+  projs.forEach(pj=>{
+    h+=line(planProjName(pj)+' 年合计', planSum(yRecs.filter(x=>x.project===pj)), null, null, {level:'Y',period:String(planYear),project:pj});
+  });
+  h+=line('全公司年合计', T, null, 'subline', {level:'Y',period:String(planYear),project:''}, true);
+  h+='</div>';
   h+='</div>';
   return h;
 }
+
 function fmtAxisMoney(v){
   const c=usd2cny(v), a=Math.abs(c);
   if(a>=10000) return '¥'+(c/10000).toFixed(a>=100000?1:2).replace(/\.0+$/,'')+'万';
@@ -1981,9 +2146,14 @@ function planChartSeries(months){
     const pv=[], av=[], rv=[];
     months.forEach(m=>{
       const a=planSum(g.recs.filter(r=>r.month===m));
-      if(kind==='money'){ pv.push(a.plan?a.plan:null); av.push(a.actual?a.actual:null); }
-      else if(kind==='count'){ pv.push(a.planQ?a.planQ:null); av.push(a.actualQ?a.actualQ:null); }
-      else { rv.push(a.plan>0?Math.round(a.actual/a.plan*1000)/10:null); }
+      // 计划线：合计组/按项目组取「手填总计划」；按业务员组取各人自填的个人计划之和
+      let pNum=0, pQn=0;
+      if(!planSplit) { const gg=planGoalOf('M',m,''); pNum=gg.amt; pQn=gg.qty; }
+      else if(planSelProject==='all'){ const gg=planGoalOf('M',m,g.key); pNum=gg.amt; pQn=gg.qty; }
+      else { pNum=a.plan; pQn=a.planQ; }
+      if(kind==='money'){ pv.push(pNum?pNum:null); av.push(a.actual?a.actual:null); }
+      else if(kind==='count'){ pv.push(pQn?pQn:null); av.push(a.actualQ?a.actualQ:null); }
+      else { rv.push(pNum>0?Math.round(a.actual/pNum*1000)/10:null); }
     });
     if(kind==='rate'){
       series.push({name:(groups.length>1?g.name+' ':'')+'完成率', color:g.color, dash:false, vals:rv});
@@ -2066,42 +2236,66 @@ function renderDash(){
     return;
   }
   // 关键指标（金额一律人民币）
+  // 「年度总计划」是手填项，不与个人计划相加；实际完成 = 明细相加
+  // 筛了单个业务员时没有「该人的总计划」概念 → 退回个人计划之和
+  const kScope = planSelProject==='all' ? '' : planSelProject;
+  const bySeller = planSelSeller!=='all';
+  const yG = bySeller ? {amt:T.plan, qty:T.planQ} : planGoalOf('Y',String(planYear),kScope);
+  const yPlan=yG.amt, yPlanQ=yG.qty;
+  const yRate=yPlan>0?(T.actual/yPlan*100):0;
+  const yPlanWord = bySeller ? '个人计划合计' : (kScope?(planProjName(kScope)+'年总计划'):'年度总计划');
   const grid=[];
-  grid.push({label:'年计划金额', val:fmtCny(T.plan), foot:months.filter(m=>plan.some(r=>r.month===m&&(r.plan||0)>0)).length+' 个月已定计划'});
-  grid.push({label:'年实际金额', val:fmtCny(T.actual), foot:'计划 '+fmtCny(T.plan)+(T.plan>0?('（完成 '+Math.round(rate)+'%）'):'')});
-  grid.push({label:'计划 vs 实际差额', val:T.plan>0?fmtCnySigned(T.actual-T.plan):'—', foot:T.plan>0?(rate>=100?'已超额完成 ✓':'缺口 '+(100-rate).toFixed(1)+'%'):'先填计划才能算差额', bar:T.plan>0?Math.min(100,rate):0});
-  grid.push({label:'订单数（实际/计划）', val:Math.round(T.actualQ)+' / '+Math.round(T.planQ), foot:T.planQ>0?('完成 '+Math.round(T.actualQ/T.planQ*100)+'%'):'未定订单计划'});
+  grid.push({label:yPlanWord+(bySeller?('（'+planSelSeller+'）'):'（手填）'), val:yPlan?fmtCny(yPlan):'未填',
+             foot:yPlan?('完成 '+Math.round(yRate*10)/10+'% · 点击修改'):(bySeller?'该业务员还没有个人计划':'点击填写年度总计划 →'),
+             bar:yPlan?Math.min(100,yRate):0, click:(bySeller?'':planGoalClick('Y',String(planYear),kScope,(kScope?(planProjName(kScope)+' '):'全公司 ')+'年度总计划'))});
+  grid.push({label:'年度实际完成', val:fmtCny(T.actual), foot:'相关人员明细相加 · '+((T.autoA||T.autoQ)?'含自动抓取':'手工填写')});
+  grid.push({label:'总计划 vs 实际差额', val:yPlan>0?fmtCnySigned(T.actual-yPlan):'—',
+             foot:yPlan>0?(yRate>=100?'已超额完成 ✓':'缺口 '+(100-yRate).toFixed(1)+'%'):'先填年度总计划才能算差额'});
+  grid.push({label:'订单数（实际/总计划）', val:Math.round(T.actualQ)+' / '+Math.round(yPlanQ),
+             foot:yPlanQ>0?('完成 '+Math.round(T.actualQ/yPlanQ*100)+'%'):'年度订单总计划未填'});
   html+='<div class="dash-grid" style="grid-template-columns:repeat(4,1fr)">';
   grid.forEach(g=>{
-    html+='<div class="dash-metric"><div class="dm-label">'+escHtml(g.label)+'</div><div class="dm-value">'+escHtml(g.val)+'</div>';
+    html+='<div class="dash-metric'+(g.click?' dash-metric-click':'')+'"'+(g.click?(' onclick="'+escAttr(g.click)+'" title="点击填写 / 修改"'):'')+'>';
+    html+='<div class="dm-label">'+escHtml(g.label)+'</div><div class="dm-value">'+escHtml(g.val)+'</div>';
     html+='<div class="dm-foot"><span class="dm-sub">'+escHtml(g.foot)+'</span></div>';
     if(g.bar) html+='<div class="dash-bar"><span style="width:'+g.bar.toFixed(1)+'%"></span></div>';
     html+='</div>';
   });
   html+='</div>';
-  // 项目合计（每个项目一张对比卡：计划 / 实际 / 完成率 / 差额）
+  // 年度总计划 + 项目合计（每项都手填总计划，点击卡片即可改）
+  const yAll=planSum(plan.filter(r=>String(r.month).slice(0,4)===String(planYear)));
   const pjCards=PLAN_PROJECT_KEYS.map(k=>{
     const a=planSum(plan.filter(r=>r.project===k&&String(r.month).slice(0,4)===String(planYear)));
-    return {key:k,a:a};
+    return {key:k,a:a,g:planGoalOf('Y',String(planYear),k)};
   });
-  html+='<div class="dash-panel"><div class="dash-panel-head"><div class="dash-panel-title">项目合计 · '+planYear+' 年</div>'
-      + '<span class="dm-sub">'+escHtml(PLAN_FX_NOTE)+'</span></div>';
-  html+='<div style="display:grid;grid-template-columns:repeat('+pjCards.length+',1fr);gap:12px">';
-  pjCards.forEach(c=>{
-    const a=c.a, rt=a.plan>0?(a.actual/a.plan*100):0;
-    html+='<div class="plan-pjcard"><h4>'+escHtml(planProjName(c.key))+'<span class="tag'+PLAN_PROJECTS[c.key].tag+'">店铺项目</span></h4>';
-    html+='<div class="plan-pjgrid">'
-      + '<div><span>年计划</span><b>'+escHtml(fmtCny(a.plan))+'</b></div>'
+  const goalCard=(title,tag,tagCls,a,pAmt,pQty,lv,period,project,label,clickable)=>{
+    const rt=pAmt>0?(a.actual/pAmt*100):0;
+    const b=Object.assign({},a,{plan:dNum(pAmt),planQ:dNum(pQty)});
+    return '<div class="plan-pjcard'+(clickable?' plan-pjcard-goal':'')+'"'+(clickable?(' onclick="'+escAttr(planGoalClick(lv,period,project,label))+'" title="点击填写 / 修改总计划"'):'')+'>'
+      + '<h4>'+escHtml(title)+'<span class="'+(tagCls||'')+'">'+escHtml(tag)+'</span></h4>'
+      + '<div class="plan-pjgrid">'
+      + '<div><span>年总计划</span><b>'+(pAmt?escHtml(fmtCny(pAmt)):'未填')+'</b></div>'
       + '<div><span>年实际</span><b>'+escHtml(fmtCny(a.actual))+'</b></div>'
-      + '<div><span>完成率</span><b>'+(a.plan>0?(Math.round(rt*10)/10)+'%':'—')+'</b></div>'
-      + '<div><span>差额</span><b>'+escHtml(planDiffVal(a))+'</b></div>'
+      + '<div><span>完成率</span><b>'+(pAmt>0?((Math.round(rt*10)/10)+'%'):'—')+'</b></div>'
+      + '<div><span>差额</span><b>'+escHtml(planDiffVal(b))+'</b></div>'
+      + '</div>'
+      + '<div class="plan-pjrow"><span>订单数（实际/总计划）</span><span>'+Math.round(a.actualQ)+' / '+Math.round(dNum(pQty))+'</span></div>'
+      + (pAmt>0?'<div class="dash-bar"><span style="width:'+Math.min(100,rt).toFixed(1)+'%"></span></div>':'')
       + '</div>';
-    html+='<div class="plan-pjrow"><span>订单数（实际/计划）</span><span>'+Math.round(a.actualQ)+' / '+Math.round(a.planQ)+'</span></div>';
-    if(a.plan>0) html+='<div class="dash-bar"><span style="width:'+Math.min(100,rt).toFixed(1)+'%"></span></div>';
-    html+='</div>';
+  };
+  html+='<div class="dash-panel"><div class="dash-panel-head"><div class="dash-panel-title">年度总计划 · 项目合计 · '+planYear+' 年</div>'
+      + '<span class="dm-sub">总计划手填（不累加个人）· 实际=明细相加 · '+escHtml(PLAN_FX_NOTE)+'</span></div>';
+  html+='<div class="plan-pjgrid3">';
+  if(planSelProject==='all'){
+    const gAll=planGoalOf('Y',String(planYear),'');
+    html+=goalCard('年度总计划 · 全公司','手填总目标','tagon',yAll,gAll.amt,gAll.qty,'Y',String(planYear),'','全公司 年度总计划',true);
+  }
+  pjCards.forEach(c=>{
+    if(planSelProject!=='all' && c.key!==planSelProject) return;
+    html+=goalCard(planProjName(c.key)+' 年度总计划','店铺项目','tag'+PLAN_PROJECTS[c.key].tag,c.a,c.g.amt,c.g.qty,'Y',String(planYear),c.key,planProjName(c.key)+' 年度总计划',true);
   });
   html+='</div></div>';
-  // 表格
+  // 表格（上下分屏：朗格斯 / 凡适 / 全公司总览）
   html+='<div class="dash-panel">';
   html+='<div class="dash-panel-head"><div class="dash-panel-title">月度销售计划 vs 实际完成 · '+planYear+' 年</div>'
       + '<span class="dm-sub">点任意格子录入 / 修改 · '+(planMetric==='qty'?'单位：笔':(planMetric==='rate'?'完成率':'单位：¥ 人民币'))+'</span></div>';
@@ -2112,17 +2306,20 @@ function renderDash(){
       + '<b><span class="plan-sw manual"></span>✎ 手工填写</b>'
       + '<b><span class="plan-sw mixed"></span>⚡✎ 自动+手工混合</b>'
       + '<b><span class="plan-sw none"></span>未填</b>'
-      + '<span style="flex:1 1 100%">实际完成=「经营分析」里按到账时间归月的收款流水（业务员取业绩归属人）；计划=手工填写，「分线显示」可切换 项目 / 业务员 各自一条线。'
-      + '每格上排是<b>实际金额</b>、下排是<b>计划金额 + 完成率 + 差额</b>。</span>'
-      + '<span style="flex:1 1 100%">合计口径：<b>月合计</b>=每月行最右列；<b>季度合计</b>=每季度末行；<b>年合计</b>=「全年合计」行；<b>项目合计</b>=各项目分组下的「小计」列（全年合计行即该项目全年数）。</span>'
-      + '<span style="flex:1 1 100%">'+escHtml(PLAN_FX_NOTE)+'（显示与录入均按人民币，内部仍按美元存原始数）。</span>'
+      + '<b><span class="plan-bdg goal">总</span> 手填总计划</b>'
+      + '<span style="flex:1 1 100%"><b>计划口径（本版重点）</b>：每个格子上排=实际完成、下排=计划；<b>月 / 季度 / 年度 / 项目 / 全公司的计划一律手填总数</b>（标 <b>总</b> 的格子），不再把个人计划累加成总数；'
+      + '而<b>实际完成永远是相关人员相加</b>。业务员个人的格子仍可填个人计划（用于内部分配），但它不影响上面的总计划。</span>'
+      + '<span style="flex:1 1 100%">表格说明：<b>朗格斯 / 凡适两张明细表</b>上下排列（列=业务员 + 项目合计）；<b>全公司总览表</b>里「全公司合计」列就是月合计，季度合计行、全年合计行同表。'
+      + '全年合计行里业务员格 = 该人 12 个月个人计划相加（个人维度），项目/公司格 = 手填总计划。</span>'
+      + '<span style="flex:1 1 100%">'+escHtml(PLAN_FX_NOTE)+'（显示与录入均按人民币，内部仍按美元存原始数）。'
+      + (PLAN_EXCLUDE_SELLERS.length?('已按设置剔除：'+escHtml(PLAN_EXCLUDE_SELLERS.join('、'))+'（其记录已移入隔离区，未删除）。'):'')+'</span>'
       + '</div>';
   html+='</div>';
   // 曲线
   const cs=planChartSeries(months);
   html+='<div class="dash-panel">';
   html+='<div class="dash-panel-head"><div class="dash-panel-title">趋势曲线 · '+(planMetric==='rate'?'完成率':(planMetric==='qty'?'订单数':'收款额（¥）'))+'</div>'
-      + '<span class="dm-sub">'+(planSplit?'已分线：'+((planSelProject==='all')?'按项目':'按业务员'):'合计两条线（虚线=计划，实线=实际；金额为人民币）')+'</span></div>';
+      + '<span class="dm-sub">虚线=<b>总计划</b>（手填）· 实线=<b>实际完成</b>（明细相加）· '+(planSplit?('已分线：'+((planSelProject==='all')?'按项目（各店总计划）':'按业务员（各人个人计划）')):'合计两条线')+'</span></div>';
   html+=planChartSvg(months, cs.kind, cs.series);
   html+='<div class="dash-legend">'+cs.series.map(se=>'<span><i style="background:'+se.color+(se.dash?';height:0;border-top:2px dashed '+se.color+';vertical-align:4px':';height:3px;border-radius:2px')+'"></i>'+escHtml(se.name)+'</span>').join('')+'</div>';
   html+='</div>';
@@ -2133,7 +2330,7 @@ function renderDash(){
     const autos=plan.filter(r=>r.srcAmt==='auto'||r.srcQty==='auto');
     const at=autos.reduce((a,r)=>Math.max(a,dNum(r.autoAt)),0);
     const preset=autos.some(r=>r.autoFrom==='预置');
-    let t=plan.length+' 组记录 · 金额按人民币（1 美元≈6.8 元）';
+    let t=plan.length+' 组记录 · 总计划 '+planGoalCount()+' 项 · 金额按人民币（1 美元≈6.8 元）';
     if(autos.length) t+=' · 自动来源 '+autos.length+' 组'+(at?('（最近 '+new Date(at).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+'）'):'')+(preset?'（含预置快照）':'');
     hint.textContent=t;
   }
@@ -2268,6 +2465,82 @@ function deletePlanRecord(){
     showToast('已删除');
   });
 }
+// ---------- 总计划弹窗（月 / 季度 / 年度 / 项目 / 全公司）----------
+function openGoalModal(level,period,project,label){
+  const lv=String(level||'M').toUpperCase();
+  const per=String(period||'');
+  const pj=PLAN_PROJECTS[project]?project:'';
+  editingGoal={level:lv, period:per, project:pj, label:String(label||'')};
+  const lvName = lv==='M'?'月度':(lv==='Q'?'季度':'年度');
+  document.getElementById('modalGoalTitle').textContent='填写总计划 · '+planPeriodName(lv,per)+(pj?(' · '+planProjName(pj)):' · 全公司');
+  const g=planGoalOf(lv,per,pj);
+  // 弹窗里一律显示人民币（内部存美元）
+  document.getElementById('goalAmt').value=g.amt?Math.round(usd2cny(g.amt)*100)/100:'';
+  document.getElementById('goalQty').value=g.qty?g.qty:'';
+  document.getElementById('goalNote').value=g.note||'';
+  document.getElementById('btnGoalDel').style.display=planGoalHas(lv,per,pj)?'':'none';
+  planRefreshGoalHint();
+  document.getElementById('modalGoal').style.display='flex';
+}
+// 该总计划范围覆盖的明细（与表格里的合计口径一致：不受业务员筛选影响）
+function planGoalActualList(){
+  if(!editingGoal) return [];
+  const lv=editingGoal.level, per=editingGoal.period, pj=editingGoal.project;
+  const inPj=r=>(!pj||r.project===pj);
+  if(lv==='M') return plan.filter(r=>r.month===per && inPj(r));
+  if(lv==='Q'){
+    const m=String(per).match(/^(\d{4})Q([1-4])$/);
+    if(!m) return [];
+    const qs=PLAN_QUARTERS[parseInt(m[2],10)-1];
+    const list=qs.map(n=>m[1]+'-'+String(n).padStart(2,'0'));
+    return plan.filter(r=>list.indexOf(r.month)>=0 && inPj(r));
+  }
+  if(lv==='Y') return plan.filter(r=>String(r.month).slice(0,4)===String(per) && inPj(r));
+  return [];
+}
+function planRefreshGoalHint(){
+  if(!editingGoal) return;
+  const box=document.getElementById('planGoalScope');
+  const hint=document.getElementById('goalActualHint');
+  const a=planSum(planGoalActualList());
+  const g=planGoalOf(editingGoal.level,editingGoal.period,editingGoal.project);
+  const inAmt=dNum(document.getElementById('goalAmt').value);
+  const amtV=inAmt?Math.round(cny2usd(inAmt)*100)/100:g.amt;
+  if(box){
+    box.innerHTML='<b>范围</b>：'+escHtml(planGoalLabel(editingGoal.level,editingGoal.period,editingGoal.project))
+      + '<br>这里的计划数是<b>总数</b>，直接填要完成的目标即可；<b>不参与任何个人计划的相加</b>。';
+  }
+  if(hint){
+    const rt=amtV>0?(a.actual/amtV*100):0;
+    hint.innerHTML='<b>实际完成（相关人员相加，只读）</b>：<b>'+fmtCny(a.actual)+'</b> / <b>'+Math.round(a.actualQ)+' 笔</b>'
+      + (amtV>0?('　完成率 <b>'+(Math.round(rt*10)/10)+'%</b>'):'')
+      + '<br>总计划一改，完成率与差额立刻跟着变。';
+  }
+}
+function saveGoalRecord(){
+  if(!editingGoal) return;
+  // 输入是人民币 → ÷6.8 存美元（与经营分析、个人计划同一口径）
+  const amt=Math.round(cny2usd(planNumFromCsv(document.getElementById('goalAmt').value))*100)/100;
+  const qty=planNumFromCsv(document.getElementById('goalQty').value);
+  const note=document.getElementById('goalNote').value;
+  const lv=editingGoal.level, per=editingGoal.period, pj=editingGoal.project;
+  planGoalSet(lv,per,pj,amt,qty,note);
+  editingGoal=null;
+  closeModal('modalGoal'); refreshAll();
+  const label=planGoalLabel(lv,per,pj);
+  showToast((amt||qty)?('✓ 已保存总计划：'+label+' → '+fmtCny(amt)+' / '+Math.round(qty)+' 笔'):('已清除总计划：'+label),'info');
+}
+function deleteGoalRecord(){
+  if(!editingGoal) return;
+  const lv=editingGoal.level, per=editingGoal.period, pj=editingGoal.project;
+  const label=planGoalLabel(lv,per,pj);
+  showConfirm('确定清除「'+label+'」的总计划吗？实际完成数据不受影响。',()=>{
+    planGoalSet(lv,per,pj,0,0,'');
+    editingGoal=null;
+    closeModal('modalGoal'); refreshAll();
+    showToast('已清除总计划：'+label);
+  });
+}
 // ---------- 导入 / 导出 ----------
 function planDownload(name, text, withBom){
   const blob=new Blob([(withBom?'\ufeff':'')+text],{type:(/\.csv$/.test(name)?'text/csv':'application/json')+';charset=utf-8'});
@@ -2278,13 +2551,26 @@ function planDownload(name, text, withBom){
 }
 function planCsvEsc(v){ const s=String(v==null?'':v); return /[",\n]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s; }
 // 导出：金额按人民币（¥），列名带 (¥) 让导入端能认出币种
+// 第 2 段是「总计划（手填汇总）」，以 # 开头的分隔行标记，导入端按段识别
 function planExportCsv(){
   const rows=[['月份','项目','业务员','计划金额(¥)','实际金额(¥)','实际来源','计划订单数','实际订单数','订单来源','备注']];
   plan.slice().sort((a,b)=>(a.month<b.month?-1:(a.month>b.month?1:(a.project<b.project?-1:((a.seller||'')<(b.seller||'')?-1:1)))))
     .forEach(r=>rows.push([r.month,planProjName(r.project),r.seller||'未分配',planCsvNum(r.plan),planCsvNum(r.actual),
       r.srcAmt==='auto'?'自动':'手工',dNum(r.planQ),dNum(r.actualQ),r.srcQty==='auto'?'自动':'手工',r.note||'']));
-  planDownload('数据看板_月度计划与实际_'+planYear+'_人民币.csv', rows.map(r=>r.map(planCsvEsc).join(',')).join('\r\n'), true);
-  showToast('✓ 已导出 CSV（'+plan.length+' 条，金额单位人民币，汇率 1 美元≈6.8 元）','info');
+  const lines=rows.map(r=>r.map(planCsvEsc).join(','));
+  // 第二段：总计划（月/季/年 × 项目）
+  lines.push('');
+  lines.push('# 总计划（手填汇总）· 这一段的计划是总数，不参与个人计划相加');
+  lines.push(['层级','期间','项目','总计划金额(¥)','总计划订单数','备注'].map(planCsvEsc).join(','));
+  Object.keys(planGoals||{}).sort().forEach(k=>{
+    const g=planGoals[k]||{};
+    const seg=String(k).split('|');
+    const lv=seg[0], per=seg[1]||'', pj=seg[2]||'';
+    if(!lv||!per) return;
+    lines.push([planLevelName(lv), per, pj?planProjName(pj):'全公司', planCsvNum(g.amt), planCsvNum(g.qty), g.note||''].map(planCsvEsc).join(','));
+  });
+  planDownload('数据看板_月度计划与实际_'+planYear+'_人民币.csv', lines.join('\r\n'), true);
+  showToast('✓ 已导出 CSV（明细 '+plan.length+' 条 + 总计划 '+planGoalCount()+' 项，金额单位人民币，汇率 1 美元≈6.8 元）','info');
 }
 function planNumFromCsv(v){ const s=String(v==null?'':v).replace(/[^0-9.\-]/g,''); const n=parseFloat(s); return isNaN(n)?0:n; }
 function planSplitCsvLine(line){
@@ -2308,7 +2594,7 @@ function handlePlanImport(){
   reader.onerror=function(){ showToast('文件读取失败，换个文件试试'); input.value=''; };
   reader.onload=function(e){
     const txt=String(e.target.result||'').replace(/^\ufeff/,'');
-    let recs=null, src='', cny=false;
+    let recs=null, src='', cny=false, goalRecs=null;
     if(/\.json$/i.test(file.name) || txt.trim().charAt(0)==='[' || txt.trim().charAt(0)==='{'){
       let d=null;
       try{ d=JSON.parse(txt); }catch(err){ showToast('JSON 解析失败：'+((err&&err.message)||err)); input.value=''; return; }
@@ -2318,6 +2604,16 @@ function handlePlanImport(){
       const cur=String((d&&!Array.isArray(d)&&(d.currency||d.unit))||'').toUpperCase();
       cny = (cur==='CNY'||cur==='RMB'||cur==='¥'||txt.indexOf('人民币')>=0);
       const toUsd=v=>cny?Math.round(cny2usd(v)*100)/100:v;
+      // JSON 里带 planGoals：总计划（手填汇总）一并导入
+      if(!Array.isArray(d) && d.planGoals && typeof d.planGoals==='object'){
+        goalRecs=[];
+        Object.keys(d.planGoals).forEach(k=>{
+          const g=d.planGoals[k]||{}; const seg=String(k).split('|');
+          if(!seg[0]||!seg[1]) return;
+          goalRecs.push({level:String(seg[0]).toUpperCase(), period:seg[1], project:seg[2]||'',
+                         amt:toUsd(dNum(g.amt)), qty:dNum(g.qty), note:String(g.note||'')});
+        });
+      }
       recs=arr.map(r=>{
         const m=normMonth(r.month||r.ym||r.date)||normMonth(r['月份']);
         const pj=PLAN_PROJECTS[r.project]?r.project:(PLAN_PROJECTS[normShop(r.project||r.shop||r['项目'])]?normShop(r.project||r.shop||r['项目']):'');
@@ -2335,7 +2631,32 @@ function handlePlanImport(){
       });
       src='JSON';
     } else {
-      const lines=txt.split(/\r?\n/).filter(l=>l.trim());
+      const all=txt.split(/\r?\n/).filter(l=>l.trim());
+      // 第 2 段（以 # 开头的分隔行之后）= 总计划（手填汇总）
+      let lines=all;
+      const gi=all.findIndex(l=>/^\s*#/.test(l));
+      if(gi>=0){
+        lines=all.slice(0,gi).filter(l=>l.trim());
+        const glines=all.slice(gi);
+        const hi=glines.findIndex(l=>l.replace(/\s/g,'').indexOf('层级')>=0);
+        if(hi>=0){
+          const gh=planSplitCsvLine(glines[hi]);
+          const gf=(...names)=>{ for(let i=0;i<gh.length;i++){ for(let j=0;j<names.length;j++){ if(gh[i].replace(/\s/g,'').indexOf(names[j])>=0) return i; } } return -1; };
+          const iL=gf('层级'), iPer=gf('期间','月份'), iPj=gf('项目'), iAm=gf('总计划金额','总计划'), iQt=gf('总计划订单'), iNt=gf('备注');
+          goalRecs=[];
+          glines.slice(hi+1).forEach(line=>{
+            if(!line.trim()) return;
+            const c=planSplitCsvLine(line);
+            const lvCn=String(c[iL]||'').trim();
+            const lv=/月/.test(lvCn)?'M':(/季/.test(lvCn)?'Q':(/年/.test(lvCn)?'Y':''));
+            if(!lv) return;
+            const per=String(c[iPer]||'').trim();
+            const pjRaw=String(c[iPj]||'').trim();
+            const pj=/全公司|全部|^all$|^-$|^—$/i.test(pjRaw)?'':normShop(pjRaw);
+            goalRecs.push({level:lv, period:per, project:pj, amt:planNumFromCsv(c[iAm]), qty:planNumFromCsv(c[iQt]), note:iNt>=0?String(c[iNt]||''):''});
+          });
+        }
+      }
       if(lines.length<2){ showToast('CSV 至少要有表头 + 一行数据'); input.value=''; return; }
       const head=planSplitCsvLine(lines[0]);
       const find=(...names)=>{ for(let i=0;i<head.length;i++){ for(let j=0;j<names.length;j++){ if(head[i].replace(/\s/g,'').indexOf(names[j])>=0) return i; } } return -1; };
@@ -2368,6 +2689,7 @@ function handlePlanImport(){
     if(bad) msg+='，另有 '+bad+' 条认不出会跳过';
     const willSet=good.filter(r=>r.hasActual||r.hasQty).length;
     msg+='（金额按'+(cny?'人民币，÷6.8 换算后入库':'美元原值入库')+'）';
+    if(goalRecs&&goalRecs.length) msg+='，另有 '+goalRecs.length+' 项「总计划」会一并写入';
     msg+=(willSet?('。其中 '+willSet+' 条带实际值，会记为「手工填写」并覆盖同名记录的自动值'):'')+'。确定导入吗？';
     showConfirm(msg,()=>{
       let add=0, upd=0;
@@ -2388,13 +2710,31 @@ function handlePlanImport(){
           nr._sample=false; add++;
         }
       });
-      planInvalidateAuto(); saveAll(); switchTab('data'); refreshAll();
+      planInvalidateAuto(); saveAll();
+      // 总计划（手填汇总）
+      let goalN=0;
+      (goalRecs||[]).forEach(g=>{
+        const lv=String(g.level||'').toUpperCase();
+        if(lv==='M' && !/^\d{4}-\d{2}$/.test(g.period)) return;
+        if(lv==='Q' && !/^\d{4}Q[1-4]$/.test(String(g.period).toUpperCase())) return;
+        if(lv==='Y' && !/^\d{4}$/.test(g.period)) return;
+        if(lv!=='M'&&lv!=='Q'&&lv!=='Y') return;
+        const per=lv==='Q'?String(g.period).toUpperCase():g.period;
+        const pj=PLAN_PROJECTS[g.project]?g.project:'';
+        const amt=cny?Math.round(cny2usd(g.amt)*100)/100:dNum(g.amt);
+        const k=planGoalKey(lv,per,pj);
+        if(!amt && !dNum(g.qty) && !String(g.note||'').trim()) delete planGoals[k];
+        else planGoals[k]={amt:amt, qty:dNum(g.qty), at:Date.now(), note:String(g.note||'')};
+        goalN++;
+      });
+      if(goalN){ planInvalidateAuto(); saveAll(); }
+      switchTab('data'); refreshAll();
       if(bad){
         // 导入文件里认不出来的记录同样进隔离区（只隔离不删除），导出备份时会一并带走
         planOrphans=planOrphans.concat(orphan.map(o=>Object.assign({_importSkipped:true,at:Date.now()},o)));
         try{ localStorage.setItem(STORAGE_PREFIX+'plan_orphan', JSON.stringify(planOrphans)); }catch(e){}
       }
-      showToast('✓ 已导入 '+src+'：新增 '+add+' 条、更新 '+upd+' 条','info');
+      showToast('✓ 已导入 '+src+'：新增 '+add+' 条、更新 '+upd+' 条'+(goalN?('、总计划 '+goalN+' 项'):''),'info');
     });
     input.value='';
   };
@@ -3828,7 +4168,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,plan,expenses,claims,biz,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
   try{
     const corrupt = {};
@@ -3870,6 +4210,8 @@ document.getElementById('importFile').addEventListener('change',function(){
         dashboard = data.dashboard || [];
         // 数据看板（月度计划/实际）：旧备份没有这个字段时，保留本机已有数据，不能清空
         if(Object.prototype.hasOwnProperty.call(data,'plan')) plan = data.plan || [];
+        // 数据看板「总计划」（手填）：同样旧备份没有就保留本机
+        if(Object.prototype.hasOwnProperty.call(data,'planGoals') && data.planGoals && typeof data.planGoals==='object') planGoals = data.planGoals;
         // 报账数据：旧备份里没有这个字段时，保留本机已有记录，不能清空
         if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = data.expenses || [];
         // 货损客诉：同样旧备份没有这字段时保留本机
@@ -3893,7 +4235,7 @@ document.getElementById('importFile').addEventListener('change',function(){
 // Clear all data
 document.getElementById('btnClearAll').addEventListener('click',()=>{
   showConfirm('确定要清空所有数据吗？此操作不可恢复！建议先导出备份。', ()=>{
-    tasks = []; notes = []; projects = []; dashboard = []; plan = []; expenses = []; claims = []; biz = bizBlank();
+    tasks = []; notes = []; projects = []; dashboard = []; plan = []; planGoals = {}; expenses = []; claims = []; biz = bizBlank();
     saveAll();
     refreshAll();
     showToast('所有数据已清空');
@@ -4126,7 +4468,7 @@ async function doSyncUpload(){
     return c;
   });
   const buildSync = (withBiz)=>{
-    const d = {v:8, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
+    const d = {v:9, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, planGoals: planGoals, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
     if(withBiz) d.biz = biz;
     return d;
   };
@@ -4389,6 +4731,7 @@ document.getElementById('btnSyncImportYes').addEventListener('click',()=>{
     projects = data.projects || [];
     if(data.dashboard) dashboard = data.dashboard;
     if(data.plan) plan = data.plan;
+    if(data.planGoals && typeof data.planGoals==='object') planGoals = data.planGoals;
     saveAll();
     hideSyncBar();
     refreshAll();
@@ -4572,10 +4915,10 @@ function asSnapshot(){
     _version:APP_VERSION,
     savedAt:new Date().toISOString(),
     counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
-            dashboard:dashboard.length, plan:plan.length, expenses:expenses.length, claims:claims.length,
+            dashboard:dashboard.length, plan:plan.length, planGoals:Object.keys(planGoals).length, expenses:expenses.length, claims:claims.length,
             bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, plan:plan, expenses:light(expenses), claims:light(claims),
+    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded}
   };
@@ -4718,6 +5061,7 @@ async function asRestore(){
       if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = mergeFiles(claims, data.claims);
       if(Object.prototype.hasOwnProperty.call(data,'dashboard')) dashboard = data.dashboard || [];
       if(Object.prototype.hasOwnProperty.call(data,'plan')) plan = data.plan || [];
+      if(Object.prototype.hasOwnProperty.call(data,'planGoals') && data.planGoals && typeof data.planGoals==='object') planGoals = data.planGoals;
       saveAll(); refreshAll();
       showToast('✓ 已恢复 ' + n + ' 条内容，正在补齐附件...', 'info');
       await asPullAttachments();
@@ -9117,6 +9461,11 @@ document.getElementById('btnPlanCancel').addEventListener('click',()=>closeModal
 document.getElementById('btnPlanDel').addEventListener('click',deletePlanRecord);
 document.getElementById('planSellerInput').addEventListener('input',planRefreshAutoHint);
 document.getElementById('planProjectInput').addEventListener('change',planRefreshAutoHint);
+document.getElementById('btnGoalSave').addEventListener('click',saveGoalRecord);
+document.getElementById('btnGoalCancel').addEventListener('click',()=>closeModal('modalGoal'));
+document.getElementById('btnGoalDel').addEventListener('click',deleteGoalRecord);
+document.getElementById('goalAmt').addEventListener('input',planRefreshGoalHint);
+document.getElementById('goalQty').addEventListener('input',planRefreshGoalHint);
 
 // Keyboard shortcuts
 document.addEventListener('keydown',function(e){
