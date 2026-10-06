@@ -221,6 +221,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-pjgrid div b{font-size:13px;font-weight:700}
 .plan-pjrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-secondary);padding:3px 0;border-top:1px dashed var(--border)}
 @media (max-width:768px){.plan-pjgrid{grid-template-columns:repeat(2,1fr)}}
+/* ===== v2.8：朗格斯新增业务员「崔燕柯」（项目固定人员：暂无流水也固定占列，方便先排计划）===== */
 /* ===== v2.7：字号放大 + 项目上下分屏 + 手填总计划 ===== */
 .plan-blk{margin-bottom:20px}
 .plan-blk:last-child{margin-bottom:0}
@@ -864,7 +865,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.7 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.8 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -1319,7 +1320,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.7';
+const APP_VERSION = 'v2.8';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1617,6 +1618,17 @@ function normMonth(v){
 const PLAN_PROJECTS = {langges:{name:'朗格斯',tag:'lg'}, fansi:{name:'凡适',tag:'fs'}};
 const PLAN_PROJECT_KEYS = ['langges','fansi'];
 const PLAN_SELLERS_BASE = ['陈曦','孟伊','李雪洋','乔萌萌','周文怡','王梦莹'];
+// 项目固定人员：属于某个项目、但因为刚入职还没有任何数据的人。
+// 有了这个名单，新员工即使当月/当年一条流水都没有，也会在对应项目的表格里固定占一列，方便先给他排计划。
+const PLAN_PROJ_SELLERS = { langges:['崔燕柯'], fansi:[] };
+// 全公司人员池 = 基础名单 + 各项目固定人员（用于业务员筛选下拉 / 输入建议框）
+function planSellersPool(){
+  const out=[];
+  const add=n=>{ n=(n==null?'':String(n)).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
+  PLAN_SELLERS_BASE.forEach(add);
+  PLAN_PROJECT_KEYS.forEach(pj=>(PLAN_PROJ_SELLERS[pj]||[]).forEach(add));
+  return out;
+}
 // 剔除名单（大小写不敏感）：这些人的数据不进看板（记录移入隔离区，不删除，可随时恢复）
 const PLAN_EXCLUDE_SELLERS = ['shirley li'];
 function planSellerExcluded(s){
@@ -1703,7 +1715,7 @@ function planSellerOfPay(p){
 function planSellersAll(){
   const out=[];
   const add=n=>{ n=String(n==null?'':n).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
-  PLAN_SELLERS_BASE.forEach(add);
+  planSellersPool().forEach(add);
   plan.forEach(r=>add(r.seller));
   (biz.pays||[]).forEach(p=>add(planSellerOfPay(p)));
   return out;
@@ -1712,7 +1724,7 @@ function planSellerOptions(){
   const y=String(planYear), out=[];
   const add=n=>{ n=String(n==null?'':n).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
   plan.forEach(r=>{ if(String(r.month).slice(0,4)===y) add(r.seller); });
-  PLAN_SELLERS_BASE.forEach(add);
+  planSellersPool().forEach(add);
   return out;
 }
 function planYearList(){
@@ -1732,6 +1744,7 @@ function planSellerCols(proj){
   const add=n=>{ n=(n==null?'':String(n)).trim(); if(n && !planSellerExcluded(n) && out.indexOf(n)<0) out.push(n); };
   let has=false;
   plan.forEach(r=>{ if(r.project===proj && String(r.month).slice(0,4)===y){ has=true; add(r.seller); } });
+  (PLAN_PROJ_SELLERS[proj]||[]).forEach(add);   // 项目固定人员（新入职、暂无流水也固定占列）
   if(!has) PLAN_SELLERS_BASE.forEach(add);
   const tot=s=>plan.reduce((a,r)=>a+((r.project===proj&&(r.seller||'')===s)?dNum(r.actual):0),0);
   return out.sort((a,b)=>{ const d=tot(b)-tot(a); return d?d:((a<b)?-1:((a>b)?1:0)); });
@@ -2139,6 +2152,9 @@ function planChartSeries(months){
   } else {
     let sellers=planSellerCols(planSelProject);
     if(planSelSeller!=='all') sellers=sellers.filter(s=>s===planSelSeller);
+    // 按业务员分屏的曲线：整年一条数据都没有的人不画线（新入职的固定列只在表格里占位）
+    const alive=sellers.filter(s=>scope.some(r=>(r.seller||'')===s && (dNum(r.actual)||dNum(r.plan)||dNum(r.actualQ)||dNum(r.planQ))));
+    if(alive.length) sellers=alive;
     sellers.forEach((s,i)=>groups.push({name:(s||'未分配'), color:PLAN_COLOR[i%PLAN_COLOR.length], recs:scope.filter(r=>(r.seller||'')===s)}));
   }
   const series=[];
