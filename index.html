@@ -824,7 +824,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.5 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.6 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -1261,7 +1261,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.5';
+const APP_VERSION = 'v2.6';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1326,6 +1326,12 @@ function loadData(){
   if(!Array.isArray(biz.uploads)) biz.uploads=[];
   if(!biz.chats||typeof biz.chats!=='object') biz.chats=bizChatBlank();
   if(!Array.isArray(biz.chats.files)) biz.chats.files=[];
+  // 修正国家库的键统一小写（同一买家的大小写变体会产生两个键 → 云端 JSON 变成"重复键"）
+  try{
+    const _fc=(biz.fixCountry&&typeof biz.fixCountry==='object')?biz.fixCountry:{}, _fo={};
+    Object.keys(_fc).forEach(k=>{ const nk=String(k).trim().toLowerCase(); if(nk && _fo[nk]===undefined) _fo[nk]=_fc[k]; });
+    biz.fixCountry=_fo;
+  }catch(e){}
   // 首笔收款库：载入时就并入老助版历史库（BIZ_FP_SEED），不必等导入订单
   try{ bizRebuildFirstPay(); }catch(e){}
   // 首单库：载入时就从已导入订单里取每个(买家+业务员)的最早下单日
@@ -4509,6 +4515,42 @@ function asCollectAttachments(){
 }
 
 // 生成云端快照：文字内容全量 + 附件只留索引（附件本体另存为独立文件）
+// 【v2.6 备份链路防断】合并「只差大小写」的重复键。
+// 背景：PowerShell 的 ConvertFrom-Json 用大小写不敏感的字典，遇到 {A:1, a:2} 会直接抛错，
+// 本机自动备份脚本从 2026-09-22 起因此整体失败（云端还在推，但本机一直拉不下来）。
+// 现在每次生成云端快照前全量过一遍，从源头保证云端 JSON 永远能被任何工具解析。
+function jsonMergeDeep(a,b){
+  if(a===undefined||a===null) return b;
+  if(b===undefined||b===null) return a;
+  if(typeof a==='number'&&typeof b==='number') return a+b;
+  if(typeof a==='string'&&typeof b==='string'){
+    // 形如日期的字符串（首笔收款库/首单库的值）取更早的那天，与这两库「只增不减、取最早」的语义一致
+    if(/^\d{4}-\d{2}-\d{2}/.test(a)&&/^\d{4}-\d{2}-\d{2}/.test(b)) return a<b?a:b;
+    return a||b;
+  }
+  if(typeof a==='boolean'&&typeof b==='boolean') return a||b;
+  if(Array.isArray(a)&&Array.isArray(b)){ const o=a.slice(); b.forEach(x=>{ if(o.indexOf(x)<0) o.push(x); }); return o; }
+  if(typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){
+    const o={}; Object.keys(a).forEach(k=>{ o[k]=a[k]; });
+    Object.keys(b).forEach(k=>{ o[k]=(k in o)?jsonMergeDeep(o[k],b[k]):b[k]; });
+    return o;
+  }
+  return a;   // 类型不同：保留先出现的那份
+}
+function jsonCaseDedupe(v,seen){
+  if(v===null||typeof v!=='object') return v;
+  if(Array.isArray(v)){ for(let i=0;i<v.length;i++) v[i]=jsonCaseDedupe(v[i],seen); return v; }
+  const low={}, dup={};
+  Object.keys(v).forEach(k=>{ const lk=k.toLowerCase(); if(low[lk]===undefined) low[lk]=k; else if(low[lk]!==k) dup[k]=low[lk]; });
+  Object.keys(dup).forEach(k=>{
+    const keep=dup[k];
+    v[keep]=jsonMergeDeep(v[keep],v[k]);
+    delete v[k];
+    if(seen) seen.n++;
+  });
+  Object.keys(v).forEach(k=>{ v[k]=jsonCaseDedupe(v[k],seen); });
+  return v;
+}
 function asSnapshot(){
   const cfg = getAsCfg();
   const light = (arr)=>{
@@ -4525,7 +4567,7 @@ function asSnapshot(){
     });
   };
   const attCount = asCollectAttachments().length;
-  return {
+  const snap = {
     _app:'office-desk',
     _version:APP_VERSION,
     savedAt:new Date().toISOString(),
@@ -4537,6 +4579,12 @@ function asSnapshot(){
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded}
   };
+  try{
+    const seen={n:0};
+    jsonCaseDedupe(snap,seen);
+    if(seen.n){ try{ console.warn('[云快照] 已合并 '+seen.n+' 处「仅大小写不同」的重复键，避免本机备份脚本解析失败'); }catch(e){} }
+  }catch(e){}
+  return snap;
 }
 
 // 字符串 -> base64（UTF-8 安全）。注意：encodeSync 会先做一次 JSON.stringify，
@@ -6452,7 +6500,12 @@ function bizDate(v){
   return '';
 }
 function bizPayKey(p){ return [p.shop,p.ts,p.amount,p.buyer,p.orderNo].join('|'); }
-function bizCustKey(p){ const b=String(p.buyer||'').trim(), s=String(p.sellerRaw||'').trim(); return (b&&s)?(b+'|||'+s):''; }
+// ⚠️ 客户键统一小写（2026-10-06）：源数据里同一客户/业务员存在大小写变体
+// （vivian fanshi / Vivian Fanshi、Khadija Houho / khadija houho），键只差大小写时
+// 云端 JSON 会出现"重复键"，PowerShell 的 ConvertFrom-Json 会直接拒绝解析 → 本机备份链路断掉。
+// 业务员识别走 bizSellerCn() 且大小写无关，所以归一化不改变任何统计口径。
+function bizCustKey(p){ const b=String(p.buyer||'').trim().toLowerCase(), s=String(p.sellerRaw||'').trim().toLowerCase(); return (b&&s)?(b+'|||'+s):''; }
+function bizCustKeyNorm(k){ const a=String(k||'').split('|||'); return a.length===2?((a[0].trim().toLowerCase())+'|||'+(a[1].trim().toLowerCase())):String(k||''); }
 
 // ---------------- 零依赖 xlsx 读取 ----------------
 function bizXmlUnesc(s){
@@ -6726,12 +6779,12 @@ const BIZ_FP_SEED={"Nadhrah Alhadi|||Phoebe Lignes":"2026-06-30","Clara Mae|||Al
 // 首笔收款历史库：只增不减（跨批次累积，老基准比新算出来的更早时沿用旧的；BIZ_FP_SEED=老助版客户历史库 355 条）
 function bizRebuildFirstPay(){
   const fp={};
-  Object.keys(biz.firstPay||{}).forEach(k=>{ if(biz.firstPay[k]) fp[k]=biz.firstPay[k]; });
-  Object.keys(BIZ_FP_SEED||{}).forEach(k=>{ const d=BIZ_FP_SEED[k]; if(d&&(!fp[k]||d<fp[k])) fp[k]=d; });
+  const put=(k,d)=>{ if(!k||!d) return; if(!fp[k]||d<fp[k]) fp[k]=d; };
+  // 旧库/种子库的键一并归一化（大小写变体合并，取更早的那一天）
+  Object.keys(biz.firstPay||{}).forEach(k=>{ put(bizCustKeyNorm(k), biz.firstPay[k]); });
+  Object.keys(BIZ_FP_SEED||{}).forEach(k=>{ put(bizCustKeyNorm(k), BIZ_FP_SEED[k]); });
   biz.pays.slice().sort((a,b)=>String(a.ts).localeCompare(String(b.ts))).forEach(p=>{
-    const k=bizCustKey(p); if(!k) return;
-    const d=String(p.ts).slice(0,10); if(!d) return;
-    if(!fp[k]||d<fp[k]) fp[k]=d;
+    put(bizCustKey(p), String(p.ts).slice(0,10));
   });
   biz.firstPay=fp;
 }
@@ -6751,14 +6804,15 @@ function bizRebuildFirstOrder(){
     const d=fo0[k]; if(!d||d<'2000-01-01'||d>tToday) return;
     const st=BIZ_SELLER_START[bizSellerCn(String(k).split('|||')[1])];
     if(st&&d<st) return;
-    fo[k]=d;
+    const nk=bizCustKeyNorm(k);           // 键统一小写（合并大小写变体）
+    if(!fo[nk]||d<fo[nk]) fo[nk]=d;
   });
   (biz.orders||[]).forEach(o=>{
     const b=String(o.buyer||'').trim(), s=String(o.sellerRaw||'').trim(), d=String(o.ts||'').slice(0,10);
     if(!b||!s||!d||d<'2000-01-01'||d>tToday) return;
     const st=BIZ_SELLER_START[bizSellerCn(s)];
     if(st&&d<st) return;
-    const k=b+'|||'+s;
+    const k=bizCustKey(o);
     if(!fo[k]||d<fo[k]) fo[k]=d;
   });
   biz.firstOrder=fo;
@@ -6935,7 +6989,7 @@ function bizSellers(list){
     return o;
   }).sort((a,b)=>b.amount-a.amount);
 }
-function bizCountryOf(p){ return (biz.fixCountry&&biz.fixCountry[p.buyer]) ? biz.fixCountry[p.buyer] : (p.country||'未知国家'); }
+function bizCountryOf(p){ const k=String(p.buyer||'').trim().toLowerCase(); return (biz.fixCountry&&biz.fixCountry[k]) ? biz.fixCountry[k] : (p.country||'未知国家'); }
 function bizCountries(list, shop){
   const m={};
   list.filter(p=>!shop||p.shop===shop).forEach(p=>{
@@ -8314,7 +8368,7 @@ function bizFixCountry(){
   const c=window.prompt('「'+name+'」的真实国家是？例如：法国', '');
   if(!c) return;
   biz.fixCountry=biz.fixCountry||{};
-  biz.fixCountry[name]=bizCountryCn(c);
+  biz.fixCountry[String(name).trim().toLowerCase()]=bizCountryCn(c);   // 键统一小写
   saveAll(); renderBiz();
   showToast('✓ 已把「'+name+'」记为 '+bizCountryCn(c),'info');
 }
