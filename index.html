@@ -189,7 +189,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-cell:hover{filter:brightness(.97)}
 .plan-cv{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px}
 .plan-cell.none .plan-cv{color:var(--text-muted);font-weight:500}
-.plan-cs{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+.plan-cs{font-size:10.5px;color:#0e7490;font-weight:600;margin-top:1px}
 .plan-bdg{font-size:9.5px;font-weight:700;border-radius:4px;padding:0 4px;line-height:15px;flex-shrink:0}
 .plan-bdg.auto{background:#DBEAFE;color:#1d4ed8}
 .plan-bdg.manual{background:#FDE9C8;color:#b45309}
@@ -207,7 +207,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-tbl tr.sum td.sub{background:#eaf0f6}
 .plan-totcell{display:block;padding:7px 9px;text-align:left;line-height:1.35;min-height:44px}
 .plan-totcell .plan-cv{font-size:12.5px;font-weight:700;color:var(--text);display:block}
-.plan-totcell .plan-cs{font-size:10.5px;color:var(--text-secondary);margin-top:1px;display:block}
+.plan-totcell .plan-cs{font-size:10.5px;color:#0e7490;margin-top:1px;display:block}
 .plan-totcell .plan-df{font-size:10.5px;font-weight:700;margin-top:1px;display:block;color:var(--text-secondary)}
 .plan-totcell.none .plan-cv{color:var(--text-muted);font-weight:500}
 .plan-totcell.strong .plan-cv{font-size:13.5px;color:var(--primary-dark)}
@@ -221,6 +221,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-pjgrid div b{font-size:13px;font-weight:700}
 .plan-pjrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-secondary);padding:3px 0;border-top:1px dashed var(--border)}
 @media (max-width:768px){.plan-pjgrid{grid-template-columns:repeat(2,1fr)}}
+/* ===== v2.9：表格副行（计划/完成、点击填计划）加大加深 —— 12.5px 浅灰 → 13.5px 深青加粗 ===== */
 /* ===== v2.8：朗格斯新增业务员「崔燕柯」（项目固定人员：暂无流水也固定占列，方便先排计划）===== */
 /* ===== v2.7：字号放大 + 项目上下分屏 + 手填总计划 ===== */
 .plan-blk{margin-bottom:20px}
@@ -236,12 +237,12 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .plan-tbl td.mth{font-size:15px;padding:11px 13px}
 .plan-cell{padding:10px 12px;min-height:58px}
 .plan-cv{font-size:16.5px}
-.plan-cs{font-size:12.5px;margin-top:2px}
+.plan-cs{font-size:13.5px;margin-top:2px}
 .plan-bdg{font-size:11px;line-height:17px;padding:0 5px;border-radius:5px}
 .plan-bdg.goal{background:#DCFCE7;color:#15803d}
 .plan-totcell{padding:10px 12px;min-height:58px;border-left:3px solid transparent}
 .plan-totcell .plan-cv{font-size:16.5px}
-.plan-totcell .plan-cs{font-size:12.5px}
+.plan-totcell .plan-cs{font-size:13.5px}
 .plan-totcell strong,.plan-totcell.strong .plan-cv{font-size:17px}
 .plan-totcell.goal{cursor:pointer}
 .plan-totcell.goal:hover{filter:brightness(.97)}
@@ -865,7 +866,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.8 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.9 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -1320,7 +1321,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.8';
+const APP_VERSION = 'v2.9';
 let tasks = [];
 let notes = [];
 let projects = [];
