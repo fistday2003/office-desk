@@ -866,7 +866,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.10 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.11 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -1328,7 +1328,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.10';
+const APP_VERSION = 'v2.11';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4227,26 +4227,15 @@ document.getElementById('importFile').addEventListener('change',function(){
       if(!data.tasks || !data.notes || !data.projects){
         showToast('文件格式不正确'); return;
       }
-      showConfirm('导入将覆盖当前所有数据（共 '+totalItems()+' 条），确定要导入吗？', ()=>{
-        tasks = data.tasks || [];
-        notes = data.notes || [];
-        projects = data.projects || [];
-        dashboard = data.dashboard || [];
-        // 数据看板（月度计划/实际）：旧备份没有这个字段时，保留本机已有数据，不能清空
-        if(Object.prototype.hasOwnProperty.call(data,'plan')) plan = data.plan || [];
-        // 数据看板「总计划」（手填）：同样旧备份没有就保留本机
-        if(Object.prototype.hasOwnProperty.call(data,'planGoals') && data.planGoals && typeof data.planGoals==='object') planGoals = data.planGoals;
-        // 报账数据：旧备份里没有这个字段时，保留本机已有记录，不能清空
-        if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = data.expenses || [];
-        // 货损客诉：同样旧备份没有这字段时保留本机
-        if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = data.claims || [];
-        // 经营分析：旧备份没有这字段时保留本机（已导入的订单/收款表不能因为导个旧备份就没了）
-        if(Object.prototype.hasOwnProperty.call(data,'biz') && data.biz && typeof data.biz==='object'){
-          biz = Object.assign(bizBlank(), data.biz);
-        }
-        saveAll();
+      const before = totalItems();
+      showConfirm('导入「'+file.name+'」\n' +
+        '本机现有 ' + before + ' 条，导入采用【合并】方式：\n' +
+        '· 本机独有的记录一律保留，不会被覆盖或删除\n' +
+        '· 已报账状态、本机附件不会被冲掉\n' +
+        '确定导入吗？', ()=>{
+        const st = applyIncoming(data, '从文件导入前');
         refreshAll();
-        showToast('导入成功！共恢复 '+totalItems()+' 条数据', 'info');
+        showToast('✓ 合并导入完成：补入 ' + (st.newFromIncoming + st.bizAdded) + ' 条，保留本机独有 ' + st.kept + ' 条', 'info');
       });
     }catch(err){
       showToast('文件解析失败，请检查文件格式');
