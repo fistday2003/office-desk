@@ -151,6 +151,62 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   .dash-mcard{display:block}
   .dash-panel{padding:13px}
 }
+
+/* ===== 数据看板 v2.4 · 月度销售计划 vs 实际完成 ===== */
+.plan-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.plan-bar .dash-select{min-height:34px;padding:6px 10px;font-size:12.5px}
+.plan-mset{display:flex;gap:3px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px}
+.plan-mtab{padding:5px 11px;border:none;background:transparent;border-radius:6px;font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit}
+.plan-mtab.active{background:var(--card-bg);color:var(--primary-dark);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.plan-chk{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary);cursor:pointer;user-select:none;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg)}
+.plan-spacer{flex:1 1 auto}
+.plan-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--text-secondary);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);line-height:1.7}
+.plan-legend b{display:inline-flex;align-items:center;gap:4px;font-weight:500;color:var(--text-secondary)}
+.plan-sw{display:inline-block;width:24px;height:14px;border-radius:3px}
+.plan-sw.auto{background:#EAF3FE;border:1px solid #A9CDF5}
+.plan-sw.manual{background:#FFF6E8;border:1px solid #F3C98B}
+.plan-sw.mixed{background:#F2ECFC;border:1px solid #C9B6EE}
+.plan-sw.none{background:var(--bg);border:1px solid var(--border)}
+.plan-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.plan-tbl th{background:var(--bg);font-size:11.5px;font-weight:700;color:var(--text-secondary);padding:7px 8px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--border)}
+.plan-tbl th.mth{text-align:left;position:sticky;left:0;z-index:2;background:var(--bg);border-right:1px solid var(--border)}
+.plan-tbl th.pj{background:#eef2f7;color:var(--text)}
+.plan-tbl th.pj.lg{background:#e0f2fe;color:#0369a1}
+.plan-tbl th.pj.fs{background:#fef3c7;color:#b45309}
+.plan-tbl th.tot{background:#f1f5f9;color:var(--text)}
+.plan-tbl td{padding:0;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
+.plan-tbl td.mth{text-align:left;font-weight:600;white-space:nowrap;padding:8px 10px;position:sticky;left:0;z-index:1;background:var(--card-bg);border-right:1px solid var(--border)}
+.plan-tbl td.tot{background:#f8fafc;font-weight:600}
+.plan-tbl tbody tr:hover td{background-color:#f6fafd}
+.plan-tbl tbody tr:hover td.mth{background-color:#eef6fb}
+.plan-tbl tr.sum td{background:#f1f5f9;font-weight:700}
+.plan-tbl tr.sum td.mth{background:#e2e8f0}
+.plan-cell{display:block;padding:7px 9px;cursor:pointer;text-align:left;line-height:1.35;min-height:44px;border-left:3px solid transparent}
+.plan-cell.auto{background:#EAF3FE;border-left-color:#3B82F6}
+.plan-cell.manual{background:#FFF6E8;border-left-color:#F59E0B}
+.plan-cell.mixed{background:#F2ECFC;border-left-color:#8B5CF6}
+.plan-cell.none{background:transparent;border-left-color:transparent;color:var(--text-muted)}
+.plan-cell:hover{filter:brightness(.97)}
+.plan-cv{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px}
+.plan-cell.none .plan-cv{color:var(--text-muted);font-weight:500}
+.plan-cs{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+.plan-bdg{font-size:9.5px;font-weight:700;border-radius:4px;padding:0 4px;line-height:15px;flex-shrink:0}
+.plan-bdg.auto{background:#DBEAFE;color:#1d4ed8}
+.plan-bdg.manual{background:#FDE9C8;color:#b45309}
+.plan-bdg.mixed{background:#E7DCFA;color:#6D28D9}
+.plan-mini{height:4px;border-radius:2px;background:rgba(15,23,42,.10);margin-top:5px;overflow:hidden}
+.plan-mini span{display:block;height:100%;border-radius:2px;background:currentColor}
+.plan-cell.over span{background:#0f766e}
+.plan-mcard{display:none}
+.plan-mitem{border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-bottom:10px}
+.plan-mrow{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--border)}
+.plan-mrow:last-child{border-bottom:none}
+@media (max-width:768px){
+  .plan-tbl-wrap{display:none}
+  .plan-mcard{display:block}
+  .plan-bar{gap:6px}
+  .plan-bar .btn{padding:7px 10px;font-size:12px}
+}
 .main-content{flex:1;padding:20px 24px;overflow-y:auto;max-height:calc(100vh - var(--header-h))}
 
 /* Tab panels */
@@ -743,7 +799,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.3 · 2026-09-22</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.4 · 2026-10-06</div>
     </div>
   </aside>
 
@@ -829,22 +885,13 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
         <div class="section-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
-          数据看板
+          数据看板 · 月度销售计划 vs 实际完成
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <label class="btn" for="dashImportInput" id="btnImportDash" style="cursor:pointer" title="选择由取数脚本生成的 JSON 文件">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            导入看板数据
-          </label>
-          <button class="btn btn-primary" id="btnAddDash">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            录入月度数据
-          </button>
-        </div>
-        <input type="file" id="dashImportInput" accept=".json,application/json" style="display:none" onchange="handleDashImport()">
+        <span class="dm-sub" id="planSyncHint"></span>
       </div>
-      <p class="section-subtitle">每月从阿里后台导出关键数字填进来，工作台自动算环比、画趋势、比两个店</p>
+      <p class="section-subtitle">按「<b>项目 × 业务员 × 月份</b>」跟踪<b>计划</b>与<b>实际完成</b>。实际完成可从「经营分析」的收款流水一键抓取，也可以手工填写——底色和角标会区分来源（⚡ 自动 / ✎ 手工）。<b>点表格里任意格子即可修改</b>。</p>
       <div id="dashContent"></div>
+      <input type="file" id="planImportInput" accept=".json,.csv,.txt" style="display:none" onchange="handlePlanImport()">
     </div>
 
     <!-- TAB: 经营分析（国际站订单/收款） -->
@@ -1092,35 +1139,36 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 </div>
 
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
-<div class="modal-overlay" id="modalDash" style="display:none">
+<div class="modal-overlay" id="modalPlan" style="display:none">
   <div class="modal">
-    <h3 id="modalDashTitle">录入月度数据</h3>
+    <h3 id="modalPlanTitle">录入销售计划 / 实际完成</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 130px"><label>年份</label><select id="dashYear"></select></div>
-      <div class="form-group" style="flex:1 1 130px"><label>月份</label><select id="dashMonthInput"></select></div>
-    </div>
-    <div class="form-group"><label>店铺</label>
-      <select id="dashShop">
-        <option value="langges">朗格斯（泳装 / 布基尼）</option>
-        <option value="fansi">凡适（BJJ / MMA）</option>
-      </select>
+      <div class="form-group" style="flex:1 1 110px"><label>年份</label><select id="planYearInput"></select></div>
+      <div class="form-group" style="flex:1 1 110px"><label>月份</label><select id="planMonthInput"></select></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 140px"><label>收款额（美元）</label><input type="number" id="dashRevenue" placeholder="0" inputmode="decimal"></div>
-      <div class="form-group" style="flex:1 1 140px"><label>订单数（笔）</label><input type="number" id="dashOrders" placeholder="0" inputmode="numeric"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>项目</label>
+        <select id="planProjectInput"></select>
+      </div>
+      <div class="form-group" style="flex:1 1 170px"><label>业务员</label>
+        <input type="text" id="planSellerInput" list="planSellerList" placeholder="选一个或直接输入">
+        <datalist id="planSellerList"></datalist>
+      </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 140px"><label>询盘数（条）</label><input type="number" id="dashInquiries" placeholder="0" inputmode="numeric"></div>
-      <div class="form-group" style="flex:1 1 140px"><label>新建客户数（个）</label><input type="number" id="dashNewCust" placeholder="0" inputmode="numeric"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>计划收款额（$）</label><input type="number" id="planPlan" placeholder="0" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>计划订单数（笔）</label><input type="number" id="planPlanQ" placeholder="0" inputmode="numeric"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 140px"><label>其中：新客户订单（笔）</label><input type="number" id="dashNewOrders" placeholder="0" inputmode="numeric"></div>
-      <div class="form-group" style="flex:1 1 140px"><label>急速回复率（%）</label><input type="number" id="dashReply" placeholder="0" step="0.01" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>实际收款额（$）</label><input type="number" id="planActual" placeholder="留空则跟自动值" inputmode="decimal"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>实际订单数（笔）</label><input type="number" id="planActualQ" placeholder="留空则跟自动值" inputmode="numeric"></div>
     </div>
-    <p style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-top:-4px">填「新客户订单」是为了自动算新老客户占比。拿不准可以先留空，之后再补。</p>
+    <div id="planAutoHint" style="font-size:12px;color:var(--text-secondary);line-height:1.8;background:var(--bg);border:1px dashed var(--border);border-radius:8px;padding:9px 11px;margin-bottom:12px"></div>
+    <div class="form-group"><label>备注（可空）</label><input type="text" id="planNote" placeholder="例如：含 XX 客户补单 / 汇率影响"></div>
     <div class="modal-actions">
-      <button class="btn" id="btnDashCancel">取消</button>
-      <button class="btn btn-primary" id="btnDashSave">保存</button>
+      <button class="btn" id="btnPlanDel" style="margin-right:auto;color:var(--danger);display:none">删除这条</button>
+      <button class="btn" id="btnPlanCancel">取消</button>
+      <button class="btn btn-primary" id="btnPlanSave">保存</button>
     </div>
   </div>
 </div>
@@ -1188,12 +1236,14 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.3';
+const APP_VERSION = 'v2.4';
 let tasks = [];
 let notes = [];
 let projects = [];
 let expenses = [];
 let claims = [];   // 货损 / 客诉登记
+let plan = [];     // 数据看板：月度销售计划 / 实际完成（项目×业务员×月份）
+let planOrphans = [];   // 隔离区：认不出项目/月份的看板记录（只隔离不删除）
 let currentTab = 'tasks';
 let editingId = null;
 let noteFilterTag = null;
@@ -1233,9 +1283,11 @@ function loadData(){
   notes     = rdStore('notes', [], true);
   projects  = rdStore('projects', [], true);
   dashboard = rdStore('dashboard', [], true);
+  plan      = rdStore('plan', [], true);      // 新版数据看板：月度计划/实际
   expenses  = rdStore('expenses', [], true);
   claims    = rdStore('claims', [], true);
   dashOrphans = rdStore('dash_orphan', [], true);
+  planOrphans = rdStore('plan_orphan', [], true);
   const _bz = rdStore('biz', null);
   if(_bz && typeof _bz==='object') biz = Object.assign(bizBlank(), _bz);
   if(!biz || typeof biz!=='object') biz = bizBlank();
@@ -1254,6 +1306,7 @@ function loadData(){
   // 首单库：载入时就从已导入订单里取每个(买家+业务员)的最早下单日
   try{ bizRebuildFirstOrder(); }catch(e){}
   healDashboard();
+  healPlan();
   expHeal();
   clmHeal();
   if(dataHealNotes.length || dashOrphans.length){
@@ -1320,6 +1373,7 @@ function saveAll(){
     localStorage.setItem(STORAGE_PREFIX+'notes',JSON.stringify(notes));
     localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(projects));
     localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
+    localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
     localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(expenses));
     localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(claims));
     localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
@@ -1364,11 +1418,11 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + expenses.length + claims.length + biz.orders.length + biz.pays.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + expenses.length + claims.length + biz.orders.length + biz.pays.length}
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample);
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample);
 }
 
 // Clear sample data
@@ -1377,6 +1431,7 @@ function clearSampleData(){
   notes = notes.filter(n=>!n._sample);
   projects = projects.filter(p=>!p._sample);
   dashboard = dashboard.filter(d=>!d._sample);
+  plan = plan.filter(p=>!p._sample);
   expenses = expenses.filter(e=>!e._sample);
   claims = claims.filter(c=>!c._sample);
   saveAll();
@@ -1423,334 +1478,20 @@ function seedSampleData(){
   saveAll();
 }
 
-// 数据看板：首次为空时载入一组示例，方便立刻看懂用法（顶部「清空示例数据」可一键清除）
-function seedDashSample(){
-  const mk = (month,shop,revenue,orders,inquiries,newCustomers,newOrders,quickReply)=>
-    ({id:uid(),month,shop,revenue,orders,inquiries,newCustomers,newOrders,quickReply,_sample:true});
-  dashboard.push(
-    mk('2026-07','langges',86500,42,1580,210,12,41.2),
-    mk('2026-08','langges',92400,47,1712,238,15,44.8),
-    mk('2026-09','langges',68200,33,1240,176,9,38.5),
-    mk('2026-07','fansi',21800,15,420,68,6,30.2),
-    mk('2026-08','fansi',24600,17,462,74,7,33.6),
-    mk('2026-09','fansi',15900,11,318,52,3,35.7)
-  );
-}
-
 // ============================================================
-//  数据看板
+//  数据看板 v2.4 · 月度销售计划 vs 实际完成
+//  · 结构：项目（店铺）× 业务员 × 月份 → 计划 / 实际完成
+//  · 计划：手工填写；实际：①从「经营分析」收款流水自动抓取 ②手工填写
+//  · 自动值与手工值分别记录来源，界面上用底色 + 角标区分（⚡自动 / ✎手工 / ⚡✎混合）
 // ============================================================
-const SHOP_NAMES = {langges:'朗格斯', fansi:'凡适'};
-const DASH_METRICS = [
-  {key:'revenue',      label:'收款额',         fmt:v=>fmtMoney(v)},
-  {key:'orders',       label:'订单数',         fmt:v=>Math.round(v)+' 笔'},
-  {key:'inquiries',    label:'询盘数',         fmt:v=>Math.round(v)+' 条'},
-  {key:'newCustomers', label:'新建客户',       fmt:v=>Math.round(v)+' 个'},
-  {key:'newRatio',     label:'新客户订单占比', fmt:v=>v.toFixed(1)+'%', bar:true},
-  {key:'quickReply',   label:'急速回复率',     fmt:v=>v.toFixed(1)+'%'}
-];
-const DASH_TRENDS = [
-  {key:'revenue',      label:'收款额',    axis:v=>fmtMoney(v)},
-  {key:'orders',       label:'订单数',    axis:v=>String(Math.round(v))},
-  {key:'inquiries',    label:'询盘数',    axis:v=>String(Math.round(v))},
-  {key:'newCustomers', label:'新建客户',  axis:v=>String(Math.round(v))},
-  {key:'quickReply',   label:'急速回复率',axis:v=>v.toFixed(0)+'%'}
-];
-let dashSelMonth = null;
-let dashSelMetric = 'revenue';
-let editingDashId = null;
-
-function dNum(v){const n=parseFloat(v);return isNaN(n)?0:n}
-function fmtMoney(v){return '$'+Math.round(v).toLocaleString('en-US')}
-function fmtMonthLabel(m){const p=String(m).split('-');return p[0]+'年'+parseInt(p[1])+'月'}
-function fmtMonthShort(m){const p=String(m).split('-');return parseInt(p[1])+'月'}
-function dashMonths(){return [...new Set(dashboard.map(r=>r.month))].sort()}
-
-function dashAgg(list){
-  const a={revenue:0,orders:0,inquiries:0,newCustomers:0,newOrders:0,quickReply:0,
-           rateSum:0,rateN:0,count:0,hasNewOrders:false,hasReply:false};
-  list.forEach(r=>{
-    a.revenue+=dNum(r.revenue);
-    a.orders+=dNum(r.orders);
-    a.inquiries+=dNum(r.inquiries);
-    a.newCustomers+=dNum(r.newCustomers);
-    a.newOrders+=dNum(r.newOrders);
-    if(dNum(r.newOrders)>0) a.hasNewOrders=true;
-    if(r.quickReply!==''&&r.quickReply!=null){a.rateSum+=dNum(r.quickReply);a.rateN++;a.hasReply=true;}
-    a.count++;
-  });
-  a.quickReply = a.rateN ? a.rateSum/a.rateN : 0;
-  a.newRatio = a.orders ? Math.min(100, a.newOrders/a.orders*100) : 0;
-  return a;
-}
-
-function dashAt(month, shop){
-  return dashAgg(dashboard.filter(r=>r.month===month && (!shop || r.shop===shop)));
-}
-
-function dashPrevMonth(m){
-  const p=String(m).split('-');
-  const d=new Date(parseInt(p[0]),parseInt(p[1])-2,1);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-}
-
-function dashDelta(cur, prev){
-  if(prev===null||prev===undefined) return {text:'—',cls:'flat'};
-  if(prev===0) return cur===0 ? {text:'—',cls:'flat'} : {text:'新增',cls:'up'};
-  const pct=(cur-prev)/Math.abs(prev)*100;
-  if(Math.abs(pct)<0.05) return {text:'持平',cls:'flat'};
-  return {text:(pct>0?'↑ ':'↓ ')+Math.abs(pct).toFixed(1)+'%', cls: pct>0?'up':'down'};
-}
-
-function dashChartSvg(months, metricKey){
-  const mt = DASH_TRENDS.find(t=>t.key===metricKey) || DASH_TRENDS[0];
-  const W=680, PL=68, PR=18, PT=22, PB=36, H=250;
-  const iw=W-PL-PR, ih=H-PT-PB;
-  const series=['langges','fansi'].map((shop,i)=>({
-    shop, name:SHOP_NAMES[shop], color: i===0 ? '#0891b2' : '#f59e0b',
-    vals: months.map(m=>{ const a=dashAt(m,shop); return a.count ? a[metricKey] : null; })
-  }));
-  const allv=[];
-  series.forEach(s=>s.vals.forEach(v=>{ if(v!==null) allv.push(v); }));
-  if(allv.length===0) return '<div style="color:var(--text-muted);font-size:13px;padding:24px 0;text-align:center">暂无可对比数据</div>';
-  let mx=Math.max.apply(null,allv), mn=Math.min.apply(null,allv);
-  if(mx===mn){ mx = mx ? mx*1.15 : 1; mn = mn*0.85; }
-  const padv=(mx-mn)*0.18; mx+=padv; mn-=padv; if(mn<0) mn=0;
-  const span=(mx-mn)||1;
-  const px=i=> months.length===1 ? PL+iw/2 : PL+iw*i/(months.length-1);
-  const py=v=> PT+ih-(v-mn)/span*ih;
-  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block" role="img" aria-label="月度趋势对比图">';
-  for(let i=0;i<=4;i++){
-    const v=mn+span*i/4, yy=py(v);
-    s+='<line x1="'+PL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+yy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="0.5"/>';
-    s+='<text x="'+(PL-8)+'" y="'+yy.toFixed(1)+'" text-anchor="end" dominant-baseline="central" font-size="11" fill="#94a3b8">'+mt.axis(v)+'</text>';
-  }
-  months.forEach((m,i)=>{
-    s+='<text x="'+px(i).toFixed(1)+'" y="'+(PT+ih+20)+'" text-anchor="middle" font-size="11" fill="#94a3b8">'+fmtMonthShort(m)+'</text>';
-  });
-  series.forEach(se=>{
-    const pts=[];
-    se.vals.forEach((v,i)=>{ if(v!==null) pts.push([px(i),py(v)]); });
-    if(pts.length>1){
-      s+='<polyline fill="none" stroke="'+se.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+'"/>';
-    }
-    pts.forEach(p=>{
-      s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.5" fill="#fff" stroke="'+se.color+'" stroke-width="2"/>';
-    });
-    if(months.length<=6){
-      se.vals.forEach((v,i)=>{
-        if(v===null) return;
-        s+='<text x="'+px(i).toFixed(1)+'" y="'+(py(v)-11).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="500" fill="'+se.color+'">'+mt.axis(v)+'</text>';
-      });
-    }
-  });
-  s+='</svg>';
-  return s;
-}
-
+// —— 公共小工具（v2.4 起由本模块提供：报账、货损、复盘等模块也在用）——
+function dNum(v){ const n=parseFloat(v); return isNaN(n)?0:n; }
+function fmtMoney(v){ return '$'+Math.round(v).toLocaleString('en-US'); }
+function fmtMonthLabel(m){ const p=String(m).split('-'); return p[0]+'年'+parseInt(p[1])+'月'; }
+function fmtMonthShort(m){ const p=String(m).split('-'); return parseInt(p[1])+'月'; }
 const ICON_EDIT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
 const ICON_DEL='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
-
-function renderDash(){
-  const box=document.getElementById('dashContent');
-  if(!box) return;
-  const months=dashMonths();
-  if(months.length===0){
-    box.innerHTML='<div class="card dash-empty">'
-      +'还没有数据<br>'
-      +'<span style="font-size:13px">点右上角「录入月度数据」，把每个月从阿里后台导出的几个关键数字填进来<br>'
-      +'填过一次之后，每个月只要补一条，环比和趋势就自动出来了</span></div>';
-    return;
-  }
-  if(!dashSelMonth || months.indexOf(dashSelMonth)<0) dashSelMonth=months[months.length-1];
-  const m=dashSelMonth;
-  const cur=dashAt(m);
-  const prev=dashAt(dashPrevMonth(m));
-  const hasPrev=prev.count>0;
-  const isLatest = m===months[months.length-1];
-
-  let html='';
-  html+='<div class="dash-toolbar">';
-  html+='<select class="dash-select" id="dashMonthSel" onchange="dashPickMonth(this.value)">';
-  months.slice().reverse().forEach(mm=>{
-    html+='<option value="'+mm+'"'+(mm===m?' selected':'')+'>'+fmtMonthLabel(mm)+'</option>';
-  });
-  html+='</select>';
-  html+='<span class="dash-chip">两店合计 · '+cur.count+' 条记录</span>';
-  if(isLatest) html+='<span class="dash-chip" style="background:var(--success-light);color:#047857">最新月份</span>';
-  html+='</div>';
-
-  html+='<div class="dash-grid">';
-  DASH_METRICS.forEach(mt=>{
-    const v=cur[mt.key];
-    const pv=hasPrev?prev[mt.key]:null;
-    const d=dashDelta(v,pv);
-    let foot='对比上月';
-    if(!hasPrev) foot='无上月对比';
-    else if(mt.key==='newRatio' && !cur.hasNewOrders) foot='未填新客户订单';
-    else if(mt.key==='quickReply' && !cur.hasReply) foot='未填回复率';
-    html+='<div class="dash-metric">';
-    html+='<div class="dm-label">'+mt.label+'</div>';
-    html+='<div class="dm-value">'+mt.fmt(v)+'</div>';
-    html+='<div class="dm-foot"><span class="dm-delta '+d.cls+'">'+d.text+'</span><span class="dm-sub">'+foot+'</span></div>';
-    if(mt.bar) html+='<div class="dash-bar"><span style="width:'+v.toFixed(1)+'%"></span></div>';
-    html+='</div>';
-  });
-  html+='</div>';
-
-  html+='<div class="dash-panel">';
-  html+='<div class="dash-panel-head"><div class="dash-panel-title">趋势对比（两店各一条线）</div><div class="dash-metric-tabs">';
-  DASH_TRENDS.forEach(t=>{
-    html+='<button class="dash-mtab'+(t.key===dashSelMetric?' active':'')+'" onclick="dashPickMetric(\''+t.key+'\')">'+t.label+'</button>';
-  });
-  html+='</div></div>';
-  html+=dashChartSvg(months,dashSelMetric);
-  html+='<div class="dash-legend"><span><i style="background:#0891b2"></i>朗格斯</span><span><i style="background:#f59e0b"></i>凡适</span></div>';
-  html+='</div>';
-
-  html+='<div class="dash-panel">';
-  html+='<div class="dash-panel-title" style="margin-bottom:12px">两店对比 · '+fmtMonthLabel(m)+'</div>';
-  html+='<div class="dash-shop-cols">';
-  ['langges','fansi'].forEach(shop=>{
-    const a=dashAt(m,shop);
-    html+='<div class="dash-shop-col">';
-    html+='<div class="dash-shop-head"><span class="dash-shop-tag '+(shop==='langges'?'lg':'fs')+'">'+SHOP_NAMES[shop]+'</span>'+(a.count?'':'<span style="font-size:12px;color:var(--text-muted);font-weight:400">本月未录入</span>')+'</div>';
-    if(a.count){
-      html+='<div class="dash-kv"><span>收款额</span><span>'+fmtMoney(a.revenue)+'</span></div>';
-      html+='<div class="dash-kv"><span>订单数</span><span>'+Math.round(a.orders)+' 笔</span></div>';
-      html+='<div class="dash-kv"><span>询盘数</span><span>'+Math.round(a.inquiries)+' 条</span></div>';
-      html+='<div class="dash-kv"><span>新建客户</span><span>'+Math.round(a.newCustomers)+' 个</span></div>';
-      html+='<div class="dash-kv"><span>新客户订单占比</span><span>'+(a.hasNewOrders?a.newRatio.toFixed(1)+'%':'—')+'</span></div>';
-      html+='<div class="dash-kv"><span>急速回复率</span><span>'+(a.hasReply?a.quickReply.toFixed(1)+'%':'—')+'</span></div>';
-      html+='<div class="dash-kv"><span>询盘→订单转化</span><span>'+(a.inquiries?((a.orders/a.inquiries)*100).toFixed(1)+'%':'—')+'</span></div>';
-    } else {
-      html+='<div style="font-size:12px;color:var(--text-muted);padding:6px 0">本月还没录入这个店的数据</div>';
-    }
-    html+='</div>';
-  });
-  html+='</div></div>';
-
-  const sorted=dashboard.slice().sort((a,b)=>{
-    if(a.month!==b.month) return a.month<b.month?1:-1;
-    return a.shop<b.shop?-1:1;
-  });
-  html+='<div class="dash-panel">';
-  html+='<div class="dash-panel-head"><div class="dash-panel-title">全部记录（'+dashboard.length+' 条）</div><span class="dm-sub">点右侧铅笔可改，垃圾桶可删</span></div>';
-  html+='<div class="dash-table-wrap"><table class="dash-row-table"><thead><tr>';
-  html+='<th>月份</th><th>店铺</th><th>收款额</th><th>订单</th><th>询盘</th><th>新建客户</th><th>新客户占比</th><th>急速回复率</th><th style="text-align:right">操作</th>';
-  html+='</tr></thead><tbody>';
-  sorted.forEach(r=>{
-    const a=dashAgg([r]);
-    html+='<tr>';
-    html+='<td>'+fmtMonthLabel(r.month)+'</td>';
-    html+='<td><span class="dash-shop-tag '+(r.shop==='langges'?'lg':'fs')+'">'+(SHOP_NAMES[r.shop]||r.shop)+'</span></td>';
-    html+='<td>'+fmtMoney(dNum(r.revenue))+'</td>';
-    html+='<td>'+Math.round(dNum(r.orders))+'</td>';
-    html+='<td>'+Math.round(dNum(r.inquiries))+'</td>';
-    html+='<td>'+Math.round(dNum(r.newCustomers))+'</td>';
-    html+='<td>'+(a.hasNewOrders?a.newRatio.toFixed(1)+'%':'—')+'</td>';
-    html+='<td>'+(r.quickReply===''||r.quickReply==null?'—':dNum(r.quickReply).toFixed(1)+'%')+'</td>';
-    html+='<td style="text-align:right;white-space:nowrap">';
-    html+='<button class="btn-icon" onclick="openDashModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
-    html+='<button class="btn-icon" onclick="deleteDashRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
-    html+='</td></tr>';
-  });
-  html+='</tbody></table></div>';
-
-  html+='<div class="dash-mcard">';
-  sorted.forEach(r=>{
-    const a=dashAgg([r]);
-    html+='<div class="dash-mcard-item">';
-    html+='<div class="dash-mcard-head"><span><span class="dash-shop-tag '+(r.shop==='langges'?'lg':'fs')+'">'+(SHOP_NAMES[r.shop]||r.shop)+'</span> <strong style="font-size:13px">'+fmtMonthLabel(r.month)+'</strong></span>';
-    html+='<span style="white-space:nowrap"><button class="btn-icon" onclick="openDashModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
-    html+='<button class="btn-icon" onclick="deleteDashRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button></span></div>';
-    html+='<div class="dash-kv"><span>收款额</span><span>'+fmtMoney(dNum(r.revenue))+'</span></div>';
-    html+='<div class="dash-kv"><span>订单 / 询盘</span><span>'+Math.round(dNum(r.orders))+' 笔 / '+Math.round(dNum(r.inquiries))+' 条</span></div>';
-    html+='<div class="dash-kv"><span>新建客户</span><span>'+Math.round(dNum(r.newCustomers))+' 个</span></div>';
-    html+='<div class="dash-kv"><span>新客户占比</span><span>'+(a.hasNewOrders?a.newRatio.toFixed(1)+'%':'—')+'</span></div>';
-    html+='<div class="dash-kv"><span>急速回复率</span><span>'+(r.quickReply===''||r.quickReply==null?'—':dNum(r.quickReply).toFixed(1)+'%')+'</span></div>';
-    html+='</div>';
-  });
-  html+='</div>';
-  html+='</div>';
-
-  box.innerHTML=html;
-}
-
-function dashPickMonth(m){ dashSelMonth=m; renderDash(); }
-function dashPickMetric(k){ dashSelMetric=k; renderDash(); }
-
-function openDashModal(id){
-  const now=new Date();
-  const ySel=document.getElementById('dashYear');
-  const mSel=document.getElementById('dashMonthInput');
-  if(ySel.options.length===0){
-    for(let y=now.getFullYear()+1;y>=2022;y--) ySel.innerHTML+='<option value="'+y+'">'+y+' 年</option>';
-    for(let i=1;i<=12;i++) mSel.innerHTML+='<option value="'+String(i).padStart(2,'0')+'">'+i+' 月</option>';
-  }
-  editingDashId = id||null;
-  const rec = id ? dashboard.find(d=>d.id===id) : null;
-  const m = rec ? rec.month : (dashSelMonth || (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')));
-  const parts=String(m).split('-');
-  ySel.value=parts[0];
-  mSel.value=parts[1];
-  document.getElementById('dashShop').value = rec ? rec.shop : 'langges';
-  document.getElementById('dashRevenue').value = rec ? rec.revenue : '';
-  document.getElementById('dashOrders').value = rec ? rec.orders : '';
-  document.getElementById('dashInquiries').value = rec ? rec.inquiries : '';
-  document.getElementById('dashNewCust').value = rec ? rec.newCustomers : '';
-  document.getElementById('dashNewOrders').value = rec ? rec.newOrders : '';
-  document.getElementById('dashReply').value = rec ? rec.quickReply : '';
-  document.getElementById('modalDashTitle').textContent = rec ? '编辑数据' : '录入月度数据';
-  document.getElementById('modalDash').style.display='flex';
-}
-
-function saveDashRecord(){
-  const month=document.getElementById('dashYear').value+'-'+document.getElementById('dashMonthInput').value;
-  const shop=document.getElementById('dashShop').value;
-  const replyRaw=document.getElementById('dashReply').value;
-  const rec={
-    month, shop,
-    revenue:dNum(document.getElementById('dashRevenue').value),
-    orders:dNum(document.getElementById('dashOrders').value),
-    inquiries:dNum(document.getElementById('dashInquiries').value),
-    newCustomers:dNum(document.getElementById('dashNewCust').value),
-    newOrders:dNum(document.getElementById('dashNewOrders').value),
-    quickReply: replyRaw==='' ? '' : dNum(replyRaw)
-  };
-  if(rec.revenue===0 && rec.orders===0 && rec.inquiries===0 && rec.newCustomers===0 && rec.quickReply===''){
-    showToast('至少填一项数据再保存'); return;
-  }
-  const finish=()=>{
-    saveAll(); closeModal('modalDash'); refreshAll();
-    showToast('✓ 已保存 '+fmtMonthLabel(month)+' '+(SHOP_NAMES[shop]||'')+' 的数据','info');
-  };
-  if(editingDashId){
-    const idx=dashboard.findIndex(d=>d.id===editingDashId);
-    if(idx>=0) dashboard[idx]=Object.assign({},dashboard[idx],rec,{_sample:false});
-    editingDashId=null;
-    finish();
-    return;
-  }
-  const exist=dashboard.find(d=>d.month===month && d.shop===shop);
-  if(exist){
-    showConfirm('该月该店已经有一条记录了，要用现在填的数据覆盖吗？',()=>{
-      Object.assign(exist,rec);
-      exist._sample=false;
-      finish();
-    });
-    return;
-  }
-  dashboard.push(Object.assign({id:uid(),createdAt:Date.now()},rec));
-  finish();
-}
-
-// ===== 导入看板数据（来自 Accio 自动取数脚本生成的 JSON）=====
-// 规则：按「月份+店铺」对齐；已存在的记录只更新自动取的 4 个字段，
-//       手工填的「新建客户数 / 新客户订单数」原样保留。
-//
-// 容错：外部文件里的店铺/月份写法千奇百怪（fanshi / fansi / 凡适 / 2026-8 …），
-//       这里统一归一化成内部标识，避免"导入成功但页面看不到"的假死现象。
+// 外部文件里店铺/月份写法千奇百怪（fanshi / fansi / 凡适 / 2026-8 …），统一归一化
 const DASH_SHOP_ALIAS = {
   langges:'langges', linges:'langges', lignes:'langges', longgers:'langges',
   langgesapparel:'langges', '朗格斯':'langges',
@@ -1769,106 +1510,736 @@ function normMonth(v){
   return m[1]+'-'+String(mm).padStart(2,'0');
 }
 
-function handleDashImport(){
-  const input=document.getElementById('dashImportInput');
-  const file=input.files && input.files[0];
-  if(!file){ showToast('没有选到文件，请重新点一次「导入看板数据」'); input.value=''; return; }
-  const reader=new FileReader();
-  reader.onerror=function(){ showToast('文件读取失败，请重试或换个文件'); input.value=''; };
-  reader.onload=function(e){
-    let data;
-    try{ data=JSON.parse(e.target.result); }
-    catch(err){ showToast('文件读不出来，可能不是有效的 JSON 文件'); input.value=''; return; }
-    const recs = data && Array.isArray(data.records) ? data.records
-               : (Array.isArray(data) ? data : null);
-    if(!recs || !recs.length){ showToast('文件里没有找到看板数据（缺少 records 字段）'); input.value=''; return; }
-    const plan=[];
-    let skipped=0;
-    recs.forEach(r=>{
-      if(!r) { skipped++; return; }
-      const month=normMonth(r.month||r.date||r.ym);
-      const shop=normShop(r.shop||r.store||r.shopName);
-      if(!month||!shop){ skipped++; return; }
-      plan.push({ r:r, month:month, shop:shop,
-                  exist: dashboard.find(d=>d.month===month && d.shop===shop) || null });
+const PLAN_PROJECTS = {langges:{name:'朗格斯',tag:'lg'}, fansi:{name:'凡适',tag:'fs'}};
+const PLAN_PROJECT_KEYS = ['langges','fansi'];
+const PLAN_SELLERS_BASE = ['陈曦','孟伊','李雪洋','乔萌萌','周文怡','Shirley Li','王梦莹'];
+const PLAN_METRICS = [{key:'amt',label:'收款额'},{key:'qty',label:'订单数'},{key:'rate',label:'完成率'}];
+const PLAN_COLOR = ['#0891b2','#f59e0b','#8b5cf6','#10b981','#ef4444','#3b82f6','#ec4899','#14b8a6','#f97316','#6366f1'];
+// 预置「实际完成」：真实收款流水汇总（2024-07 ~ 2026-08，741 笔），格式 月份|项目|业务员|金额|笔数
+const PLAN_SEED_RAW = '2024-07|langges|bella bella|311|4;2024-08|langges|mia mia|196|1;2024-11|langges|Shirley Li|90|1;2024-11|langges|bella bella|80|1;2024-11|langges|陈曦|95|1;2024-12|langges|Shirley Li|265|2;2024-12|langges|bella bella|456.7|3;2025-01|langges|Shirley Li|2696.2|8;2025-01|langges|bella bella|130|1;2025-02|langges|Molly Yang|148|1;2025-02|langges|Shirley Li|7427.16|12;2025-02|langges|bella bella|395|2;2025-03|langges|Aria Wang|138|1;2025-03|langges|Molly Yang|2473|3;2025-03|langges|Shirley Li|6590.62|9;2025-03|langges|bella bella|120|1;2025-04|langges|Aria Wang|41.94|1;2025-04|langges|Hannah|109|1;2025-04|langges|Molly Yang|504.2|2;2025-04|langges|Natiya Jin|560|5;2025-04|langges|Shirley Li|9592.18|16;2025-04|langges|bella bella|580|1;2025-05|langges|Aria Wang|1301.54|3;2025-05|langges|Hannah|366|1;2025-05|langges|Shirley Li|2946.55|6;2025-05|langges|bella bella|110|1;2025-05|langges|王梦莹|806.05|1;2025-06|langges|Hannah|405|2;2025-06|langges|未分配|373.45|3;2025-06|langges|王梦莹|130|2;2025-07|langges|Hannah|2496.8|6;2025-07|langges|未分配|86.45|1;2025-07|langges|王梦莹|1658.5|10;2025-08|langges|Hannah|4215.81|8;2025-08|langges|王梦莹|1500|3;2025-09|langges|Hannah|1096.56|6;2025-09|langges|未分配|86.42|3;2025-09|langges|王梦莹|7963.82|21;2025-10|langges|Hannah|3640.5|4;2025-10|langges|未分配|216.19|2;2025-10|langges|王梦莹|4522|9;2025-11|langges|Hannah|4659.5|10;2025-11|langges|王梦莹|10487.5|22;2025-12|langges|Hannah|195|2;2025-12|langges|王梦莹|31592.5|15;2025-12|langges|陈曦|580|5;2026-01|fansi|乔萌萌|420|3;2026-01|langges|孟伊|316|3;2026-01|langges|王梦莹|9517.51|15;2026-01|langges|陈曦|5352.5|20;2026-02|fansi|乔萌萌|628|5;2026-02|langges|孟伊|1802|6;2026-02|langges|王梦莹|464.98|5;2026-02|langges|陈曦|6631.41|10;2026-03|fansi|乔萌萌|3724.5|9;2026-03|langges|孟伊|3478|16;2026-03|langges|王梦莹|4167|15;2026-03|langges|陈曦|8776.94|28;2026-04|fansi|乔萌萌|4002|10;2026-04|langges|孟伊|11158.1|13;2026-04|langges|王梦莹|17195|19;2026-04|langges|陈曦|14052.41|26;2026-05|fansi|乔萌萌|348|6;2026-05|langges|孟伊|7436.2|8;2026-05|langges|李楠|300|3;2026-05|langges|王梦莹|14361|16;2026-05|langges|陈曦|16439.51|23;2026-06|fansi|乔萌萌|3146|16;2026-06|langges|孟伊|13678.7|25;2026-06|langges|李楠|200|2;2026-06|langges|李雪洋|456|7;2026-06|langges|王梦莹|16938|22;2026-06|langges|陈曦|5460.4|24;2026-07|fansi|乔萌萌|3921|11;2026-07|langges|Shirley Li|75|1;2026-07|langges|孟伊|15634.5|24;2026-07|langges|李雪洋|5733|19;2026-07|langges|王梦莹|7963.5|10;2026-07|langges|陈曦|13478|19;2026-08|fansi|乔萌萌|4455|15;2026-08|fansi|周文怡|50|1;2026-08|langges|孟伊|8622.9|22;2026-08|langges|李雪洋|2621.5|13;2026-08|langges|王梦莹|1730|4;2026-08|langges|陈曦|44486|24';
+let planYear = null;
+let planSelProject = 'all';
+let planSelSeller = 'all';
+let planMetric = 'amt';
+let planSplit = false;
+let editingPlan = null;
+let planAutoCache = null;
+
+function planProjName(k){ return (PLAN_PROJECTS[k]&&PLAN_PROJECTS[k].name)||k||'未分类'; }
+function planInvalidateAuto(){ planAutoCache=null; }
+function planMonthList(y){ const o=[]; for(let i=1;i<=12;i++) o.push(y+'-'+String(i).padStart(2,'0')); return o; }
+function planRec(month,project,seller){
+  const s=(seller==null?'':String(seller));
+  for(let i=0;i<plan.length;i++){
+    const r=plan[i];
+    if(r && r.month===month && r.project===project && (r.seller||'')===s) return r;
+  }
+  return null;
+}
+function planUpsert(month,project,seller,patch){
+  let r=planRec(month,project,seller);
+  if(!r){
+    r={id:uid(),month:month,project:project,seller:(seller==null?'':String(seller)),
+       plan:0,actual:0,planQ:0,actualQ:0,srcAmt:'manual',srcQty:'manual',note:''};
+    plan.push(r);
+  }
+  Object.assign(r,patch);
+  return r;
+}
+function planSellerOfPay(p){
+  const cn=String((p&&p.sellerCn)||'').trim(), raw=String((p&&p.sellerRaw)||'').trim();
+  if(!cn||cn==='未知业务员'||cn==='未注明业务员') return raw||'未分配';
+  if(cn.indexOf('店铺')>=0||cn.indexOf('直收')>=0) return '未分配';
+  return cn;
+}
+function planSellersAll(){
+  const out=[];
+  const add=n=>{ n=String(n==null?'':n).trim(); if(n&&out.indexOf(n)<0) out.push(n); };
+  PLAN_SELLERS_BASE.forEach(add);
+  plan.forEach(r=>add(r.seller));
+  (biz.pays||[]).forEach(p=>add(planSellerOfPay(p)));
+  return out;
+}
+function planSellerOptions(){
+  const y=String(planYear), out=[];
+  const add=n=>{ n=String(n==null?'':n).trim(); if(n&&out.indexOf(n)<0) out.push(n); };
+  plan.forEach(r=>{ if(String(r.month).slice(0,4)===y) add(r.seller); });
+  PLAN_SELLERS_BASE.forEach(add);
+  return out;
+}
+function planYearList(){
+  const ys={};
+  plan.forEach(r=>{ const y=String(r.month||'').slice(0,4); if(/^\d{4}$/.test(y)) ys[y]=1; });
+  (biz.pays||[]).forEach(p=>{ const y=String(p.ts||'').slice(0,4); if(/^\d{4}$/.test(y)) ys[y]=1; });
+  const nowY=(new Date()).getFullYear();
+  ys[String(nowY)]=1; ys[String(nowY-1)]=1;
+  if(planYear) ys[String(planYear)]=1;
+  return Object.keys(ys).map(Number).sort((a,b)=>b-a);
+}
+// 表格列 = 该项目本年度真实涉及的业务员（谁有数据列谁），实现「项目分开、业务员分开」；
+// 只有该项目本年一条记录都没有时才用基础名单兜底，避免出现一张空表。
+function planSellerCols(proj){
+  const y=String(planYear), out=[];
+  const add=n=>{ n=(n==null?'':String(n)).trim(); if(out.indexOf(n)<0) out.push(n); };
+  let has=false;
+  plan.forEach(r=>{ if(r.project===proj && String(r.month).slice(0,4)===y){ has=true; add(r.seller); } });
+  if(!has) PLAN_SELLERS_BASE.forEach(add);
+  const tot=s=>plan.reduce((a,r)=>a+((r.project===proj&&(r.seller||'')===s)?dNum(r.actual):0),0);
+  return out.sort((a,b)=>{ const d=tot(b)-tot(a); return d?d:((a<b)?-1:((a>b)?1:0)); });
+}
+// 数据自愈：格式修正 + 认不出的记录进隔离区（只隔离不删除）
+function healPlan(){
+  if(!Array.isArray(plan)) plan=[];
+  let changed=false;
+  plan=plan.filter(r=>r&&typeof r==='object');
+  plan.forEach(r=>{
+    const m=normMonth(r.month); if(m&&m!==r.month){ r.month=m; changed=true; }
+    if(r.seller==null){ r.seller=''; changed=true; }
+    ['plan','actual','planQ','actualQ'].forEach(k=>{ const v=parseFloat(r[k]); if(isNaN(v)||String(v)!==String(r[k])){ r[k]=isNaN(v)?0:v; changed=true; } });
+    if(!r.id){ r.id=uid(); changed=true; }
+    if(r.srcAmt!=='manual'&&r.srcAmt!=='auto'){ r.srcAmt='manual'; changed=true; }
+    if(r.srcQty!=='manual'&&r.srcQty!=='auto'){ r.srcQty='manual'; changed=true; }
+  });
+  const _orph=[];
+  plan=plan.filter(r=>{
+    if(r && r.month && PLAN_PROJECTS[r.project]) return true;
+    if(r) _orph.push(r);
+    return false;
+  });
+  if(_orph.length){
+    planOrphans=planOrphans.concat(_orph);
+    try{ localStorage.setItem(STORAGE_PREFIX+'plan_orphan', JSON.stringify(planOrphans)); }catch(e){}
+    changed=true;
+  }
+  const seen={};
+  plan=plan.filter(r=>{
+    const k=r.month+'|'+r.project+'|'+(r.seller||'');
+    if(seen[k]){ changed=true; return false; }
+    seen[k]=1; return true;
+  });
+  if(changed) saveAll();
+}
+// 首次种入：把真实收款流水的历史汇总变成「实际完成」（来源=自动·预置）
+function seedPlanActual(){
+  const raw=String(PLAN_SEED_RAW||'');
+  if(!raw||raw.indexOf('|')<0) return 0;
+  let n=0;
+  raw.split(';').forEach(seg=>{
+    const p=seg.split('|');
+    if(p.length<5) return;
+    const month=p[0], proj=p[1], seller=p[2], amt=parseFloat(p[3])||0, qty=parseInt(p[4],10)||0;
+    if(!/^\d{4}-\d{2}$/.test(month) || !PLAN_PROJECTS[proj]) return;
+    if(planRec(month,proj,seller)) return;
+    plan.push({id:uid(),month:month,project:proj,seller:seller,plan:0,actual:amt,planQ:0,actualQ:qty,
+               srcAmt:'auto',srcQty:'auto',autoFrom:'预置',autoAt:0,note:'',_seed:true});
+    n++;
+  });
+  return n;
+}
+// 自动值：从「经营分析」收款流水按 (月份, 店铺, 业务员) 汇总（每次渲染只算一次）
+function planAutoMap(){
+  if(planAutoCache) return planAutoCache;
+  const map={};
+  (biz.pays||[]).forEach(p=>{
+    const m=String(p.ts||'').slice(0,7);
+    if(!/^\d{4}-\d{2}$/.test(m)) return;
+    const proj=p.shop;
+    if(!PLAN_PROJECTS[proj]) return;
+    const k=m+'|'+proj+'|'+planSellerOfPay(p);
+    if(!map[k]) map[k]={amt:0,qty:0};
+    map[k].amt+=dNum(p.amount); map[k].qty++;
+  });
+  planAutoCache=map;
+  return map;
+}
+function planAutoOf(month,project,seller){
+  const m=planAutoMap()[month+'|'+project+'|'+(seller||'')];
+  return m?{amt:m.amt,qty:m.qty}:{amt:0,qty:0};
+}
+// 该单元格"当前有效的自动值"：优先用经营分析实时流水；没流水时沿用已存的自动值（预置快照/上次抓取），
+// 避免"预置的历史汇总被空白流水覆盖成 0"这类静默丢数。
+function planAutoEff(month,project,seller){
+  const live=planAutoOf(month,project,seller);
+  if(live.amt||live.qty) return {amt:live.amt,qty:live.qty,from:'live'};
+  const r=planRec(month,project,seller);
+  if(r && (r.srcAmt==='auto'||r.srcQty==='auto')){
+    return {amt:r.srcAmt==='auto'?dNum(r.actual):0, qty:r.srcQty==='auto'?dNum(r.actualQ):0,
+            from:(r.autoFrom==='预置'?'preset':'stored'), at:dNum(r.autoAt)};
+  }
+  return {amt:0,qty:0,from:'none'};
+}
+function planFetchActual(quiet){
+  const map=planAutoMap();
+  const keys=Object.keys(map);
+  if(!keys.length){ if(!quiet) showToast('经营分析里还没有收款流水。先到「经营分析」导入收款表（或阿里后台订单），再回来抓取'); return 0; }
+  let touched=0, kept=0;
+  keys.forEach(k=>{
+    const seg=k.split('|');
+    const month=seg[0], proj=seg[1], seller=seg[2];
+    if(String(month).slice(0,4)!==String(planYear)) return;      // 只抓当前选中的年份
+    const cur=planRec(month,proj,seller);
+    const amtManual=!!(cur&&cur.srcAmt==='manual');
+    const qtyManual=!!(cur&&cur.srcQty==='manual');
+    if(amtManual||qtyManual) kept++;
+    const patch={};
+    if(!amtManual){ patch.actual=Math.round(map[k].amt*100)/100; patch.srcAmt='auto'; }
+    if(!qtyManual){ patch.actualQ=map[k].qty; patch.srcQty='auto'; }
+    if(!Object.keys(patch).length) return;
+    patch.autoFrom='抓取'; patch.autoAt=Date.now();
+    planUpsert(month,proj,seller,patch);
+    touched++;
+  });
+  if(touched){ planInvalidateAuto(); saveAll(); refreshAll(); }
+  if(!quiet){
+    let msg=touched?('✓ 已抓取 '+touched+' 组实际完成数据'):'当前年份没有可抓取的收款流水';
+    if(touched && kept) msg+='；'+kept+' 处手工填写已保留';
+    showToast(msg, touched?'info':'warning');
+  }
+  return touched;
+}
+function planInScope(r){
+  if(planSelProject!=='all' && r.project!==planSelProject) return false;
+  if(planSelSeller!=='all' && (r.seller||'')!==planSelSeller) return false;
+  return true;
+}
+function planSum(list){
+  const a={plan:0,actual:0,planQ:0,actualQ:0,n:0,autoA:false,manA:false,autoQ:false,manQ:false};
+  list.forEach(r=>{
+    if(!r) return;
+    a.plan+=dNum(r.plan); a.actual+=dNum(r.actual); a.planQ+=dNum(r.planQ); a.actualQ+=dNum(r.actualQ); a.n++;
+    if(dNum(r.actual)!==0){ if(r.srcAmt==='auto') a.autoA=true; else a.manA=true; }
+    if(dNum(r.actualQ)!==0){ if(r.srcQty==='auto') a.autoQ=true; else a.manQ=true; }
+  });
+  return a;
+}
+function planPick(month,project,seller){
+  const s=(seller==null?'':String(seller));
+  return plan.filter(r=>r.month===month&&r.project===project&&(!seller||(r.seller||'')===s));
+}
+function planSrcOf(a){
+  if(planMetric==='qty')    return a.autoQ&&a.manQ?'mixed':(a.autoQ?'auto':(a.manQ?'manual':'none'));
+  if(planMetric==='rate')   return (a.autoA||a.autoQ)&&(a.manA||a.manQ)?'mixed':((a.autoA||a.autoQ)?'auto':((a.manA||a.manQ)?'manual':'none'));
+  return a.autoA&&a.manA?'mixed':(a.autoA?'auto':(a.manA?'manual':'none'));
+}
+function planBdg(src){ return src==='auto'?'⚡':(src==='manual'?'✎':(src==='mixed'?'⚡✎':'')); }
+function planMainVal(a){
+  if(planMetric==='qty')  return a.actualQ?Math.round(a.actualQ)+' 笔':'—';
+  if(planMetric==='rate') return (a.plan>0&&a.actual>0)?(Math.round(a.actual/a.plan*1000)/10)+'%':'—';
+  return a.actual?fmtMoney(a.actual):'—';
+}
+function planSubVal(a){
+  if(planMetric==='qty'){
+    let s='计划 '+(a.planQ?Math.round(a.planQ)+' 笔':'—');
+    if(a.planQ>0&&a.actualQ>0) s+=' · '+Math.round(a.actualQ/a.planQ*100)+'%';
+    return s;
+  }
+  if(planMetric==='rate'){
+    if(a.plan>0||a.actual>0) return fmtMoney(a.actual)+' / 计划 '+fmtMoney(a.plan);
+    return '未填计划与实际';
+  }
+  let s='计划 '+(a.plan?fmtMoney(a.plan):'—');
+  if(a.plan>0&&a.actual>0) s+=' · '+Math.round(a.actual/a.plan*100)+'%';
+  return s;
+}
+function planPctOf(a){
+  if(planMetric==='qty') return a.planQ>0?(a.actualQ/a.planQ*100):0;
+  return a.plan>0?(a.actual/a.plan*100):0;
+}
+function planCellHtml(month,project,seller){
+  const a=planSum(planPick(month,project,seller));
+  const empty=!(a.n&&(a.plan||a.actual||a.planQ||a.actualQ));
+  const src=empty?'none':planSrcOf(a);
+  const call='openPlanModalAt('+JSON.stringify(month)+','+JSON.stringify(project)+','+JSON.stringify(seller==null?'':String(seller))+')';
+  let inner='<span class="plan-cv">'+escHtml(planMainVal(a));
+  if(src!=='none') inner+='<span class="plan-bdg '+src+'">'+planBdg(src)+'</span>';
+  inner+='</span><span class="plan-cs">'+escHtml(empty?'点击填计划':planSubVal(a))+'</span>';
+  if(!empty && planMetric!=='rate' && planPctOf(a)>0){
+    const pc=Math.min(100,planPctOf(a));
+    inner+='<span class="plan-mini"><span style="width:'+pc.toFixed(1)+'%"></span></span>';
+  }
+  return '<div class="plan-cell '+src+'" onclick="'+escAttr(call)+'" title="点击录入 / 修改">'+inner+'</div>';
+}
+function planSumCellHtml(list){
+  const a=planSum(list);
+  if(!a.n||!(a.plan||a.actual||a.planQ||a.actualQ)) return '<div class="plan-cell none" style="cursor:default"><span class="plan-cv">—</span></div>';
+  let inner='<span class="plan-cv">'+escHtml(planMainVal(a))+'</span><span class="plan-cs">'+escHtml(planSubVal(a))+'</span>';
+  if(planMetric!=='rate' && planPctOf(a)>0){
+    inner+='<span class="plan-mini"><span style="width:'+Math.min(100,planPctOf(a)).toFixed(1)+'%"></span></span>';
+  }
+  return '<div class="plan-cell" style="cursor:default;background:transparent;border-left-color:transparent">'+inner+'</div>';
+}
+function planTableHtml(months){
+  const projs = planSelProject==='all' ? PLAN_PROJECT_KEYS.slice() : [planSelProject];
+  const cols={};
+  projs.forEach(pj=>{ cols[pj]=planSellerCols(pj); });
+  if(planSelSeller!=='all') projs.forEach(pj=>{ cols[pj]=cols[pj].filter(s=>s===planSelSeller); });
+  const multi=projs.length>1;
+  let h='<div class="dash-table-wrap plan-tbl-wrap"><table class="plan-tbl"><thead>';
+  if(multi){
+    h+='<tr><th class="mth" rowspan="2">月份</th>';
+    projs.forEach(pj=>{ h+='<th class="pj '+PLAN_PROJECTS[pj].tag+'" colspan="'+Math.max(1,cols[pj].length)+'">'+escHtml(planProjName(pj))+'</th>'; });
+    h+='<th class="tot" rowspan="2">合计</th></tr><tr>';
+    projs.forEach(pj=>{
+      if(!cols[pj].length) h+='<th>—</th>';
+      cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
     });
-    if(!plan.length){
-      showToast('文件里的 '+recs.length+' 条数据都没认出来（店铺或月份格式不对）');
-      input.value=''; return;
+    h+='</tr>';
+  } else {
+    const pj=projs[0];
+    h+='<tr><th class="mth">月份</th>';
+    if(!cols[pj].length) h+='<th>—</th>';
+    cols[pj].forEach(s=>{ h+='<th>'+escHtml(s||'未分配')+'</th>'; });
+    h+='<th class="tot">合计</th></tr>';
+  }
+  h+='</thead><tbody>';
+  months.forEach(m=>{
+    h+='<tr><td class="mth">'+fmtMonthShort(m)+'</td>';
+    projs.forEach(pj=>{
+      if(!cols[pj].length){ h+='<td>'+planCellHtml(m,pj,'')+'</td>'; return; }
+      cols[pj].forEach(s=>{ h+='<td>'+planCellHtml(m,pj,s)+'</td>'; });
+    });
+    h+='<td>'+planSumCellHtml(plan.filter(r=>r.month===m&&planInScope(r)))+'</td></tr>';
+  });
+  h+='<tr class="sum"><td class="mth">全年合计</td>';
+  projs.forEach(pj=>{
+    if(!cols[pj].length){ h+='<td>'+planSumCellHtml(plan.filter(r=>r.project===pj&&months.indexOf(r.month)>=0&&planInScope(r)))+'</td>'; return; }
+    cols[pj].forEach(s=>{ h+='<td>'+planSumCellHtml(plan.filter(r=>r.project===pj&&(r.seller||'')===s&&months.indexOf(r.month)>=0&&planInScope(r)))+'</td>'; });
+  });
+  h+='<td>'+planSumCellHtml(plan.filter(r=>months.indexOf(r.month)>=0&&planInScope(r)))+'</td></tr>';
+  h+='</tbody></table></div>';
+  return h;
+}
+function planMCardHtml(months){
+  const projs = planSelProject==='all' ? PLAN_PROJECT_KEYS.slice() : [planSelProject];
+  let h='<div class="plan-mcard">';
+  months.forEach(m=>{
+    const a=planSum(plan.filter(r=>r.month===m&&planInScope(r)));
+    if(!a.n) return;
+    h+='<div class="plan-mitem">';
+    h+='<div class="dash-mcard-head"><span><strong style="font-size:13px">'+fmtMonthShort(m)+'</strong></span>';
+    h+='<span style="font-size:12px;color:var(--text-secondary)">'+escHtml(planMainVal(a))+' · '+escHtml(planSubVal(a))+'</span></div>';
+    projs.forEach(pj=>{
+      let sellers=planSellerCols(pj);
+      if(planSelSeller!=='all') sellers=sellers.filter(s=>s===planSelSeller);
+      sellers.forEach(s=>{
+        const b=planSum(plan.filter(r=>r.month===m&&r.project===pj&&(r.seller||'')===s));
+        if(!b.n||!(b.plan||b.actual||b.planQ||b.actualQ)) return;
+        const src=planSrcOf(b);
+        h+='<div class="plan-mrow"><span>'+escHtml(planProjName(pj)+' · '+(s||'未分配'))+'</span>';
+        h+='<span>'+escHtml(planMainVal(b))+' <span class="plan-bdg '+src+'">'+planBdg(src)+'</span></span></div>';
+      });
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+function fmtAxisMoney(v){
+  if(Math.abs(v)>=1000000) return '$'+(v/1000000).toFixed(1)+'M';
+  if(Math.abs(v)>=1000) return '$'+(v/1000).toFixed(0)+'k';
+  return '$'+Math.round(v);
+}
+function planChartSeries(months){
+  const kind = planMetric==='amt'?'money':(planMetric==='qty'?'count':'rate');
+  const scope=plan.filter(planInScope);
+  const groups=[];
+  if(!planSplit){
+    groups.push({name:'合计', color:'#0891b2', recs:scope});
+  } else if(planSelProject==='all'){
+    PLAN_PROJECT_KEYS.forEach((pj,i)=>groups.push({name:planProjName(pj), color:PLAN_COLOR[i], recs:scope.filter(r=>r.project===pj)}));
+  } else {
+    let sellers=planSellerCols(planSelProject);
+    if(planSelSeller!=='all') sellers=sellers.filter(s=>s===planSelSeller);
+    sellers.forEach((s,i)=>groups.push({name:(s||'未分配'), color:PLAN_COLOR[i%PLAN_COLOR.length], recs:scope.filter(r=>(r.seller||'')===s)}));
+  }
+  const series=[];
+  groups.forEach(g=>{
+    const pv=[], av=[], rv=[];
+    months.forEach(m=>{
+      const a=planSum(g.recs.filter(r=>r.month===m));
+      if(kind==='money'){ pv.push(a.plan?a.plan:null); av.push(a.actual?a.actual:null); }
+      else if(kind==='count'){ pv.push(a.planQ?a.planQ:null); av.push(a.actualQ?a.actualQ:null); }
+      else { rv.push(a.plan>0?Math.round(a.actual/a.plan*1000)/10:null); }
+    });
+    if(kind==='rate'){
+      series.push({name:(groups.length>1?g.name+' ':'')+'完成率', color:g.color, dash:false, vals:rv});
+    } else {
+      series.push({name:g.name+' 计划', color:(groups.length>1?g.color:'#94a3b8'), dash:true, vals:pv});
+      series.push({name:g.name+' 实际', color:g.color, dash:false, vals:av});
     }
-    const add=plan.filter(p=>!p.exist).length;
-    const upd=plan.length-add;
-    let msg='将导入 '+plan.length+' 条数据（新增 '+add+' 条，更新 '+upd+' 条）';
-    if(skipped) msg+='，另有 '+skipped+' 条没认出来会跳过';
-    msg+='。已手工填写的「新建客户数 / 新客户订单数」会保留。确定导入吗？';
-    showConfirm(msg, ()=>{
-      // 清理历史遗留的错误店铺标识记录（早期版本写成了 fanshi 之类）
-      const before=dashboard.length;
-      const _orph2=[];
-      dashboard=dashboard.filter(d=>{
-        if(d.shop==='langges'||d.shop==='fansi') return true;
-        if(d) _orph2.push(d);   // 同上：隔离，不删
-        return false;
+  });
+  return {kind:kind, series:series};
+}
+function planChartSvg(months, kind, series){
+  const W=780, PL=76, PR=26, PT=22, PB=40, H=300;
+  const iw=W-PL-PR, ih=H-PT-PB;
+  const allv=[];
+  series.forEach(s=>s.vals.forEach(v=>{ if(v!==null&&v!==undefined) allv.push(v); }));
+  if(!allv.length) return '<div style="color:var(--text-muted);font-size:13px;padding:34px 0;text-align:center">当前筛选下还没有可画的数据</div>';
+  let mx=Math.max.apply(null,allv), mn=Math.min.apply(null,allv);
+  if(kind==='rate'){ mx=Math.max(mx,100); mn=0; } else { mn=Math.min(mn,0); }
+  if(mx===mn) mx=mx?mx*1.15:1;
+  if(mn<0) mn=0;
+  const span=(mx-mn)||1;
+  const px=i=> months.length===1?PL+iw/2:PL+iw*i/(months.length-1);
+  const py=v=>PT+ih-(v-mn)/span*ih;
+  const axis = kind==='money'?fmtAxisMoney:(kind==='count'?(v=>String(Math.round(v))):(v=>Math.round(v)+'%'));
+  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block" role="img" aria-label="月度计划与实际完成趋势图">';
+  for(let i=0;i<=4;i++){
+    const v=mn+span*i/4, yy=py(v);
+    s+='<line x1="'+PL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+yy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="0.6"/>';
+    s+='<text x="'+(PL-8)+'" y="'+yy.toFixed(1)+'" text-anchor="end" dominant-baseline="central" font-size="11" fill="#94a3b8">'+axis(v)+'</text>';
+  }
+  if(kind==='rate' && py(100)>=PT && py(100)<=PT+ih){
+    s+='<line x1="'+PL+'" y1="'+py(100).toFixed(1)+'" x2="'+(W-PR)+'" y2="'+py(100).toFixed(1)+'" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>';
+    s+='<text x="'+(W-PR)+'" y="'+(py(100)-6).toFixed(1)+'" text-anchor="end" font-size="10" fill="#b45309">目标 100%</text>';
+  }
+  months.forEach((m,i)=>{
+    s+='<text x="'+px(i).toFixed(1)+'" y="'+(PT+ih+20)+'" text-anchor="middle" font-size="11" fill="#94a3b8">'+fmtMonthShort(m)+'</text>';
+  });
+  series.forEach(se=>{
+    const pts=[];
+    months.forEach((m,i)=>{ const v=se.vals[i]; if(v!==null&&v!==undefined) pts.push([px(i),py(v)]); });
+    if(pts.length>1){
+      s+='<polyline fill="none" stroke="'+se.color+'" stroke-width="'+(se.dash?1.8:2.2)+'"'+(se.dash?' stroke-dasharray="6 4" opacity="0.75"':'')+' stroke-linejoin="round" stroke-linecap="round" points="'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+'"/>';
+    }
+    pts.forEach(p=>{
+      s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(se.dash?2.6:3.6)+'" fill="'+(se.dash?se.color:'#fff')+'" stroke="'+se.color+'" stroke-width="2"/>';
+    });
+  });
+  s+='</svg>';
+  return s;
+}
+function renderDash(){
+  const box=document.getElementById('dashContent');
+  if(!box) return;
+  planInvalidateAuto();
+  const years=planYearList();
+  if(!planYear || years.indexOf(planYear)<0) planYear=years[0];
+  const months=planMonthList(planYear);
+  const allScope=plan.filter(r=>String(r.month).slice(0,4)===String(planYear) && planInScope(r));
+  const T=planSum(allScope);
+  const rate = T.plan>0?(T.actual/T.plan*100):0;
+  let html='';
+  const sOpt=planSellerOptions();
+  html+='<div class="plan-bar">';
+  html+='<select class="dash-select" onchange="planPickYear(this.value)">'+years.map(y=>'<option value="'+y+'"'+(y===planYear?' selected':'')+'>'+y+' 年</option>').join('')+'</select>';
+  html+='<select class="dash-select" onchange="planPickProject(this.value)"><option value="all"'+(planSelProject==='all'?' selected':'')+'>全部项目</option>'
+      + PLAN_PROJECT_KEYS.map(k=>'<option value="'+k+'"'+(planSelProject===k?' selected':'')+'>'+escHtml(planProjName(k))+'</option>').join('')+'</select>';
+  html+='<select class="dash-select" onchange="planPickSeller(this.value)"><option value="all"'+(planSelSeller==='all'?' selected':'')+'>全部业务员</option>'
+      + sOpt.map(s=>'<option value="'+escAttr(s)+'"'+(planSelSeller===s?' selected':'')+'>'+escHtml(s)+'</option>').join('')+'</select>';
+  html+='<div class="plan-mset">'+PLAN_METRICS.map(m=>'<button class="plan-mtab'+(m.key===planMetric?' active':'')+'" onclick="planPickMetric(\''+m.key+'\')">'+m.label+'</button>').join('')+'</div>';
+  html+='<label class="plan-chk"><input type="checkbox" '+(planSplit?'checked':'')+' onchange="planToggleSplit(this.checked)"> 分线显示</label>';
+  html+='<span class="plan-spacer"></span>';
+  html+='<button class="btn" onclick="planFetchActual(false)">⚡ 从经营分析抓取实际</button>';
+  html+='<label class="btn" for="planImportInput" style="cursor:pointer">导入计划 / 实际</label>';
+  html+='<button class="btn" onclick="planExportCsv()">导出 CSV</button>';
+  html+='<button class="btn btn-primary" onclick="openPlanModalAt()">＋ 录入</button>';
+  html+='</div>';
+  if(!plan.length){
+    html+='<div class="card dash-empty">还没有计划数据<br><span style="font-size:13px">点右上角「＋ 录入」填第一个月的计划；实际完成可以点「⚡ 从经营分析抓取实际」自动带出来<br>也可以点「导入计划 / 实际」批量导入（CSV / JSON）</span></div>';
+    box.innerHTML=html;
+    return;
+  }
+  // 关键指标
+  const grid=[];
+  grid.push({label:'年计划合计', val:fmtMoney(T.plan), foot:months.filter(m=>plan.some(r=>r.month===m&&(r.plan||0)>0)).length+' 个月已定计划'});
+  grid.push({label:'年实际完成', val:fmtMoney(T.actual), foot:(T.autoA||T.autoQ)?'含自动抓取':'手工填写'});
+  grid.push({label:'完成率', val:T.plan>0?(Math.round(rate*10)/10)+'%':'—', foot:T.plan>0?('差额 '+fmtMoney(T.actual-T.plan)):'先填计划才能算完成率', bar:T.plan>0?Math.min(100,rate):0});
+  grid.push({label:'订单数（实际/计划）', val:Math.round(T.actualQ)+' / '+Math.round(T.planQ), foot:T.planQ>0?('完成 '+Math.round(T.actualQ/T.planQ*100)+'%'):'未定订单计划'});
+  html+='<div class="dash-grid" style="grid-template-columns:repeat(4,1fr)">';
+  grid.forEach(g=>{
+    html+='<div class="dash-metric"><div class="dm-label">'+escHtml(g.label)+'</div><div class="dm-value">'+escHtml(g.val)+'</div>';
+    html+='<div class="dm-foot"><span class="dm-sub">'+escHtml(g.foot)+'</span></div>';
+    if(g.bar) html+='<div class="dash-bar"><span style="width:'+g.bar.toFixed(1)+'%"></span></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  // 表格
+  html+='<div class="dash-panel">';
+  html+='<div class="dash-panel-head"><div class="dash-panel-title">月度销售计划 vs 实际完成 · '+planYear+' 年</div>'
+      + '<span class="dm-sub">点任意格子录入 / 修改</span></div>';
+  html+=planTableHtml(months);
+  html+=planMCardHtml(months);
+  html+='<div class="plan-legend">'
+      + '<b><span class="plan-sw auto"></span>⚡ 自动抓取</b>'
+      + '<b><span class="plan-sw manual"></span>✎ 手工填写</b>'
+      + '<b><span class="plan-sw mixed"></span>⚡✎ 自动+手工混合</b>'
+      + '<b><span class="plan-sw none"></span>未填</b>'
+      + '<span style="flex:1 1 100%">实际完成=「经营分析」里按到账时间归月的收款流水（业务员取业绩归属人）；计划=手工填写，「分线显示」可切换 项目 / 业务员 各自一条线。</span>'
+      + '</div>';
+  html+='</div>';
+  // 曲线
+  const cs=planChartSeries(months);
+  html+='<div class="dash-panel">';
+  html+='<div class="dash-panel-head"><div class="dash-panel-title">趋势曲线 · '+(planMetric==='rate'?'完成率':(planMetric==='qty'?'订单数':'收款额'))+'</div>'
+      + '<span class="dm-sub">'+(planSplit?'已分线：'+((planSelProject==='all')?'按项目':'按业务员'):'合计两条线（虚线=计划，实线=实际）')+'</span></div>';
+  html+=planChartSvg(months, cs.kind, cs.series);
+  html+='<div class="dash-legend">'+cs.series.map(se=>'<span><i style="background:'+se.color+(se.dash?';height:0;border-top:2px dashed '+se.color+';vertical-align:4px':';height:3px;border-radius:2px')+'"></i>'+escHtml(se.name)+'</span>').join('')+'</div>';
+  html+='</div>';
+  box.innerHTML=html;
+  // 头部提示
+  const hint=document.getElementById('planSyncHint');
+  if(hint){
+    const autos=plan.filter(r=>r.srcAmt==='auto'||r.srcQty==='auto');
+    const at=autos.reduce((a,r)=>Math.max(a,dNum(r.autoAt)),0);
+    const preset=autos.some(r=>r.autoFrom==='预置');
+    let t=plan.length+' 组记录';
+    if(autos.length) t+=' · 自动来源 '+autos.length+' 组'+(at?('（最近 '+new Date(at).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+'）'):'')+(preset?'（含预置快照）':'');
+    hint.textContent=t;
+  }
+}
+function planPickYear(y){ planYear=parseInt(y,10); renderDash(); }
+function planPickProject(v){ planSelProject=v; planSelSeller='all'; renderDash(); }
+function planPickSeller(v){ planSelSeller=v; renderDash(); }
+function planPickMetric(k){ planMetric=k; renderDash(); }
+function planToggleSplit(v){ planSplit=!!v; renderDash(); }
+// ---------- 弹窗 ----------
+function planRefreshAutoHint(){
+  const y=document.getElementById('planYearInput').value;
+  const m=document.getElementById('planMonthInput').value;
+  const proj=document.getElementById('planProjectInput').value;
+  const seller=String(document.getElementById('planSellerInput').value||'').trim();
+  const auto=planAutoEff(y+'-'+m,proj,seller);
+  const el=document.getElementById('planAutoHint');
+  let t;
+  if(auto.from==='live'){
+    t='⚡ 自动值（来自经营分析收款流水）：<b>'+fmtMoney(auto.amt)+'</b> / <b>'+Math.round(auto.qty)+' 笔</b><br>'
+     +'实际值留空=跟着自动值走（角标 ⚡）；填了数字就记为手工填写（角标 ✎），下次抓取不会被覆盖。';
+  } else if(auto.from==='preset'||auto.from==='stored'){
+    t='⚡ 当前实际值来自已保存的历史汇总（'+(auto.from==='preset'?'预置快照':'上次抓取')+'）：<b>'+fmtMoney(auto.amt)+'</b> / <b>'+Math.round(auto.qty)+' 笔</b><br>'
+     +'留空=继续沿用这份汇总（角标 ⚡）；到「经营分析」导入收款表后点「⚡ 从经营分析抓取实际」就能用最新流水刷新。';
+  } else {
+    t='⚡ 目前没有可用的自动值（经营分析里没有收款流水，这里也没有历史汇总）<br>'
+     +'可以先手工填实际值（角标 ✎），或到「经营分析」导入收款表后再回来抓取。';
+  }
+  el.innerHTML=t;
+}
+function openPlanModalAt(month,project,seller){
+  const now=new Date();
+  if(!month) month=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  if(!project) project=(planSelProject==='all'?PLAN_PROJECT_KEYS[0]:planSelProject);
+  if(seller==null) seller='';
+  const ySel=document.getElementById('planYearInput'), mSel=document.getElementById('planMonthInput');
+  if(ySel.options.length===0){
+    for(let y=now.getFullYear()+1;y>=2022;y--) ySel.innerHTML+='<option value="'+y+'">'+y+' 年</option>';
+    for(let i=1;i<=12;i++) mSel.innerHTML+='<option value="'+String(i).padStart(2,'0')+'">'+i+' 月</option>';
+    const pSel=document.getElementById('planProjectInput');
+    PLAN_PROJECT_KEYS.forEach(k=>{ pSel.innerHTML+='<option value="'+k+'">'+escHtml(planProjName(k))+'</option>'; });
+  }
+  document.getElementById('planSellerList').innerHTML=planSellersAll().map(s=>'<option value="'+escAttr(s)+'">').join('');
+  const r=planRec(month,project,seller);
+  editingPlan={id:r?r.id:null, month:month, project:project, seller:seller||''};
+  ySel.value=String(month).slice(0,4);
+  mSel.value=String(month).slice(5,7);
+  document.getElementById('planProjectInput').value=project;
+  document.getElementById('planSellerInput').value=seller||'';
+  document.getElementById('planPlan').value=(r&&dNum(r.plan))?r.plan:'';
+  document.getElementById('planPlanQ').value=(r&&dNum(r.planQ))?r.planQ:'';
+  document.getElementById('planActual').value=(r&&r.srcAmt==='manual')?r.actual:'';
+  document.getElementById('planActualQ').value=(r&&r.srcQty==='manual')?r.actualQ:'';
+  document.getElementById('planNote').value=(r&&r.note)?r.note:'';
+  document.getElementById('modalPlanTitle').textContent=r?'修改：'+planProjName(project)+' · '+(seller||'未分配')+' · '+fmtMonthLabel(month):'新增销售计划 / 实际完成';
+  document.getElementById('btnPlanDel').style.display=r?'':'none';
+  document.getElementById('planActual').placeholder='留空=用自动值';
+  document.getElementById('planActualQ').placeholder='留空=用自动值';
+  planRefreshAutoHint();
+  document.getElementById('modalPlan').style.display='flex';
+}
+function savePlanRecord(){
+  const y=document.getElementById('planYearInput').value;
+  const m=document.getElementById('planMonthInput').value;
+  const month=y+'-'+String(m).padStart(2,'0');
+  const project=document.getElementById('planProjectInput').value;
+  const seller=String(document.getElementById('planSellerInput').value||'').trim();
+  const planV=dNum(document.getElementById('planPlan').value);
+  const planQ=dNum(document.getElementById('planPlanQ').value);
+  const aRaw=String(document.getElementById('planActual').value).trim();
+  const qRaw=String(document.getElementById('planActualQ').value).trim();
+  const note=String(document.getElementById('planNote').value||'').trim();
+  if(!PLAN_PROJECTS[project]){ showToast('请选择项目'); return; }
+  if(!editingPlan){ editingPlan={id:null,month:'',project:'',seller:''}; }
+  const isNew=!editingPlan.id;
+  if(isNew && !planV && !planQ && aRaw==='' && qRaw==='' ){ showToast('至少填一项（计划或实际）再保存'); return; }
+  const cur=planRec(month,project,seller);
+  const auto=planAutoEff(month,project,seller);
+  const patch={
+    plan:planV, planQ:planQ,
+    actual: aRaw===''?Math.round(auto.amt*100)/100:dNum(aRaw),
+    actualQ: qRaw===''?auto.qty:dNum(qRaw),
+    srcAmt: aRaw===''?'auto':'manual',
+    srcQty: qRaw===''?'auto':'manual',
+    note: note
+  };
+  if(aRaw===''||qRaw===''){
+    patch.autoFrom = auto.from==='live' ? '抓取' : (auto.from==='preset' ? '预置' : (cur&&cur.autoFrom ? cur.autoFrom : '抓取'));
+    patch.autoAt   = auto.from==='live' ? Date.now() : (cur?dNum(cur.autoAt):0);
+  }
+  const finish=()=>{ planInvalidateAuto(); saveAll(); closeModal('modalPlan'); refreshAll(); showToast('✓ 已保存 '+planProjName(project)+' · '+(seller||'未分配')+' · '+fmtMonthLabel(month)+' 的计划/实际','info'); };
+  if(editingPlan.id){
+    const old=plan.filter(r=>r.id===editingPlan.id)[0];
+    const sameKey=old&&old.month===month&&old.project===project&&(old.seller||'')===seller;
+    if(old&&!sameKey){
+      const dup=planRec(month,project,seller);
+      if(dup){
+        showConfirm('「'+fmtMonthLabel(month)+' · '+planProjName(project)+' · '+(seller||'未分配')+'」已经有记录，要用这次填的覆盖吗？',()=>{
+          Object.assign(dup,patch); dup._sample=false; _sampleFix(dup);
+          plan=plan.filter(r=>r.id!==editingPlan.id);
+          finish();
+        });
+        return;
+      }
+      plan=plan.filter(r=>r.id!==editingPlan.id);
+    }
+  } else {
+    const dup=planRec(month,project,seller);
+    if(dup){
+      showConfirm('「'+fmtMonthLabel(month)+' · '+planProjName(project)+' · '+(seller||'未分配')+'」已经有记录，要用这次填的覆盖吗？',()=>{
+        Object.assign(dup,patch); dup._sample=false; _sampleFix(dup);
+        finish();
       });
-      if(_orph2.length) dashQuarantine(_orph2);
-      const cleaned=before-dashboard.length;
-      // 清理后重新对齐一次，避免引用到已被移除的记录
-      let realAdd=0, realUpd=0;
-      plan.forEach(p=>{
-        p.exist = dashboard.find(d=>d.month===p.month && d.shop===p.shop) || null;
-        if(p.exist) realUpd++; else realAdd++;
-      });
-      plan.forEach(p=>{
-        const r=p.r;
-        const patch={
-          revenue: dNum(r.revenue),
-          orders: dNum(r.orders),
-          inquiries: dNum(r.inquiries),
-          quickReply: (r.quickReply===''||r.quickReply==null) ? '' : dNum(r.quickReply)
+      return;
+    }
+  }
+  const r=planUpsert(month,project,seller,patch);
+  r._sample=false;
+  finish();
+}
+function _sampleFix(r){ if(r) r._sample=false; }
+function deletePlanRecord(){
+  if(!editingPlan||!editingPlan.id) return;
+  const r=plan.filter(x=>x.id===editingPlan.id)[0];
+  if(!r) return;
+  showConfirm('确定删除 '+planProjName(r.project)+' · '+(r.seller||'未分配')+' · '+fmtMonthLabel(r.month)+' 这条记录吗？',()=>{
+    plan=plan.filter(x=>x.id!==editingPlan.id);
+    editingPlan=null;
+    saveAll(); closeModal('modalPlan'); refreshAll();
+    showToast('已删除');
+  });
+}
+// ---------- 导入 / 导出 ----------
+function planDownload(name, text, withBom){
+  const blob=new Blob([(withBom?'\ufeff':'')+text],{type:(/\.csv$/.test(name)?'text/csv':'application/json')+';charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); if(a.parentNode) a.parentNode.removeChild(a); },500);
+}
+function planCsvEsc(v){ const s=String(v==null?'':v); return /[",\n]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s; }
+function planExportCsv(){
+  const rows=[['月份','项目','业务员','计划收款额','实际收款额','实际来源','计划订单数','实际订单数','订单来源','备注']];
+  plan.slice().sort((a,b)=>(a.month<b.month?-1:(a.month>b.month?1:(a.project<b.project?-1:((a.seller||'')<(b.seller||'')?-1:1)))))
+    .forEach(r=>rows.push([r.month,planProjName(r.project),r.seller||'未分配',dNum(r.plan),dNum(r.actual),
+      r.srcAmt==='auto'?'自动':'手工',dNum(r.planQ),dNum(r.actualQ),r.srcQty==='auto'?'自动':'手工',r.note||'']));
+  planDownload('数据看板_月度计划与实际_'+planYear+'.csv', rows.map(r=>r.map(planCsvEsc).join(',')).join('\r\n'), true);
+  showToast('✓ 已导出 CSV（'+plan.length+' 条）','info');
+}
+function planNumFromCsv(v){ const s=String(v==null?'':v).replace(/[^0-9.\-]/g,''); const n=parseFloat(s); return isNaN(n)?0:n; }
+function planSplitCsvLine(line){
+  const out=[]; let cur='', q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(q){
+      if(c==='"'){ if(line[i+1]==='"'){ cur+='"'; i++; } else q=false; } else cur+=c;
+    } else {
+      if(c==='"') q=true; else if(c===','){ out.push(cur); cur=''; } else cur+=c;
+    }
+  }
+  out.push(cur);
+  return out.map(x=>x.trim());
+}
+function handlePlanImport(){
+  const input=document.getElementById('planImportInput');
+  const file=input.files&&input.files[0];
+  if(!file){ input.value=''; return; }
+  const reader=new FileReader();
+  reader.onerror=function(){ showToast('文件读取失败，换个文件试试'); input.value=''; };
+  reader.onload=function(e){
+    const txt=String(e.target.result||'').replace(/^\ufeff/,'');
+    let recs=null, src='';
+    if(/\.json$/i.test(file.name) || txt.trim().charAt(0)==='[' || txt.trim().charAt(0)==='{'){
+      let d=null;
+      try{ d=JSON.parse(txt); }catch(err){ showToast('JSON 解析失败：'+((err&&err.message)||err)); input.value=''; return; }
+      const arr = Array.isArray(d)?d:(d.plan||d.records||d.rows||null);
+      if(!arr||!arr.length){ showToast('文件里没找到记录（需要 plan / records / rows 数组）'); input.value=''; return; }
+      recs=arr.map(r=>{
+        const m=normMonth(r.month||r.ym||r.date)||normMonth(r['月份']);
+        const pj=PLAN_PROJECTS[r.project]?r.project:(PLAN_PROJECTS[normShop(r.project||r.shop||r['项目'])]?normShop(r.project||r.shop||r['项目']):'');
+        const seller=String(r.seller||r['业务员']||'').trim();
+        return {
+          month:m, project:pj, seller:seller,
+          plan:planNumFromCsv(r.plan!=null?r.plan:(r.revenue!=null?r.revenue:r['计划'])),
+          actual:planNumFromCsv(r.actual!=null?r.actual:(r.revenue!=null?r.revenue:r['实际'])),
+          actualQ:planNumFromCsv(r.actualQ!=null?r.actualQ:(r.orders!=null?r.orders:r['实际订单数'])),
+          planQ:planNumFromCsv(r.planQ!=null?r.planQ:r['计划订单数']),
+          note:String(r.note||'').trim(),
+          hasActual:(r.actual!=null||r.revenue!=null||r['实际']!=null),
+          hasQty:(r.actualQ!=null||r.orders!=null||r['实际订单数']!=null)
         };
-        if(p.exist){
-          Object.assign(p.exist, patch);
-          // 示例数据不算「手工填写」，一并按导入值覆盖；真实记录才保留手工填的新客户数据
-          const isSample=!!p.exist._sample;
-          if(isSample || (r.newCustomers!=='' && r.newCustomers!=null)) p.exist.newCustomers=dNum(r.newCustomers);
-          if(isSample || (r.newOrders!=='' && r.newOrders!=null)) p.exist.newOrders=dNum(r.newOrders);
-          p.exist._sample=false;
-        } else {
-          dashboard.push(Object.assign({
-            id:uid(), createdAt:Date.now(), month:p.month, shop:p.shop,
-            newCustomers:(r.newCustomers===''||r.newCustomers==null)?0:dNum(r.newCustomers),
-            newOrders:(r.newOrders===''||r.newOrders==null)?0:dNum(r.newOrders)
-          }, patch));
+      });
+      src='JSON';
+    } else {
+      const lines=txt.split(/\r?\n/).filter(l=>l.trim());
+      if(lines.length<2){ showToast('CSV 至少要有表头 + 一行数据'); input.value=''; return; }
+      const head=planSplitCsvLine(lines[0]);
+      const find=(...names)=>{ for(let i=0;i<head.length;i++){ for(let j=0;j<names.length;j++){ if(head[i].replace(/\s/g,'').indexOf(names[j])>=0) return i; } } return -1; };
+      const iM=find('月份'), iP=find('项目','店铺'), iS=find('业务员','销售'), iPl=find('计划收款','计划金额','计划'), iAc=find('实际收款','实际金额','实际'), iPlQ=find('计划订单'), iAcQ=find('实际订单'), iN=find('备注');
+      if(iM<0||iP<0){ showToast('CSV 缺少「月份」或「项目」列'); input.value=''; return; }
+      recs=[];
+      lines.slice(1).forEach(line=>{
+        const c=planSplitCsvLine(line);
+        recs.push({
+          month:normMonth(c[iM]), project:normShop(c[iP]), seller:iS>=0?String(c[iS]||'').trim():'',
+          plan:iPl>=0?planNumFromCsv(c[iPl]):0,
+          actual:iAc>=0?planNumFromCsv(c[iAc]):0,
+          planQ:iPlQ>=0?planNumFromCsv(c[iPlQ]):0,
+          actualQ:iAcQ>=0?planNumFromCsv(c[iAcQ]):0,
+          note:iN>=0?String(c[iN]||''):'',
+          hasActual:iAc>=0 && String(c[iAc]||'').trim()!=='',
+          hasQty:iAcQ>=0 && String(c[iAcQ]||'').trim()!==''
+        });
+      });
+      src='CSV';
+    }
+    const good=recs.filter(r=>r.month&&r.project);
+    const orphan=recs.filter(r=>!(r.month&&r.project));   // 认不出月份/项目的：隔离保留，不丢
+    const bad=orphan.length;
+    if(!good.length){ showToast('没有认出有效记录（月份/项目格式不对）'); input.value=''; return; }
+    let msg='将导入 '+good.length+' 条记录';
+    if(bad) msg+='，另有 '+bad+' 条认不出会跳过';
+    const willSet=good.filter(r=>r.hasActual||r.hasQty).length;
+    msg+=(willSet?('。其中 '+willSet+' 条带实际值，会记为「手工填写」并覆盖同名记录的自动值'):'')+'。确定导入吗？';
+    showConfirm(msg,()=>{
+      let add=0, upd=0;
+      good.forEach(r=>{
+        const cur=planRec(r.month,r.project,r.seller);
+        const patch={plan:dNum(r.plan),planQ:dNum(r.planQ)};
+        if(r.hasActual){ patch.actual=dNum(r.actual); patch.srcAmt='manual'; }
+        if(r.hasQty){ patch.actualQ=dNum(r.actualQ); patch.srcQty='manual'; }
+        if(r.note) patch.note=r.note;
+        if(cur){ Object.assign(cur,patch); cur._sample=false; upd++; }
+        else{
+          // 新建记录：文件里「实际」列留空 = 不指定 → 保持「自动」来源（先继承已有的自动值/预置快照），
+          // 不要把空白当成手工填的 0（否则后续「抓取实际」会被误判为已手工填写而跳过）。
+          const eff=planAutoEff(r.month,r.project,r.seller);
+          const base={actual:eff.amt,actualQ:eff.qty,srcAmt:'auto',srcQty:'auto'};
+          if(eff.from!=='none'){ base.autoFrom=(eff.from==='preset'?'预置':'抓取'); base.autoAt=Date.now(); }
+          const nr=planUpsert(r.month,r.project,r.seller,Object.assign(base,patch));
+          nr._sample=false; add++;
         }
       });
-      // 同一「月份+店铺」若出现重复，保留最后一条（防御）
-      const seen={};
-      dashboard=dashboard.filter(d=>{
-        const k=d.month+'|'+d.shop;
-        if(seen[k]) return false;
-        seen[k]=1; return true;
-      });
-      saveAll();
-      // 导入后自动跳到数据看板，让用户立刻看到结果（否则停在别的页面会以为没反应）
-      switchTab('data');
-      refreshAll();
-      showToast('✓ 已导入 '+plan.length+' 条（新增 '+realAdd+' 条，更新 '+realUpd+' 条）'+(cleaned?'，并清理了 '+cleaned+' 条旧格式记录':''),'info');
+      planInvalidateAuto(); saveAll(); switchTab('data'); refreshAll();
+      if(bad){
+        // 导入文件里认不出来的记录同样进隔离区（只隔离不删除），导出备份时会一并带走
+        planOrphans=planOrphans.concat(orphan.map(o=>Object.assign({_importSkipped:true,at:Date.now()},o)));
+        try{ localStorage.setItem(STORAGE_PREFIX+'plan_orphan', JSON.stringify(planOrphans)); }catch(e){}
+      }
+      showToast('✓ 已导入 '+src+'：新增 '+add+' 条、更新 '+upd+' 条','info');
     });
     input.value='';
   };
   reader.readAsText(file);
 }
-
-function deleteDashRecord(id){
-  const r=dashboard.find(d=>d.id===id);
-  if(!r) return;
-  showConfirm('确定删除 '+fmtMonthLabel(r.month)+' '+(SHOP_NAMES[r.shop]||'')+' 这条数据吗？',()=>{
-    dashboard=dashboard.filter(d=>d.id!==id);
-    saveAll(); refreshAll();
-    showToast('已删除');
-  });
-}
-
 // ============================================================
 //  BANNER
 // ============================================================
@@ -1894,10 +2265,10 @@ function renderBanner(){
       html += '<span class="banner-item">项目 <strong>'+escHtml(p.name)+'</strong>：'+escHtml(p.blockers||'待处理')+'</span>';
     });
   }
-  // 数据看板：当月还没录入数据时温和提醒（只在已经开始用看板后提醒）
+  // 数据看板：当月销售计划还没录时温和提醒（只在已经开始用看板后提醒）
   const curMonth = today.slice(0,7);
-  if(dashboard.length>0 && !dashboard.some(d=>d.month===curMonth)){
-    html += '<span class="banner-alert warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>'+parseInt(curMonth.split('-')[1])+' 月数据还没录入</span>';
+  if(plan.length>0 && !plan.some(d=>d.month===curMonth && dNum(d.plan)>0)){
+    html += '<span class="banner-alert warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>'+parseInt(curMonth.split('-')[1])+' 月销售计划还没录入</span>';
     html += '<span class="banner-item"><a onclick="switchTab(\'data\')">去录入 →</a></span>';
   }
   if(!html) html = '<span class="banner-empty">✓ 一切正常，没有逾期任务或卡住的项目</span>';
@@ -3297,7 +3668,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,expenses,claims,biz,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,plan,expenses,claims,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
   try{
     const corrupt = {};
@@ -3306,6 +3677,7 @@ document.getElementById('btnExport').addEventListener('click',()=>{
     });
     if(Object.keys(corrupt).length) data.corrupt = corrupt;
     if(dashOrphans.length) data.dashOrphan = dashOrphans;
+    if(planOrphans.length) data.planOrphan = planOrphans;
   }catch(e){}
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -3336,6 +3708,8 @@ document.getElementById('importFile').addEventListener('change',function(){
         notes = data.notes || [];
         projects = data.projects || [];
         dashboard = data.dashboard || [];
+        // 数据看板（月度计划/实际）：旧备份没有这个字段时，保留本机已有数据，不能清空
+        if(Object.prototype.hasOwnProperty.call(data,'plan')) plan = data.plan || [];
         // 报账数据：旧备份里没有这个字段时，保留本机已有记录，不能清空
         if(Object.prototype.hasOwnProperty.call(data,'expenses')) expenses = data.expenses || [];
         // 货损客诉：同样旧备份没有这字段时保留本机
@@ -3359,7 +3733,7 @@ document.getElementById('importFile').addEventListener('change',function(){
 // Clear all data
 document.getElementById('btnClearAll').addEventListener('click',()=>{
   showConfirm('确定要清空所有数据吗？此操作不可恢复！建议先导出备份。', ()=>{
-    tasks = []; notes = []; projects = []; dashboard = []; expenses = []; claims = []; biz = bizBlank();
+    tasks = []; notes = []; projects = []; dashboard = []; plan = []; expenses = []; claims = []; biz = bizBlank();
     saveAll();
     refreshAll();
     showToast('所有数据已清空');
@@ -3592,7 +3966,7 @@ async function doSyncUpload(){
     return c;
   });
   const buildSync = (withBiz)=>{
-    const d = {v:7, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
+    const d = {v:8, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
     if(withBiz) d.biz = biz;
     return d;
   };
@@ -3774,6 +4148,8 @@ async function doSyncReceive(){
     });
     // 看板数据：对方的数据包里有这个字段才覆盖；对方是旧版本上传的（没这个字段）则保留本机数据
     if(Object.prototype.hasOwnProperty.call(received,'dashboard')) dashboard = received.dashboard || [];
+    // 数据看板（月度计划/实际）：对方有这字段才覆盖，旧版本数据包没有则保留本机
+    if(Object.prototype.hasOwnProperty.call(received,'plan')) plan = received.plan || [];
     // 报账数据：对方有这字段才覆盖；旧版本数据包没有则保留本机（同样保留本机发票）
     if(Object.prototype.hasOwnProperty.call(received,'expenses')){
       expenses = (received.expenses||[]).map(re=>{
@@ -3852,6 +4228,7 @@ document.getElementById('btnSyncImportYes').addEventListener('click',()=>{
     notes = data.notes || [];
     projects = data.projects || [];
     if(data.dashboard) dashboard = data.dashboard;
+    if(data.plan) plan = data.plan;
     saveAll();
     hideSyncBar();
     refreshAll();
@@ -3999,10 +4376,10 @@ function asSnapshot(){
     _version:APP_VERSION,
     savedAt:new Date().toISOString(),
     counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
-            dashboard:dashboard.length, expenses:expenses.length, claims:claims.length,
+            dashboard:dashboard.length, plan:plan.length, expenses:expenses.length, claims:claims.length,
             bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, expenses:light(expenses), claims:light(claims),
+    dashboard:dashboard, plan:plan, expenses:light(expenses), claims:light(claims),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded}
   };
@@ -4138,6 +4515,7 @@ async function asRestore(){
       // 货损客诉：同报账逻辑
       if(Object.prototype.hasOwnProperty.call(data,'claims')) claims = mergeFiles(claims, data.claims);
       if(Object.prototype.hasOwnProperty.call(data,'dashboard')) dashboard = data.dashboard || [];
+      if(Object.prototype.hasOwnProperty.call(data,'plan')) plan = data.plan || [];
       saveAll(); refreshAll();
       showToast('✓ 已恢复 ' + n + ' 条内容，正在补齐附件...', 'info');
       await asPullAttachments();
@@ -8526,9 +8904,11 @@ document.getElementById('btnAddProject').addEventListener('click',openProjectMod
 // 数据看板：录入弹窗、保存、取消
 // （此前这几处漏了绑定，"录入月度数据"点了没反应，2026-09-11 修复）
 // 「导入看板数据」用 <label for> 原生触发文件选择框，不再走 JS 二次调用
-document.getElementById('btnAddDash').addEventListener('click',()=>openDashModal());
-document.getElementById('btnDashSave').addEventListener('click',saveDashRecord);
-document.getElementById('btnDashCancel').addEventListener('click',()=>closeModal('modalDash'));
+document.getElementById('btnPlanSave').addEventListener('click',savePlanRecord);
+document.getElementById('btnPlanCancel').addEventListener('click',()=>closeModal('modalPlan'));
+document.getElementById('btnPlanDel').addEventListener('click',deletePlanRecord);
+document.getElementById('planSellerInput').addEventListener('input',planRefreshAutoHint);
+document.getElementById('planProjectInput').addEventListener('change',planRefreshAutoHint);
 
 // Keyboard shortcuts
 document.addEventListener('keydown',function(e){
@@ -8552,11 +8932,12 @@ function init(){
     loadData();
   }
   
-  // 数据看板：首次打开若为空，载入一组示例（顶部「清空示例数据」可一键清除）
-  if(dashboard.length===0 && !localStorage.getItem(STORAGE_PREFIX+'dash_seeded')){
-    seedDashSample();
-    localStorage.setItem(STORAGE_PREFIX+'dash_seeded','1');
+  // 数据看板：首次打开若为空，把真实收款流水的历史汇总预置成「实际完成」（角标=⚡自动·预置，可随时重新抓取）
+  if(plan.length===0 && !localStorage.getItem(STORAGE_PREFIX+'plan_seeded')){
+    const _pn=seedPlanActual();
+    localStorage.setItem(STORAGE_PREFIX+'plan_seeded','1');
     saveAll();
+    if(_pn) setTimeout(()=>{ try{ showToast('数据看板：已预置 '+_pn+' 组历史「实际完成」（来自收款流水），点「⚡ 从经营分析抓取实际」可随时刷新','info'); }catch(e){} }, 1800);
   }
 
   // 报账整理：首次打开若为空，载入几条示例（顶部「清空示例数据」可一键清除）
