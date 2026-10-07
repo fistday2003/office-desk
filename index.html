@@ -737,6 +737,97 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
   .biz-filterbar{gap:5px}
   .biz-chip{padding:5px 9px;font-size:11.5px}
 }
+/* ===== 人事管理（v2.15）：在职员工 + 人才储备库 ===== */
+.hr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.hr-tools{display:flex;gap:8px;flex-wrap:wrap}
+.hr-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.hr-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:22px;border:1px solid var(--border);background:var(--card-bg);font-size:13px;font-weight:600;color:var(--text-secondary);transition:var(--transition)}
+.hr-tab:hover{border-color:var(--primary);color:var(--primary-dark)}
+.hr-tab.active{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark)}
+.hr-tab .n{font-size:11.5px;font-weight:700;background:#e2e8f0;color:var(--text-secondary);border-radius:9px;padding:1px 7px}
+.hr-tab.active .n{background:var(--primary);color:#fff}
+.hr-statbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin-bottom:14px}
+.hr-stat{border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);padding:11px 13px;box-shadow:var(--shadow)}
+.hr-stat .k{font-size:11.5px;color:var(--text-muted);font-weight:600}
+.hr-stat .v{font-size:19px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;margin-top:2px;line-height:1.25}
+.hr-stat .v small{font-size:11.5px;font-weight:600;color:var(--text-muted);margin-left:3px}
+.hr-group{margin-bottom:18px}
+.hr-group-h{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--text);margin:0 0 9px}
+.hr-group-h .cnt{font-size:11.5px;font-weight:600;color:var(--text-muted);background:#f1f5f9;padding:2px 8px;border-radius:9px}
+.hr-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.hr-dot.lg{background:#0891b2}.hr-dot.fs{background:#f59e0b}.hr-dot.gen{background:#8b5cf6}.hr-dot.off{background:#94a3b8}
+.hr-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:11px}
+.hr-card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);box-shadow:var(--shadow);overflow:hidden;transition:var(--transition)}
+.hr-card:hover{box-shadow:var(--shadow-md)}
+.hr-card.open{border-color:var(--primary)}
+.hr-card-h{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.hr-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#0891b2,#0d9488)}
+.hr-avatar.t{background:linear-gradient(135deg,#8b5cf6,#ec4899)}
+.hr-avatar.off{background:linear-gradient(135deg,#94a3b8,#64748b)}
+.hr-card-h .who{flex:1;min-width:0}
+.hr-card-h .nm{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hr-card-h .nm .en{font-size:11.5px;font-weight:600;color:var(--text-muted)}
+.hr-card-h .sub{font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.5}
+.hr-pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;white-space:nowrap}
+.hr-pill.probation{background:#fef3c7;color:#b45309}
+.hr-pill.active{background:var(--success-light);color:#047857}
+.hr-pill.leave{background:#f1f5f9;color:#64748b}
+.hr-pill.wait{background:#fef3c7;color:#b45309}
+.hr-pill.hired{background:var(--success-light);color:#047857}
+.hr-pill.lost{background:#f1f5f9;color:#94a3b8}
+.hr-pill.a{background:var(--success-light);color:#047857}
+.hr-pill.b{background:var(--info-light);color:#1d4ed8}
+.hr-pill.c{background:#f1f5f9;color:#64748b}
+.hr-card-b{padding:0 14px 13px;border-top:1px dashed var(--border);font-size:12.5px;color:var(--text-secondary);line-height:1.75}
+.hr-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:5px 14px;padding-top:11px}
+.hr-kv span{min-width:0;overflow-wrap:anywhere}
+.hr-kv b{color:var(--text-muted);font-weight:600;font-size:11.5px}
+.hr-sec{margin-top:11px}
+.hr-sec-h{font-size:11.5px;font-weight:700;color:var(--text);letter-spacing:.02em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.hr-sec-h .tag{font-weight:600;color:var(--text-muted);font-size:11px}
+.hr-sal{width:100%;border-collapse:collapse;font-size:12.5px}
+.hr-sal th,.hr-sal td{border:1px solid var(--border);padding:5px 9px;text-align:left}
+.hr-sal th{background:#f8fafc;color:var(--text-muted);font-weight:600;font-size:11.5px;white-space:nowrap}
+.hr-sal td{font-variant-numeric:tabular-nums}
+.hr-sal tr.total td{background:var(--primary-light);font-weight:700;color:var(--primary-dark)}
+.hr-tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--border);margin-left:5px}
+.hr-tl li{position:relative;padding:0 0 10px 15px}
+.hr-tl li::before{content:'';position:absolute;left:-6px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--primary);border:2px solid var(--card-bg)}
+.hr-tl .d{font-size:11.5px;font-weight:700;color:var(--text)}
+.hr-tl .t{font-size:12px;color:var(--text-secondary);line-height:1.65}
+.hr-tl .t .up{color:#b91c1c;font-weight:700}
+.hr-tl .t .dn{color:#047857;font-weight:700}
+.hr-empty{color:var(--text-muted);font-size:12px;padding:4px 0}
+.hr-dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px 16px;padding-top:2px}
+.hr-dim{font-size:12px}
+.hr-dim .lb{display:flex;justify-content:space-between;gap:8px;color:var(--text-secondary)}
+.hr-dim .lb b{color:var(--text);font-variant-numeric:tabular-nums}
+.hr-bar{height:5px;border-radius:3px;background:#e2e8f0;margin-top:4px;overflow:hidden}
+.hr-bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#0891b2,#0d9488)}
+.hr-chipbox{display:flex;gap:6px;flex-wrap:wrap}
+.hr-chipx{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border);border-radius:16px;padding:4px 10px;background:var(--card-bg)}
+.hr-chipx.on{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark)}
+.hr-chipx.add{border-style:dashed;color:var(--text-muted)}
+.hr-money{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text)}
+.hr-money.warn{color:#b45309}
+.hr-money.ok{color:#047857}
+.hr-acts{display:flex;gap:8px;flex-wrap:wrap;padding-top:11px}
+.hr-acts .btn{padding:5px 12px;font-size:12px}
+.hr-star{display:flex;gap:3px;align-items:center}
+.hr-star i{cursor:pointer;font-style:normal;font-size:15px;line-height:1;color:#cbd5e1;transition:var(--transition)}
+.hr-star i.on{color:#f59e0b}
+.hr-dimrow{display:flex;align-items:center;gap:9px;margin-bottom:7px;flex-wrap:wrap}
+.hr-dimrow .nm{flex:0 0 118px;font-size:12px;font-weight:600;color:var(--text-secondary)}
+.hr-dimrow .vl{font-size:12px;font-weight:700;color:var(--text);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.hr-dimrow input[type=range]{flex:1;min-width:110px}
+@media (max-width:768px){
+  .hr-cards{grid-template-columns:1fr}
+  .hr-statbar{grid-template-columns:1fr 1fr;gap:8px}
+  .hr-tools{width:100%}
+  .hr-tools .btn{flex:1;justify-content:center}
+  .hr-dimrow .nm{flex:0 0 88px;font-size:11.5px}
+  .hr-tl li{padding-left:12px}
+}
 </style>
 </head>
 <body>
@@ -860,13 +951,18 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         已完成项目
         <span class="nav-badge" id="archiveBadge" style="display:none">0</span>
       </button>
+      <button class="nav-item" data-tab="hr">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        人事管理
+        <span class="nav-badge" id="hrBadge" style="display:none">0</span>
+      </button>
     </nav>
     <div class="sidebar-footer">
       <button class="nav-item" id="btnClearAll" style="color:var(--text-muted);font-size:12px">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.14 · 2026-10-07</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.15 · 2026-10-07</div>
     </div>
   </aside>
 
@@ -1005,6 +1101,22 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <p class="section-subtitle">长期保存 · 索引形式，点击项目名称展开/收起详细内容</p>
       <div id="archiveList"></div>
     </div>
+
+    <!-- TAB: 人事管理 -->
+    <div class="tab-panel" id="tab-hr">
+      <div class="hr-head">
+        <div>
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            人事管理
+          </div>
+          <p class="section-subtitle">在职员工档案（项目归属 / 薪资构成 / 调薪时间记录）+ 人才储备库（面试信息 / 多维度评价 / 期望薪资与承诺薪资）。点卡片展开详情。</p>
+        </div>
+        <div class="hr-tools" id="hrTools"></div>
+      </div>
+      <div class="hr-tabs" id="hrTabs"></div>
+      <div id="hrContent"></div>
+    </div>
   </main>
 </div>
 
@@ -1045,6 +1157,10 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
   <button class="mnav-item" data-mtab="archive">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
     归档
+  </button>
+  <button class="mnav-item" data-mtab="hr">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    人事
   </button>
 </nav>
 
@@ -1205,6 +1321,127 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
   </div>
 </div>
 
+<!-- ====== MODAL: 在职员工档案 ====== -->
+<div class="modal-overlay" id="modalHrStaff" style="display:none">
+  <div class="modal" style="width:min(760px,95vw)">
+    <h3 id="modalHrStaffTitle">新增员工档案</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>姓名 *</label><input type="text" id="hsName" placeholder="如 陈曦"></div>
+      <div class="form-group" style="flex:1 1 120px"><label>英文名</label><input type="text" id="hsEnName" placeholder="如 Nancy"></div>
+      <div class="form-group" style="flex:0 1 110px"><label>性别</label><select id="hsGender"><option value="">未填</option><option>女</option><option>男</option></select></div>
+      <div class="form-group" style="flex:0 1 140px"><label>出生年月</label><input type="month" id="hsBirth"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>项目归属 *</label><select id="hsProject"></select></div>
+      <div class="form-group" style="flex:1 1 140px"><label>岗位</label><input type="text" id="hsPost" placeholder="如 外贸业务员"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>子账号 / 工号</label><input type="text" id="hsSubAccount" placeholder="如 Nancy Lignes"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 110px"><label>学历</label><input type="text" id="hsEdu" placeholder="如 本科"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>毕业学校</label><input type="text" id="hsSchool"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>专业</label><input type="text" id="hsMajor"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 150px"><label>联系方式</label><input type="text" id="hsPhone" placeholder="手机 / 微信"></div>
+      <div class="form-group" style="flex:0 1 140px"><label>入职日期</label><input type="date" id="hsJoin"></div>
+      <div class="form-group" style="flex:0 1 140px"><label>试用期到期</label><input type="date" id="hsProbEnd"></div>
+      <div class="form-group" style="flex:0 1 120px"><label>状态</label><select id="hsStatus"><option value="probation">试用期</option><option value="active">在职</option><option value="leave">已离职</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap" id="hsLeaveWrap">
+      <div class="form-group" style="flex:0 1 140px"><label>离职日期</label><input type="date" id="hsLeaveDate"></div>
+      <div class="form-group" style="flex:1 1 200px"><label>离职原因 / 交接</label><input type="text" id="hsLeaveReason" placeholder="如 主动离职，客户转孟伊"></div>
+    </div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">💰 薪资构成（元 / 月，可留空）</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 110px"><label>基本工资</label><input type="number" id="hsBase" step="1" inputmode="decimal" placeholder="0"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>岗位工资</label><input type="number" id="hsPostPay" step="1" inputmode="decimal" placeholder="0"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>绩效工资</label><input type="number" id="hsPerf" step="1" inputmode="decimal" placeholder="0"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>提成 / 奖金</label><input type="number" id="hsComm" step="1" inputmode="decimal" placeholder="0"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 110px"><label>补贴</label><input type="number" id="hsAllow" step="1" inputmode="decimal" placeholder="餐补/交通/通讯"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>社保 / 公积金</label><input type="number" id="hsSocial" step="1" inputmode="decimal" placeholder="公司承担"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>其他</label><input type="number" id="hsOther" step="1" inputmode="decimal" placeholder="0"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>合计（自动）</label><input type="text" id="hsSalTotal" readonly style="background:#f8fafc;font-weight:700"></div>
+    </div>
+    <div class="form-group"><label>备注</label><textarea id="hsNote" rows="2" placeholder="提成口径、转正结论、其他说明"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrStaff')">取消</button>
+      <button class="btn btn-primary" id="btnHrStaffSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 调薪登记 ====== -->
+<div class="modal-overlay" id="modalHrSalary" style="display:none">
+  <div class="modal" style="width:min(520px,95vw)">
+    <h3 id="modalHrSalaryTitle">调薪登记</h3>
+    <p style="font-size:12.5px;color:var(--text-secondary);margin:-4px 0 12px;line-height:1.7">登记后会自动更新该员工的薪资构成，并在档案里留下一条带时间的调整记录。</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>生效日期 *</label><input type="date" id="hslDate"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>调整项目 *</label><select id="hslItem"></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 120px"><label>调整前（元）</label><input type="text" id="hslBefore" readonly style="background:#f8fafc"></div>
+      <div class="form-group" style="flex:1 1 120px"><label>调整后（元）*</label><input type="number" id="hslAfter" step="1" inputmode="decimal"></div>
+    </div>
+    <div class="form-group"><label>调整原因</label><input type="text" id="hslReason" placeholder="如 转正核定 / 年度调薪 / 岗位晋升"></div>
+    <div class="form-group"><label>经办人</label><input type="text" id="hslBy" placeholder="如 李国良"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrSalary')">取消</button>
+      <button class="btn btn-primary" id="btnHrSalarySave">保存调薪</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 人才储备库 ====== -->
+<div class="modal-overlay" id="modalHrTalent" style="display:none">
+  <div class="modal" style="width:min(820px,95vw)">
+    <h3 id="modalHrTalentTitle">新增候选人</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>姓名 *</label><input type="text" id="htName"></div>
+      <div class="form-group" style="flex:0 1 100px"><label>性别</label><select id="htGender"><option value="">未填</option><option>女</option><option>男</option></select></div>
+      <div class="form-group" style="flex:1 1 120px"><label>出生年月</label><input type="month" id="htBirth"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>应聘岗位</label><input type="text" id="htPost" placeholder="如 外贸业务员"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:0 1 110px"><label>学历</label><input type="text" id="htEdu" placeholder="如 本科"></div>
+      <div class="form-group" style="flex:1 1 170px"><label>毕业学校</label><input type="text" id="htSchool"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>专业</label><input type="text" id="htMajor"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 150px"><label>联系方式</label><input type="text" id="htPhone" placeholder="手机 / 微信"></div>
+      <div class="form-group" style="flex:1 1 170px"><label>邮箱</label><input type="text" id="htEmail"></div>
+      <div class="form-group" style="flex:1 1 120px"><label>现居地</label><input type="text" id="htCity"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:0 1 140px"><label>面试时间</label><input type="date" id="htDate"></div>
+      <div class="form-group" style="flex:0 1 140px"><label>批次 / 来源</label><input type="text" id="htSource" placeholder="如 第一批 · 悦婷推送"></div>
+      <div class="form-group" style="flex:0 1 110px"><label>优先级</label><select id="htPriority"><option value="">未评级</option><option value="A">A 重点推进</option><option value="B">B 培养 / 定向</option><option value="C">C 兜底备选</option></select></div>
+      <div class="form-group" style="flex:0 1 130px"><label>状态</label><select id="htStatus"></select></div>
+    </div>
+    <div class="form-group">
+      <label>面试人员（可多选，点「+ 加人」可新增名单）</label>
+      <div class="hr-chipbox" id="htInterviewers"></div>
+    </div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">📊 多维度评价（0–5 分，可拖动）<span class="tag" style="font-weight:400">维度可自定义</span>
+      <button class="btn" style="padding:3px 9px;font-size:11.5px;margin-left:auto" onclick="hrAddDim()">+ 加维度</button>
+    </div>
+    <div id="htDimRows"></div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">💰 薪资意向（元 / 月）</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>期望薪资</label><input type="text" id="htExpectPay" placeholder="面试未涉及可留空"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>承诺薪资</label><input type="text" id="htOfferPay" placeholder="我方谈定/承诺的口径"></div>
+      <div class="form-group" style="flex:1 1 180px"><label>薪资说明</label><input type="text" id="htPayNote" placeholder="如 口径冲突：您说4500/人事说4000"></div>
+    </div>
+    <div class="form-group"><label>综合评价 / 结论</label><textarea id="htRemark" rows="3" placeholder="优势、短板、定位建议、下一步动作"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrTalent')">取消</button>
+      <button class="btn btn-primary" id="btnHrTalentSave">保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
 <div class="modal-overlay" id="modalPlan" style="display:none">
   <div class="modal">
@@ -1328,7 +1565,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.14';
+const APP_VERSION = 'v2.15';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1337,6 +1574,8 @@ let claims = [];   // 货损 / 客诉登记
 let plan = [];     // 数据看板：月度销售计划 / 实际完成（项目×业务员×月份）
 let planGoals = {};     // 数据看板：手填「总计划」（月/季/年 × 项目），与个人计划分开存
 let planOrphans = [];   // 隔离区：认不出项目/月份的看板记录（只隔离不删除）
+// 人事管理（v2.15）：{staff:[在职员工], talent:[人才储备库], meta:{面试人员名单、评价维度}}
+let hr = {staff:[], talent:[], meta:{}};
 let currentTab = 'tasks';
 let editingId = null;
 let noteFilterTag = null;
@@ -1383,6 +1622,14 @@ function loadData(){
   claims    = rdStore('claims', [], true);
   dashOrphans = rdStore('dash_orphan', [], true);
   planOrphans = rdStore('plan_orphan', [], true);
+  const _hrr = rdStore('hr', null);
+  if(_hrr && typeof _hrr==='object' && !Array.isArray(_hrr)) hr = Object.assign(hrBlank(), _hrr);
+  else hr = hrBlank();
+  if(!Array.isArray(hr.staff)) hr.staff=[];
+  if(!Array.isArray(hr.talent)) hr.talent=[];
+  if(!hr.meta || typeof hr.meta!=='object' || Array.isArray(hr.meta)) hr.meta={};
+  hrHeal();
+  try{ hrSeedIfEmpty(); }catch(e){}
   const _bz = rdStore('biz', null);
   if(_bz && typeof _bz==='object') biz = Object.assign(bizBlank(), _bz);
   if(!biz || typeof biz!=='object') biz = bizBlank();
@@ -1538,6 +1785,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
       localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser(expenses)));
       localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser(claims)));
+      localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(hr));
       localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
     }catch(e){
       // 即使剥离附件元数据仍写不下：再退一步，连 files 也清空，保证文字记录绝不丢
@@ -1551,6 +1799,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
         localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser2(expenses)));
         localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser2(claims)));
+        localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(hr));
         localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
         showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
       }catch(e2){ showToast('⚠️ 本地存储写入失败，请导出备份到百度盘', 'warning'); }
@@ -1597,7 +1846,7 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + claims.length + biz.orders.length + biz.pays.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + claims.length + hr.staff.length + hr.talent.length + biz.orders.length + biz.pays.length}
 
 // Check if sample data exists
 function hasSampleData(){
@@ -4267,7 +4516,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,biz,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
   try{
     const corrupt = {};
@@ -4299,7 +4548,7 @@ document.getElementById('importFile').addEventListener('change',function(){
   reader.onload = function(e){
     try{
       const data = JSON.parse(e.target.result);
-      if(!data.tasks || !data.notes || !data.projects){
+      if(!data.tasks && !data.notes && !data.projects && !data.hr){
         showToast('文件格式不正确'); return;
       }
       const before = totalItems();
@@ -4323,7 +4572,7 @@ document.getElementById('importFile').addEventListener('change',function(){
 // Clear all data
 document.getElementById('btnClearAll').addEventListener('click',()=>{
   showConfirm('确定要清空所有数据吗？此操作不可恢复！建议先导出备份。', ()=>{
-    tasks = []; notes = []; projects = []; dashboard = []; plan = []; planGoals = {}; expenses = []; claims = []; biz = bizBlank();
+    tasks = []; notes = []; projects = []; dashboard = []; plan = []; planGoals = {}; expenses = []; claims = []; hr = hrBlank(); biz = bizBlank();
     saveAll();
     refreshAll();
     showToast('所有数据已清空');
@@ -4560,7 +4809,7 @@ async function doSyncUpload(){
     return c;
   });
   const buildSync = (withBiz)=>{
-    const d = {v:9, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, planGoals: planGoals, expenses: syncExpenses, claims: syncClaims, syncedAt:new Date().toISOString()};
+    const d = {v:10, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, planGoals: planGoals, expenses: syncExpenses, claims: syncClaims, hr: hr, syncedAt:new Date().toISOString()};
     if(withBiz) d.biz = biz;
     return d;
   };
@@ -5012,7 +5261,7 @@ function localSnapSave(tag){
     });
     const snap = {at:Date.now(), tag:String(tag||''), ver:APP_VERSION,
       tasks:strip(tasks), notes:strip(notes), projects:strip(projects), dashboard:dashboard,
-      plan:plan, planGoals:planGoals, expenses:strip(expenses), claims:strip(claims)};
+      plan:plan, planGoals:planGoals, expenses:strip(expenses), claims:strip(claims), hr:hr};
     localStorage.setItem(STORAGE_PREFIX+'pre_restore', JSON.stringify(snap));
     return true;
   }catch(e){ return false; }
@@ -5024,7 +5273,8 @@ function localSnapInfo(){
   const s = localSnapGet();
   if(!s) return null;
   const n = (s.tasks||[]).length + (s.notes||[]).length + (s.projects||[]).length + (s.dashboard||[]).length
-          + (s.plan||[]).length + Object.keys(s.planGoals||{}).length + (s.expenses||[]).length + (s.claims||[]).length;
+          + (s.plan||[]).length + Object.keys(s.planGoals||{}).length + (s.expenses||[]).length + (s.claims||[]).length
+          + ((s.hr&&s.hr.staff)||[]).length + ((s.hr&&s.hr.talent)||[]).length;
   return {at:s.at, tag:s.tag, n:n};
 }
 // 把一份「外来数据」（云端快照 / 另一台设备的同步包 / 本机快照）合并进本机，只增不减
@@ -5045,6 +5295,23 @@ function applyIncoming(data, label){
   arr('plan','plan', ()=>plan, v=>{plan=v;});
   arr('expenses','expense', ()=>expenses, v=>{expenses=v;});
   arr('claims','claim', ()=>claims, v=>{claims=v;});
+  // 人事：员工 / 候选人 各自按 id 合并（只增不减）；面试人员名单与评价维度按 map 合并
+  if(data && data.hr && typeof data.hr === 'object'){
+    const lh = hr || hrBlank(), ih = data.hr;
+    const r1 = syncMergeById(lh.staff || [], ih.staff || [], 'staff');
+    const r2 = syncMergeById(lh.talent || [], ih.talent || [], 'talent');
+    hr.staff = r1.list; hr.talent = r2.list;
+    hr.meta = hrMetaNormalize(Object.assign({}, hr.meta||{}, {
+      interviewers: Object.assign({}, (ih.meta&&ih.meta.interviewers)||{}, (lh.meta&&lh.meta.interviewers)||{}),
+      dims: (function(){
+        const a=((lh.meta&&lh.meta.dims)||[]).slice(), b=((ih.meta&&ih.meta.dims)||[]);
+        b.forEach(d=>{ if(d && d.key && !a.some(x=>x && x.key===d.key)) a.push(d); });
+        return a;
+      })()
+    }));
+    stat.kept += r1.keepLocal + r2.keepLocal;
+    stat.newFromIncoming += r1.incomingNew + r2.incomingNew;
+  }
   if(data && data.planGoals && typeof data.planGoals === 'object') planGoals = syncMergeMap(planGoals, data.planGoals);
   if(data && data.biz && typeof data.biz === 'object'){
     const ib = data.biz, lb = biz;
@@ -5101,9 +5368,10 @@ function asSnapshot(){
     savedAt:new Date().toISOString(),
     counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
             dashboard:dashboard.length, plan:plan.length, planGoals:Object.keys(planGoals).length, expenses:expenses.length, claims:claims.length,
+            hrStaff:hr.staff.length, hrTalent:hr.talent.length,
             bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims),
+    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims), hr:hr,
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded}
   };
@@ -9617,6 +9885,485 @@ function switchTab(tab){
   renderCurrentTab();
 }
 
+// ============================================================
+//  人事管理模块（v2.15）：在职员工档案 + 人才储备库
+//  数据键 hr：read/write/export/import/sync 五链路全部接入
+// ============================================================
+const HR_PROJECTS = ['朗格斯','凡适','综合'];
+const HR_SALARY_ITEMS = ['基本工资','岗位工资','绩效工资','提成','补贴','社保','其他'];
+const HR_TALENT_STATUS = ['待面试','面试中','已通过','已发offer','已入职','已流失','暂不考虑','未落地·可培养','兜底备选','待定'];
+const HR_DIMS_DEFAULT = [
+  {key:'major', name:'专业/经历对口度'},
+  {key:'image', name:'个人形象'},
+  {key:'impress', name:'印象打分'},
+  {key:'comm', name:'沟通表达'},
+  {key:'eng', name:'英语/口语'},
+  {key:'stable', name:'稳定性'}
+];
+const HR_INTERVIEWERS_DEFAULT = ['李国良','李鹏','王洁'];
+const HR_SALARY_KEYMAP = {'基本工资':'base','岗位工资':'postPay','绩效工资':'perf','提成':'comm','补贴':'allow','社保':'social','其他':'other'};
+
+let hrTab = 'staff';
+let editingHrStaffId = null;
+let hrSalaryForId = null;
+let editingHrTalentId = null;
+let htModalDims = [];        // [{key,name,score}]
+let htModalInterviewers = []; // [name,...]
+
+function hrBlank(){
+  return { staff:[], talent:[], meta:{ interviewers:{}, dims: HR_DIMS_DEFAULT.slice() } };
+}
+function hrMetaNormalize(meta){
+  meta = meta || {};
+  if(!meta.interviewers || typeof meta.interviewers!=='object') meta.interviewers={};
+  if(!Array.isArray(meta.dims)) meta.dims = HR_DIMS_DEFAULT.slice();
+  HR_INTERVIEWERS_DEFAULT.forEach(n=>{ if(!(n in meta.interviewers)) meta.interviewers[n]=1; });
+  return meta;
+}
+function hrHeal(){
+  let changed=false;
+  hr.meta = hrMetaNormalize(hr.meta);
+  hr.staff.forEach(s=>{
+    if(!s) return;
+    if(HR_PROJECTS.indexOf(s.project)<0){ s.project='综合'; changed=true; }
+    if(!s.status) { s.status = s.leaveDate ? 'leave':'active'; changed=true; }
+    if(!Array.isArray(s.salaryLog)){ s.salaryLog=[]; changed=true; }
+    if(!s.salary || typeof s.salary!=='object'){ s.salary={}; changed=true; }
+  });
+  hr.staff = hr.staff.filter(s=>s && s.name);
+  hr.talent.forEach(t=>{
+    if(!t) return;
+    if(!Array.isArray(t.dims)){ t.dims=[]; changed=true; }
+    if(!Array.isArray(t.interviewers)){ t.interviewers=[]; changed=true; }
+    if(!t.status){ t.status='未落地·可培养'; changed=true; }
+  });
+  hr.talent = hr.talent.filter(t=>t && t.name);
+  if(changed) saveAll();
+}
+function hrSalTotal(s){
+  const sal = s.salary||{};
+  let t=0;
+  ['base','postPay','perf','comm','allow','social','other'].forEach(k=>{ const n=parseFloat(sal[k]); if(!isNaN(n)) t+=n; });
+  return Math.round(t);
+}
+function hrSalaryKeyOf(item){ return HR_SALARY_KEYMAP[item]||'other'; }
+function hrCalcSalTotal(){
+  let t=0;
+  ['hsBase','hsPostPay','hsPerf','hsComm','hsAllow','hsSocial','hsOther'].forEach(id=>{
+    const v=parseFloat(document.getElementById(id).value); if(!isNaN(v)) t+=v;
+  });
+  document.getElementById('hsSalTotal').value = t? Math.round(t):'';
+}
+function hrStaffLeaveToggle(){
+  const st=document.getElementById('hsStatus').value;
+  document.getElementById('hsLeaveWrap').style.display = (st==='leave')?'flex':'none';
+}
+
+// ---------------- 在职员工：弹窗与保存 ----------------
+function openHrStaffModal(id){
+  editingHrStaffId = id || null;
+  const rec = id ? hr.staff.find(s=>s.id===id) : null;
+  const projSel=document.getElementById('hsProject');
+  projSel.innerHTML = HR_PROJECTS.map(p=>'<option value="'+p+'">'+(p||'')+'</option>').join('');
+  document.getElementById('modalHrStaffTitle').textContent = rec?'编辑员工档案':'新增员工档案';
+  document.getElementById('hsName').value = rec?(rec.name||''):'';
+  document.getElementById('hsEnName').value = rec?(rec.enName||''):'';
+  document.getElementById('hsGender').value = rec?(rec.gender||''):'';
+  document.getElementById('hsBirth').value = rec?(rec.birth||''):'';
+  projSel.value = rec?(HR_PROJECTS.indexOf(rec.project)>=0?rec.project:'综合'):'朗格斯';
+  document.getElementById('hsPost').value = rec?(rec.post||''):'';
+  document.getElementById('hsSubAccount').value = rec?(rec.subAccount||''):'';
+  document.getElementById('hsEdu').value = rec?(rec.edu||''):'';
+  document.getElementById('hsSchool').value = rec?(rec.school||''):'';
+  document.getElementById('hsMajor').value = rec?(rec.major||''):'';
+  document.getElementById('hsPhone').value = rec?(rec.phone||''):'';
+  document.getElementById('hsJoin').value = rec?(rec.joinDate||''):'';
+  document.getElementById('hsProbEnd').value = rec?(rec.probEnd||''):'';
+  document.getElementById('hsStatus').value = rec?(rec.status||'active'):'active';
+  document.getElementById('hsLeaveDate').value = rec?(rec.leaveDate||''):'';
+  document.getElementById('hsLeaveReason').value = rec?(rec.leaveReason||''):'';
+  const sal = rec?(rec.salary||{}):{};
+  document.getElementById('hsBase').value = (sal.base!==undefined && sal.base!=='')?sal.base:'';
+  document.getElementById('hsPostPay').value = (sal.postPay!==undefined && sal.postPay!=='')?sal.postPay:'';
+  document.getElementById('hsPerf').value = (sal.perf!==undefined && sal.perf!=='')?sal.perf:'';
+  document.getElementById('hsComm').value = (sal.comm!==undefined && sal.comm!=='')?sal.comm:'';
+  document.getElementById('hsAllow').value = (sal.allow!==undefined && sal.allow!=='')?sal.allow:'';
+  document.getElementById('hsSocial').value = (sal.social!==undefined && sal.social!=='')?sal.social:'';
+  document.getElementById('hsOther').value = (sal.other!==undefined && sal.other!=='')?sal.other:'';
+  hrCalcSalTotal();
+  document.getElementById('hsNote').value = rec?(rec.note||''):'';
+  hrStaffLeaveToggle();
+  document.getElementById('modalHrStaff').style.display='flex';
+}
+function saveHrStaff(){
+  const name=String(document.getElementById('hsName').value||'').trim();
+  if(!name){ showToast('请填写姓名'); try{document.getElementById('hsName').focus()}catch(e){} return; }
+  const readNum=id=>{ const v=document.getElementById(id).value; if(v===''||v===null) return ''; const n=parseFloat(v); return isNaN(n)?'':n; };
+  const rec={
+    id: editingHrStaffId||uid(),
+    name: name,
+    enName: String(document.getElementById('hsEnName').value||'').trim(),
+    gender: document.getElementById('hsGender').value||'',
+    birth: document.getElementById('hsBirth').value||'',
+    project: document.getElementById('hsProject').value||'综合',
+    post: String(document.getElementById('hsPost').value||'').trim(),
+    subAccount: String(document.getElementById('hsSubAccount').value||'').trim(),
+    edu: String(document.getElementById('hsEdu').value||'').trim(),
+    school: String(document.getElementById('hsSchool').value||'').trim(),
+    major: String(document.getElementById('hsMajor').value||'').trim(),
+    phone: String(document.getElementById('hsPhone').value||'').trim(),
+    joinDate: document.getElementById('hsJoin').value||'',
+    probEnd: document.getElementById('hsProbEnd').value||'',
+    status: document.getElementById('hsStatus').value||'active',
+    leaveDate: document.getElementById('hsLeaveDate').value||'',
+    leaveReason: String(document.getElementById('hsLeaveReason').value||'').trim(),
+    salary: { base:readNum('hsBase'), postPay:readNum('hsPostPay'), perf:readNum('hsPerf'), comm:readNum('hsComm'), allow:readNum('hsAllow'), social:readNum('hsSocial'), other:readNum('hsOther') },
+    salaryLog: [],
+    note: String(document.getElementById('hsNote').value||'').trim(),
+    createdAt: Date.now()
+  };
+  if(editingHrStaffId){ const old=hr.staff.find(s=>s.id===editingHrStaffId); if(old && Array.isArray(old.salaryLog)) rec.salaryLog=old.salaryLog; }
+  if(editingHrStaffId){ const i=hr.staff.findIndex(s=>s.id===editingHrStaffId); if(i>=0) hr.staff[i]=rec; }
+  else hr.staff.push(rec);
+  editingHrStaffId=null;
+  saveAll(); closeModal('modalHrStaff'); refreshAll();
+  showToast('✓ 已保存员工档案', 'info');
+}
+function deleteHrStaff(id){
+  const s=hr.staff.find(x=>x.id===id); if(!s) return;
+  showConfirm('删除「'+(s.name||'未命名')+'」的档案？调薪记录也会一起删。', ()=>{
+    hr.staff = hr.staff.filter(x=>x.id!==id); saveAll(); refreshAll(); showToast('已删除');
+  });
+}
+
+// ---------------- 调薪登记 ----------------
+function openHrSalaryModal(id){
+  const s = id? hr.staff.find(x=>x.id===id): null;
+  if(!s){ showToast('请先选择一名员工'); return; }
+  hrSalaryForId = s.id;
+  const itemSel=document.getElementById('hslItem');
+  itemSel.innerHTML = HR_SALARY_ITEMS.map(it=>'<option value="'+it+'">'+it+'</option>').join('');
+  itemSel.setAttribute('onchange','hrSalaryItemChange()');
+  document.getElementById('modalHrSalaryTitle').textContent = '调薪登记 · '+(s.name||'');
+  document.getElementById('hslDate').value = todayStr();
+  itemSel.value = HR_SALARY_ITEMS[0];
+  const before = (s.salary && s.salary[hrSalaryKeyOf(HR_SALARY_ITEMS[0])])||0;
+  document.getElementById('hslBefore').value = before||0;
+  document.getElementById('hslAfter').value='';
+  document.getElementById('hslReason').value='';
+  document.getElementById('hslBy').value='李国良';
+  document.getElementById('modalHrSalary').style.display='flex';
+}
+function hrSalaryItemChange(){
+  const s = hr.staff.find(x=>x.id===hrSalaryForId);
+  const item = document.getElementById('hslItem').value;
+  const before = (s && s.salary)? (s.salary[hrSalaryKeyOf(item)]||0):0;
+  document.getElementById('hslBefore').value = before||0;
+}
+function saveHrSalary(){
+  const s = hr.staff.find(x=>x.id===hrSalaryForId);
+  if(!s){ showToast('未找到该员工'); return; }
+  const date=document.getElementById('hslDate').value || todayStr();
+  const item=document.getElementById('hslItem').value;
+  const afterRaw=String(document.getElementById('hslAfter').value||'').trim();
+  if(!afterRaw){ showToast('请填调整后的金额'); try{document.getElementById('hslAfter').focus()}catch(e){} return; }
+  const after=parseFloat(afterRaw); if(isNaN(after)){ showToast('金额格式不对'); return; }
+  const key=hrSalaryKeyOf(item);
+  const before = (s.salary && s.salary[key])||0;
+  s.salary = s.salary||{};
+  s.salary[key]=after;
+  s.salaryLog = s.salaryLog||[];
+  s.salaryLog.push({ id:uid(), date:date, item:item, before:before, after:after,
+    reason:String(document.getElementById('hslReason').value||'').trim(), by:String(document.getElementById('hslBy').value||'').trim(), at:Date.now() });
+  hrSalaryForId=null;
+  saveAll(); closeModal('modalHrSalary'); refreshAll();
+  showToast('✓ 已登记调薪并更新薪资构成', 'info');
+}
+
+// ---------------- 人才储备库：弹窗与保存 ----------------
+function openHrTalentModal(id){
+  editingHrTalentId = id || null;
+  const rec = id? hr.talent.find(t=>t.id===id): null;
+  const statusSel=document.getElementById('htStatus');
+  statusSel.innerHTML = HR_TALENT_STATUS.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
+  document.getElementById('modalHrTalentTitle').textContent = rec?'编辑候选人':'新增候选人';
+  document.getElementById('htName').value = rec?(rec.name||''):'';
+  document.getElementById('htGender').value = rec?(rec.gender||''):'';
+  document.getElementById('htBirth').value = rec?(rec.birth||''):'';
+  document.getElementById('htPost').value = rec?(rec.post||''):'';
+  document.getElementById('htEdu').value = rec?(rec.edu||''):'';
+  document.getElementById('htSchool').value = rec?(rec.school||''):'';
+  document.getElementById('htMajor').value = rec?(rec.major||''):'';
+  document.getElementById('htPhone').value = rec?(rec.phone||''):'';
+  document.getElementById('htEmail').value = rec?(rec.email||''):'';
+  document.getElementById('htCity').value = rec?(rec.city||''):'';
+  document.getElementById('htDate').value = rec?(rec.interviewDate||''):'';
+  document.getElementById('htSource').value = rec?(rec.source||''):'';
+  document.getElementById('htPriority').value = rec?(rec.priority||'B'):'B';
+  statusSel.value = rec?(HR_TALENT_STATUS.indexOf(rec.status)>=0?rec.status:'未落地·可培养'):'面试中';
+  htModalInterviewers = rec? (rec.interviewers||[]).slice(): [];
+  htModalDims = rec? (rec.dims||[]).map(d=>({key:d.key,name:d.name,score:d.score||0})) : HR_DIMS_DEFAULT.map(d=>({key:d.key,name:d.name,score:0}));
+  hrRenderInterviewers();
+  hrRenderDims();
+  document.getElementById('htExpectPay').value = rec?(rec.expectPay||''):'';
+  document.getElementById('htOfferPay').value = rec?(rec.offerPay||''):'';
+  document.getElementById('htPayNote').value = rec?(rec.payNote||''):'';
+  document.getElementById('htRemark').value = rec?(rec.remark||''):'';
+  document.getElementById('modalHrTalent').style.display='flex';
+}
+function hrRenderInterviewers(){
+  const box=document.getElementById('htInterviewers');
+  if(!box) return;
+  const names = Object.keys(hr.meta.interviewers||{});
+  let h='';
+  names.forEach(n=>{
+    const on = htModalInterviewers.indexOf(n)>=0;
+    h+='<button type="button" class="hr-chip'+(on?' on':'')+'" onclick="hrToggleInterviewer(\''+escAttr(n)+'\')">'+escHtml(n)+'</button>';
+  });
+  h+='<input type="text" id="htInterviewerNew" placeholder="加面试人…" style="width:110px">';
+  h+='<button type="button" class="btn btn-sm" onclick="hrAddInterviewer()">+ 加人</button>';
+  box.innerHTML=h;
+}
+function hrToggleInterviewer(n){ const i=htModalInterviewers.indexOf(n); if(i>=0) htModalInterviewers.splice(i,1); else htModalInterviewers.push(n); hrRenderInterviewers(); }
+function hrAddInterviewer(){
+  const inp=document.getElementById('htInterviewerNew'); if(!inp) return;
+  const n=String(inp.value||'').trim(); if(!n) return;
+  if(!hr.meta.interviewers[n]) hr.meta.interviewers[n]=1;
+  if(htModalInterviewers.indexOf(n)<0) htModalInterviewers.push(n);
+  inp.value=''; hrRenderInterviewers();
+}
+function hrRenderDims(){
+  const box=document.getElementById('htDimRows'); if(!box) return;
+  let h='';
+  htModalDims.forEach((d,i)=>{
+    h+='<div class="hr-dimrow">';
+    h+='<input type="text" value="'+escAttr(d.name)+'" placeholder="维度名" style="flex:0 0 150px" oninput="hrDimName(\''+i+'\',this.value)">';
+    h+='<input type="range" min="0" max="5" step="0.5" value="'+d.score+'" style="flex:1 1 160px" oninput="hrDimScore(\''+i+'\',this.value)">';
+    h+='<span class="hr-dimval" id="hrdv'+i+'">'+d.score+'</span>';
+    h+='<button type="button" class="btn-icon" title="删除维度" onclick="hrDelDim(\''+i+'\')" style="color:var(--danger)">✕</button>';
+    h+='</div>';
+  });
+  box.innerHTML=h;
+}
+function hrDimName(i,v){ if(htModalDims[i]) htModalDims[i].name=v; }
+function hrDimScore(i,v){ if(htModalDims[i]){ htModalDims[i].score=v; const el=document.getElementById('hrdv'+i); if(el) el.textContent=v; } }
+function hrDelDim(i){ htModalDims.splice(i,1); hrRenderDims(); }
+function hrAddDim(){ htModalDims.push({key:'dim_'+uid(), name:'', score:3}); hrRenderDims(); }
+function saveHrTalent(){
+  const name=String(document.getElementById('htName').value||'').trim();
+  if(!name){ showToast('请填写姓名'); try{document.getElementById('htName').focus()}catch(e){} return; }
+  const rec={
+    id: editingHrTalentId||uid(),
+    name:name,
+    gender: document.getElementById('htGender').value||'',
+    birth: document.getElementById('htBirth').value||'',
+    post: String(document.getElementById('htPost').value||'').trim(),
+    edu: String(document.getElementById('htEdu').value||'').trim(),
+    school: String(document.getElementById('htSchool').value||'').trim(),
+    major: String(document.getElementById('htMajor').value||'').trim(),
+    phone: String(document.getElementById('htPhone').value||'').trim(),
+    email: String(document.getElementById('htEmail').value||'').trim(),
+    city: String(document.getElementById('htCity').value||'').trim(),
+    interviewDate: document.getElementById('htDate').value||'',
+    source: String(document.getElementById('htSource').value||'').trim(),
+    priority: document.getElementById('htPriority').value||'',
+    status: document.getElementById('htStatus').value||'未落地·可培养',
+    interviewers: htModalInterviewers.slice(),
+    dims: htModalDims.map(d=>({key:d.key,name:d.name,score:parseFloat(d.score)||0})).filter(d=>d.name),
+    expectPay: String(document.getElementById('htExpectPay').value||'').trim(),
+    offerPay: String(document.getElementById('htOfferPay').value||'').trim(),
+    payNote: String(document.getElementById('htPayNote').value||'').trim(),
+    remark: String(document.getElementById('htRemark').value||'').trim(),
+    createdAt: Date.now()
+  };
+  if(editingHrTalentId){ const i=hr.talent.findIndex(t=>t.id===editingHrTalentId); if(i>=0) hr.talent[i]=rec; }
+  else hr.talent.push(rec);
+  editingHrTalentId=null;
+  saveAll(); closeModal('modalHrTalent'); refreshAll();
+  showToast('✓ 已保存候选人', 'info');
+}
+function deleteHrTalent(id){
+  const t=hr.talent.find(x=>x.id===id); if(!t) return;
+  showConfirm('删除「'+(t.name||'未命名')+'」的候选记录？', ()=>{
+    hr.talent = hr.talent.filter(x=>x.id!==id); saveAll(); refreshAll(); showToast('已删除');
+  });
+}
+
+// ---------------- 渲染 ----------------
+function renderHr(){
+  const tools=document.getElementById('hrTools');
+  if(tools) tools.innerHTML='<button class="btn btn-primary" onclick="openHrStaffModal()">＋ 新增员工</button>'
+    +'<button class="btn" onclick="openHrTalentModal()">＋ 新增候选人</button>';
+  const tabs=document.getElementById('hrTabs');
+  if(tabs) tabs.innerHTML=''
+    +'<button class="hr-tab'+(hrTab==='staff'?' on':'')+'" onclick="hrSetTab(\'staff\')">在职员工 <span class="hr-tab-cnt">'+hr.staff.length+'</span></button>'
+    +'<button class="hr-tab'+(hrTab==='talent'?' on':'')+'" onclick="hrSetTab(\'talent\')">人才储备库 <span class="hr-tab-cnt">'+hr.talent.length+'</span></button>';
+  const box=document.getElementById('hrContent');
+  if(box) box.innerHTML = hrTab==='staff'? hrStaffHtml() : hrTalentHtml();
+}
+function hrSetTab(t){ hrTab=t; renderHr(); }
+function hrBadge(){ const b=document.getElementById('hrBadge'); if(b) b.style.display='none'; }
+
+function hrStaffHtml(){
+  const groups={}; HR_PROJECTS.forEach(p=>groups[p]=[]);
+  hr.staff.forEach(s=>{ const p=HR_PROJECTS.indexOf(s.project)>=0?s.project:'综合'; groups[p].push(s); });
+  const total=hr.staff.length;
+  const active=hr.staff.filter(s=>s.status!=='leave').length;
+  const prob=hr.staff.filter(s=>s.status==='probation').length;
+  const leave=hr.staff.filter(s=>s.status==='leave').length;
+  let h='<div class="hr-statbar">'
+    +'<div class="hr-stat"><b>'+total+'</b><span>总人数</span></div>'
+    +'<div class="hr-stat"><b>'+active+'</b><span>在职</span></div>'
+    +'<div class="hr-stat"><b>'+prob+'</b><span>试用中</span></div>'
+    +'<div class="hr-stat"><b>'+leave+'</b><span>已离职</span></div></div>';
+  HR_PROJECTS.forEach(p=>{
+    const list=groups[p]; if(!list.length) return;
+    h+='<div class="hr-group"><div class="hr-group-h"><span class="hr-dot"></span>'+p+' <span class="hr-gcnt">'+list.length+' 人</span></div>';
+    list.forEach(s=>{ h+=hrStaffCard(s); });
+    h+='</div>';
+  });
+  if(!total) h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">还没有员工档案，点上面「＋ 新增员工」登记第一条（第一版初始数据已自动导入，刷新即可见）</div>';
+  return h;
+}
+function hrStaffCard(s){
+  const statusMap={active:'在职',probation:'试用期',leave:'已离职'};
+  const stTxt=statusMap[s.status]||s.status||'在职';
+  const stCls= s.status==='leave'?'off':(s.status==='probation'?'prob':'on');
+  const sal=hrSalTotal(s);
+  let h='<div class="hr-card">';
+  h+='<div class="hr-card-top">';
+  h+='<div class="hr-avatar">'+escHtml((s.name||'?').slice(0,1))+'</div>';
+  h+='<div class="hr-card-h"><div class="hr-card-name">'+escHtml(s.name||'')+' <span class="hr-pill '+stCls+'">'+escHtml(stTxt)+'</span></div>';
+  h+='<div class="hr-card-sub">'+escHtml(s.enName||'')+(s.post?' · '+escHtml(s.post):'')+'</div></div>';
+  h+='<div class="hr-card-b">'
+    +'<button class="btn-icon" title="调薪登记" onclick="openHrSalaryModal(\''+s.id+'\')">💰</button>'
+    +'<button class="btn-icon" title="编辑" onclick="openHrStaffModal(\''+s.id+'\')">'+ICON_EDIT+'</button>'
+    +'<button class="btn-icon" title="删除" onclick="deleteHrStaff(\''+s.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>'
+    +'</div>';
+  h+='</div>';
+  h+='<div class="hr-kv">';
+  if(s.joinDate) h+='<span>入职 '+escHtml(s.joinDate)+'</span>';
+  if(s.probEnd && s.status==='probation') h+='<span>试用至 '+escHtml(s.probEnd)+'</span>';
+  if(s.subAccount) h+='<span>子账号 '+escHtml(s.subAccount)+'</span>';
+  if(s.phone) h+='<span>'+escHtml(s.phone)+'</span>';
+  if(s.edu||s.school||s.major) h+='<span>'+(s.edu?escHtml(s.edu)+' ':'')+(s.school?escHtml(s.school)+' ':'')+(s.major?escHtml(s.major):'')+'</span>';
+  h+='</div>';
+  if(s.status==='leave' && s.leaveDate){ h+='<div class="hr-kv"><span>离职 '+escHtml(s.leaveDate)+'</span>'+(s.leaveReason?'<span>'+escHtml(s.leaveReason)+'</span>':'')+'</div>'; }
+  if(sal>0){
+    h+='<div class="hr-sal"><span class="hr-sal-l">月薪合计</span><b class="hr-sal-v">¥'+sal.toLocaleString('zh-CN')+'</b></div>';
+    const salMap=[['base','基本'],['postPay','岗位'],['perf','绩效'],['comm','提成'],['allow','补贴'],['social','社保'],['other','其他']];
+    const parts=[];
+    salMap.forEach((it)=>{ const v=parseFloat(s.salary[it[0]]); if(!isNaN(v)&&v) parts.push(it[1]+' '+v); });
+    if(parts.length) h+='<div class="hr-sal-d">'+parts.map(escHtml).join(' · ')+'</div>';
+  }
+  if(s.salaryLog && s.salaryLog.length){
+    h+='<div class="hr-tl"><div class="hr-tl-h">调薪记录（'+s.salaryLog.length+'）</div>';
+    s.salaryLog.slice().reverse().forEach(l=>{
+      h+='<div class="hr-tl-row"><span class="hr-tl-d">'+escHtml(l.date||'')+'</span><span class="hr-tl-it">'+escHtml(l.item||'')+'</span><span class="hr-tl-ch">'+escHtml(String(l.before||0))+' → '+escHtml(String(l.after||0))+'</span>'+(l.reason?'<span class="hr-tl-r">'+escHtml(l.reason)+'</span>':'')+'</div>';
+    });
+    h+='</div>';
+  }
+  if(s.note) h+='<div class="hr-note">'+escHtml(s.note)+'</div>';
+  h+='</div>';
+  return h;
+}
+function hrTalentHtml(){
+  const total=hr.talent.length;
+  let h='<div class="hr-statbar">'
+    +'<div class="hr-stat"><b>'+total+'</b><span>候选人总数</span></div>';
+  ['A','B','C'].forEach(p=>{ const n=hr.talent.filter(t=>t.priority===p).length; h+='<div class="hr-stat"><b>'+n+'</b><span>'+p+' 级</span></div>'; });
+  const inpool=hr.talent.filter(t=>['待面试','面试中','已通过','已发offer','已入职','未落地·可培养','兜底备选','待定'].indexOf(t.status)>=0).length;
+  h+='<div class="hr-stat"><b>'+inpool+'</b><span>在池可激活</span></div></div>';
+  if(!total){ h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">还没有候选人，点上面「＋ 新增候选人」登记</div>'; return h; }
+  const order=['已入职','未落地·可培养','兜底备选','待定','已流失','暂不考虑'];
+  const groups={};
+  hr.talent.forEach(t=>{ const k=t.status||'未落地·可培养'; (groups[k]=groups[k]||[]).push(t); });
+  order.concat(Object.keys(groups).filter(k=>order.indexOf(k)<0)).forEach(k=>{
+    if(!groups[k]||!groups[k].length) return;
+    h+='<div class="hr-group"><div class="hr-group-h"><span class="hr-dot"></span>'+escHtml(k)+' <span class="hr-gcnt">'+groups[k].length+' 人</span></div>';
+    groups[k].forEach(t=>{ h+=hrTalentCard(t); });
+    h+='</div>';
+  });
+  return h;
+}
+function hrTalentCard(t){
+  const prMap={A:'A 重点',B:'B 培养',C:'C 兜底'};
+  const pr=t.priority||'';
+  const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
+  let h='<div class="hr-card">';
+  h+='<div class="hr-card-top">';
+  h+='<div class="hr-avatar">'+escHtml((t.name||'?').slice(0,1))+'</div>';
+  h+='<div class="hr-card-h"><div class="hr-card-name">'+escHtml(t.name||'')+(prCls?' <span class="hr-pill pr'+prCls+'">'+escHtml(prMap[pr])+'</span>':'')+' <span class="hr-pill">'+escHtml(t.status||'')+'</span></div>';
+  h+='<div class="hr-card-sub">'+(t.post?escHtml(t.post):'')+(t.interviewDate?' · 面于 '+escHtml(t.interviewDate):'')+'</div></div>';
+  h+='<div class="hr-card-b">'
+    +'<button class="btn-icon" title="编辑" onclick="openHrTalentModal(\''+t.id+'\')">'+ICON_EDIT+'</button>'
+    +'<button class="btn-icon" title="删除" onclick="deleteHrTalent(\''+t.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>'
+    +'</div>';
+  h+='</div>';
+  h+='<div class="hr-kv">';
+  if(t.edu) h+='<span>'+escHtml(t.edu)+'</span>';
+  if(t.school) h+='<span>'+escHtml(t.school)+'</span>';
+  if(t.major) h+='<span>'+escHtml(t.major)+'</span>';
+  if(t.source) h+='<span>来源 '+escHtml(t.source)+'</span>';
+  if(t.phone) h+='<span>'+escHtml(t.phone)+'</span>';
+  if(t.city) h+='<span>'+escHtml(t.city)+'</span>';
+  if(t.interviewers&&t.interviewers.length) h+='<span>面试 '+escHtml(t.interviewers.join('/'))+'</span>';
+  h+='</div>';
+  if(t.dims&&t.dims.length){
+    h+='<div class="hr-dims">';
+    t.dims.forEach(d=>{
+      const v=parseFloat(d.score)||0;
+      const pct=(v/5*100).toFixed(0);
+      h+='<div class="hr-dim"><span class="hr-dim-n">'+escHtml(d.name||'')+'</span>'
+        +'<span class="hr-bar"><span class="hr-bar-i" style="width:'+pct+'%"></span></span>'
+        +'<span class="hr-dim-s">'+v+'</span></div>';
+    });
+    h+='</div>';
+  }
+  if(t.expectPay||t.offerPay){
+    h+='<div class="hr-money"><div class="hr-money-i"><span>期望薪资</span><b>'+escHtml(t.expectPay||'—')+'</b></div>'
+      +'<div class="hr-money-i"><span>承诺薪资</span><b>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'—')+'</b></div></div>';
+    if(t.payNote) h+='<div class="hr-note">薪资说明：'+escHtml(t.payNote)+'</div>';
+  }
+  if(t.remark) h+='<div class="hr-note">'+escHtml(t.remark)+'</div>';
+  h+='</div>';
+  return h;
+}
+
+// ---------------- 第一版初始数据（仅空库时种入，之后由用户自行修改） ----------------
+function hrSeedIfEmpty(){
+  if(hr.staff.length || hr.talent.length) return;
+  const now = Date.now();
+  hr.staff = [
+    {id:uid(), name:'陈曦', enName:'Nancy', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Nancy Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'核心业务员', createdAt:now},
+    {id:uid(), name:'孟伊', enName:'Alyssa', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Alyssa Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'核心业务员；接手李楠、王梦莹转来的客户', createdAt:now},
+    {id:uid(), name:'李雪洋', enName:'Phoebe', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Phoebe Lignes', edu:'', school:'', major:'', phone:'', joinDate:'2026-06-09', probEnd:'2026-09-08', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'试用期已满，评估结论：建议转正', createdAt:now},
+    {id:uid(), name:'崔燕柯', enName:'Yan', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员（助理型）', subAccount:'Salima Lignes（沿用王梦莹）', edu:'本科（2024 毕业）', school:'', major:'', phone:'', joinDate:'2026-09-21', probEnd:'', status:'probation', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'09-27 起接待询盘；薪资待人事补充', createdAt:now},
+    {id:uid(), name:'乔萌萌', enName:'Ella Fans', gender:'女', birth:'', project:'凡适', post:'外贸业务员', subAccount:'Ella Fans', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'', createdAt:now},
+    {id:uid(), name:'周文怡', enName:'Vivian', gender:'女', birth:'', project:'凡适', post:'外贸业务员', subAccount:'Vivian Fanshi', edu:'', school:'', major:'', phone:'', joinDate:'2026-08-10', probEnd:'2026-11-10', status:'probation', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'', createdAt:now},
+    {id:uid(), name:'王梦莹', enName:'Salima', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Salima Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'leave', leaveDate:'2026-09-05', leaveReason:'主动离职；重要客户转接孟伊，其余由运营分配；子账号 9/27 起移交崔燕柯', salary:{}, salaryLog:[], note:'', createdAt:now},
+    {id:uid(), name:'李楠', enName:'Lilian', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'', edu:'', school:'', major:'', phone:'', joinDate:'2026-04-27', probEnd:'', status:'leave', leaveDate:'2026-07-10', leaveReason:'试用期未通过；工作交接给孟伊，离职手续已办完', salary:{}, salaryLog:[], note:'', createdAt:now},
+    {id:uid(), name:'Hannah', enName:'', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'leave', leaveDate:'2025-12', leaveReason:'', salary:{}, salaryLog:[], note:'', createdAt:now}
+  ];
+  hr.talent = [
+    {id:uid(), name:'崔燕柯', gender:'女', birth:'', post:'外贸业务员（助理型）', edu:'本科（2024 毕业）', school:'', major:'', phone:'', email:'', city:'', interviewDate:'2026-09-17', source:'', priority:'A', status:'已入职', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:3},{key:'biz',name:'业务能力',score:2}], expectPay:'', offerPay:'', payNote:'', remark:'已入职朗格斯试用；山东传统外贸公司销售助理，产品对接/订单安排/接待过国外客户，人踏实', createdAt:now},
+    {id:uid(), name:'何胜涛', gender:'男', birth:'', post:'跟单 / 面料支持岗（不建议业务开发）', edu:'本科', school:'染整工程', major:'染整工程', phone:'', email:'', city:'郑州 / 新乡', interviewDate:'2026-10-07', source:'', priority:'B', status:'待定', interviewers:['李国良'], dims:[{key:'d1',name:'行业与专业背景',score:4.5},{key:'d2',name:'外贸业务经验',score:1},{key:'d3',name:'英语口语',score:1.5},{key:'d4',name:'跟单与订单履约能力',score:3.5},{key:'d5',name:'数据分析与流程规范',score:4.5},{key:'d6',name:'稳定性与本地化',score:5},{key:'d7',name:'岗位即时产出能力',score:2}], expectPay:'', offerPay:'', payNote:'期望薪资面试未涉及，待补', remark:'B− 待定：男，1982，染整工程 + 17 年半爱慕商品运营；不建议业务开发岗，建议跟单/面料支持岗；若推进由李鹏再面', createdAt:now},
+    {id:uid(), name:'魏俊美', gender:'女', birth:'', post:'外贸业务员', edu:'', school:'', major:'宠物服装外贸', phone:'', email:'', city:'上海', interviewDate:'2026-09-02', source:'李总推送', priority:'A', status:'已流失', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:5},{key:'comm',name:'沟通表达',score:4},{key:'biz',name:'业务能力',score:5}], expectPay:'', offerPay:'', payNote:'', remark:'33 岁，上海宠物服装外贸多年；口语业务双突出。9/22 确认已入职别处（流失）', createdAt:now},
+    {id:uid(), name:'李晓莹', gender:'女', birth:'', post:'外贸业务员', edu:'', school:'', major:'家纺外贸（洛阳 2 年）', phone:'', email:'', city:'郑州', interviewDate:'2026-09-02', source:'李总推送', priority:'A', status:'已流失', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:4},{key:'biz',name:'业务能力',score:5}], expectPay:'', offerPay:'', payNote:'', remark:'多年家纺外贸，业务突出、沟通自如。9/3 确认已找到别的工作（流失）', createdAt:now},
+    {id:uid(), name:'王梓雁', gender:'女', birth:'2005-05', post:'外贸业务员 / 跟单助理', edu:'本科在读（2027.06 毕业）', school:'中原工学院', major:'无纺布工程（专业前 5%）', phone:'17667172860', email:'wzy759684244@qq.com', city:'郑州', interviewDate:'2026-09-17', source:'', priority:'A', status:'暂不考虑', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:3},{key:'biz',name:'业务能力',score:2}], expectPay:'4500（您口径）/ 4000（人事口径，冲突作废）', offerPay:'', payNote:'口径冲突：您说 4500 / 人事说 4000，差 500，未统一后作废', remark:'纺织科班 + 国际站实操 + 组织力强；在校生身份用工形式待定；9/22 因工作经验暂不考虑，重启招聘再评估', createdAt:now},
+    {id:uid(), name:'朱利霞', gender:'女', birth:'2004-01', post:'外贸业务员', edu:'本科（2026 届）', school:'黄河科技学院', major:'国际贸易', phone:'19233829704', email:'', city:'焦作', interviewDate:'2026-09-17', source:'', priority:'B', status:'未落地·可培养', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:4},{key:'biz',name:'业务能力',score:4}], expectPay:'', offerPay:'', payNote:'', remark:'LED 外贸业务员，国际站/OKKI/WhatsApp 实操全套、可零适应期上手；建议推进', createdAt:now},
+    {id:uid(), name:'张文逸', gender:'女', birth:'', post:'外贸业务员', edu:'应届', school:'', major:'家具外贸（3 个月）', phone:'', email:'', city:'', interviewDate:'2026-09-03', source:'悦婷推送', priority:'B', status:'未落地·可培养', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:5},{key:'comm',name:'沟通表达',score:3},{key:'biz',name:'业务能力',score:3}], expectPay:'4000（试用期，已当面谈）', offerPay:'4000', payNote:'试用期已按 4000 沟通', remark:'应届但口语流利、有 3 个月外贸底子；曾建议录用培养', createdAt:now},
+    {id:uid(), name:'邹艺', gender:'女', birth:'', post:'翻译 / 口语辅助岗', edu:'', school:'', major:'', phone:'', email:'', city:'', interviewDate:'2026-09-17', source:'', priority:'B', status:'未落地·可培养', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:4},{key:'comm',name:'沟通表达',score:4},{key:'biz',name:'业务能力',score:1}], expectPay:'', offerPay:'', payNote:'', remark:'翻译项目出身、对接政企；定向口语/翻译辅助岗，不建议直接放业务开发岗', createdAt:now},
+    {id:uid(), name:'王硕', gender:'女', birth:'', post:'国际站运营 / 业务辅助', edu:'一本（2025 毕业）', school:'河南财经政法大学', major:'贸易经济', phone:'18539437260', email:'3539524984@qq.com', city:'', interviewDate:'2026-09-17', source:'', priority:'B', status:'未落地·可培养', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:2},{key:'comm',name:'沟通表达',score:3},{key:'biz',name:'业务能力',score:3}], expectPay:'', offerPay:'', payNote:'英语仅 CET-4，需实测', remark:'近 1 年 HR 专员 + 国际站运营实习；英语仅 CET-4 需实测；定位运营辅助', createdAt:now},
+    {id:uid(), name:'裴鑫源', gender:'女', birth:'', post:'翻译辅助 + 销售培养生', edu:'在读大学生（明年毕业）', school:'', major:'', phone:'', email:'', city:'', interviewDate:'2026-09-02', source:'悦婷推送', priority:'B', status:'未落地·可培养', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:3},{key:'biz',name:'业务能力',score:1}], expectPay:'', offerPay:'', payNote:'', remark:'入职意愿强；可承担老业务员翻译补充；用工形式（实习/兼职/全职）待定', createdAt:now},
+    {id:uid(), name:'潘庆琳', gender:'女', birth:'', post:'业务助理 / 初级业务（储备）', edu:'大专（2027 毕业）', school:'', major:'', phone:'', email:'', city:'', interviewDate:'2026-09-17', source:'', priority:'B', status:'未落地·可培养', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:2},{key:'biz',name:'业务能力',score:1}], expectPay:'3500（试用期保底，已明确告知）', offerPay:'3500', payNote:'试用期保底 3500', remark:'在校生、大专；口语可用 + 成本低，储备培养型', createdAt:now},
+    {id:uid(), name:'单梦瑶', gender:'女', birth:'', post:'外贸业务员', edu:'', school:'', major:'机械类外贸（2 年+）', phone:'', email:'', city:'', interviewDate:'2026-09-02', source:'悦婷推送', priority:'C', status:'兜底备选', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:2},{key:'comm',name:'沟通表达',score:2},{key:'biz',name:'业务能力',score:2}], expectPay:'', offerPay:'', payNote:'', remark:'机械类外贸 2 年+，与服装差异大；兜底', createdAt:now},
+    {id:uid(), name:'刘文宝', gender:'女', birth:'', post:'外贸业务员', edu:'毕业 1 年', school:'', major:'教师 10 个月 + 杭州外贸 2 个月', phone:'', email:'', city:'', interviewDate:'2026-09-02', source:'悦婷推送', priority:'C', status:'兜底备选', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:3},{key:'comm',name:'沟通表达',score:2},{key:'biz',name:'业务能力',score:2}], expectPay:'', offerPay:'', payNote:'', remark:'外贸仅 2 个月，转行动机与稳定性需了解；兜底', createdAt:now},
+    {id:uid(), name:'程洁', gender:'女', birth:'', post:'外贸业务员', edu:'', school:'', major:'国际站设备出口（外贸仅 3 个月）', phone:'', email:'', city:'', interviewDate:'2026-09-03', source:'悦婷推送', priority:'C', status:'兜底备选', interviewers:['李国良'], dims:[{key:'eng',name:'英语/口语',score:1},{key:'comm',name:'沟通表达',score:2},{key:'biz',name:'业务能力',score:1}], expectPay:'', offerPay:'', payNote:'', remark:'英语四级，口语不敢说（硬伤）；兜底', createdAt:now}
+  ];
+  try{ saveAll(); }catch(e){}
+}
+
 function renderCurrentTab(){
   if(currentTab==='tasks') renderTasks();
   else if(currentTab==='notes'){renderNotes();renderTagFilter();}
@@ -9627,6 +10374,7 @@ function renderCurrentTab(){
   else if(currentTab==='expenses') renderExpenses();
   else if(currentTab==='claims') renderClaims();
   else if(currentTab==='biz') renderBiz();
+  else if(currentTab==='hr') renderHr();
 }
 
 function refreshAll(){
@@ -9637,6 +10385,7 @@ function refreshAll(){
   expRenderBadge();
   clmRenderBadge();
   bizBadge();
+  hrBadge();
 }
 
 function updateClearDemoBtn(){
@@ -9668,6 +10417,13 @@ document.querySelectorAll('.mnav-item[data-mtab]').forEach(el=>{
 document.getElementById('btnAddTask').addEventListener('click',openTaskModal);
 document.getElementById('btnAddNote').addEventListener('click',openNoteModal);
 document.getElementById('btnAddProject').addEventListener('click',openProjectModal);
+
+// 人事管理模块：保存按钮 + 薪资实时合计 + 离职行显隐
+document.getElementById('btnHrStaffSave').addEventListener('click',saveHrStaff);
+document.getElementById('btnHrSalarySave').addEventListener('click',saveHrSalary);
+document.getElementById('btnHrTalentSave').addEventListener('click',saveHrTalent);
+['hsBase','hsPostPay','hsPerf','hsComm','hsAllow','hsSocial','hsOther'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input',hrCalcSalTotal); });
+document.getElementById('hsStatus').addEventListener('change',hrStaffLeaveToggle);
 
 // 数据看板：录入弹窗、保存、取消
 // （此前这几处漏了绑定，"录入月度数据"点了没反应，2026-09-11 修复）
