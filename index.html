@@ -866,7 +866,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.13 · 2026-10-07</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.14 · 2026-10-07</div>
     </div>
   </aside>
 
@@ -1328,7 +1328,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.13';
+const APP_VERSION = 'v2.14';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4496,6 +4496,10 @@ document.getElementById('btnSyncSettings').addEventListener('click', ()=>{
 
 // ========== 上传同步 ==========
 document.getElementById('btnSyncSend').addEventListener('click', async ()=>{
+  // v2.14：只要配了 GitHub 令牌，就走「大通道」——照片一起传、无体积上限、可跨设备还原。
+  // 老的小通道（ntfy 分片）每片只有 3000 字节、最多 10 片（30KB），文字稍多一点就报「数据量过大」。
+  if(asReady()){ asRun(true); return; }
+  // 没配令牌：走小通道兜底（只传文字，不传照片）
   if(!getSyncName()){
     openSyncSetupModal('首次使用请先设置同步名称，电脑和手机用同一个名称即可配对', ()=>{
       // 设置完成后自动执行上传
@@ -4563,19 +4567,21 @@ async function doSyncUpload(){
   const topic = getSyncTopic();
   const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 
-  // 分片：每片内容不超过 3000 字节（服务器上限 4096，留足余量）
+  // 分片：每片内容不超过 3800 字节（服务器上限 4096，留足余量）
+  // v2.14：段数上限从 10 提到 30（≈114KB），避免文字数据稍多一点就报「数据量过大」。
   // 经营分析（订单+收款）体量很大，容易把分片撑爆；超限时自动降级成「本次不带它」，
   // 先保证待办/报账/货损这些主力模块的同步不被拖垮。
+  const MAX_SEGS = 30;
   let withBiz = true;
-  let chunks = chunkByBytes(JSON.stringify(buildSync(true)), 3000);
-  if(chunks.length > 10){
+  let chunks = chunkByBytes(JSON.stringify(buildSync(true)), 3800);
+  if(chunks.length > MAX_SEGS){
     withBiz = false;
-    chunks = chunkByBytes(JSON.stringify(buildSync(false)), 3000);
-    if(chunks.length > 10){
-      showToast('数据量过大（需分 '+chunks.length+' 段，上限 10 段），建议精简数据或使用「导出文件」备份');
+    chunks = chunkByBytes(JSON.stringify(buildSync(false)), 3800);
+    if(chunks.length > MAX_SEGS){
+      showToast('文字数据过大（需分 '+chunks.length+' 段，上限 '+MAX_SEGS+' 段）。建议到「同步设置」里粘贴 GitHub 令牌，走大通道可同步全部数据（含照片）');
       return;
     }
-    showToast('经营分析数据体积较大，本次同步不带它（其余模块照常同步）。经营数据请走「导出文件」或云端存档', 'warning');
+    showToast('经营分析数据体积较大，本次同步不带它（其余模块照常同步）。粘贴 GitHub 令牌走大通道可全部同步', 'warning');
   }
   const parts = chunks.map((c,i)=>'WBO4|'+batchId+'|'+(i+1)+'/'+chunks.length+'|'+c);
 
@@ -4606,12 +4612,17 @@ async function doSyncUpload(){
         }
       }
     }
+    if(i < parts.length-1) await new Promise(r=>setTimeout(r,120));   // v2.14：段间小间隔，段数变多也不易被限流
   }
-  showToast('✓ 已上传 '+count+' 条数据'+(parts.length>1?'（已分 '+parts.length+' 段）':'')+(hasFiles?'（附件不随同步传输，只存本机）':'')+'，另一台设备点「接收同步」即可获取', 'info');
+  showToast('✓ 已上传 '+count+' 条数据'+(parts.length>1?'（已分 '+parts.length+' 段）':'')+
+    (hasFiles?'（照片不随此通道传输，配好 GitHub 令牌即可连同照片一起同步）':'')+
+    '，另一台设备点「接收同步」即可获取', 'info');
 }
 
 // ========== 接收同步 ==========
 document.getElementById('btnSyncReceive').addEventListener('click', async ()=>{
+  // v2.14：配了令牌就走大通道恢复（合并式·只增不减，带确认框，并自动把照片还原回来）
+  if(asReady()){ asRestore(); return; }
   if(!getSyncName()){
     openSyncSetupModal('首次使用请先设置同步名称，电脑和手机用同一个名称即可配对', ()=>{
       doSyncReceive();
@@ -5308,7 +5319,7 @@ function asRenderStatus(state){
     }
     if(!el) return;
     if(!c.token){
-      el.innerHTML = '<span class="wait">未配置</span>：把 GitHub 令牌粘到下面，自动同步就生效了';
+      el.innerHTML = '<span class="wait">未配置</span>：现在点「上传同步」只能传文字、照片不会同步；把 GitHub 令牌粘到下面，照片也会一起同步（无体积上限）';
     } else if(!c.enabled){
       el.innerHTML = '<span class="wait">已暂停</span>：上面开关打开即恢复自动同步';
     } else if(state === 'syncing' || asRunning){
