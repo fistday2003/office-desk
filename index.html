@@ -866,7 +866,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.11 · 2026-10-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.13 · 2026-10-07</div>
     </div>
   </aside>
 
@@ -1328,7 +1328,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.11';
+const APP_VERSION = 'v2.13';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1468,21 +1468,98 @@ function healDashboard(){
   if(changed) saveAll();
 }
 
-function saveAll(){
-  try{
-    localStorage.setItem(STORAGE_PREFIX+'tasks',JSON.stringify(tasks));
-    localStorage.setItem(STORAGE_PREFIX+'notes',JSON.stringify(notes));
-    localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(projects));
-    localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
-    localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
-    localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
-    localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(expenses));
-    localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(claims));
-    localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
-  }catch(e){
-    showToast('⚠️ 保存失败：本地存储空间已满。请删除部分附件或导出备份后清理');
+// ===== 附件统一存 IndexedDB（容量比 localStorage 大几百倍，彻底解除 5MB 上限）=====
+// localStorage 只存 tiny 元数据（{fid,name,type,size}），照片本体走 IDB；内存里始终保留 dataUrl 供渲染/云同步/导出。
+// 若 IndexedDB 不可用（极少数隐私模式），自动回退为旧行为（dataUrl 内嵌 localStorage）。
+const IDB_NAME = 'wb_office_files', IDB_STORE = 'files';
+let _idb = null, _idbAvail = true;
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    if(_idb) return res(_idb);
+    if(!_idbAvail || typeof indexedDB==='undefined'){ _idbAvail=false; return rej(new Error('indexedDB 不可用')); }
+    try{
+      const r = indexedDB.open(IDB_NAME,1);
+      r.onupgradeneeded = ()=>{ try{ if(!r.result.objectStoreNames.contains(IDB_STORE)) r.result.createObjectStore(IDB_STORE,{keyPath:'fid'}); }catch(e){} };
+      r.onsuccess = ()=>{ _idb = r.result; res(_idb); };
+      r.onerror   = ()=>{ _idbAvail=false; rej(r.error||new Error('idb open')); };
+    }catch(e){ _idbAvail=false; rej(e); }
+  });
+}
+async function idbPut(f){ const db=await idbOpen(); return await new Promise((res,rej)=>{ const tx=db.transaction(IDB_STORE,'readwrite'); tx.objectStore(IDB_STORE).put(f); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error||new Error('put')); }); }
+async function idbGet(fid){
+  try{ const db=await idbOpen(); return await new Promise((res)=>{ const tx=db.transaction(IDB_STORE,'readonly'); const rq=tx.objectStore(IDB_STORE).get(fid); rq.onsuccess=()=>res((rq.result&&rq.result.dataUrl)?rq.result:null); rq.onerror=()=>res(null); }); }
+  catch(e){ return null; }
+}
+async function idbGetAll(){ try{ const db=await idbOpen(); return await new Promise((res)=>{ const tx=db.transaction(IDB_STORE,'readonly'); const rq=tx.objectStore(IDB_STORE).getAll(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>res([]); }); }catch(e){ return []; } }
+async function idbPutAll(arr){
+  try{ const db=await idbOpen(); await new Promise((res,rej)=>{ const tx=db.transaction(IDB_STORE,'readwrite'); const st=tx.objectStore(IDB_STORE); (arr||[]).forEach(f=>{ if(f&&f.fid) st.put(f); }); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+  catch(e){ throw e; }
+}
+// 把内存里所有带 dataUrl 的附件落进 IDB（并给缺 fid 的附件补 fid）；返回是否 IDB 可用
+async function persistAllFiles(){
+  const all=[];
+  for(const arr of [expenses,claims,tasks,notes,projects]){
+    if(!Array.isArray(arr)) continue;
+    for(const r of arr){ if(r&&Array.isArray(r.files)) for(const f of r.files){ if(f&&f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); all.push({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); } } }
   }
-  asSchedule();  // 内容一变，几秒后自动同步到云端存档
+  if(all.length) await idbPutAll(all);
+}
+// 加载时：旧版内嵌 dataUrl 的附件迁到 IDB；新格式（只有 fid）从 IDB 取回 dataUrl 供渲染/云同步
+async function initFiles(){
+  const mods=[expenses,claims,tasks,notes,projects];
+  let changed=false;
+  for(const arr of mods){
+    if(!Array.isArray(arr)) continue;
+    for(const r of arr){ if(!r||!Array.isArray(r.files)) continue;
+      for(const f of r.files){ if(!f) continue;
+        if(f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); try{ await idbPut({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); changed=true; }catch(e){} }
+        else if(f.fid){ try{ const g=await idbGet(f.fid); if(g&&g.dataUrl) f.dataUrl=g.dataUrl; }catch(e){} }
+      }
+    }
+  }
+  if(changed) await saveAll();
+  return changed;
+}
+let _saveBusy=false, _saveAgain=false;
+function saveAll(){
+  if(_saveBusy){ _saveAgain=true; return; }
+  _saveBusy=true;
+  (async()=>{
+    let idbOk=true;
+    try{ await persistAllFiles(); }catch(e){ idbOk=false; }
+    const fileMeta = f => { const m={name:(f&&f.name)||'', type:(f&&f.type)||'', size:(f&&f.size)||0}; if(f&&f.fid) m.fid=f.fid; return m; };
+    const ser = arr => (arr||[]).map(r=>{ const c=Object.assign({},r); if(Array.isArray(c.files)) c.files = idbOk ? c.files.map(fileMeta) : c.files; return c; });
+    try{
+      localStorage.setItem(STORAGE_PREFIX+'tasks',JSON.stringify(ser(tasks)));
+      localStorage.setItem(STORAGE_PREFIX+'notes',JSON.stringify(ser(notes)));
+      localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(ser(projects)));
+      localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
+      localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
+      localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
+      localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser(expenses)));
+      localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser(claims)));
+      localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
+    }catch(e){
+      // 即使剥离附件元数据仍写不下：再退一步，连 files 也清空，保证文字记录绝不丢
+      try{
+        const ser2 = arr => (arr||[]).map(r=>{ const c=Object.assign({},r); if(Array.isArray(c.files)) c.files=c.files.map(()=>({name:'(附件过大未保存)',type:'',size:0})); return c; });
+        localStorage.setItem(STORAGE_PREFIX+'tasks',JSON.stringify(ser2(tasks)));
+        localStorage.setItem(STORAGE_PREFIX+'notes',JSON.stringify(ser2(notes)));
+        localStorage.setItem(STORAGE_PREFIX+'projects',JSON.stringify(ser2(projects)));
+        localStorage.setItem(STORAGE_PREFIX+'dashboard',JSON.stringify(dashboard));
+        localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
+        localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
+        localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser2(expenses)));
+        localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser2(claims)));
+        localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
+        showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
+      }catch(e2){ showToast('⚠️ 本地存储写入失败，请导出备份到百度盘', 'warning'); }
+    }
+  })().then(()=>{}).catch(()=>{}).finally(()=>{
+    _saveBusy=false;
+    if(_saveAgain){ _saveAgain=false; saveAll(); }
+    else asSchedule();  // 内容一变，几秒后自动同步到云端存档
+  });
 }
 
 // 一次性迁移：旧项目的“当前进度/下一步”转为一条跟进记录（界面不再单独展示这两项）
@@ -3032,6 +3109,24 @@ function addTaskFilesFromList(taskId, files){
     });
   });
 }
+// 统一图片压缩：缩放到 maxDim、JPEG 重编码，硬上限 capBytes（默认 160KB）——附件体积可控，避免把存储撑爆
+function compressImageDataUrl(dataUrl, maxDim, quality, capBytes){
+  return new Promise((resolve,reject)=>{
+    maxDim = maxDim||1100; quality = (quality==null?0.6:quality); capBytes = capBytes||160*1024;
+    const img = new Image();
+    img.onload = ()=>{
+      let w = img.width, h = img.height;
+      if(w>maxDim || h>maxDim){ const s = Math.min(maxDim/w, maxDim/h); w = Math.round(w*s); h = Math.round(h*s); }
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      try{ cv.getContext('2d').drawImage(img,0,0,w,h); }catch(e){ return resolve(dataUrl); }
+      let q = quality, out = cv.toDataURL('image/jpeg', q), n = 0;
+      while(out.length > capBytes && n<6){ q = Math.max(q-0.1,0.35); out = cv.toDataURL('image/jpeg', q); n++; }
+      resolve(out);
+    };
+    img.onerror = ()=>reject(new Error('图片解码失败'));
+    img.src = dataUrl;
+  });
+}
 function processTaskFile(file){
   return new Promise((resolve,reject)=>{
     if(file.type.indexOf('image/')!==0 && file.size > 3*1024*1024){
@@ -3041,31 +3136,11 @@ function processTaskFile(file){
     reader.onload = ()=>{
       const dataUrl = reader.result;
       if(file.type.indexOf('image/')===0){
-        const img = new Image();
-        img.onload = ()=>{
-          const MAX = 1280;
-          let w = img.width, h = img.height;
-          if(w>MAX || h>MAX){
-            const s = Math.min(MAX/w, MAX/h);
-            w = Math.round(w*s); h = Math.round(h*s);
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img,0,0,w,h);
-          let quality = 0.8;
-          let out = canvas.toDataURL('image/jpeg', quality);
-          let n = 0;
-          while(out.length > 1.5*1024*1024 && n<3){
-            quality -= 0.15;
-            out = canvas.toDataURL('image/jpeg', Math.max(quality,0.4));
-            n++;
-          }
-          resolve({dataUrl:out, name:file.name.replace(/\.[^.]+$/,'')+'.jpg', type:'image/jpeg', size:Math.round(out.length*0.75)});
-        };
-        img.onerror = ()=>resolve({dataUrl, name:file.name, type:file.type, size:file.size});
-        img.src = dataUrl;
+        compressImageDataUrl(dataUrl, 1100, 0.6, 160*1024).then(out=>{
+          resolve({fid:'f_'+uid(), name:file.name.replace(/\.[^.]+$/,'')+'.jpg', type:'image/jpeg', size:Math.round(out.length*0.75), dataUrl:out});
+        }).catch(()=>resolve({fid:'f_'+uid(), name:file.name, type:file.type, size:file.size, dataUrl}));
       } else {
-        resolve({dataUrl, name:file.name, type:file.type, size:file.size});
+        resolve({fid:'f_'+uid(), name:file.name, type:file.type, size:file.size, dataUrl});
       }
     };
     reader.onerror = ()=>reject(new Error(file.name+' 读取失败'));
@@ -5064,7 +5139,7 @@ async function asPutFile(repo, branch, path, token, base64, message){
 }
 
 // ---- 同步主流程 ----
-let asTimer = null, asRunning = false, asDirty = false, asShownErr = '';
+let asTimer = null, asRunning = false, asDirty = false, asShownErr = '', asReceiving = false;
 
 function asSchedule(delay){
   try{
@@ -5082,6 +5157,7 @@ async function asRun(manual){
   if(!cfg.token){ if(manual) showToast('请先粘贴 GitHub 令牌'); return; }
   if(!cfg.enabled && !manual) return;
   if(asRunning){ asDirty = true; if(manual) showToast('正在同步中，稍后会自动继续', 'info'); return; }
+  if(asReceiving){ asDirty = true; if(manual) showToast('正在接收云端数据，稍后自动同步', 'info'); return; }
   asRunning = true; asDirty = false; asRenderStatus('syncing');
   let attUp = 0;
   try{
@@ -5151,6 +5227,43 @@ async function asRestore(){
     });
   }catch(e){
     showToast('读取云端存档失败：' + ((e && e.message) || e));
+  }
+}
+
+// ---- 打开即自动从云端合并（双向同步：接收端）----
+// 与手动「从云端恢复」用同一套合并逻辑（applyIncoming = 只增不减），
+// 区别：不打确认框、不阻塞，打开页面静默把云端独有内容补齐到本机。
+// 这样无论你用哪个浏览器 / 哪份文件副本打开，数据都会向云端状态收敛，
+// 彻底解决「在这录入、换个入口打开就看不到」的老毛病。
+async function asAutoReceive(){
+  const cfg = getAsCfg();
+  if(!cfg.token || !cfg.enabled) return;        // 没配令牌就不动作（保持原行为）
+  if(asReceiving || asRunning) return;          // 避免与上传 / 接收打架
+  asReceiving = true; asRenderStatus('syncing');
+  try{
+    const res = await asGh('GET', asContentsApi(cfg.repo, AS_DATA_PATH)+'?ref='+encodeURIComponent(cfg.branch)+'&_='+Date.now(),
+                          cfg.token, null, 'application/vnd.github.raw');
+    if(res.status === 404){ asRenderStatus('ok'); return; }   // 云端还没数据，等首次上传
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    let data = JSON.parse(await res.text());
+    if(typeof data === 'string') data = JSON.parse(data);
+    if(!data || !data.tasks){ asRenderStatus('ok'); return; }
+    const st = applyIncoming(data, '自动接收前');  // 同步改内存 + 留回退快照 + saveAll
+    refreshAll();
+    if(st.newFromIncoming > 0){
+      showToast('🔄 已从云端自动合并 ' + st.newFromIncoming + ' 条（本机独有 ' + st.kept + ' 条已保留）', 'info');
+      asPullAttachments();                         // 后台补齐附件，不阻塞界面
+    }
+    setAsCfg({lastSync: new Date().toISOString(), lastError: ''});
+    asRenderStatus('ok');
+    asSchedule(3000);                              // 把合并后的全集推回云端，保证双向一致
+  }catch(e){
+    const msg = (e && e.message) || String(e);
+    setAsCfg({lastError: msg});
+    asRenderStatus('err');
+    console.warn('自动接收云端失败：', msg);
+  }finally{
+    asReceiving = false;
   }
 }
 
@@ -9608,17 +9721,15 @@ function init(){
   // Auto-postpone yesterday's tasks
   autoPostpone();
   
-  // Render all
-  refreshAll();
-  updateClearDemoBtn();
-  checkBackupReminder();
-  
-  // Check for sync data in URL hash (AFTER render to avoid conflicts)
-  setTimeout(checkSyncHash, 100);
-
-  // 自动三点同步：打开页面就补一次（把离线时的改动、没传完的内容补上去）
-  asRenderStatus();
-  if(asReady()) asSchedule(3000);
+  // 附件：从 IndexedDB 取回 dataUrl，并把旧版内嵌附件迁过去（彻底解除 5MB localStorage 上限）
+  initFiles().catch(e=>{ try{ console.warn('initFiles', e); }catch(_){} }).finally(()=>{
+    refreshAll();
+    updateClearDemoBtn();
+    checkBackupReminder();
+    setTimeout(checkSyncHash, 100);
+    asRenderStatus();
+    if(asReady()) asAutoReceive();
+  });
 }
 
 init();
