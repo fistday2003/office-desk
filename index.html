@@ -820,6 +820,38 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .hr-dimrow .nm{flex:0 0 118px;font-size:12px;font-weight:600;color:var(--text-secondary)}
 .hr-dimrow .vl{font-size:12px;font-weight:700;color:var(--text);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
 .hr-dimrow input[type=range]{flex:1;min-width:110px}
+.hr-tablewrap{width:100%;overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch}
+.hr-table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius)}
+.hr-table th,.hr-table td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:middle;white-space:nowrap}
+.hr-table thead th{background:#f8fafc;color:var(--text-secondary);font-weight:700;font-size:11.5px}
+.hr-table tbody tr:hover{background:var(--primary-light)}
+.hr-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.hr-td-name{font-weight:600;color:var(--text)}
+.hr-name-link{cursor:pointer;color:var(--primary-dark);border-bottom:1px dashed var(--primary)}
+.hr-name-link:hover{opacity:.85}
+.hr-en{font-size:11px;color:var(--text-muted);font-weight:400;margin-left:3px}
+.hr-td-acts{white-space:nowrap}
+.hr-td-acts .btn{margin:0 2px 2px 0}
+.hr-pill.formal{background:var(--success-light);color:#047857}
+.hr-detail-row td{background:#fafcff;border-bottom:2px solid var(--border)}
+.hr-detail{padding:4px 2px}
+.hr-detail-info{font-size:12px;color:var(--text-secondary);line-height:1.9;margin-bottom:4px}
+.hr-detail-sec{margin-top:8px}
+.hr-detail-h{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px}
+.hr-mini{width:100%;border-collapse:collapse;font-size:12px;max-width:440px}
+.hr-mini th,.hr-mini td{border:1px solid var(--border);padding:4px 8px}
+.hr-mini th{background:#f8fafc;color:var(--text-muted);font-weight:600}
+.hr-mini .num{text-align:right;font-variant-numeric:tabular-nums}
+.hr-tip{font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.6}
+.hr-empty-box{color:var(--text-muted);font-size:12.5px;padding:30px;text-align:center}
+.btn-xs{padding:3px 9px;font-size:11.5px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-secondary);cursor:pointer;font-weight:600;font-family:inherit}
+.btn-xs:hover{border-color:var(--primary);color:var(--primary-dark)}
+.btn-xs.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-xs.btn-primary:hover{filter:brightness(1.05);color:#fff}
+.btn-xs.btn-warn{background:#fef3c7;border-color:#fcd34d;color:#b45309}
+.btn-xs.btn-warn:hover{background:#fde68a;color:#92400e}
+.btn-xs.btn-danger{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+.btn-xs.btn-danger:hover{background:#fee2e2;color:#b91c1c}
 @media (max-width:768px){
   .hr-cards{grid-template-columns:1fr}
   .hr-statbar{grid-template-columns:1fr 1fr;gap:8px}
@@ -1333,11 +1365,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 140px"><label>项目归属 *</label><select id="hsProject"></select></div>
-      <div class="form-group" style="flex:1 1 140px"><label>岗位</label><input type="text" id="hsPost" placeholder="如 外贸业务员"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>岗位</label><input type="text" id="hsPost" placeholder="如 外贸业务员" list="hrPostList"></div>
       <div class="form-group" style="flex:1 1 140px"><label>子账号 / 工号</label><input type="text" id="hsSubAccount" placeholder="如 Nancy Lignes"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 110px"><label>学历</label><input type="text" id="hsEdu" placeholder="如 本科"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>学历</label><select id="hsEdu"></select></div>
       <div class="form-group" style="flex:1 1 150px"><label>毕业学校</label><input type="text" id="hsSchool"></div>
       <div class="form-group" style="flex:1 1 130px"><label>专业</label><input type="text" id="hsMajor"></div>
     </div>
@@ -1345,7 +1377,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <div class="form-group" style="flex:1 1 150px"><label>联系方式</label><input type="text" id="hsPhone" placeholder="手机 / 微信"></div>
       <div class="form-group" style="flex:0 1 140px"><label>入职日期</label><input type="date" id="hsJoin"></div>
       <div class="form-group" style="flex:0 1 140px"><label>试用期到期</label><input type="date" id="hsProbEnd"></div>
-      <div class="form-group" style="flex:0 1 120px"><label>状态</label><select id="hsStatus"><option value="probation">试用期</option><option value="active">在职</option><option value="leave">已离职</option></select></div>
+      <div class="form-group" style="flex:0 1 120px"><label>状态</label><select id="hsStatus"><option value="formal">正式</option><option value="probation">试用期</option><option value="leave">已离职</option></select></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap" id="hsLeaveWrap">
       <div class="form-group" style="flex:0 1 140px"><label>离职日期</label><input type="date" id="hsLeaveDate"></div>
@@ -1370,6 +1402,14 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <button class="btn btn-primary" id="btnHrStaffSave">保存</button>
     </div>
   </div>
+  <datalist id="hrPostList">
+    <option value="外贸业务员"></option>
+    <option value="外贸业务员（助理型）"></option>
+    <option value="跟单 / 面料支持"></option>
+    <option value="国际站运营"></option>
+    <option value="翻译 / 口语辅助"></option>
+    <option value="业务助理"></option>
+  </datalist>
 </div>
 
 <!-- ====== MODAL: 调薪登记 ====== -->
@@ -1402,10 +1442,10 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <div class="form-group" style="flex:1 1 130px"><label>姓名 *</label><input type="text" id="htName"></div>
       <div class="form-group" style="flex:0 1 100px"><label>性别</label><select id="htGender"><option value="">未填</option><option>女</option><option>男</option></select></div>
       <div class="form-group" style="flex:1 1 120px"><label>出生年月</label><input type="month" id="htBirth"></div>
-      <div class="form-group" style="flex:1 1 130px"><label>应聘岗位</label><input type="text" id="htPost" placeholder="如 外贸业务员"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>应聘岗位</label><input type="text" id="htPost" placeholder="如 外贸业务员" list="hrPostList"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:0 1 110px"><label>学历</label><input type="text" id="htEdu" placeholder="如 本科"></div>
+      <div class="form-group" style="flex:0 1 110px"><label>学历</label><select id="htEdu"></select></div>
       <div class="form-group" style="flex:1 1 170px"><label>毕业学校</label><input type="text" id="htSchool"></div>
       <div class="form-group" style="flex:1 1 150px"><label>专业</label><input type="text" id="htMajor"></div>
     </div>
@@ -1416,7 +1456,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:0 1 140px"><label>面试时间</label><input type="date" id="htDate"></div>
-      <div class="form-group" style="flex:0 1 140px"><label>批次 / 来源</label><input type="text" id="htSource" placeholder="如 第一批 · 悦婷推送"></div>
+      <div class="form-group" style="flex:0 1 140px"><label>批次 / 来源</label><input type="text" id="htSource" placeholder="如 第一批 · 悦婷推送" list="hrSourceList"></div>
       <div class="form-group" style="flex:0 1 110px"><label>优先级</label><select id="htPriority"><option value="">未评级</option><option value="A">A 重点推进</option><option value="B">B 培养 / 定向</option><option value="C">C 兜底备选</option></select></div>
       <div class="form-group" style="flex:0 1 130px"><label>状态</label><select id="htStatus"></select></div>
     </div>
@@ -1440,6 +1480,14 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <button class="btn btn-primary" id="btnHrTalentSave">保存</button>
     </div>
   </div>
+  <datalist id="hrSourceList">
+    <option value="第一批 · 悦婷推送"></option>
+    <option value="李总推送"></option>
+    <option value="推荐"></option>
+    <option value="校招"></option>
+    <option value="社招"></option>
+    <option value="内部推荐"></option>
+  </datalist>
 </div>
 
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
@@ -1888,14 +1936,14 @@ function seedSampleData(){
   const pid3 = uid(); // 子项目
   const pidDone = uid(); // 已完成示例
   projects.push(
-    {id:pid1,name:'Q3新产品开发',blockers:'其中1家交期太长，需要确认是否有替代方案',status:'active',parentId:null,
+    {id:pid1,name:'Q3新产品开发',blockers:'其中1家交期太长，需要确认是否有替代方案',status:'formal',parentId:null,
      logs:[
        {id:uid(),text:'对比了5家供应商，初步圈定3家，其中A家性价比最高',updatedAt:Date.now()-86400000*3},
        {id:uid(),text:'和供应商确认了面料规格细节，预计下周一寄样（点击这条可以直接编辑）',updatedAt:Date.now()-3600000}
      ],createdAt:Date.now()-86400000*7,_sample:true},
-    {id:pid2,name:'独立站SEO优化',blockers:'',status:'active',parentId:null,
+    {id:pid2,name:'独立站SEO优化',blockers:'',status:'formal',parentId:null,
      logs:[{id:uid(),text:'完成关键词研究，整理了50个高意向词，页面结构方案已发给开发',updatedAt:Date.now()-86400000*2}],createdAt:Date.now()-86400000*3,_sample:true},
-    {id:pid3,name:'样品打样跟进',blockers:'暂无',status:'active',parentId:pid1,
+    {id:pid3,name:'样品打样跟进',blockers:'暂无',status:'formal',parentId:pid1,
      logs:[{id:uid(),text:'已发打样需求给2家供应商，等回复；拿到样品后做对比测试',updatedAt:Date.now()-86400000*2}],createdAt:Date.now()-86400000*2,_sample:true},
     {id:pidDone,name:'旧官网迁移上线',blockers:'',status:'completed',completedAt:Date.now()-86400000*10,parentId:null,
      logs:[{id:uid(),text:'全部页面迁移完成，域名解析正常，正式对外发布',updatedAt:Date.now()-86400000*10}],createdAt:Date.now()-86400000*30,_sample:true}
@@ -9892,6 +9940,15 @@ function switchTab(tab){
 const HR_PROJECTS = ['朗格斯','凡适','综合'];
 const HR_SALARY_ITEMS = ['基本工资','岗位工资','绩效工资','提成','补贴','社保','其他'];
 const HR_TALENT_STATUS = ['待面试','面试中','已通过','已发offer','已入职','已流失','暂不考虑','未落地·可培养','兜底备选','待定'];
+const HR_STAFF_STATUS = [
+  {key:'formal', label:'正式'},
+  {key:'probation', label:'试用期'},
+  {key:'leave', label:'已离职'}
+];
+const HR_STAFF_STATUS_KEYS = HR_STAFF_STATUS.map(x=>x.key);
+const HR_EDU_OPTIONS = ['','大专','本科','硕士','博士','其他'];
+const HR_POST_OPTIONS = ['外贸业务员','外贸业务员（助理型）','跟单 / 面料支持','国际站运营','翻译 / 口语辅助','业务助理'];
+const HR_SOURCE_OPTIONS = ['第一批 · 悦婷推送','李总推送','推荐','校招','社招','内部推荐'];
 const HR_DIMS_DEFAULT = [
   {key:'major', name:'专业/经历对口度'},
   {key:'image', name:'个人形象'},
@@ -9920,13 +9977,21 @@ function hrMetaNormalize(meta){
   HR_INTERVIEWERS_DEFAULT.forEach(n=>{ if(!(n in meta.interviewers)) meta.interviewers[n]=1; });
   return meta;
 }
+// 下拉填充：opts 为字符串数组；若 val 不在列表中也会补一个选项，避免自定义值丢失
+function hrFillSelect(sel, opts, val){
+  sel.innerHTML = opts.map(o=>'<option value="'+escAttr(o)+'">'+escHtml(o===''?'未填':o)+'</option>').join('');
+  if(val && opts.indexOf(val)<0){ const op=document.createElement('option'); op.value=val; op.textContent=val; sel.appendChild(op); }
+  sel.value = val||'';
+}
 function hrHeal(){
   let changed=false;
   hr.meta = hrMetaNormalize(hr.meta);
   hr.staff.forEach(s=>{
     if(!s) return;
     if(HR_PROJECTS.indexOf(s.project)<0){ s.project='综合'; changed=true; }
-    if(!s.status) { s.status = s.leaveDate ? 'leave':'active'; changed=true; }
+    if(!s.status) { s.status = s.leaveDate ? 'leave':'formal'; changed=true; }
+    if(s.status==='active'){ s.status='formal'; changed=true; } // 旧版「在职」统一为「正式」
+    if(s.regularizeDate===undefined) s.regularizeDate='';
     if(!Array.isArray(s.salaryLog)){ s.salaryLog=[]; changed=true; }
     if(!s.salary || typeof s.salary!=='object'){ s.salary={}; changed=true; }
   });
@@ -9965,6 +10030,8 @@ function openHrStaffModal(id){
   const rec = id ? hr.staff.find(s=>s.id===id) : null;
   const projSel=document.getElementById('hsProject');
   projSel.innerHTML = HR_PROJECTS.map(p=>'<option value="'+p+'">'+(p||'')+'</option>').join('');
+  const stSel=document.getElementById('hsStatus');
+  stSel.innerHTML = HR_STAFF_STATUS.map(x=>'<option value="'+x.key+'">'+x.label+'</option>').join('');
   document.getElementById('modalHrStaffTitle').textContent = rec?'编辑员工档案':'新增员工档案';
   document.getElementById('hsName').value = rec?(rec.name||''):'';
   document.getElementById('hsEnName').value = rec?(rec.enName||''):'';
@@ -9973,13 +10040,13 @@ function openHrStaffModal(id){
   projSel.value = rec?(HR_PROJECTS.indexOf(rec.project)>=0?rec.project:'综合'):'朗格斯';
   document.getElementById('hsPost').value = rec?(rec.post||''):'';
   document.getElementById('hsSubAccount').value = rec?(rec.subAccount||''):'';
-  document.getElementById('hsEdu').value = rec?(rec.edu||''):'';
+  hrFillSelect(document.getElementById('hsEdu'), HR_EDU_OPTIONS, rec?(rec.edu||''):'');
   document.getElementById('hsSchool').value = rec?(rec.school||''):'';
   document.getElementById('hsMajor').value = rec?(rec.major||''):'';
   document.getElementById('hsPhone').value = rec?(rec.phone||''):'';
   document.getElementById('hsJoin').value = rec?(rec.joinDate||''):'';
   document.getElementById('hsProbEnd').value = rec?(rec.probEnd||''):'';
-  document.getElementById('hsStatus').value = rec?(rec.status||'active'):'active';
+  stSel.value = rec?(HR_STAFF_STATUS_KEYS.indexOf(rec.status)>=0?rec.status:'formal'):'formal';
   document.getElementById('hsLeaveDate').value = rec?(rec.leaveDate||''):'';
   document.getElementById('hsLeaveReason').value = rec?(rec.leaveReason||''):'';
   const sal = rec?(rec.salary||{}):{};
@@ -10091,7 +10158,7 @@ function openHrTalentModal(id){
   document.getElementById('htGender').value = rec?(rec.gender||''):'';
   document.getElementById('htBirth').value = rec?(rec.birth||''):'';
   document.getElementById('htPost').value = rec?(rec.post||''):'';
-  document.getElementById('htEdu').value = rec?(rec.edu||''):'';
+  hrFillSelect(document.getElementById('htEdu'), HR_EDU_OPTIONS, rec?(rec.edu||''):'');
   document.getElementById('htSchool').value = rec?(rec.school||''):'';
   document.getElementById('htMajor').value = rec?(rec.major||''):'';
   document.getElementById('htPhone').value = rec?(rec.phone||''):'';
@@ -10205,129 +10272,162 @@ function hrSetTab(t){ hrTab=t; renderHr(); }
 function hrBadge(){ const b=document.getElementById('hrBadge'); if(b) b.style.display='none'; }
 
 function hrStaffHtml(){
-  const groups={}; HR_PROJECTS.forEach(p=>groups[p]=[]);
-  hr.staff.forEach(s=>{ const p=HR_PROJECTS.indexOf(s.project)>=0?s.project:'综合'; groups[p].push(s); });
   const total=hr.staff.length;
   const active=hr.staff.filter(s=>s.status!=='leave').length;
   const prob=hr.staff.filter(s=>s.status==='probation').length;
   const leave=hr.staff.filter(s=>s.status==='leave').length;
   let h='<div class="hr-statbar">'
     +'<div class="hr-stat"><b>'+total+'</b><span>总人数</span></div>'
-    +'<div class="hr-stat"><b>'+active+'</b><span>在职</span></div>'
+    +'<div class="hr-stat"><b>'+active+'</b><span>在职（含试用）</span></div>'
     +'<div class="hr-stat"><b>'+prob+'</b><span>试用中</span></div>'
     +'<div class="hr-stat"><b>'+leave+'</b><span>已离职</span></div></div>';
-  HR_PROJECTS.forEach(p=>{
-    const list=groups[p]; if(!list.length) return;
-    h+='<div class="hr-group"><div class="hr-group-h"><span class="hr-dot"></span>'+p+' <span class="hr-gcnt">'+list.length+' 人</span></div>';
-    list.forEach(s=>{ h+=hrStaffCard(s); });
-    h+='</div>';
+  if(!total){ h+='<div class="hr-empty-box">还没有员工档案，点上方「＋ 新增员工」登记；第一版初始数据已自动导入，刷新即可见。</div>'; return h; }
+  h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+    +'<th>姓名</th><th>项目</th><th>岗位</th><th>状态</th><th>入职时间</th><th>试用至</th><th>转正时间</th><th class="num">月薪合计</th><th>操作</th>'
+    +'</tr></thead><tbody>';
+  hr.staff.forEach(s=>{
+    const stLbl = s.status==='formal'?'正式':(s.status==='probation'?'试用期':(s.status==='leave'?'已离职':escHtml(s.status||'')));
+    const stCls = s.status==='formal'?'formal':(s.status==='probation'?'probation':(s.status==='leave'?'leave':''));
+    const sal=hrSalTotal(s);
+    h+='<tr>';
+    h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDs_'+s.id+'\')">'+escHtml(s.name||'')+'</b>'+(s.enName?' <span class="hr-en">'+escHtml(s.enName)+'</span>':'')+'</td>';
+    h+='<td>'+escHtml(s.project||'')+'</td>';
+    h+='<td>'+escHtml(s.post||'')+'</td>';
+    h+='<td><span class="hr-pill '+stCls+'">'+stLbl+'</span></td>';
+    h+='<td>'+escHtml(s.joinDate||'')+'</td>';
+    h+='<td>'+escHtml(s.probEnd||'')+'</td>';
+    h+='<td>'+escHtml(s.regularizeDate||'')+'</td>';
+    h+='<td class="num">'+(sal>0?('¥'+sal.toLocaleString('zh-CN')):'')+'</td>';
+    h+='<td class="hr-td-acts">';
+    if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
+    h+='<button class="btn btn-xs" onclick="openHrSalaryModal(\''+s.id+'\')">调薪</button>';
+    h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
+    h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">删</button>';
+    h+='</td></tr>';
+    h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="9">'+hrStaffDetail(s)+'</td></tr>';
   });
-  if(!total) h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">还没有员工档案，点上面「＋ 新增员工」登记第一条（第一版初始数据已自动导入，刷新即可见）</div>';
+  h+='</tbody></table></div>';
+  h+='<div class="hr-tip">提示：点姓名可展开「薪资明细 / 调薪记录 / 备注」</div>';
   return h;
 }
-function hrStaffCard(s){
-  const statusMap={active:'在职',probation:'试用期',leave:'已离职'};
-  const stTxt=statusMap[s.status]||s.status||'在职';
-  const stCls= s.status==='leave'?'off':(s.status==='probation'?'prob':'on');
+function hrStaffDetail(s){
+  let h='<div class="hr-detail">';
+  const info=[];
+  if(s.gender) info.push('性别 '+escHtml(s.gender));
+  if(s.birth) info.push('出生 '+escHtml(s.birth));
+  if(s.edu||s.school||s.major) info.push('学历 '+(s.edu?escHtml(s.edu)+' ':'')+(s.school?escHtml(s.school)+' ':'')+(s.major?escHtml(s.major):''));
+  if(s.subAccount) info.push('子账号 '+escHtml(s.subAccount));
+  if(s.phone) info.push('联系 '+escHtml(s.phone));
+  if(s.status==='leave' && s.leaveDate) info.push('离职 '+escHtml(s.leaveDate)+(s.leaveReason?('（'+escHtml(s.leaveReason)+'）'):''));
+  if(info.length) h+='<div class="hr-detail-info">'+info.map(escHtml).join('　')+'</div>';
+  const salMap=[['base','基本工资'],['postPay','岗位工资'],['perf','绩效工资'],['comm','提成'],['allow','补贴'],['social','社保'],['other','其他']];
   const sal=hrSalTotal(s);
-  let h='<div class="hr-card">';
-  h+='<div class="hr-card-top">';
-  h+='<div class="hr-avatar">'+escHtml((s.name||'?').slice(0,1))+'</div>';
-  h+='<div class="hr-card-h"><div class="hr-card-name">'+escHtml(s.name||'')+' <span class="hr-pill '+stCls+'">'+escHtml(stTxt)+'</span></div>';
-  h+='<div class="hr-card-sub">'+escHtml(s.enName||'')+(s.post?' · '+escHtml(s.post):'')+'</div></div>';
-  h+='<div class="hr-card-b">'
-    +'<button class="btn-icon" title="调薪登记" onclick="openHrSalaryModal(\''+s.id+'\')">💰</button>'
-    +'<button class="btn-icon" title="编辑" onclick="openHrStaffModal(\''+s.id+'\')">'+ICON_EDIT+'</button>'
-    +'<button class="btn-icon" title="删除" onclick="deleteHrStaff(\''+s.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>'
-    +'</div>';
-  h+='</div>';
-  h+='<div class="hr-kv">';
-  if(s.joinDate) h+='<span>入职 '+escHtml(s.joinDate)+'</span>';
-  if(s.probEnd && s.status==='probation') h+='<span>试用至 '+escHtml(s.probEnd)+'</span>';
-  if(s.subAccount) h+='<span>子账号 '+escHtml(s.subAccount)+'</span>';
-  if(s.phone) h+='<span>'+escHtml(s.phone)+'</span>';
-  if(s.edu||s.school||s.major) h+='<span>'+(s.edu?escHtml(s.edu)+' ':'')+(s.school?escHtml(s.school)+' ':'')+(s.major?escHtml(s.major):'')+'</span>';
-  h+='</div>';
-  if(s.status==='leave' && s.leaveDate){ h+='<div class="hr-kv"><span>离职 '+escHtml(s.leaveDate)+'</span>'+(s.leaveReason?'<span>'+escHtml(s.leaveReason)+'</span>':'')+'</div>'; }
   if(sal>0){
-    h+='<div class="hr-sal"><span class="hr-sal-l">月薪合计</span><b class="hr-sal-v">¥'+sal.toLocaleString('zh-CN')+'</b></div>';
-    const salMap=[['base','基本'],['postPay','岗位'],['perf','绩效'],['comm','提成'],['allow','补贴'],['social','社保'],['other','其他']];
-    const parts=[];
-    salMap.forEach((it)=>{ const v=parseFloat(s.salary[it[0]]); if(!isNaN(v)&&v) parts.push(it[1]+' '+v); });
-    if(parts.length) h+='<div class="hr-sal-d">'+parts.map(escHtml).join(' · ')+'</div>';
+    h+='<div class="hr-detail-sec"><div class="hr-detail-h">薪资构成（合计 ¥'+sal.toLocaleString('zh-CN')+'）</div><table class="hr-mini"><thead><tr><th>项目</th><th class="num">金额</th></tr></thead><tbody>';
+    salMap.forEach(it=>{ const v=parseFloat(s.salary[it[0]]); if(!isNaN(v)&&v) h+='<tr><td>'+it[1]+'</td><td class="num">'+v+'</td></tr>'; });
+    h+='</tbody></table></div>';
   }
   if(s.salaryLog && s.salaryLog.length){
-    h+='<div class="hr-tl"><div class="hr-tl-h">调薪记录（'+s.salaryLog.length+'）</div>';
+    h+='<div class="hr-detail-sec"><div class="hr-detail-h">调薪记录（'+s.salaryLog.length+'）</div><div class="hr-tl">';
     s.salaryLog.slice().reverse().forEach(l=>{
       h+='<div class="hr-tl-row"><span class="hr-tl-d">'+escHtml(l.date||'')+'</span><span class="hr-tl-it">'+escHtml(l.item||'')+'</span><span class="hr-tl-ch">'+escHtml(String(l.before||0))+' → '+escHtml(String(l.after||0))+'</span>'+(l.reason?'<span class="hr-tl-r">'+escHtml(l.reason)+'</span>':'')+'</div>';
     });
-    h+='</div>';
+    h+='</div></div>';
   }
-  if(s.note) h+='<div class="hr-note">'+escHtml(s.note)+'</div>';
+  if(s.note) h+='<div class="hr-detail-sec"><div class="hr-detail-h">备注</div><div class="hr-note">'+escHtml(s.note)+'</div></div>';
   h+='</div>';
   return h;
+}
+function hrToggleDetail(rowId){
+  const el=document.getElementById(rowId); if(!el) return;
+  el.style.display = (el.style.display==='none'||el.style.display==='')?'table-row':'none';
+}
+function hrRegularize(id){
+  const s=hr.staff.find(x=>x.id===id); if(!s) return;
+  if(s.status!=='probation'){ showToast('只有「试用期」员工可以转正'); return; }
+  showConfirm('将「'+(s.name||'')+'」由试用期转为正式？会记录转正时间 '+todayStr()+'。', ()=>{
+    s.status='formal';
+    s.regularizeDate = s.regularizeDate || todayStr();
+    saveAll(); refreshAll();
+    showToast('✓ 已转正，转正时间：'+s.regularizeDate, 'info');
+  });
 }
 function hrTalentHtml(){
   const total=hr.talent.length;
   let h='<div class="hr-statbar">'
     +'<div class="hr-stat"><b>'+total+'</b><span>候选人总数</span></div>';
   ['A','B','C'].forEach(p=>{ const n=hr.talent.filter(t=>t.priority===p).length; h+='<div class="hr-stat"><b>'+n+'</b><span>'+p+' 级</span></div>'; });
-  const inpool=hr.talent.filter(t=>['待面试','面试中','已通过','已发offer','已入职','未落地·可培养','兜底备选','待定'].indexOf(t.status)>=0).length;
+  const inpool=hr.talent.filter(t=>t.status!=='已流失'&&t.status!=='暂不考虑').length;
   h+='<div class="hr-stat"><b>'+inpool+'</b><span>在池可激活</span></div></div>';
-  if(!total){ h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">还没有候选人，点上面「＋ 新增候选人」登记</div>'; return h; }
-  const order=['已入职','未落地·可培养','兜底备选','待定','已流失','暂不考虑'];
-  const groups={};
-  hr.talent.forEach(t=>{ const k=t.status||'未落地·可培养'; (groups[k]=groups[k]||[]).push(t); });
-  order.concat(Object.keys(groups).filter(k=>order.indexOf(k)<0)).forEach(k=>{
-    if(!groups[k]||!groups[k].length) return;
-    h+='<div class="hr-group"><div class="hr-group-h"><span class="hr-dot"></span>'+escHtml(k)+' <span class="hr-gcnt">'+groups[k].length+' 人</span></div>';
-    groups[k].forEach(t=>{ h+=hrTalentCard(t); });
-    h+='</div>';
+  if(!total){ h+='<div class="hr-empty-box">还没有候选人，点上方「＋ 新增候选人」登记。</div>'; return h; }
+  h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+    +'<th>姓名</th><th>应聘岗位</th><th>优先级</th><th>状态</th><th>面试时间</th><th>面试人员</th><th>期望薪资</th><th>承诺薪资</th><th>操作</th>'
+    +'</tr></thead><tbody>';
+  const rank=t=>{ if(t.status==='已流失'||t.status==='暂不考虑') return 9; const p={'A':0,'B':1,'C':2}; return (p[t.priority]!==undefined?p[t.priority]:5); };
+  hr.talent.slice().sort((a,b)=>rank(a)-rank(b)).forEach(t=>{
+    const pr=t.priority||'';
+    const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
+    const prTxt= pr==='A'?'A 重点':(pr==='B'?'B 培养':(pr==='C'?'C 兜底':''));
+    h+='<tr>';
+    h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDt_'+t.id+'\')">'+escHtml(t.name||'')+'</b></td>';
+    h+='<td>'+escHtml(t.post||'')+'</td>';
+    h+='<td>'+(prCls?'<span class="hr-pill '+prCls+'">'+prTxt+'</span>':'')+'</td>';
+    h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
+    h+='<td>'+escHtml(t.interviewDate||'')+'</td>';
+    h+='<td>'+(t.interviewers&&t.interviewers.length?escHtml(t.interviewers.join('/')):'')+'</td>';
+    h+='<td>'+(t.expectPay?escHtml(t.expectPay):'')+'</td>';
+    h+='<td>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'')+'</td>';
+    h+='<td class="hr-td-acts">';
+    h+='<button class="btn btn-xs btn-primary" onclick="hrTalentToProbation(\''+t.id+'\')">转试用</button>';
+    h+='<button class="btn btn-xs" onclick="openHrTalentModal(\''+t.id+'\')">编辑</button>';
+    h+='<button class="btn btn-xs btn-danger" onclick="deleteHrTalent(\''+t.id+'\')">删</button>';
+    h+='</td></tr>';
+    h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="9">'+hrTalentDetail(t)+'</td></tr>';
   });
+  h+='</tbody></table></div>';
+  h+='<div class="hr-tip">提示：点姓名可展开「评价维度 / 来源 / 备注」；「转试用」会把该候选人转入在职（试用期）并从人才库移除</div>';
   return h;
 }
-function hrTalentCard(t){
-  const prMap={A:'A 重点',B:'B 培养',C:'C 兜底'};
-  const pr=t.priority||'';
-  const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
-  let h='<div class="hr-card">';
-  h+='<div class="hr-card-top">';
-  h+='<div class="hr-avatar">'+escHtml((t.name||'?').slice(0,1))+'</div>';
-  h+='<div class="hr-card-h"><div class="hr-card-name">'+escHtml(t.name||'')+(prCls?' <span class="hr-pill pr'+prCls+'">'+escHtml(prMap[pr])+'</span>':'')+' <span class="hr-pill">'+escHtml(t.status||'')+'</span></div>';
-  h+='<div class="hr-card-sub">'+(t.post?escHtml(t.post):'')+(t.interviewDate?' · 面于 '+escHtml(t.interviewDate):'')+'</div></div>';
-  h+='<div class="hr-card-b">'
-    +'<button class="btn-icon" title="编辑" onclick="openHrTalentModal(\''+t.id+'\')">'+ICON_EDIT+'</button>'
-    +'<button class="btn-icon" title="删除" onclick="deleteHrTalent(\''+t.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>'
-    +'</div>';
-  h+='</div>';
-  h+='<div class="hr-kv">';
-  if(t.edu) h+='<span>'+escHtml(t.edu)+'</span>';
-  if(t.school) h+='<span>'+escHtml(t.school)+'</span>';
-  if(t.major) h+='<span>'+escHtml(t.major)+'</span>';
-  if(t.source) h+='<span>来源 '+escHtml(t.source)+'</span>';
-  if(t.phone) h+='<span>'+escHtml(t.phone)+'</span>';
-  if(t.city) h+='<span>'+escHtml(t.city)+'</span>';
-  if(t.interviewers&&t.interviewers.length) h+='<span>面试 '+escHtml(t.interviewers.join('/'))+'</span>';
-  h+='</div>';
+function hrTalentDetail(t){
+  let h='<div class="hr-detail">';
+  const info=[];
+  if(t.gender) info.push('性别 '+escHtml(t.gender));
+  if(t.birth) info.push('出生 '+escHtml(t.birth));
+  if(t.edu||t.school||t.major) info.push('学历 '+(t.edu?escHtml(t.edu)+' ':'')+(t.school?escHtml(t.school)+' ':'')+(t.major?escHtml(t.major):''));
+  if(t.source) info.push('来源 '+escHtml(t.source));
+  if(t.phone) info.push('联系 '+escHtml(t.phone));
+  if(t.email) info.push('邮箱 '+escHtml(t.email));
+  if(t.city) info.push('现居 '+escHtml(t.city));
+  if(info.length) h+='<div class="hr-detail-info">'+info.map(escHtml).join('　')+'</div>';
   if(t.dims&&t.dims.length){
-    h+='<div class="hr-dims">';
+    h+='<div class="hr-detail-sec"><div class="hr-detail-h">多维度评价</div><div class="hr-dims">';
     t.dims.forEach(d=>{
-      const v=parseFloat(d.score)||0;
-      const pct=(v/5*100).toFixed(0);
-      h+='<div class="hr-dim"><span class="hr-dim-n">'+escHtml(d.name||'')+'</span>'
-        +'<span class="hr-bar"><span class="hr-bar-i" style="width:'+pct+'%"></span></span>'
-        +'<span class="hr-dim-s">'+v+'</span></div>';
+      const v=parseFloat(d.score)||0; const pct=(v/5*100).toFixed(0);
+      h+='<div class="hr-dim"><span class="hr-dim-n">'+escHtml(d.name||'')+'</span><span class="hr-bar"><span class="hr-bar-i" style="width:'+pct+'%"></span></span><span class="hr-dim-s">'+v+'</span></div>';
     });
-    h+='</div>';
+    h+='</div></div>';
   }
-  if(t.expectPay||t.offerPay){
-    h+='<div class="hr-money"><div class="hr-money-i"><span>期望薪资</span><b>'+escHtml(t.expectPay||'—')+'</b></div>'
-      +'<div class="hr-money-i"><span>承诺薪资</span><b>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'—')+'</b></div></div>';
-    if(t.payNote) h+='<div class="hr-note">薪资说明：'+escHtml(t.payNote)+'</div>';
-  }
-  if(t.remark) h+='<div class="hr-note">'+escHtml(t.remark)+'</div>';
+  if(t.expectPay||t.offerPay) h+='<div class="hr-detail-sec"><div class="hr-detail-h">薪资意向</div><div class="hr-money"><div class="hr-money-i"><span>期望薪资</span><b>'+escHtml(t.expectPay||'—')+'</b></div><div class="hr-money-i"><span>承诺薪资</span><b>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'—')+'</b></div></div>'+(t.payNote?'<div class="hr-note">薪资说明：'+escHtml(t.payNote)+'</div>':'')+'</div>';
+  if(t.remark) h+='<div class="hr-detail-sec"><div class="hr-detail-h">综合评价</div><div class="hr-note">'+escHtml(t.remark)+'</div></div>';
   h+='</div>';
   return h;
+}
+function hrTalentToProbation(id){
+  const t=hr.talent.find(x=>x.id===id); if(!t) return;
+  showConfirm('将「'+(t.name||'')+'」从人才库转入在职（试用期）？转入后该候选人会从人才库移除。', ()=>{
+    const exist = hr.staff.find(s=>s.name===t.name && s.status!=='leave');
+    if(!exist){
+      hr.staff.push({
+        id: uid(), name: t.name||'', enName:'', gender: t.gender||'', birth: t.birth||'',
+        project: '朗格斯', post: t.post||'', subAccount:'', edu: t.edu||'', school: t.school||'', major: t.major||'',
+        phone: (t.phone||'')||(t.email||''), joinDate: todayStr(), probEnd:'', status:'probation', regularizeDate:'',
+        leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'由人才库转试用'+(t.remark?('：'+t.remark):''), createdAt: Date.now()
+      });
+    }
+    hr.talent = hr.talent.filter(x=>x.id!==id);
+    saveAll(); refreshAll();
+    showToast(exist? ('「'+(t.name||'')+'」已在职，已从人才库移除') : ('✓ 已将「'+(t.name||'')+'」转入在职（试用期）'), 'info');
+  });
 }
 
 // ---------------- 第一版初始数据（仅空库时种入，之后由用户自行修改） ----------------
@@ -10335,11 +10435,11 @@ function hrSeedIfEmpty(){
   if(hr.staff.length || hr.talent.length) return;
   const now = Date.now();
   hr.staff = [
-    {id:uid(), name:'陈曦', enName:'Nancy', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Nancy Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'核心业务员', createdAt:now},
-    {id:uid(), name:'孟伊', enName:'Alyssa', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Alyssa Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'核心业务员；接手李楠、王梦莹转来的客户', createdAt:now},
-    {id:uid(), name:'李雪洋', enName:'Phoebe', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Phoebe Lignes', edu:'', school:'', major:'', phone:'', joinDate:'2026-06-09', probEnd:'2026-09-08', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'试用期已满，评估结论：建议转正', createdAt:now},
+    {id:uid(), name:'陈曦', enName:'Nancy', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Nancy Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'formal', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'核心业务员', createdAt:now},
+    {id:uid(), name:'孟伊', enName:'Alyssa', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Alyssa Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'formal', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'核心业务员；接手李楠、王梦莹转来的客户', createdAt:now},
+    {id:uid(), name:'李雪洋', enName:'Phoebe', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Phoebe Lignes', edu:'', school:'', major:'', phone:'', joinDate:'2026-06-09', probEnd:'2026-09-08', status:'formal', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'试用期已满，评估结论：建议转正', createdAt:now},
     {id:uid(), name:'崔燕柯', enName:'Yan', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员（助理型）', subAccount:'Salima Lignes（沿用王梦莹）', edu:'本科（2024 毕业）', school:'', major:'', phone:'', joinDate:'2026-09-21', probEnd:'', status:'probation', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'09-27 起接待询盘；薪资待人事补充', createdAt:now},
-    {id:uid(), name:'乔萌萌', enName:'Ella Fans', gender:'女', birth:'', project:'凡适', post:'外贸业务员', subAccount:'Ella Fans', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'active', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'', createdAt:now},
+    {id:uid(), name:'乔萌萌', enName:'Ella Fans', gender:'女', birth:'', project:'凡适', post:'外贸业务员', subAccount:'Ella Fans', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'formal', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'', createdAt:now},
     {id:uid(), name:'周文怡', enName:'Vivian', gender:'女', birth:'', project:'凡适', post:'外贸业务员', subAccount:'Vivian Fanshi', edu:'', school:'', major:'', phone:'', joinDate:'2026-08-10', probEnd:'2026-11-10', status:'probation', leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], note:'', createdAt:now},
     {id:uid(), name:'王梦莹', enName:'Salima', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'Salima Lignes', edu:'', school:'', major:'', phone:'', joinDate:'', probEnd:'', status:'leave', leaveDate:'2026-09-05', leaveReason:'主动离职；重要客户转接孟伊，其余由运营分配；子账号 9/27 起移交崔燕柯', salary:{}, salaryLog:[], note:'', createdAt:now},
     {id:uid(), name:'李楠', enName:'Lilian', gender:'女', birth:'', project:'朗格斯', post:'外贸业务员', subAccount:'', edu:'', school:'', major:'', phone:'', joinDate:'2026-04-27', probEnd:'', status:'leave', leaveDate:'2026-07-10', leaveReason:'试用期未通过；工作交接给孟伊，离职手续已办完', salary:{}, salaryLog:[], note:'', createdAt:now},
