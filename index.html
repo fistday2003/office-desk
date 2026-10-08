@@ -808,6 +808,22 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .hr-chipx{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border);border-radius:16px;padding:4px 10px;background:var(--card-bg)}
 .hr-chipx.on{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark)}
 .hr-chipx.add{border-style:dashed;color:var(--text-muted)}
+/* 面试人员：可编辑下拉选择菜单（多选） */
+.hr-iv{position:relative;max-width:100%}
+.hr-iv-sel{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:38px;padding:5px 30px 5px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;position:relative}
+.hr-iv-sel.ph{color:var(--text-muted)}
+.hr-iv-caret{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.hr-iv-chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--primary-dark);background:var(--primary-light);border:1px solid var(--primary);border-radius:14px;padding:3px 9px}
+.hr-iv-pop{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:60;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.14);padding:8px;max-height:260px;overflow:auto}
+.hr-iv-list{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.hr-iv-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:13px}
+.hr-iv-item:hover{background:#f1f5f9}
+.hr-iv-item input[type=checkbox]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
+.hr-iv-item .nm{flex:1;min-width:0}
+.hr-iv-item .x{color:var(--danger);cursor:pointer;font-size:13px;opacity:.55;padding:0 2px}
+.hr-iv-item .x:hover{opacity:1}
+.hr-iv-add{display:flex;gap:6px;align-items:center;border-top:1px dashed var(--border);padding-top:8px}
+.hr-iv-add input{flex:1;min-width:0}
 .hr-money{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text)}
 .hr-money.warn{color:#b45309}
 .hr-money.ok{color:#047857}
@@ -1470,8 +1486,20 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <div class="form-group" style="flex:0 1 130px"><label>状态</label><select id="htStatus"></select></div>
     </div>
     <div class="form-group">
-      <label>面试人员（可多选，点「+ 加人」可新增名单）</label>
-      <div class="hr-chipbox" id="htInterviewers"></div>
+      <label>面试人员（点选择框展开名单，可多选；名单项可增删）</label>
+      <div class="hr-iv">
+        <div class="hr-iv-sel ph" id="htInterviewerSel" onclick="hrToggleInterviewerPop()">
+          <span class="hr-iv-ph" id="htIvPh">请选择面试人员…</span>
+          <span class="hr-iv-caret">▾</span>
+        </div>
+        <div class="hr-iv-pop" id="htInterviewerPop" style="display:none">
+          <div class="hr-iv-list" id="htInterviewerList"></div>
+          <div class="hr-iv-add">
+            <input type="text" id="htInterviewerNew" placeholder="新增面试人…">
+            <button type="button" class="btn btn-sm" onclick="hrAddInterviewer()">+ 加人</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="hr-sec-h" style="margin:12px 0 6px">📊 多维度评价（0–5 分，可拖动）<span class="tag" style="font-weight:400">维度可自定义</span>
       <button class="btn" style="padding:3px 9px;font-size:11.5px;margin-left:auto" onclick="hrAddDim()">+ 加维度</button>
@@ -10242,17 +10270,38 @@ function openHrTalentModal(id){
   document.getElementById('modalHrTalent').style.display='flex';
 }
 function hrRenderInterviewers(){
-  const box=document.getElementById('htInterviewers');
-  if(!box) return;
+  const sel=document.getElementById('htInterviewerSel');
+  const list=document.getElementById('htInterviewerList');
+  if(!list) return;
+  // 选择框内显示已选的面试人员（芯片）
+  if(sel){
+    if(htModalInterviewers.length){
+      sel.classList.remove('ph');
+      sel.innerHTML = htModalInterviewers.map(n=>'<span class="hr-iv-chip">'+escHtml(n)+'</span>').join('') + '<span class="hr-iv-caret">▾</span>';
+    } else {
+      sel.classList.add('ph');
+      sel.innerHTML = '<span class="hr-iv-ph" id="htIvPh">请选择面试人员…</span><span class="hr-iv-caret">▾</span>';
+    }
+  }
+  // 下拉名单：每个名字可勾选（多选），可点 ✕ 从名单中删除
   const names = Object.keys(hr.meta.interviewers||{});
   let h='';
+  if(!names.length){ h='<div class="hr-iv-ph" style="padding:6px 4px;color:var(--text-muted)">名单为空，用下方「+ 加人」新增</div>'; }
   names.forEach(n=>{
     const on = htModalInterviewers.indexOf(n)>=0;
-    h+='<button type="button" class="hr-chip'+(on?' on':'')+'" onclick="hrToggleInterviewer(\''+escAttr(n)+'\')">'+escHtml(n)+'</button>';
+    h+='<div class="hr-iv-item" onclick="hrToggleInterviewer(\''+escAttr(n)+'\')">';
+    h+='<input type="checkbox" '+(on?'checked':'')+' onclick="event.stopPropagation();hrToggleInterviewer(\''+escAttr(n)+'\')">';
+    h+='<span class="nm">'+escHtml(n)+'</span>';
+    h+='<span class="x" title="从名单中删除该项" onclick="event.stopPropagation();hrRemoveInterviewerMenu(\''+escAttr(n)+'\')">✕</span>';
+    h+='</div>';
   });
-  h+='<input type="text" id="htInterviewerNew" placeholder="加面试人…" style="width:110px">';
-  h+='<button type="button" class="btn btn-sm" onclick="hrAddInterviewer()">+ 加人</button>';
-  box.innerHTML=h;
+  list.innerHTML=h;
+}
+function hrToggleInterviewerPop(){
+  const pop=document.getElementById('htInterviewerPop');
+  if(!pop) return;
+  pop.style.display = (pop.style.display==='none'||!pop.style.display)?'block':'none';
+  if(pop.style.display==='block'){ const inp=document.getElementById('htInterviewerNew'); if(inp) inp.focus(); }
 }
 function hrToggleInterviewer(n){ const i=htModalInterviewers.indexOf(n); if(i>=0) htModalInterviewers.splice(i,1); else htModalInterviewers.push(n); hrRenderInterviewers(); }
 function hrAddInterviewer(){
@@ -10260,8 +10309,20 @@ function hrAddInterviewer(){
   const n=String(inp.value||'').trim(); if(!n) return;
   if(!hr.meta.interviewers[n]) hr.meta.interviewers[n]=1;
   if(htModalInterviewers.indexOf(n)<0) htModalInterviewers.push(n);
-  inp.value=''; hrRenderInterviewers();
+  inp.value=''; saveAll(); hrRenderInterviewers();
+  if(inp) inp.focus();
 }
+// 从「面试人员名单」（菜单）中删除该项，并同步取消其被选状态；立即落盘
+function hrRemoveInterviewerMenu(n){
+  if(hr.meta.interviewers && (n in hr.meta.interviewers)) delete hr.meta.interviewers[n];
+  const i=htModalInterviewers.indexOf(n); if(i>=0) htModalInterviewers.splice(i,1);
+  saveAll(); hrRenderInterviewers();
+}
+// 点击面板外部自动收起下拉
+if(!window.__hrIvDocBound){ window.__hrIvDocBound=true; document.addEventListener('click', function(e){
+  if(e.target.closest && e.target.closest('.hr-iv')) return;
+  const pop=document.getElementById('htInterviewerPop'); if(pop) pop.style.display='none';
+}); }
 function hrRenderDims(){
   const box=document.getElementById('htDimRows'); if(!box) return;
   let h='';
