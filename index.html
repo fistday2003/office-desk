@@ -841,6 +841,9 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .hr-table th,.hr-table td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:middle;white-space:nowrap}
 .hr-table th.hr-col-comm,.hr-table td.hr-col-comm{white-space:normal;min-width:150px;max-width:220px;word-break:break-word;line-height:1.5}
 .hr-table thead th{background:#f1f5f9;color:var(--text-secondary);font-weight:700;font-size:11.5px;border-bottom:2px solid var(--border)}
+.hr-table th.hr-th-sort{cursor:pointer;user-select:none;position:relative}
+.hr-table th.hr-th-sort:hover{background:#e2e8f0;color:var(--text)}
+.hr-table th.hr-th-sort.on{color:var(--primary);background:var(--primary-light)}
 .hr-table tbody tr:hover{background:var(--primary-light)}
 .hr-table tbody tr:nth-child(4n+1){background:rgba(0,0,0,0.012)}
 .hr-table .num{text-align:right;font-variant-numeric:tabular-nums}
@@ -1478,6 +1481,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <div class="form-group" style="flex:1 1 150px"><label>联系方式</label><input type="text" id="htPhone" placeholder="手机 / 微信"></div>
       <div class="form-group" style="flex:1 1 170px"><label>邮箱</label><input type="text" id="htEmail"></div>
       <div class="form-group" style="flex:1 1 120px"><label>现居地</label><input type="text" id="htCity"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>联系方法</label><input type="text" id="htContact" placeholder="手机/微信/邮箱等"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:0 1 140px"><label>面试时间</label><input type="date" id="htDate"></div>
@@ -1570,6 +1574,20 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('modalHrToProb')">取消</button>
       <button class="btn btn-primary" onclick="hrToProbationConfirm()">确认转试用</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 离职弹窗 ====== -->
+<div class="modal-overlay" id="modalHrLeave" style="display:none">
+  <div class="modal" style="width:min(460px,95vw)">
+    <h3 id="modalHrLeaveTitle">办理离职</h3>
+    <div class="form-group"><label>离职日期</label><input type="date" id="hrLeaveDateX"></div>
+    <div class="form-group"><label>离职原因 / 交接说明</label><textarea id="hrLeaveReasonX" rows="3" placeholder="如 主动离职 / 试用期未通过；客户交接、账号移交等"></textarea></div>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 6px">确认后该员工状态变为「已离职」，自动转入下方「已离职员工」区域；日后可在该区域「恢复」回在职。</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrLeave')">取消</button>
+      <button class="btn btn-danger" onclick="hrStaffLeaveConfirm()">确认离职</button>
     </div>
   </div>
 </div>
@@ -10051,6 +10069,8 @@ let editingHrTalentId = null;
 let htModalDims = [];        // [{key,name,score}]
 let htModalInterviewers = []; // [name,...]
 let hrDelTalentId = null;    // 待软删除的候选人 id（删除原因弹窗用）
+let hrTalentSort = {key:'',dir:1}; // 人才库表头排序：key=字段名, dir=1升序/-1降序
+let hrLeaveId = null;        // 待办理离职的员工 id（离职弹窗用）
 
 function hrBlank(){
   return { staff:[], talent:[], meta:{ interviewers:{}, dims: HR_DIMS_DEFAULT.slice() } };
@@ -10091,6 +10111,11 @@ function hrHeal(){
     if(t.deleted===undefined){ t.deleted=false; changed=true; }
     if(t.delReason===undefined){ t.delReason=''; changed=true; }
     if(t.delDate===undefined){ t.delDate=''; changed=true; }
+    if(t.contact===undefined){ t.contact=''; changed=true; }
+    if(t.expectPay===undefined){ t.expectPay=''; changed=true; }
+    if(t.offerPay===undefined){ t.offerPay=''; changed=true; }
+    if(t.payNote===undefined){ t.payNote=''; changed=true; }
+    if(t.remark===undefined){ t.remark=''; changed=true; }
   });
   hr.talent = hr.talent.filter(t=>t && t.name);
   if(changed) saveAll();
@@ -10255,6 +10280,7 @@ function openHrTalentModal(id){
   document.getElementById('htPhone').value = rec?(rec.phone||''):'';
   document.getElementById('htEmail').value = rec?(rec.email||''):'';
   document.getElementById('htCity').value = rec?(rec.city||''):'';
+  document.getElementById('htContact').value = rec?(rec.contact||''):'';
   document.getElementById('htDate').value = rec?(rec.interviewDate||''):'';
   document.getElementById('htSource').value = rec?(rec.source||''):'';
   document.getElementById('htPriority').value = rec?(rec.priority||'B'):'B';
@@ -10355,6 +10381,7 @@ function saveHrTalent(){
     phone: String(document.getElementById('htPhone').value||'').trim(),
     email: String(document.getElementById('htEmail').value||'').trim(),
     city: String(document.getElementById('htCity').value||'').trim(),
+    contact: String(document.getElementById('htContact').value||'').trim(),
     interviewDate: document.getElementById('htDate').value||'',
     source: String(document.getElementById('htSource').value||'').trim(),
     priority: document.getElementById('htPriority').value||'',
@@ -10448,6 +10475,7 @@ function hrStaffHtml(){
       h+='<td class="num">'+(sal>0?('¥'+sal.toLocaleString('zh-CN')):'')+'</td>';
       h+='<td class="hr-td-acts">';
       if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
+      h+='<button class="btn btn-xs btn-warn" onclick="hrStaffLeave(\''+s.id+'\')">离职</button>';
       h+='<button class="btn btn-xs" onclick="openHrSalaryModal(\''+s.id+'\')">调薪</button>';
       h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">删</button>';
@@ -10486,6 +10514,24 @@ function hrStaffRestore(id){
   const s=hr.staff.find(x=>x.id===id); if(!s) return;
   s.status='formal'; s.leaveDate=''; s.leaveReason='';
   saveAll(); refreshAll(); showToast('已恢复为正式员工','info');
+}
+function hrStaffLeave(id){
+  const s=hr.staff.find(x=>x.id===id); if(!s) return;
+  if(s.status==='leave'){ showToast('该员工已是离职状态'); return; }
+  hrLeaveId=id;
+  document.getElementById('modalHrLeaveTitle').textContent='办理离职 · '+(s.name||'');
+  document.getElementById('hrLeaveDateX').value = s.leaveDate || todayStr();
+  document.getElementById('hrLeaveReasonX').value = s.leaveReason||'';
+  document.getElementById('modalHrLeave').style.display='flex';
+}
+function hrStaffLeaveConfirm(){
+  const s=hr.staff.find(x=>x.id===hrLeaveId); if(!s){ closeModal('modalHrLeave'); return; }
+  s.status='leave';
+  s.leaveDate = document.getElementById('hrLeaveDateX').value || todayStr();
+  s.leaveReason = String(document.getElementById('hrLeaveReasonX').value||'').trim();
+  hrLeaveId=null;
+  saveAll(); closeModal('modalHrLeave'); refreshAll();
+  showToast('✓ 已办理离职，转入「已离职员工」','info');
 }
 function hrStaffDetail(s){
   let h='<div class="hr-detail">';
@@ -10545,6 +10591,16 @@ function hrRegularizeConfirm(){
   saveAll(); closeModal('modalHrRegularize'); refreshAll();
   showToast('✓ 已转正，转正时间：'+d, 'info');
 }
+function hrTalentSortBy(key){
+  if(hrTalentSort.key===key){ hrTalentSort.dir = -hrTalentSort.dir; }
+  else { hrTalentSort.key=key; hrTalentSort.dir=1; }
+  renderHr();
+}
+function hrTalentCmp(a,b,key){
+  if(key==='priority'){ const p={'A':0,'B':1,'C':2}; const pa=p[a.priority]!==undefined?p[a.priority]:5, pb=p[b.priority]!==undefined?p[b.priority]:5; return pa-pb; }
+  if(key==='expectPay'||key==='offerPay'){ const num=v=>{ const m=String(v||'').match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):0; }; return num(a[key])-num(b[key]); }
+  return String(a[key]||'').localeCompare(String(b[key]||''),'zh');
+}
 function hrTalentHtml(){
   const all=hr.talent;
   const total=all.length;
@@ -10557,11 +10613,25 @@ function hrTalentHtml(){
   if(!total){ h+='<div class="hr-empty-box">还没有候选人，点上方「＋ 新增候选人」登记。</div>'; return h; }
   if(!activeT.length){ h+='<div class="hr-empty-box">当前没有在库候选人，已删除资源见下方「已删除资源」。</div>'; }
   else {
+    const th=(key,label,sortable)=>{ if(!sortable) return '<th>'+label+'</th>'; const on=hrTalentSort.key===key; return '<th class="hr-th-sort'+(on?' on':'')+'" onclick="hrTalentSortBy(\''+key+'\')">'+label+(on?(' '+(hrTalentSort.dir>0?'▲':'▼')):'')+'</th>'; };
     h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
-      +'<th>姓名</th><th>应聘岗位</th><th>优先级</th><th>状态</th><th>面试时间</th><th>面试人员</th><th>期望薪资</th><th>承诺薪资</th><th>操作</th>'
+      +th('name','姓名',true)
+      +th('post','应聘岗位',true)
+      +th('priority','优先级',true)
+      +th('status','状态',true)
+      +th('interviewDate','面试时间',true)
+      +'<th>面试人员</th>'
+      +th('contact','联系方法',true)
+      +th('expectPay','期望薪资',true)
+      +th('offerPay','承诺薪资',true)
+      +'<th>备注</th>'
+      +'<th>操作</th>'
       +'</tr></thead><tbody>';
     const rank=t=>{ if(t.status==='已流失'||t.status==='暂不考虑') return 9; const p={'A':0,'B':1,'C':2}; return (p[t.priority]!==undefined?p[t.priority]:5); };
-    activeT.slice().sort((a,b)=>rank(a)-rank(b)).forEach(t=>{
+    let list = activeT.slice();
+    if(hrTalentSort.key){ list.sort((a,b)=>hrTalentCmp(a,b,hrTalentSort.key)*hrTalentSort.dir); }
+    else { list.sort((a,b)=>rank(a)-rank(b)); }
+    list.forEach(t=>{
       const pr=t.priority||'';
       const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
       const prTxt= pr==='A'?'A 重点':(pr==='B'?'B 培养':(pr==='C'?'C 兜底':''));
@@ -10572,17 +10642,19 @@ function hrTalentHtml(){
       h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
       h+='<td>'+escHtml(t.interviewDate||'')+'</td>';
       h+='<td>'+(t.interviewers&&t.interviewers.length?escHtml(t.interviewers.join('/')):'')+'</td>';
+      h+='<td>'+(t.contact?escHtml(t.contact):'')+'</td>';
       h+='<td>'+(t.expectPay?escHtml(t.expectPay):'')+'</td>';
-      h+='<td>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'')+'</td>';
+      h+='<td>'+(t.offerPay?escHtml(t.offerPay):'')+'</td>';
+      h+='<td>'+(t.remark?escHtml(t.remark):'')+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs btn-primary" onclick="hrTalentToProbation(\''+t.id+'\')">转试用</button>';
       h+='<button class="btn btn-xs" onclick="openHrTalentModal(\''+t.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="deleteHrTalent(\''+t.id+'\')">删</button>';
       h+='</td></tr>';
-      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="9">'+hrTalentDetail(t)+'</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="11">'+hrTalentDetail(t)+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="hr-tip">提示：点姓名可展开「评价维度 / 来源 / 备注」；「转试用」会把该候选人转入在职（试用期）并从人才库移除；「删」会提示选原因并移入「已删除资源」</div>';
+    h+='<div class="hr-tip">提示：点表头字段（姓名 / 岗位 / 优先级 / 状态 / 面试时间 / 联系方法 / 期望薪资 / 承诺薪资）可升、降序排序（再点一次切换方向）；点姓名展开明细；「转试用」转入在职；「删」移入「已删除资源」</div>';
   }
   if(delT.length){
     h+='<div class="hr-collapsible">';
@@ -10628,6 +10700,7 @@ function hrTalentDetail(t){
   if(t.phone) info.push('联系 '+escHtml(t.phone));
   if(t.email) info.push('邮箱 '+escHtml(t.email));
   if(t.city) info.push('现居 '+escHtml(t.city));
+  if(t.contact) info.push('联系方法 '+escHtml(t.contact));
   if(info.length) h+='<div class="hr-detail-info">'+info.map(escHtml).join('　')+'</div>';
   if(t.dims&&t.dims.length){
     h+='<div class="hr-detail-sec"><div class="hr-detail-h">多维度评价</div><div class="hr-dims">';
@@ -10637,7 +10710,7 @@ function hrTalentDetail(t){
     });
     h+='</div></div>';
   }
-  if(t.expectPay||t.offerPay) h+='<div class="hr-detail-sec"><div class="hr-detail-h">薪资意向</div><div class="hr-money"><div class="hr-money-i"><span>期望薪资</span><b>'+escHtml(t.expectPay||'—')+'</b></div><div class="hr-money-i"><span>承诺薪资</span><b>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'—')+'</b></div></div>'+(t.payNote?'<div class="hr-note">薪资说明：'+escHtml(t.payNote)+'</div>':'')+'</div>';
+  if(t.expectPay||t.offerPay) h+='<div class="hr-detail-sec"><div class="hr-detail-h">薪资意向</div><div class="hr-money"><div class="hr-money-i"><span>期望薪资</span><b>'+escHtml(t.expectPay||'—')+'</b></div><div class="hr-money-i"><span>承诺薪资</span><b>'+(t.offerPay?escHtml(t.offerPay):'—')+'</b></div></div>'+(t.payNote?'<div class="hr-note">薪资说明：'+escHtml(t.payNote)+'</div>':'')+'</div>';
   if(t.remark) h+='<div class="hr-detail-sec"><div class="hr-detail-h">综合评价</div><div class="hr-note">'+escHtml(t.remark)+'</div></div>';
   h+='</div>';
   return h;
