@@ -822,10 +822,18 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .hr-dimrow input[type=range]{flex:1;min-width:110px}
 .hr-tablewrap{width:100%;overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch}
 .hr-table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius)}
-.hr-table th,.hr-table td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:middle;white-space:nowrap}
-.hr-table thead th{background:#f8fafc;color:var(--text-secondary);font-weight:700;font-size:11.5px}
+.hr-table th,.hr-table td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:middle;white-space:nowrap}
+.hr-table thead th{background:#f1f5f9;color:var(--text-secondary);font-weight:700;font-size:11.5px;border-bottom:2px solid var(--border)}
 .hr-table tbody tr:hover{background:var(--primary-light)}
+.hr-table tbody tr:nth-child(4n+1){background:rgba(0,0,0,0.012)}
 .hr-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.hr-collapsible{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);overflow:hidden}
+.hr-collapsible-h{cursor:pointer;user-select:none;padding:11px 14px;font-weight:700;display:flex;align-items:center;gap:8px;background:#f8fafc;font-size:13.5px}
+.hr-collapsible-h:hover{background:#eef2f7}
+.hr-caret{display:inline-block;width:14px;color:var(--text-secondary);transition:transform .15s}
+.hr-collapsible-b{padding:10px 12px}
+.hr-cnt{display:inline-block;min-width:18px;padding:1px 8px;border-radius:10px;background:var(--primary-light);color:var(--primary);font-size:12px;font-weight:700}
+.hr-pill.leave{background:#fef2f2;color:#dc2626}
 .hr-td-name{font-weight:600;color:var(--text)}
 .hr-name-link{cursor:pointer;color:var(--primary-dark);border-bottom:1px dashed var(--primary)}
 .hr-name-link:hover{opacity:.85}
@@ -1488,6 +1496,27 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     <option value="社招"></option>
     <option value="内部推荐"></option>
   </datalist>
+</div>
+
+<!-- ====== MODAL: 删除候选人（选原因） ====== -->
+<div class="modal-overlay" id="modalHrDelTalent" style="display:none">
+  <div class="modal" style="width:min(460px,95vw)">
+    <h3>删除候选人 · 选择原因</h3>
+    <p id="hrDelTalentName" style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 12px"></p>
+    <div class="form-group"><label>删除原因</label>
+      <select id="hrDelReasonSel" onchange="hrDelReasonChange()">
+        <option value="已找到工作">已找到工作</option>
+        <option value="没相中我们公司">没相中我们公司</option>
+        <option value="不合适">不合适</option>
+        <option value="其他">其他（请填写）</option>
+      </select>
+    </div>
+    <div class="form-group" id="hrDelReasonOtherWrap" style="display:none"><label>其他原因说明</label><input type="text" id="hrDelReasonOther" placeholder="填写具体原因"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrDelTalent')">取消</button>
+      <button class="btn btn-danger" onclick="hrDelTalentConfirm()">确认删除</button>
+    </div>
+  </div>
 </div>
 
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
@@ -9966,6 +9995,7 @@ let hrSalaryForId = null;
 let editingHrTalentId = null;
 let htModalDims = [];        // [{key,name,score}]
 let htModalInterviewers = []; // [name,...]
+let hrDelTalentId = null;    // 待软删除的候选人 id（删除原因弹窗用）
 
 function hrBlank(){
   return { staff:[], talent:[], meta:{ interviewers:{}, dims: HR_DIMS_DEFAULT.slice() } };
@@ -10001,6 +10031,9 @@ function hrHeal(){
     if(!Array.isArray(t.dims)){ t.dims=[]; changed=true; }
     if(!Array.isArray(t.interviewers)){ t.interviewers=[]; changed=true; }
     if(!t.status){ t.status='未落地·可培养'; changed=true; }
+    if(t.deleted===undefined){ t.deleted=false; changed=true; }
+    if(t.delReason===undefined){ t.delReason=''; changed=true; }
+    if(t.delDate===undefined){ t.delDate=''; changed=true; }
   });
   hr.talent = hr.talent.filter(t=>t && t.name);
   if(changed) saveAll();
@@ -10251,9 +10284,27 @@ function saveHrTalent(){
 }
 function deleteHrTalent(id){
   const t=hr.talent.find(x=>x.id===id); if(!t) return;
-  showConfirm('删除「'+(t.name||'未命名')+'」的候选记录？', ()=>{
-    hr.talent = hr.talent.filter(x=>x.id!==id); saveAll(); refreshAll(); showToast('已删除');
-  });
+  hrDelTalentId = id;
+  document.getElementById('hrDelTalentName').textContent = '将「'+(t.name||'未命名')+'」移入「已删除资源」，请选择删除原因：';
+  const sel=document.getElementById('hrDelReasonSel');
+  sel.value='已找到工作';
+  document.getElementById('hrDelReasonOther').value='';
+  document.getElementById('hrDelReasonOtherWrap').style.display='none';
+  document.getElementById('modalHrDelTalent').style.display='flex';
+}
+function hrDelReasonChange(){
+  const sel=document.getElementById('hrDelReasonSel').value;
+  document.getElementById('hrDelReasonOtherWrap').style.display = (sel==='其他')?'flex':'none';
+}
+function hrDelTalentConfirm(){
+  const t=hr.talent.find(x=>x.id===hrDelTalentId); if(!t){ closeModal('modalHrDelTalent'); return; }
+  const sel=document.getElementById('hrDelReasonSel').value;
+  let reason = sel;
+  if(sel==='其他'){ reason = String(document.getElementById('hrDelReasonOther').value||'').trim()||'其他'; }
+  t.deleted=true; t.delReason=reason; t.delDate=todayStr();
+  hrDelTalentId=null;
+  saveAll(); closeModal('modalHrDelTalent'); refreshAll();
+  showToast('已移入「已删除资源」','info');
 }
 
 // ---------------- 渲染 ----------------
@@ -10263,8 +10314,8 @@ function renderHr(){
     +'<button class="btn" onclick="openHrTalentModal()">＋ 新增候选人</button>';
   const tabs=document.getElementById('hrTabs');
   if(tabs) tabs.innerHTML=''
-    +'<button class="hr-tab'+(hrTab==='staff'?' on':'')+'" onclick="hrSetTab(\'staff\')">在职员工 <span class="hr-tab-cnt">'+hr.staff.length+'</span></button>'
-    +'<button class="hr-tab'+(hrTab==='talent'?' on':'')+'" onclick="hrSetTab(\'talent\')">人才储备库 <span class="hr-tab-cnt">'+hr.talent.length+'</span></button>';
+    +'<button class="hr-tab'+(hrTab==='staff'?' on':'')+'" onclick="hrSetTab(\'staff\')">在职员工 <span class="hr-tab-cnt">'+hr.staff.filter(s=>s.status!=='leave').length+'</span></button>'
+    +'<button class="hr-tab'+(hrTab==='talent'?' on':'')+'" onclick="hrSetTab(\'talent\')">人才储备库 <span class="hr-tab-cnt">'+hr.talent.filter(t=>!t.deleted).length+'</span></button>';
   const box=document.getElementById('hrContent');
   if(box) box.innerHTML = hrTab==='staff'? hrStaffHtml() : hrTalentHtml();
 }
@@ -10272,43 +10323,75 @@ function hrSetTab(t){ hrTab=t; renderHr(); }
 function hrBadge(){ const b=document.getElementById('hrBadge'); if(b) b.style.display='none'; }
 
 function hrStaffHtml(){
-  const total=hr.staff.length;
-  const active=hr.staff.filter(s=>s.status!=='leave').length;
-  const prob=hr.staff.filter(s=>s.status==='probation').length;
-  const leave=hr.staff.filter(s=>s.status==='leave').length;
+  const all=hr.staff;
+  const total=all.length;
+  const leave=all.filter(s=>s.status==='leave');
+  const active=all.filter(s=>s.status!=='leave');
+  const prob=active.filter(s=>s.status==='probation').length;
   let h='<div class="hr-statbar">'
-    +'<div class="hr-stat"><b>'+total+'</b><span>总人数</span></div>'
-    +'<div class="hr-stat"><b>'+active+'</b><span>在职（含试用）</span></div>'
+    +'<div class="hr-stat"><b>'+total+'</b><span>员工总数</span></div>'
+    +'<div class="hr-stat"><b>'+active.length+'</b><span>在职（含试用）</span></div>'
     +'<div class="hr-stat"><b>'+prob+'</b><span>试用中</span></div>'
-    +'<div class="hr-stat"><b>'+leave+'</b><span>已离职</span></div></div>';
+    +'<div class="hr-stat"><b>'+leave.length+'</b><span>已离职</span></div></div>';
   if(!total){ h+='<div class="hr-empty-box">还没有员工档案，点上方「＋ 新增员工」登记；第一版初始数据已自动导入，刷新即可见。</div>'; return h; }
-  h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
-    +'<th>姓名</th><th>项目</th><th>岗位</th><th>状态</th><th>入职时间</th><th>试用至</th><th>转正时间</th><th class="num">月薪合计</th><th>操作</th>'
-    +'</tr></thead><tbody>';
-  hr.staff.forEach(s=>{
-    const stLbl = s.status==='formal'?'正式':(s.status==='probation'?'试用期':(s.status==='leave'?'已离职':escHtml(s.status||'')));
-    const stCls = s.status==='formal'?'formal':(s.status==='probation'?'probation':(s.status==='leave'?'leave':''));
-    const sal=hrSalTotal(s);
-    h+='<tr>';
-    h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDs_'+s.id+'\')">'+escHtml(s.name||'')+'</b>'+(s.enName?' <span class="hr-en">'+escHtml(s.enName)+'</span>':'')+'</td>';
-    h+='<td>'+escHtml(s.project||'')+'</td>';
-    h+='<td>'+escHtml(s.post||'')+'</td>';
-    h+='<td><span class="hr-pill '+stCls+'">'+stLbl+'</span></td>';
-    h+='<td>'+escHtml(s.joinDate||'')+'</td>';
-    h+='<td>'+escHtml(s.probEnd||'')+'</td>';
-    h+='<td>'+escHtml(s.regularizeDate||'')+'</td>';
-    h+='<td class="num">'+(sal>0?('¥'+sal.toLocaleString('zh-CN')):'')+'</td>';
-    h+='<td class="hr-td-acts">';
-    if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
-    h+='<button class="btn btn-xs" onclick="openHrSalaryModal(\''+s.id+'\')">调薪</button>';
-    h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
-    h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">删</button>';
-    h+='</td></tr>';
-    h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="9">'+hrStaffDetail(s)+'</td></tr>';
-  });
-  h+='</tbody></table></div>';
-  h+='<div class="hr-tip">提示：点姓名可展开「薪资明细 / 调薪记录 / 备注」</div>';
+  if(!active.length){ h+='<div class="hr-empty-box">当前没有在职或试用期员工，已离职员工见下方「已离职员工」。</div>'; }
+  else {
+    h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+      +'<th>姓名</th><th>项目</th><th>岗位</th><th>状态</th><th>入职时间</th><th>试用至</th><th>转正时间</th><th class="num">月薪合计</th><th>操作</th>'
+      +'</tr></thead><tbody>';
+    active.forEach(s=>{
+      const stLbl = s.status==='formal'?'正式':(s.status==='probation'?'试用期':(s.status==='leave'?'已离职':escHtml(s.status||'')));
+      const stCls = s.status==='formal'?'formal':(s.status==='probation'?'probation':'');
+      const sal=hrSalTotal(s);
+      h+='<tr>';
+      h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDs_'+s.id+'\')">'+escHtml(s.name||'')+'</b>'+(s.enName?' <span class="hr-en">'+escHtml(s.enName)+'</span>':'')+'</td>';
+      h+='<td>'+escHtml(s.project||'')+'</td>';
+      h+='<td>'+escHtml(s.post||'')+'</td>';
+      h+='<td><span class="hr-pill '+stCls+'">'+stLbl+'</span></td>';
+      h+='<td>'+escHtml(s.joinDate||'')+'</td>';
+      h+='<td>'+escHtml(s.probEnd||'')+'</td>';
+      h+='<td>'+escHtml(s.regularizeDate||'')+'</td>';
+      h+='<td class="num">'+(sal>0?('¥'+sal.toLocaleString('zh-CN')):'')+'</td>';
+      h+='<td class="hr-td-acts">';
+      if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
+      h+='<button class="btn btn-xs" onclick="openHrSalaryModal(\''+s.id+'\')">调薪</button>';
+      h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
+      h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">删</button>';
+      h+='</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="9">'+hrStaffDetail(s)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="hr-tip">提示：点姓名可展开「薪资明细 / 调薪记录 / 备注」</div>';
+  }
+  if(leave.length){
+    h+='<div class="hr-collapsible">';
+    h+='<div class="hr-collapsible-h" onclick="hrToggleBox(\'hrLeaveBox\')"><span class="hr-caret" id="hrLeaveBoxCare">▸</span>已离职员工 <span class="hr-cnt">'+leave.length+'</span></div>';
+    h+='<div class="hr-collapsible-b" id="hrLeaveBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+      +'<th>姓名</th><th>项目</th><th>岗位</th><th>入职时间</th><th>离职日期</th><th>离职原因 / 交接</th><th>操作</th>'
+      +'</tr></thead><tbody>';
+    leave.forEach(s=>{
+      h+='<tr>';
+      h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDs_'+s.id+'\')">'+escHtml(s.name||'')+'</b>'+(s.enName?' <span class="hr-en">'+escHtml(s.enName)+'</span>':'')+'</td>';
+      h+='<td>'+escHtml(s.project||'')+'</td>';
+      h+='<td>'+escHtml(s.post||'')+'</td>';
+      h+='<td>'+escHtml(s.joinDate||'')+'</td>';
+      h+='<td>'+escHtml(s.leaveDate||'')+'</td>';
+      h+='<td>'+(s.leaveReason?escHtml(s.leaveReason):'')+'</td>';
+      h+='<td class="hr-td-acts">';
+      h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
+      h+='<button class="btn btn-xs" onclick="hrStaffRestore(\''+s.id+'\')">恢复</button>';
+      h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">彻底删除</button>';
+      h+='</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="7">'+hrStaffDetail(s)+'</td></tr>';
+    });
+    h+='</tbody></table></div></div></div>';
+  }
   return h;
+}
+function hrStaffRestore(id){
+  const s=hr.staff.find(x=>x.id===id); if(!s) return;
+  s.status='formal'; s.leaveDate=''; s.leaveReason='';
+  saveAll(); refreshAll(); showToast('已恢复为正式员工','info');
 }
 function hrStaffDetail(s){
   let h='<div class="hr-detail">';
@@ -10342,6 +10425,13 @@ function hrToggleDetail(rowId){
   const el=document.getElementById(rowId); if(!el) return;
   el.style.display = (el.style.display==='none'||el.style.display==='')?'table-row':'none';
 }
+function hrToggleBox(boxId){
+  const el=document.getElementById(boxId); if(!el) return;
+  const open = (el.style.display==='none'||el.style.display==='');
+  el.style.display = open?'block':'none';
+  const caret=document.getElementById(boxId+'Care');
+  if(caret) caret.textContent = open?'▾':'▸';
+}
 function hrRegularize(id){
   const s=hr.staff.find(x=>x.id===id); if(!s) return;
   if(s.status!=='probation'){ showToast('只有「试用期」员工可以转正'); return; }
@@ -10353,40 +10443,77 @@ function hrRegularize(id){
   });
 }
 function hrTalentHtml(){
-  const total=hr.talent.length;
+  const all=hr.talent;
+  const total=all.length;
+  const delT=all.filter(t=>t.deleted);
+  const activeT=all.filter(t=>!t.deleted);
   let h='<div class="hr-statbar">'
     +'<div class="hr-stat"><b>'+total+'</b><span>候选人总数</span></div>';
-  ['A','B','C'].forEach(p=>{ const n=hr.talent.filter(t=>t.priority===p).length; h+='<div class="hr-stat"><b>'+n+'</b><span>'+p+' 级</span></div>'; });
-  const inpool=hr.talent.filter(t=>t.status!=='已流失'&&t.status!=='暂不考虑').length;
-  h+='<div class="hr-stat"><b>'+inpool+'</b><span>在池可激活</span></div></div>';
+  ['A','B','C'].forEach(p=>{ const n=activeT.filter(t=>t.priority===p).length; h+='<div class="hr-stat"><b>'+n+'</b><span>'+p+' 级</span></div>'; });
+  h+='<div class="hr-stat"><b>'+delT.length+'</b><span>已删除资源</span></div></div>';
   if(!total){ h+='<div class="hr-empty-box">还没有候选人，点上方「＋ 新增候选人」登记。</div>'; return h; }
-  h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
-    +'<th>姓名</th><th>应聘岗位</th><th>优先级</th><th>状态</th><th>面试时间</th><th>面试人员</th><th>期望薪资</th><th>承诺薪资</th><th>操作</th>'
-    +'</tr></thead><tbody>';
-  const rank=t=>{ if(t.status==='已流失'||t.status==='暂不考虑') return 9; const p={'A':0,'B':1,'C':2}; return (p[t.priority]!==undefined?p[t.priority]:5); };
-  hr.talent.slice().sort((a,b)=>rank(a)-rank(b)).forEach(t=>{
-    const pr=t.priority||'';
-    const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
-    const prTxt= pr==='A'?'A 重点':(pr==='B'?'B 培养':(pr==='C'?'C 兜底':''));
-    h+='<tr>';
-    h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDt_'+t.id+'\')">'+escHtml(t.name||'')+'</b></td>';
-    h+='<td>'+escHtml(t.post||'')+'</td>';
-    h+='<td>'+(prCls?'<span class="hr-pill '+prCls+'">'+prTxt+'</span>':'')+'</td>';
-    h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
-    h+='<td>'+escHtml(t.interviewDate||'')+'</td>';
-    h+='<td>'+(t.interviewers&&t.interviewers.length?escHtml(t.interviewers.join('/')):'')+'</td>';
-    h+='<td>'+(t.expectPay?escHtml(t.expectPay):'')+'</td>';
-    h+='<td>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'')+'</td>';
-    h+='<td class="hr-td-acts">';
-    h+='<button class="btn btn-xs btn-primary" onclick="hrTalentToProbation(\''+t.id+'\')">转试用</button>';
-    h+='<button class="btn btn-xs" onclick="openHrTalentModal(\''+t.id+'\')">编辑</button>';
-    h+='<button class="btn btn-xs btn-danger" onclick="deleteHrTalent(\''+t.id+'\')">删</button>';
-    h+='</td></tr>';
-    h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="9">'+hrTalentDetail(t)+'</td></tr>';
-  });
-  h+='</tbody></table></div>';
-  h+='<div class="hr-tip">提示：点姓名可展开「评价维度 / 来源 / 备注」；「转试用」会把该候选人转入在职（试用期）并从人才库移除</div>';
+  if(!activeT.length){ h+='<div class="hr-empty-box">当前没有在库候选人，已删除资源见下方「已删除资源」。</div>'; }
+  else {
+    h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+      +'<th>姓名</th><th>应聘岗位</th><th>优先级</th><th>状态</th><th>面试时间</th><th>面试人员</th><th>期望薪资</th><th>承诺薪资</th><th>操作</th>'
+      +'</tr></thead><tbody>';
+    const rank=t=>{ if(t.status==='已流失'||t.status==='暂不考虑') return 9; const p={'A':0,'B':1,'C':2}; return (p[t.priority]!==undefined?p[t.priority]:5); };
+    activeT.slice().sort((a,b)=>rank(a)-rank(b)).forEach(t=>{
+      const pr=t.priority||'';
+      const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
+      const prTxt= pr==='A'?'A 重点':(pr==='B'?'B 培养':(pr==='C'?'C 兜底':''));
+      h+='<tr>';
+      h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDt_'+t.id+'\')">'+escHtml(t.name||'')+'</b></td>';
+      h+='<td>'+escHtml(t.post||'')+'</td>';
+      h+='<td>'+(prCls?'<span class="hr-pill '+prCls+'">'+prTxt+'</span>':'')+'</td>';
+      h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
+      h+='<td>'+escHtml(t.interviewDate||'')+'</td>';
+      h+='<td>'+(t.interviewers&&t.interviewers.length?escHtml(t.interviewers.join('/')):'')+'</td>';
+      h+='<td>'+(t.expectPay?escHtml(t.expectPay):'')+'</td>';
+      h+='<td>'+(t.offerPay?('¥'+escHtml(t.offerPay)):'')+'</td>';
+      h+='<td class="hr-td-acts">';
+      h+='<button class="btn btn-xs btn-primary" onclick="hrTalentToProbation(\''+t.id+'\')">转试用</button>';
+      h+='<button class="btn btn-xs" onclick="openHrTalentModal(\''+t.id+'\')">编辑</button>';
+      h+='<button class="btn btn-xs btn-danger" onclick="deleteHrTalent(\''+t.id+'\')">删</button>';
+      h+='</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="9">'+hrTalentDetail(t)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="hr-tip">提示：点姓名可展开「评价维度 / 来源 / 备注」；「转试用」会把该候选人转入在职（试用期）并从人才库移除；「删」会提示选原因并移入「已删除资源」</div>';
+  }
+  if(delT.length){
+    h+='<div class="hr-collapsible">';
+    h+='<div class="hr-collapsible-h" onclick="hrToggleBox(\'hrDelBox\')"><span class="hr-caret" id="hrDelBoxCare">▸</span>已删除资源 <span class="hr-cnt">'+delT.length+'</span></div>';
+    h+='<div class="hr-collapsible-b" id="hrDelBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+      +'<th>姓名</th><th>应聘岗位</th><th>状态</th><th>删除原因</th><th>删除日期</th><th>操作</th>'
+      +'</tr></thead><tbody>';
+    delT.forEach(t=>{
+      h+='<tr>';
+      h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDt_'+t.id+'\')">'+escHtml(t.name||'')+'</b></td>';
+      h+='<td>'+escHtml(t.post||'')+'</td>';
+      h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
+      h+='<td>'+(t.delReason?escHtml(t.delReason):'—')+'</td>';
+      h+='<td>'+escHtml(t.delDate||'')+'</td>';
+      h+='<td class="hr-td-acts">';
+      h+='<button class="btn btn-xs" onclick="hrTalentRestore(\''+t.id+'\')">恢复</button>';
+      h+='<button class="btn btn-xs btn-danger" onclick="hrTalentPurge(\''+t.id+'\')">彻底删除</button>';
+      h+='</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="6">'+hrTalentDetail(t)+'</td></tr>';
+    });
+    h+='</tbody></table></div></div></div>';
+  }
   return h;
+}
+function hrTalentRestore(id){
+  const t=hr.talent.find(x=>x.id===id); if(!t) return;
+  t.deleted=false; t.delReason=''; t.delDate='';
+  saveAll(); refreshAll(); showToast('已恢复到人才库','info');
+}
+function hrTalentPurge(id){
+  const t=hr.talent.find(x=>x.id===id); if(!t) return;
+  showConfirm('彻底删除「'+(t.name||'未命名')+'」？此操作不可恢复。', ()=>{
+    hr.talent = hr.talent.filter(x=>x.id!==id); saveAll(); refreshAll(); showToast('已彻底删除');
+  });
 }
 function hrTalentDetail(t){
   let h='<div class="hr-detail">';
