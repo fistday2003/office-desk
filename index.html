@@ -847,6 +847,34 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .hr-table tbody tr:hover{background:var(--primary-light)}
 .hr-table tbody tr:nth-child(4n+1){background:rgba(0,0,0,0.012)}
 .hr-table .num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ===== 外贸运费管理 ===== */
+.fr-summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.fr-stat{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:150px}
+.fr-stat-n{display:block;font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.fr-stat-l{font-size:12px;color:var(--text-muted)}
+.fr-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.fr-tip{font-size:12px;color:var(--text-muted);line-height:1.6}
+.fr-blocktitle{font-size:14px;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fr-blocktitle .cnt{font-size:12px;font-weight:600;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:1px 9px}
+.fr-tree{font-size:12px;color:var(--text-secondary);background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.9}
+.fr-tree-c{margin-left:14px}
+.fr-tree-c2{display:inline-block;margin:0 10px 0 14px;color:var(--text-muted)}
+.fr-table .fr-col-note{white-space:normal;word-break:break-word;min-width:120px;max-width:240px;line-height:1.5}
+.fr-form-row{display:flex;gap:10px;flex-wrap:wrap}
+.fr-total-box{font-size:13px;color:var(--text-muted);margin:2px 0 10px}
+.fr-total-box b{color:var(--text);font-size:15px}
+.fr-pipe{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.fr-pipe-s{width:18px;height:18px;border-radius:50%;background:#e2e8f0;color:#64748b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.fr-pipe-s.on{background:var(--primary);color:#fff}
+.fr-pipe-bar{width:14px;height:2px;background:#e2e8f0;flex:0 0 auto}
+.fr-pipe-bar.on{background:var(--primary)}
+.fr-pipe-t{width:100%;font-size:11px;color:var(--text-secondary);margin-top:2px}
+.fr-filebadge{display:inline-block;margin:1px 2px;padding:2px 7px;border:1px solid var(--border);border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer;white-space:nowrap}
+.fr-filebadge:hover{border-color:var(--primary);color:var(--primary)}
+.fr-acts{white-space:nowrap}
+.hr-iv-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1;display:inline-block;margin-right:2px}
+.hr-iv-dot.on{background:var(--primary)}
 .hr-collapsible{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);overflow:hidden}
 .hr-collapsible-h{cursor:pointer;user-select:none;padding:11px 14px;font-weight:700;display:flex;align-items:center;gap:8px;background:#f8fafc;font-size:13.5px}
 .hr-collapsible-h:hover{background:#eef2f7}
@@ -1016,13 +1044,18 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         人事管理
         <span class="nav-badge" id="hrBadge" style="display:none">0</span>
       </button>
+      <button class="nav-item" data-tab="freight">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+        运费管理
+        <span class="nav-badge" id="frBadge" style="display:none">0</span>
+      </button>
     </nav>
     <div class="sidebar-footer">
       <button class="nav-item" id="btnClearAll" style="color:var(--text-muted);font-size:12px">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.15 · 2026-10-07</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.16 · 2026-10-12</div>
     </div>
   </aside>
 
@@ -1177,6 +1210,16 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
       <div class="hr-tabs" id="hrTabs"></div>
       <div id="hrContent"></div>
     </div>
+
+    <!-- TAB: 外贸运费管理 -->
+    <div class="tab-panel" id="tab-freight">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+        外贸运费管理
+      </div>
+      <p class="section-subtitle">每月上传各家货代运费账单（选<b>运费月份</b>＋<b>货代公司</b>），按业务员名自动分到<b>朗格斯 / 凡适</b>。工作流：<b>上传清单 → 申请付款(钉钉) → 上传付款凭证 → 上传发票</b>。月底「打包下载」生成 <b>年月 / 物流公司 / 运费清单·付款凭证·运费发票</b> 文件夹结构，解压到 <b>D:\BaiduSyncdisk\工作文件\外贸运费自动管理</b> 即可。</p>
+      <div id="frContent"></div>
+    </div>
   </main>
 </div>
 
@@ -1222,6 +1265,10 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     人事
   </button>
+  <button class="mnav-item" data-mtab="freight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+    运费
+  </button>
 </nav>
 
 <!-- 待办附件文件选择（隐藏） -->
@@ -1230,6 +1277,8 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 <input type="file" id="noteFileInput" multiple style="display:none" onchange="handleNoteFilePick()">
 <input type="file" id="expFileInput" multiple style="display:none" onchange="handleExpFilePick()">
 <input type="file" id="clmFileInput" multiple style="display:none" onchange="handleClmFilePick()">
+<input type="file" id="frListInput" multiple style="display:none" onchange="handleFrListPick()">
+<input type="file" id="frCatInput" multiple style="display:none" onchange="handleFrCatPick()">
 
 <!-- ====== MODAL: Task ====== -->
 <div class="modal-overlay" id="modalTask" style="display:none">
@@ -1377,6 +1426,57 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('modalClmReport')">取消</button>
       <button class="btn btn-primary" onclick="doClmMarkReported()">确认标记</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 外贸运费账单 ====== -->
+<div class="modal-overlay" id="modalFreightBill" style="display:none">
+  <div class="modal" style="width:min(740px,95vw)">
+    <h3 id="frBillTitle">登记运费账单</h3>
+    <div class="fr-form-row">
+      <div class="form-group" style="flex:1 1 160px"><label>运费月份 *</label><input type="month" id="frMonth"></div>
+      <div class="form-group" style="flex:1 1 240px"><label>货代公司 *（可新增 / 删除）</label>
+        <div class="hr-iv">
+          <div class="hr-iv-sel" id="frFwdSel" onclick="frToggleForwarderPop()"></div>
+          <div class="hr-iv-pop" id="frFwdPop" style="display:none">
+            <div id="frFwdList"></div>
+            <div style="display:flex;gap:6px;margin-top:6px"><input type="text" id="frFwdNew" placeholder="新增货代公司名…" style="flex:1"><button class="btn btn-sm" onclick="frAddForwarder()">+ 加</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>运费清单文件（表格 / 截图 / PDF，可多个）</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
+        <button class="btn btn-sm" onclick="document.getElementById('frListInput').click()">选择文件</button>
+        <button class="btn btn-sm" onclick="frAutoReadCsv()">自动读取 CSV</button>
+        <span class="fr-tip">表格账单另存为 CSV 后点「自动读取」可一键按业务员分到朗格斯/凡适；截图账单把图发到对话里，我帮你识别数字</span>
+      </div>
+      <div class="task-files" id="frModalList"></div>
+    </div>
+    <div class="fr-form-row">
+      <div class="form-group" style="flex:1 1 130px"><label>朗格斯运费(元)</label><input type="number" step="0.01" id="frLangges" oninput="frRecalcTotal()"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>凡适运费(元)</label><input type="number" step="0.01" id="frFansi" oninput="frRecalcTotal()"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>未分配/其他(元)</label><input type="number" step="0.01" id="frUnassigned" oninput="frRecalcTotal()"></div>
+    </div>
+    <div class="fr-total-box">总金额（朗格斯＋凡适＋未分配，自动合计）：<b id="frTotal">¥0.00</b></div>
+    <div class="form-group"><label>备注</label><textarea id="frNote" rows="2" placeholder="如：单项目账单(仅凡适) / 含退件补发 / 其他说明"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalFreightBill')">取消</button>
+      <button class="btn btn-primary" onclick="saveFreightBill()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 运费文件预览/补传 ====== -->
+<div class="modal-overlay" id="modalFrFiles" style="display:none">
+  <div class="modal" style="width:min(560px,95vw)">
+    <h3 id="frFilesTitle">资料</h3>
+    <div class="task-files" id="frFilesList"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="frUploadCat(frPreviewState.id, frPreviewState.cat)">添加文件</button>
+      <button class="btn btn-primary" onclick="closeModal('modalFrFiles')">关闭</button>
     </div>
   </div>
 </div>
@@ -1715,7 +1815,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.15';
+const APP_VERSION = 'v2.16';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -1726,6 +1826,8 @@ let planGoals = {};     // 数据看板：手填「总计划」（月/季/年 ×
 let planOrphans = [];   // 隔离区：认不出项目/月份的看板记录（只隔离不删除）
 // 人事管理（v2.15）：{staff:[在职员工], talent:[人才储备库], meta:{面试人员名单、评价维度}}
 let hr = {staff:[], talent:[], meta:{}};
+// 外贸运费管理（v2.16）：{bills:[运费账单], forwarders:{货代公司菜单}, sellerMap:{业务员名小写->项目}}
+let freight = {bills:[], forwarders:{}, sellerMap:{}};
 let currentTab = 'tasks';
 let editingId = null;
 let noteFilterTag = null;
@@ -1780,6 +1882,14 @@ function loadData(){
   if(!hr.meta || typeof hr.meta!=='object' || Array.isArray(hr.meta)) hr.meta={};
   hrHeal();
   try{ hrSeedIfEmpty(); }catch(e){}
+  // 外贸运费管理
+  const _fr = rdStore('freight', null);
+  if(_fr && typeof _fr==='object'){
+    freight.bills      = Array.isArray(_fr.bills)?_fr.bills:[];
+    freight.forwarders= (_fr.forwarders&&typeof _fr.forwarders==='object')?_fr.forwarders:{};
+    freight.sellerMap  = (_fr.sellerMap&&typeof _fr.sellerMap==='object')?_fr.sellerMap:{};
+  }
+  freightHeal();
   const _bz = rdStore('biz', null);
   if(_bz && typeof _bz==='object') biz = Object.assign(bizBlank(), _bz);
   if(!biz || typeof biz!=='object') biz = bizBlank();
@@ -1895,23 +2005,41 @@ async function idbPutAll(arr){
 // 把内存里所有带 dataUrl 的附件落进 IDB（并给缺 fid 的附件补 fid）；返回是否 IDB 可用
 async function persistAllFiles(){
   const all=[];
-  for(const arr of [expenses,claims,tasks,notes,projects]){
+  const recFiles = r => {
+    if(!r||!r.files) return [];
+    if(Array.isArray(r.files)) return r.files;
+    if(typeof r.files==='object'){ const out=[]; for(const k in r.files){ if(Array.isArray(r.files[k])) for(const f of r.files[k]) out.push(f); } return out; }
+    return [];
+  };
+  for(const arr of [expenses,claims,tasks,notes,projects,freight.bills]){
     if(!Array.isArray(arr)) continue;
-    for(const r of arr){ if(r&&Array.isArray(r.files)) for(const f of r.files){ if(f&&f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); all.push({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); } } }
+    for(const r of arr){ for(const f of recFiles(r)){ if(f&&f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); all.push({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); } } }
   }
   if(all.length) await idbPutAll(all);
 }
 // 加载时：旧版内嵌 dataUrl 的附件迁到 IDB；新格式（只有 fid）从 IDB 取回 dataUrl 供渲染/云同步
 async function initFiles(){
   const mods=[expenses,claims,tasks,notes,projects];
+  const recFiles = r => {
+    if(!r||!r.files) return [];
+    if(Array.isArray(r.files)) return r.files;
+    if(typeof r.files==='object'){ const out=[]; for(const k in r.files){ if(Array.isArray(r.files[k])) for(const f of r.files[k]) out.push(f); } return out; }
+    return [];
+  };
   let changed=false;
   for(const arr of mods){
     if(!Array.isArray(arr)) continue;
-    for(const r of arr){ if(!r||!Array.isArray(r.files)) continue;
-      for(const f of r.files){ if(!f) continue;
+    for(const r of arr){ if(!r) continue;
+      for(const f of recFiles(r)){ if(!f) continue;
         if(f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); try{ await idbPut({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); changed=true; }catch(e){} }
         else if(f.fid){ try{ const g=await idbGet(f.fid); if(g&&g.dataUrl) f.dataUrl=g.dataUrl; }catch(e){} }
       }
+    }
+  }
+  for(const r of freight.bills){ if(!r) continue;
+    for(const f of recFiles(r)){ if(!f) continue;
+      if(f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); try{ await idbPut({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); changed=true; }catch(e){} }
+      else if(f.fid){ try{ const g=await idbGet(f.fid); if(g&&g.dataUrl) f.dataUrl=g.dataUrl; }catch(e){} }
     }
   }
   if(changed) await saveAll();
@@ -1936,6 +2064,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser(expenses)));
       localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser(claims)));
       localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(hr));
+      localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight()));
       localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
     }catch(e){
       // 即使剥离附件元数据仍写不下：再退一步，连 files 也清空，保证文字记录绝不丢
@@ -1950,6 +2079,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser2(expenses)));
         localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser2(claims)));
         localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(hr));
+        localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight2()));
         localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
         showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
       }catch(e2){ showToast('⚠️ 本地存储写入失败，请导出备份到百度盘', 'warning'); }
@@ -4666,7 +4796,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 //  EXPORT / IMPORT
 // ============================================================
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,biz,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
   try{
     const corrupt = {};
@@ -4959,7 +5089,7 @@ async function doSyncUpload(){
     return c;
   });
   const buildSync = (withBiz)=>{
-    const d = {v:10, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, planGoals: planGoals, expenses: syncExpenses, claims: syncClaims, hr: hr, syncedAt:new Date().toISOString()};
+    const d = {v:10, tasks: syncTasks, notes: syncNotes, projects: syncProjects, dashboard: dashboard, plan: plan, planGoals: planGoals, expenses: syncExpenses, claims: syncClaims, hr: hr, freight: frSyncLight(), syncedAt:new Date().toISOString()};
     if(withBiz) d.biz = biz;
     return d;
   };
@@ -5462,6 +5592,16 @@ function applyIncoming(data, label){
     stat.kept += r1.keepLocal + r2.keepLocal;
     stat.newFromIncoming += r1.incomingNew + r2.incomingNew;
   }
+  // 外贸运费管理：账单按 id 合并（只增不减）；货代菜单 / 业务员映射按 map 合并
+  if(data && data.freight && typeof data.freight==='object'){
+    const lf = freight||{bills:[],forwarders:{},sellerMap:{}};
+    const rf = syncMergeById(lf.bills||[], data.freight.bills||[], 'freight');
+    freight.bills = rf.list;
+    freight.forwarders = Object.assign({}, (data.freight.forwarders||{}), (lf.forwarders||{}));
+    freight.sellerMap   = Object.assign({}, (data.freight.sellerMap||{}), (lf.sellerMap||{}));
+    stat.kept += rf.keepLocal;
+    stat.newFromIncoming += rf.incomingNew;
+  }
   if(data && data.planGoals && typeof data.planGoals === 'object') planGoals = syncMergeMap(planGoals, data.planGoals);
   if(data && data.biz && typeof data.biz === 'object'){
     const ib = data.biz, lb = biz;
@@ -5521,7 +5661,7 @@ function asSnapshot(){
             hrStaff:hr.staff.length, hrTalent:hr.talent.length,
             bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims), hr:hr,
+    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims), hr:hr, freight:frSyncLight(),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded}
   };
@@ -6345,6 +6485,416 @@ function renderExpModalFiles(){
 function removeExpModalFile(i){
   expModalFiles.splice(i,1);
   renderExpModalFiles();
+}
+
+// ============================================================
+//  外贸运费管理（v2.16）
+// ============================================================
+const FR_STAGES = ['清单已上传','已申请付款','已付款','已收发票'];
+const FR_CAT_NAMES = {list:'运费清单', voucher:'付款凭证', invoice:'运费发票'};
+const FR_ROOT = 'D:\\BaiduSyncdisk\\工作文件\\外贸运费自动管理';
+let frModalId = null;
+let frModalForwarder = '';
+let frModalFiles = {list:[], voucher:[], invoice:[]};
+let frModalDetail = [];
+let frCatTarget = null;          // 从列表补传文件时的 {id,cat}
+let frPreviewState = {id:'', cat:''};
+let frCurrFiles = [];            // 预览弹窗当前文件数组（供点击预览）
+
+function frMapSeller(name){
+  const k = String(name||'').trim().toLowerCase().replace(/\s+/g,'');
+  if(!k) return 'unassigned';
+  if(freight.sellerMap && freight.sellerMap[k]) return freight.sellerMap[k];
+  return 'unassigned';
+}
+function frMonthLabel(m){ if(!m||m.length<6) return m||''; return m.slice(0,4)+'年'+parseInt(m.slice(4),10)+'月'; }
+function freightHeal(){
+  if(!freight || typeof freight!=='object') freight={bills:[],forwarders:{},sellerMap:{}};
+  if(!Array.isArray(freight.bills)) freight.bills=[];
+  if(!freight.forwarders||typeof freight.forwarders!=='object') freight.forwarders={};
+  if(!freight.sellerMap||typeof freight.sellerMap!=='object') freight.sellerMap={};
+  freight.bills.forEach(b=>{
+    if(!b) return;
+    if(!b.id) b.id=uid();
+    if(!b.month) b.month='';
+    if(!b.forwarder) b.forwarder='';
+    if(typeof b.total!=='number') b.total=0;
+    if(typeof b.langges!=='number') b.langges=0;
+    if(typeof b.fansi!=='number') b.fansi=0;
+    if(typeof b.unassigned!=='number') b.unassigned=0;
+    if(!b.status||FR_STAGES.indexOf(b.status)<0) b.status='清单已上传';
+    if(!b.files||typeof b.files!=='object') b.files={list:[],voucher:[],invoice:[]};
+    ['list','voucher','invoice'].forEach(k=>{ if(!Array.isArray(b.files[k])) b.files[k]=[]; });
+    if(!Array.isArray(b.detail)) b.detail=[];
+    if(typeof b.singleProject!=='boolean') b.singleProject=false;
+  });
+  freight.bills = freight.bills.filter(b=>b && b.month);
+}
+function serFreight(){
+  const f = Object.assign({}, freight);
+  f.bills = (freight.bills||[]).map(b=>{ const c=Object.assign({},b); if(c.files&&typeof c.files==='object'){ const fm={}; for(const k in c.files){ if(Array.isArray(c.files[k])) fm[k]=c.files[k].map(x=>({name:x.name,type:x.type,size:x.size,fid:x.fid})); } c.files=fm; } return c; });
+  return f;
+}
+function serFreight2(){
+  const f = Object.assign({}, freight);
+  f.bills = (freight.bills||[]).map(b=>{ const c=Object.assign({},b); if(c.files&&typeof c.files==='object'){ const fm={}; for(const k in c.files){ if(Array.isArray(c.files[k])) fm[k]=c.files[k].map(()=>({name:'(附件过大未保存)',type:'',size:0})); } c.files=fm; } return c; });
+  return f;
+}
+function frSyncLight(){
+  const f = Object.assign({}, freight);
+  f.bills = (freight.bills||[]).map(b=>{ const c=Object.assign({},b); if(c.files&&typeof c.files==='object'){ const fm={}; for(const k in c.files){ if(Array.isArray(c.files[k])) fm[k]=c.files[k].map(x=>({name:x.name,type:x.type,size:x.size,fid:x.fid})); } c.files=fm; } return c; });
+  return f;
+}
+function frBadge(){
+  const b=document.getElementById('frBadge'); if(!b) return;
+  const n=freight.bills.filter(x=>x.status!=='已收发票').length;
+  if(n>0){ b.textContent=n; b.style.display=''; } else { b.style.display='none'; }
+}
+
+// ---------------- 渲染 ----------------
+function frStageHtml(b){
+  const cur=FR_STAGES.indexOf(b.status);
+  let h='<div class="fr-pipe">';
+  FR_STAGES.forEach((s,i)=>{ const cls=i<=cur?'on':''; h+='<span class="fr-pipe-s '+cls+'">'+(i+1)+'</span>'; if(i<FR_STAGES.length-1) h+='<span class="fr-pipe-bar '+(i<cur?'on':'')+'"></span>'; });
+  h+='<div class="fr-pipe-t">'+escHtml(b.status)+'</div></div>';
+  return h;
+}
+function frFilesHtml(b){
+  let h='';
+  ['list','voucher','invoice'].forEach(cat=>{
+    const n=(b.files[cat]||[]).length;
+    h+='<button class="fr-filebadge" title="'+FR_CAT_NAMES[cat]+'：'+n+' 个，点击预览 / 补传" onclick="frPreviewCat(\''+b.id+'\',\''+cat+'\')">'+FR_CAT_NAMES[cat].slice(0,2)+' '+n+'</button>';
+  });
+  return h;
+}
+function frActsHtml(b){
+  let h='';
+  h+='<button class="btn-icon" title="编辑" onclick="openFreightBillModal(\''+b.id+'\')">'+ICON_EDIT+'</button>';
+  h+='<button class="btn-icon" title="删除" onclick="deleteFreightBill(\''+b.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>';
+  if(b.status==='清单已上传') h+='<button class="btn btn-xs btn-warn" onclick="frAdvance(\''+b.id+'\',\'已申请付款\')">申请付款</button>';
+  else if(b.status==='已申请付款') h+='<button class="btn btn-xs" onclick="frUploadCat(\''+b.id+'\',\'voucher\')">上传凭证</button>';
+  else if(b.status==='已付款') h+='<button class="btn btn-xs btn-primary" onclick="frUploadCat(\''+b.id+'\',\'invoice\')">上传发票</button>';
+  return h;
+}
+function renderFreight(){
+  const box=document.getElementById('frContent'); if(!box) return;
+  frBadge();
+  if(freight.bills.length===0){
+    box.innerHTML='<div style="text-align:center;padding:46px 20px;color:var(--text-muted)"><p style="margin-bottom:14px">还没有运费账单记录</p><button class="btn btn-primary" onclick="openFreightBillModal()">登记第一笔运费账单</button></div>';
+    return;
+  }
+  const totalAll = freight.bills.reduce((s,b)=>s+(b.total||0),0);
+  const unpaid = freight.bills.filter(b=>b.status!=='已收发票');
+  const unpaidAmt = unpaid.reduce((s,b)=>s+(b.total||0),0);
+  let h='';
+  h+='<div class="fr-summary">';
+  h+='<div class="fr-stat"><span class="fr-stat-n">'+fmtCNY(totalAll)+'</span><span class="fr-stat-l">累计运费总额</span></div>';
+  h+='<div class="fr-stat"><span class="fr-stat-n">'+unpaid.length+' 笔 / '+fmtCNY(unpaidAmt)+'</span><span class="fr-stat-l">进行中（未收发票）</span></div>';
+  h+='<div class="fr-stat"><span class="fr-stat-n">'+(freight.bills.filter(b=>b.status==='已收发票').length)+' 笔</span><span class="fr-stat-l">已完成（已收发票）</span></div>';
+  h+='</div>';
+  h+='<div class="fr-tools">';
+  h+='<button class="btn btn-primary" onclick="openFreightBillModal()">＋ 登记运费账单</button>';
+  h+='<button class="btn" onclick="frDownloadZip()">打包下载全部（ZIP）</button>';
+  h+='<span class="fr-tip">落地路径：'+escHtml(FR_ROOT)+'\\202610\\物流公司\\{运费清单 / 付款凭证 / 运费发票}</span>';
+  h+='</div>';
+  const months=[...new Set(freight.bills.map(b=>b.month))].sort().reverse();
+  months.forEach(m=>{
+    const list=freight.bills.filter(b=>b.month===m).sort((a,b)=>(a.forwarder||'').localeCompare(b.forwarder||''));
+    const mTotal=list.reduce((s,b)=>s+(b.total||0),0);
+    h+='<div class="fr-blocktitle">'+escHtml(frMonthLabel(m))+' <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">下载本月 ZIP</button></div>';
+    const fwdMap={}; list.forEach(b=>{ (fwdMap[b.forwarder]=fwdMap[b.forwarder]||[]).push(b); });
+    h+='<div class="fr-tree">📁 '+escHtml(m);
+    Object.keys(fwdMap).sort().forEach(fw=>{
+      h+='<div class="fr-tree-c">📁 '+escHtml(fw||'未命名');
+      ['list','voucher','invoice'].forEach(cat=>{ const n=fwdMap[fw].reduce((s,b)=>s+(b.files[cat]?b.files[cat].length:0),0); h+='<span class="fr-tree-c2">📂 '+FR_CAT_NAMES[cat]+' ('+n+')</span>'; });
+      h+='</div>';
+    });
+    h+='</div>';
+    h+='<div class="hr-tablewrap"><table class="hr-table fr-table"><thead><tr>';
+    h+='<th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th>状态</th><th>资料</th><th class="fr-col-note">备注</th><th class="fr-acts">操作</th>';
+    h+='</tr></thead><tbody>';
+    list.forEach(b=>{
+      h+='<tr>';
+      h+='<td>'+escHtml(b.forwarder||'')+'</td>';
+      h+='<td class="num">'+fmtCNY(b.total||0)+'</td>';
+      h+='<td class="num">'+fmtCNY(b.langges||0)+'</td>';
+      h+='<td class="num">'+fmtCNY(b.fansi||0)+'</td>';
+      h+='<td class="num">'+fmtCNY(b.unassigned||0)+'</td>';
+      h+='<td>'+frStageHtml(b)+'</td>';
+      h+='<td>'+frFilesHtml(b)+'</td>';
+      h+='<td class="fr-col-note">'+escHtml(b.note||'')+'</td>';
+      h+='<td class="fr-acts">'+frActsHtml(b)+'</td>';
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+  });
+  box.innerHTML=h;
+}
+
+// ---------------- 货代公司可编辑下拉 ----------------
+function frRenderForwarder(){
+  const sel=document.getElementById('frFwdSel');
+  const list=document.getElementById('frFwdList');
+  if(sel){
+    if(frModalForwarder) sel.innerHTML='<span class="hr-iv-chip">'+escHtml(frModalForwarder)+'</span><span class="hr-iv-caret">▾</span>';
+    else sel.innerHTML='<span class="hr-iv-ph">请选择货代公司…</span><span class="hr-iv-caret">▾</span>';
+  }
+  const names=Object.keys(freight.forwarders||{});
+  let h='';
+  if(!names.length) h='<div class="hr-iv-ph" style="padding:6px 4px;color:var(--text-muted)">名单为空，用下方「+ 加」新增</div>';
+  names.forEach(n=>{ const on=frModalForwarder===n; h+='<div class="hr-iv-item" onclick="frPickForwarder(\''+escAttr(n)+'\')"><span class="hr-iv-dot'+(on?' on':'')+'"></span><span class="nm">'+escHtml(n)+'</span><span class="x" title="从名单中删除" onclick="event.stopPropagation();frRemoveForwarder(\''+escAttr(n)+'\')">✕</span></div>'; });
+  if(list) list.innerHTML=h;
+}
+function frToggleForwarderPop(){
+  const p=document.getElementById('frFwdPop'); if(!p) return;
+  p.style.display=(p.style.display==='block')?'none':'block';
+  if(p.style.display==='block'){ const i=document.getElementById('frFwdNew'); if(i) i.focus(); }
+}
+function frPickForwarder(n){ frModalForwarder=n; frRenderForwarder(); }
+function frAddForwarder(){
+  const i=document.getElementById('frFwdNew'); if(!i) return;
+  const n=String(i.value||'').trim(); if(!n) return;
+  if(!freight.forwarders[n]) freight.forwarders[n]=1;
+  frModalForwarder=n; i.value=''; saveAll(); frRenderForwarder();
+}
+function frRemoveForwarder(n){
+  if(freight.forwarders&&(n in freight.forwarders)) delete freight.forwarders[n];
+  if(frModalForwarder===n) frModalForwarder='';
+  saveAll(); frRenderForwarder();
+}
+if(!window.__frFwdBound){ window.__frFwdBound=true; document.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('.hr-iv')) return; const p=document.getElementById('frFwdPop'); if(p) p.style.display='none'; }); }
+
+// ---------------- 账单弹窗 ----------------
+function openFreightBillModal(id){
+  frModalId = id||null;
+  const b = id ? freight.bills.find(x=>x.id===id) : null;
+  document.getElementById('frBillTitle').textContent = b ? '编辑运费账单' : '登记运费账单';
+  const now=new Date();
+  const defM = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('frMonth').value = b ? (b.month? b.month.slice(0,4)+'-'+b.month.slice(4):defM) : defM;
+  frModalForwarder = b ? (b.forwarder||'') : '';
+  frModalFiles = b ? {list:(b.files.list||[]).slice(), voucher:(b.files.voucher||[]).slice(), invoice:(b.files.invoice||[]).slice()} : {list:[],voucher:[],invoice:[]};
+  frModalDetail = b ? (b.detail||[]).slice() : [];
+  document.getElementById('frLangges').value = b ? (b.langges||0) : '';
+  document.getElementById('frFansi').value = b ? (b.fansi||0) : '';
+  document.getElementById('frUnassigned').value = b ? (b.unassigned||0) : '';
+  document.getElementById('frNote').value = b ? (b.note||'') : '';
+  frRenderForwarder();
+  frRenderModalFiles();
+  frRecalcTotal();
+  document.getElementById('modalFreightBill').style.display='flex';
+}
+function frRecalcTotal(){
+  const lg=parseFloat(document.getElementById('frLangges').value||0)||0;
+  const fs=parseFloat(document.getElementById('frFansi').value||0)||0;
+  const un=parseFloat(document.getElementById('frUnassigned').value||0)||0;
+  const t=Math.round((lg+fs+un)*100)/100;
+  const el=document.getElementById('frTotal'); if(el) el.textContent=fmtCNY(t);
+}
+function frRenderModalFiles(){
+  const box=document.getElementById('frModalList'); if(!box) return;
+  let html='';
+  (frModalFiles.list||[]).forEach((f,i)=>{
+    const isImg=(f.type||'').indexOf('image/')===0;
+    html+='<div class="task-file-item">';
+    if(isImg&&f.dataUrl) html+='<img src="'+f.dataUrl+'" onclick="expShowPreview(frModalFiles.list['+i+'])" title="点击预览">';
+    else html+='<span class="file-ic">'+ICON_FILE+'</span>';
+    html+='<div class="file-info"><span class="file-name">'+escHtml(f.name||'附件')+'</span><span class="file-size">'+fmtSize(f.size||0)+'</span></div>';
+    html+='<button class="task-file-del" onclick="frRemoveModalFile('+i+')" title="移除">×</button></div>';
+  });
+  box.innerHTML=html;
+}
+function handleFrListPick(){
+  const inp=document.getElementById('frListInput'); const files=Array.from(inp.files||[]); inp.value='';
+  if(!files.length) return;
+  files.forEach(f=>{ processTaskFile(f).then(r=>{ frModalFiles.list.push(r); frRenderModalFiles(); }).catch(e=>showToast(e.message)); });
+}
+function frRemoveModalFile(i){ frModalFiles.list.splice(i,1); frRenderModalFiles(); }
+function saveFreightBill(){
+  const monthRaw=document.getElementById('frMonth').value||'';
+  const month=monthRaw.replace('-','');
+  if(!month){ showToast('请选择运费月份'); return; }
+  if(!frModalForwarder){ showToast('请选择货代公司（可点下拉新增）'); return; }
+  const lg=parseFloat(document.getElementById('frLangges').value||0)||0;
+  const fs=parseFloat(document.getElementById('frFansi').value||0)||0;
+  const un=parseFloat(document.getElementById('frUnassigned').value||0)||0;
+  const total=Math.round((lg+fs+un)*100)/100;
+  if(total<=0){ showToast('金额合计为 0，请填写朗格斯 / 凡适 / 未分配'); return; }
+  const rec={
+    id: frModalId||uid(), month:month, forwarder:frModalForwarder,
+    total:total, langges:lg, fansi:fs, unassigned:un,
+    note:String(document.getElementById('frNote').value||'').trim(),
+    files:frModalFiles, detail:frModalDetail,
+    status:(frModalId?((freight.bills.find(x=>x.id===frModalId)||{}).status||'清单已上传'):'清单已上传'),
+    createdAt:Date.now()
+  };
+  if(frModalId){ const i=freight.bills.findIndex(x=>x.id===frModalId); if(i>=0) freight.bills[i]=rec; }
+  else freight.bills.push(rec);
+  frModalId=null;
+  saveAll(); closeModal('modalFreightBill'); refreshAll();
+  showToast('✓ 已保存运费账单','info');
+}
+function deleteFreightBill(id){
+  const b=freight.bills.find(x=>x.id===id); if(!b) return;
+  showConfirm('删除「'+(b.forwarder||'')+' '+frMonthLabel(b.month)+'」这笔运费账单？', ()=>{
+    freight.bills=freight.bills.filter(x=>x.id!==id); saveAll(); refreshAll(); showToast('已删除');
+  });
+}
+
+// ---------------- 工作流推进 ----------------
+function frAdvance(id,status){
+  const b=freight.bills.find(x=>x.id===id); if(!b) return;
+  b.status=status; if(status==='已申请付款'&&b.payAppliedAt===undefined) b.payAppliedAt=todayStr();
+  saveAll(); renderFreight();
+  showToast(status==='已申请付款'?'✓ 已标记「已申请付款」，请到钉钉提交付款申请':'已更新','info');
+}
+function frUploadCat(id,cat){
+  frCatTarget={id,cat};
+  const inp=document.getElementById('frCatInput'); inp.value=''; inp.click();
+}
+function handleFrCatPick(){
+  const inp=document.getElementById('frCatInput'); const files=Array.from(inp.files||[]); inp.value='';
+  if(!files.length||!frCatTarget){ frCatTarget=null; return; }
+  const b=freight.bills.find(x=>x.id===frCatTarget.id); const cat=frCatTarget.cat;
+  if(!b){ frCatTarget=null; return; }
+  let pending=files.length, done=0;
+  files.forEach(f=>{ processTaskFile(f).then(r=>{
+    b.files[cat].push(r); done++;
+    if(done>=files.length){ if(cat==='voucher') b.status='已付款'; if(cat==='invoice') b.status='已收发票'; saveAll(); renderFreight(); frRenderFilesModal(); showToast(cat==='voucher'?'✓ 已上传付款凭证，请通知货代公司已付款':'✓ 已上传发票，流程完成','info'); }
+  }).catch(e=>{ showToast(e.message); done++; if(done>=files.length){ saveAll(); renderFreight(); } }); });
+  frCatTarget=null;
+}
+function frPreviewCat(id,cat){
+  const b=freight.bills.find(x=>x.id===id); if(!b) return;
+  frPreviewState={id,cat};
+  document.getElementById('frFilesTitle').textContent=(b.forwarder||'')+' · '+FR_CAT_NAMES[cat]+'（'+(b.files[cat]||[]).length+' 个）';
+  frRenderFilesModal();
+  document.getElementById('modalFrFiles').style.display='flex';
+}
+function frRenderFilesModal(){
+  const box=document.getElementById('frFilesList'); if(!box) return;
+  const b=freight.bills.find(x=>x.id===frPreviewState.id); if(!b) return;
+  const arr=b.files[frPreviewState.cat]||[]; frCurrFiles=arr;
+  let html='';
+  if(!arr.length) html='<div style="font-size:13px;color:var(--text-muted);padding:10px">还没有文件，点「添加文件」上传</div>';
+  arr.forEach((f,i)=>{
+    const isImg=(f.type||'').indexOf('image/')===0;
+    html+='<div class="task-file-item">';
+    if(isImg&&f.dataUrl) html+='<img src="'+f.dataUrl+'" onclick="frPreviewOpen('+i+')" title="点击预览">';
+    else html+='<span class="file-ic">'+ICON_FILE+'</span>';
+    html+='<div class="file-info"><span class="file-name">'+escHtml(f.name||'附件')+'</span><span class="file-size">'+fmtSize(f.size||0)+'</span></div>';
+    html+='<button class="task-file-del" onclick="frRemoveCatFile('+i+')" title="删除">×</button></div>';
+  });
+  box.innerHTML=html;
+}
+function frPreviewOpen(i){ if(frCurrFiles[i]) expShowPreview(frCurrFiles[i]); }
+function frRemoveCatFile(i){
+  const b=freight.bills.find(x=>x.id===frPreviewState.id); if(!b) return;
+  b.files[frPreviewState.cat].splice(i,1);
+  saveAll(); frRenderFilesModal(); renderFreight();
+}
+
+// ---------------- CSV 自动读取（按业务员分到项目） ----------------
+function frParseCsv(text){
+  return text.split(/\r?\n/).filter(l=>l.trim()!=='').map(l=> l.split(/[,;\t]/).map(c=>c.trim()));
+}
+function frApplyCsvRows(rows){
+  if(!rows||!rows.length){ showToast('CSV 为空'); return; }
+  const head=rows[0].map(c=>String(c||'').toLowerCase());
+  const sellerIdx=head.findIndex(c=>/(业务员|业务|销售|名称|姓名|客户|name|sales|seller|person)/.test(c));
+  const amtIdx=head.findIndex(c=>/(金额|费用|运费|总价|合计|总额|amount|fee|cost|total|price|运费金额)/.test(c));
+  let dataRows=rows, sIdx=sellerIdx, aIdx=amtIdx;
+  if(sIdx<0||aIdx<0){ sIdx=0; aIdx=rows[0].length-1; }
+  else dataRows=rows.slice(1);
+  if(sIdx===aIdx){ showToast('没认出「业务员」和「金额」两列，请检查表头或手动填'); return; }
+  let lg=0, fs=0, un=0; const detail=[];
+  dataRows.forEach(r=>{
+    const seller=String(r[sIdx]||'').trim();
+    const amt=parseFloat(String(r[aIdx]||'').replace(/[, ¥$￥]/g,''));
+    if(!seller || isNaN(amt)) return;
+    const proj=frMapSeller(seller);
+    if(proj==='langges') lg+=amt; else if(proj==='fansi') fs+=amt; else un+=amt;
+    detail.push({seller:seller, amount:Math.round(amt*100)/100, project:proj});
+  });
+  if(!detail.length){ showToast('CSV 里没解析出有效行（业务员 + 金额）'); return; }
+  lg=Math.round(lg*100)/100; fs=Math.round(fs*100)/100; un=Math.round(un*100)/100;
+  document.getElementById('frLangges').value=lg;
+  document.getElementById('frFansi').value=fs;
+  document.getElementById('frUnassigned').value=un;
+  frModalDetail=detail;
+  frRecalcTotal();
+  const unknown=detail.filter(d=>d.project==='unassigned').length;
+  showToast('已从 CSV 读取 '+detail.length+' 行：朗格斯 '+fmtCNY(lg)+' / 凡适 '+fmtCNY(fs)+(unknown?(' / 未分配 '+fmtCNY(un)+'（'+unknown+' 个业务员待你确认，可在对话里发我名字我来定）'):''), 'info');
+}
+function frAutoReadCsv(){
+  const csv=frModalFiles.list.find(f=>{
+    const n=(f.name||'').toLowerCase(), t=(f.type||'').toLowerCase();
+    return n.endsWith('.csv') || t.indexOf('csv')>=0 || /text\/csv/.test(t) || (f.dataUrl||'').indexOf('data:text/csv')>=0;
+  });
+  if(!csv){ showToast('没找到 CSV 文件：先把账单在 Excel 里「另存为 CSV」再上传，或手动填金额'); return; }
+  try{ const base64=csv.dataUrl.split(',')[1]||''; const text=decodeURIComponent(escape(atob(base64))); frApplyCsvRows(frParseCsv(text)); }
+  catch(e){ showToast('CSV 读取失败：'+e.message); }
+}
+
+// ---------------- 打包下载 ZIP（完整文件夹结构） ----------------
+function frCrc32(buf){
+  let table=frCrc32._t;
+  if(!table){ table=[]; for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); table[n]=c>>>0; } frCrc32._t=table; }
+  let crc=0xFFFFFFFF;
+  for(let i=0;i<buf.length;i++) crc=(crc>>>8)^table[(crc^buf[i])&0xFF];
+  return (crc^0xFFFFFFFF)>>>0;
+}
+function frBuildZip(entries){
+  const enc=new TextEncoder();
+  const u16=n=>[n&0xFF,(n>>>8)&0xFF];
+  const u32=n=>[n&0xFF,(n>>>8)&0xFF,(n>>>16)&0xFF,(n>>>24)&0xFF];
+  const parts=[]; let offset=0; const centrals=[];
+  entries.forEach(e=>{
+    const nameB=enc.encode(e.name);
+    const data=e.bytes; const crc=frCrc32(data); const size=data.length;
+    const lh=[].concat([0x50,0x4B,0x03,0x04],u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(size),u32(size),u16(nameB.length),u16(0));
+    const lhB=new Uint8Array(lh);
+    const local=new Uint8Array(lhB.length+nameB.length+data.length);
+    local.set(lhB,0); local.set(nameB,lhB.length); local.set(data,lhB.length+nameB.length);
+    parts.push(local);
+    const ch=[].concat([0x50,0x4B,0x01,0x02],u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(size),u32(size),u16(nameB.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),nameB);
+    centrals.push(new Uint8Array(ch));
+    offset+=local.length;
+  });
+  let centralLen=0; centrals.forEach(c=>centralLen+=c.length);
+  const end=[].concat([0x50,0x4B,0x05,0x06],u16(0),u16(0),u16(entries.length),u16(entries.length),u32(centralLen),u32(offset),u16(0));
+  const all=new Uint8Array(offset+centralLen+end.length);
+  let p=0; parts.forEach(part=>{ all.set(part,p); p+=part.length; });
+  centrals.forEach(c=>{ all.set(c,p); p+=c.length; });
+  all.set(new Uint8Array(end),p);
+  return new Blob([all],{type:'application/zip'});
+}
+function frDownloadZip(month){
+  const bills = month ? freight.bills.filter(b=>b.month===month) : freight.bills.slice();
+  if(!bills.length){ showToast('没有可打包的账单'); return; }
+  const entries=[]; const seen={};
+  bills.forEach(b=>{
+    const mDir=b.month||'未知月份';
+    const fDir=b.forwarder||'未命名货代';
+    ['list','voucher','invoice'].forEach(cat=>{
+      (b.files[cat]||[]).forEach((f,i)=>{
+        const base=(f.name||('file'+(i+1)));
+        let rel=mDir+'/'+fDir+'/'+FR_CAT_NAMES[cat]+'/'+base;
+        let rel2=rel, k=1;
+        while(seen[rel2]){ const dot=base.lastIndexOf('.'); rel2=mDir+'/'+fDir+'/'+FR_CAT_NAMES[cat]+'/'+(dot>0?base.slice(0,dot)+'_'+(k++)+base.slice(dot):base+'_'+(k++)); }
+        seen[rel2]=1;
+        try{ entries.push({name:rel2, bytes:dataUrlToU8(f.dataUrl)}); }catch(e){}
+      });
+    });
+  });
+  if(!entries.length){ showToast('这些账单还没有上传任何文件，先传运费清单/凭证/发票'); return; }
+  const zip=frBuildZip(entries);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(zip);
+  a.download='外贸运费_'+(month||'全部')+'_'+todayStr()+'.zip';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  showToast('✓ ZIP 已生成（'+entries.length+' 个文件），解压到 '+FR_ROOT+' 即可','info');
 }
 
 // ============================================================
@@ -10786,6 +11336,7 @@ function renderCurrentTab(){
   else if(currentTab==='claims') renderClaims();
   else if(currentTab==='biz') renderBiz();
   else if(currentTab==='hr') renderHr();
+  else if(currentTab==='freight') renderFreight();
 }
 
 function refreshAll(){
@@ -10797,6 +11348,7 @@ function refreshAll(){
   clmRenderBadge();
   bizBadge();
   hrBadge();
+  frBadge();
 }
 
 function updateClearDemoBtn(){
@@ -10892,6 +11444,14 @@ function init(){
     seedClmSample();
     localStorage.setItem(STORAGE_PREFIX+'clm_seeded','1');
     saveAll();
+  }
+  // 外贸运费：首次打开预置 4 家已知货代公司菜单（顺丰 / 腾信 / 迅驰达 / 深圳燕文），用户可增删
+  if(!localStorage.getItem(STORAGE_PREFIX+'fr_fwd_seeded')){
+    if(Object.keys(freight.forwarders||{}).length===0){
+      freight.forwarders={'顺丰':1,'腾信':1,'迅驰达':1,'深圳燕文':1};
+      try{ saveAll(); }catch(e){}
+    }
+    localStorage.setItem(STORAGE_PREFIX+'fr_fwd_seeded','1');
   }
   // 老用户兜底：示例记录是旧版本种的（不带凭证），补一张示例凭证；只动 _sample，不碰真实记录
   expAttachSampleVouchers();
