@@ -952,11 +952,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         导出文件
       </button>
-      <button class="btn-header" id="btnSyncSend" title="一键上传数据到云端">
+      <button class="btn-header" id="btnSyncSend" title="一键上传数据到云端" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M20 21H4"/><path d="M16 17v4"/><path d="M8 17v4"/></svg>
         上传同步
       </button>
-      <button class="btn-header" id="btnSyncReceive" title="一键从云端拉取最新数据">
+      <button class="btn-header" id="btnSyncReceive" title="一键从云端拉取最新数据" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"/><path d="M8 13l4 4 4-4"/><path d="M20 3H4"/><path d="M16 7V3"/><path d="M8 7V3"/></svg>
         接收同步
       </button>
@@ -1055,7 +1055,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.16 · 2026-10-12</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.17 · 2026-10-12</div>
     </div>
   </aside>
 
@@ -1815,7 +1815,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.16';
+const APP_VERSION = 'v2.17';
 let tasks = [];
 let notes = [];
 let projects = [];
