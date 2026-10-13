@@ -944,6 +944,8 @@ tr:hover .fr-fwd-acts{opacity:1}
 .hr-detail-info{font-size:12px;color:var(--text-secondary);line-height:1.9;margin-bottom:4px}
 .hr-detail-sec{margin-top:8px}
 .hr-detail-h{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px}
+.hr-transfer-now{padding:7px 10px;margin:0 0 8px;background:rgba(127,127,127,.10);border-radius:6px;font-size:12.5px;color:var(--text-muted);line-height:1.6}
+.hr-transfer-now b{color:var(--text)}
 .hr-mini{width:100%;border-collapse:collapse;font-size:12px;max-width:440px}
 .hr-mini th,.hr-mini td{border:1px solid var(--border);padding:4px 8px}
 .hr-mini th{background:#f8fafc;color:var(--text-muted);font-weight:600}
@@ -1147,7 +1149,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.24 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.26 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1309,7 +1311,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
         外贸运费管理
       </div>
-      <p class="section-subtitle">每月上传各家货代运费账单（选<b>运费月份</b>＋<b>货代公司</b>），按业务员名自动分到<b>朗格斯 / 凡适</b>。工作流：<b>上传清单 → 申请付款(钉钉) → 上传付款凭证 → 上传发票</b>。月底「打包下载」生成 <b>年月 / 物流公司 / 运费清单·付款凭证·运费发票</b> 文件夹结构，解压到 <b>D:\BaiduSyncdisk\工作文件\外贸运费自动管理</b> 即可。</p>
+      <p class="section-subtitle">每月上传各家货代运费账单（选<b>运费月份</b>＋<b>货代公司</b>），按业务员名自动分到<b>朗格斯 / 凡适</b>。工作流：<b>上传清单 → 申请付款(钉钉) → 上传付款凭证 → 上传发票</b>。月底点「<b>保存本月到本地</b>」，文件自动按 <b>年月 / 物流公司 / 运费清单·付款凭证·运费发票</b> 建好文件夹并直接存进 <b>D:\BaiduSyncdisk\工作文件\外贸运费自动管理</b>（首次会让你选一次文件夹，选完就记住；不支持时自动退回 ZIP 下载）。</p>
       <div id="frContent"></div>
     </div>
   </main>
@@ -1811,6 +1813,25 @@ tr:hover .fr-fwd-acts{opacity:1}
   </div>
 </div>
 
+<!-- ====== 调岗弹窗（v2.26） ====== -->
+<div class="modal-overlay" id="modalHrTransfer" style="display:none">
+  <div class="modal" style="width:min(520px,95vw)">
+    <h3 id="modalHrTransferTitle">办理调岗</h3>
+    <div id="hrTransferNow" class="hr-transfer-now"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>调岗生效日期</label><input type="date" id="hrTransferDate"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>调往项目</label><select id="hrTransferProject"></select></div>
+    </div>
+    <div class="form-group"><label>调往岗位</label><input type="text" id="hrTransferPost" placeholder="如 外贸业务员 / 国际站运营" list="hrPostList"></div>
+    <div class="form-group"><label>调岗原因 / 说明</label><textarea id="hrTransferReason" rows="3" placeholder="如 业务需要 / 个人申请；客户与账号交接情况"></textarea></div>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 6px">确认后该员工的项目与岗位立即更新，并在「调岗记录」里留一条历史（点姓名展开可见），原项目 / 原岗位不会被抹掉。</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrTransfer')">取消</button>
+      <button class="btn btn-primary" onclick="hrStaffTransferConfirm()">确认调岗</button>
+    </div>
+  </div>
+</div>
+
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
 <div class="modal-overlay" id="modalPlan" style="display:none">
   <div class="modal">
@@ -1934,7 +1955,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.24';
+const APP_VERSION = 'v2.26';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6751,14 +6772,19 @@ function renderFreight(){
   h+='</div>';
   h+='<div class="fr-tools">';
   h+='<button class="btn btn-primary" onclick="openFreightBillModal()">＋ 登记运费账单</button>';
-  h+='<button class="btn" onclick="frDownloadZip()">打包下载全部（ZIP）</button>';
-  h+='<span class="fr-tip">落地路径：'+escHtml(FR_ROOT)+'\\202610\\物流公司\\{运费清单 / 付款凭证 / 运费发票}</span>';
+  h+='<button class="btn" onclick="frSaveMonthLocal()">保存全部到本地</button>';
+  h+='<button class="btn btn-sm" onclick="frChangeLandingDir()">更改保存位置</button>';
+  h+='<button class="btn btn-sm" onclick="frDownloadZip()">下载 ZIP（备用）</button>';
+  h+='<span class="fr-tip">保存结构：'+escHtml(FR_ROOT)+'\\<b>年月</b>\\物流公司\\{运费清单 / 付款凭证 / 运费发票}</span>';
+  h+='<div class="fr-tip" style="flex-basis:100%;margin-bottom:2px">当前保存位置：'+(frDirHandleMem
+      ? escHtml(frDirLabel())+' ✓ 已记住（文件会按上面结构自动建好文件夹再放进去）'
+      : '<b>未设置</b> —— 首次点「保存…」会让你选一次文件夹（建议选「外贸运费自动管理」），选完就记住了，以后一键直存')+'</div>';
   h+='</div>';
   const months=[...new Set(freight.bills.map(b=>b.month))].sort().reverse();
   months.forEach(m=>{
     const list=freight.bills.filter(b=>b.month===m).sort((a,b)=>(a.forwarder||'').localeCompare(b.forwarder||''));
     const mTotal=list.reduce((s,b)=>s+(b.total||0),0);
-    h+='<div class="fr-blocktitle">'+escHtml(frMonthLabel(m))+' <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">下载本月 ZIP</button></div>';
+    h+='<div class="fr-blocktitle">'+escHtml(frMonthLabel(m))+' <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frSaveMonthLocal(\''+m+'\')">保存本月到本地</button> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">ZIP</button></div>';
     const fwdMap={}; list.forEach(b=>{ (fwdMap[b.forwarder]=fwdMap[b.forwarder]||[]).push(b); });
     // 目录树：点文件夹展开/收起，点文件直接打开预览（不再是死文本）
     h+='<div class="fr-tree">';
@@ -7399,9 +7425,10 @@ function frBuildZip(entries){
   all.set(new Uint8Array(end),p);
   return new Blob([all],{type:'application/zip'});
 }
-function frDownloadZip(month){
+// 打包计划：把账单里的文件摊成「年月/货代/文件类型/文件名」相对路径列表
+// ZIP 下载与「保存到本地目录」共用这一份计划，保证两条路结构完全一致
+function frZipPlan(month){
   const bills = month ? freight.bills.filter(b=>b.month===month) : freight.bills.slice();
-  if(!bills.length){ showToast('没有可打包的账单'); return; }
   const entries=[]; const seen={};
   bills.forEach(b=>{
     const mDir=b.month||'未知月份';
@@ -7417,14 +7444,114 @@ function frDownloadZip(month){
       });
     });
   });
-  if(!entries.length){ showToast('这些账单还没有上传任何文件，先传运费清单/凭证/发票'); return; }
-  const zip=frBuildZip(entries);
+  return {bills:bills, entries:entries};
+}
+function frDownloadZip(month){
+  const plan=frZipPlan(month);
+  if(!plan.bills.length){ showToast('没有可打包的账单'); return; }
+  if(!plan.entries.length){ showToast('这些账单还没有上传任何文件，先传运费清单/凭证/发票'); return; }
+  const zip=frBuildZip(plan.entries);
   const a=document.createElement('a');
   a.href=URL.createObjectURL(zip);
   a.download='外贸运费_'+(month||'全部')+'_'+todayStr()+'.zip';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-  showToast('✓ ZIP 已生成（'+entries.length+' 个文件），解压到 '+FR_ROOT+' 即可','info');
+  showToast('✓ ZIP 已生成（'+plan.entries.length+' 个文件），解压到 '+FR_ROOT+' 即可','info');
+}
+
+// ---------------- 保存到本地目录（v2.25：按结构直写，不再只要 ZIP） ----------------
+// 浏览器只能写「用户授权过的目录」：首次点保存会弹一次选择框（选外贸运费自动管理那个文件夹），
+// 句柄存进 IndexedDB，之后同一台电脑再点就直接落盘，不再弹。
+const FR_DIR_DB = 'wb_office_fsdir', FR_DIR_STORE = 'dirs', FR_DIR_KEY = 'frLandingDir';
+let frDirHandleMem = null;      // 本次会话已授权的目录句柄
+let frDirReady = false;         // 是否已尝试从 IndexedDB 取回句柄
+function frFsSupported(){ try{ return typeof window.showDirectoryPicker === 'function'; }catch(e){ return false; } }
+function frDirIdbOpen(){
+  return new Promise((res,rej)=>{
+    let rq;
+    try{ rq=indexedDB.open(FR_DIR_DB,1); }catch(e){ rej(e); return; }
+    rq.onupgradeneeded=()=>{ try{ if(!rq.result.objectStoreNames.contains(FR_DIR_STORE)) rq.result.createObjectStore(FR_DIR_STORE); }catch(e){} };
+    rq.onsuccess=()=>res(rq.result);
+    rq.onerror=()=>rej(rq.error||new Error('idb'));
+  });
+}
+async function frDirRemember(h){
+  try{ const db=await frDirIdbOpen(); await new Promise((res,rej)=>{ const tx=db.transaction(FR_DIR_STORE,'readwrite'); tx.objectStore(FR_DIR_STORE).put(h, FR_DIR_KEY); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }catch(e){}
+}
+async function frDirRecall(){
+  if(frDirReady) return frDirHandleMem;
+  frDirReady=true;
+  try{ const db=await frDirIdbOpen(); frDirHandleMem = await new Promise(res=>{ const tx=db.transaction(FR_DIR_STORE,'readonly'); const rq=tx.objectStore(FR_DIR_STORE).get(FR_DIR_KEY); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>res(null); }); }catch(e){ frDirHandleMem=null; }
+  return frDirHandleMem;
+}
+function frDirLabel(){
+  if(!frDirHandleMem) return '';
+  return frDirHandleMem.name || '（已选文件夹）';
+}
+async function frPickLandingDir(force){
+  if(!frFsSupported()) return null;
+  if(frDirHandleMem && !force){
+    let perm='prompt';
+    try{ perm=await frDirHandleMem.queryPermission({mode:'readwrite'}); }catch(e){ perm='prompt'; }
+    if(perm!=='granted'){ try{ perm=await frDirHandleMem.requestPermission({mode:'readwrite'}); }catch(e){ perm='prompt'; } }
+    if(perm==='granted') return frDirHandleMem;
+    frDirHandleMem=null;   // 权限被收回（清了站点数据等），下面重新弹选择框
+  }
+  const h=await window.showDirectoryPicker({id:'frLanding', mode:'readwrite', startIn:'documents'});
+  frDirHandleMem=h; frDirReady=true; frDirRemember(h);
+  return h;
+}
+// 按 entries 里的 "a/b/c/文件名" 逐级建文件夹后写文件，返回写入个数
+async function frWriteDirEntries(root, entries){
+  let n=0;
+  for(const e of entries){
+    const parts=String(e.name).split('/').filter(Boolean);
+    const fname=parts.pop();
+    let dir=root;
+    for(const p of parts){ dir=await dir.getDirectoryHandle(p,{create:true}); }
+    const fh=await dir.getFileHandle(fname,{create:true});
+    const w=await fh.createWritable();
+    await w.write(e.bytes);
+    await w.close();
+    n++;
+  }
+  return n;
+}
+async function frSaveMonthLocal(month){
+  const plan=frZipPlan(month);
+  if(!plan.bills.length){ showToast('没有可保存的账单'); return; }
+  if(!plan.entries.length){ showToast('这些账单还没有上传任何文件，先传运费清单/凭证/发票'); return; }
+  if(!frFsSupported()){
+    showToast('这个浏览器不支持直接存文件夹，已改为下载 ZIP（解压到 '+FR_ROOT+'）','warning');
+    frDownloadZip(month); return;
+  }
+  let root=null;
+  try{ root=await frPickLandingDir(false); }
+  catch(e){
+    if(e && e.name==='AbortError') return;   // 用户自己关了选择框，不打扰
+    showToast('没能选文件夹（'+(e&&e.message||e)+'），已改为下载 ZIP','warning');
+    frDownloadZip(month); return;
+  }
+  if(!root){ frDownloadZip(month); return; }
+  try{
+    const n=await frWriteDirEntries(root, plan.entries);
+    const struct = month ? (month+'\\<货代>\\<运费清单/付款凭证/运费发票>') : ('<年月>\\<货代>\\<运费清单/付款凭证/运费发票>');
+    showToast('✓ 已保存 '+n+' 个文件到「'+root.name+'」→ '+struct,'info');
+    renderFreight();
+  }catch(e){
+    showToast('保存失败：'+(e&&e.message||e)+'（可能没给写入权限），已改为下载 ZIP','warning');
+    frDownloadZip(month);
+  }
+}
+async function frChangeLandingDir(){
+  if(!frFsSupported()){ showToast('这个浏览器不支持选文件夹保存，只能用 ZIP 下载','warning'); return; }
+  try{
+    const h=await frPickLandingDir(true);
+    if(h){ showToast('✓ 保存位置已改为「'+h.name+'」，以后点保存直接写到这个文件夹','info'); renderFreight(); }
+  }catch(e){
+    if(e && e.name==='AbortError') return;
+    showToast('更改保存位置失败：'+(e&&e.message||e),'warning');
+  }
 }
 
 // ============================================================
@@ -11206,6 +11333,7 @@ function hrHeal(){
     if(s.status==='active'){ s.status='formal'; changed=true; } // 旧版「在职」统一为「正式」
     if(s.regularizeDate===undefined) s.regularizeDate='';
     if(!Array.isArray(s.salaryLog)){ s.salaryLog=[]; changed=true; }
+    if(!Array.isArray(s.transferLog)){ s.transferLog=[]; changed=true; } // v2.26 调岗记录
     if(!s.salary || typeof s.salary!=='object'){ s.salary={}; changed=true; }
     if(!Array.isArray(s.docs)){ s.docs=[]; changed=true; }
     s.docs.forEach(d=>{ if(d && !d.fid){ d.fid='f_'+uid(); changed=true; } }); // 旧记录补编号，保证能预览 / 下载
@@ -11317,11 +11445,13 @@ function saveHrStaff(){
     salary: { base:readNum('hsBase'), postPay:readNum('hsPostPay'), perf:readNum('hsPerf'), allow:readNum('hsAllow'), social:readNum('hsSocial'), other:readNum('hsOther') },
     commText: String(document.getElementById('hsCommText').value||'').trim(),
     salaryLog: [],
+    transferLog: [],
     note: String(document.getElementById('hsNote').value||'').trim(),
     docs: hsDocs.slice(),
     createdAt: Date.now()
   };
   if(editingHrStaffId){ const old=hr.staff.find(s=>s.id===editingHrStaffId); if(old && Array.isArray(old.salaryLog)) rec.salaryLog=old.salaryLog; }
+  if(editingHrStaffId){ const old2=hr.staff.find(s=>s.id===editingHrStaffId); if(old2 && Array.isArray(old2.transferLog)) rec.transferLog=old2.transferLog; }
   if(editingHrStaffId){ const i=hr.staff.findIndex(s=>s.id===editingHrStaffId); if(i>=0) hr.staff[i]=rec; }
   else hr.staff.push(rec);
   hsDocs=[];
@@ -11598,6 +11728,7 @@ function hrStaffHtml(){
       h+='<td class="hr-td-docs">'+hrDocsCell(s.docs)+'</td>';
       h+='<td class="hr-td-acts">';
       if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
+      h+='<button class="btn btn-xs btn-warn" onclick="hrStaffTransfer(\''+s.id+'\')">调岗</button>';
       h+='<button class="btn btn-xs btn-warn" onclick="hrStaffLeave(\''+s.id+'\')">离职</button>';
       h+='<button class="btn btn-xs" onclick="openHrSalaryModal(\''+s.id+'\')">调薪</button>';
       h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
@@ -11657,6 +11788,59 @@ function hrStaffLeaveConfirm(){
   saveAll(); closeModal('modalHrLeave'); refreshAll();
   showToast('✓ 已办理离职，转入「已离职员工」','info');
 }
+// ---- 调岗（v2.26）：改项目 / 岗位并留一条调岗记录 ----
+let hrTransferId=null;
+function hrFillProjectSel(selId, cur){
+  const el=document.getElementById(selId); if(!el) return;
+  let h='';
+  HR_PROJECTS.forEach(p=>{ h+='<option value="'+escAttr(p)+'"'+(p===cur?' selected':'')+'>'+escHtml(p)+'</option>'; });
+  if(cur && HR_PROJECTS.indexOf(cur)<0) h+='<option value="'+escAttr(cur)+'" selected>'+escHtml(cur)+'</option>';
+  el.innerHTML=h;
+}
+function hrStaffTransfer(id){
+  const s=hr.staff.find(x=>x.id===id); if(!s) return;
+  hrTransferId=id;
+  document.getElementById('modalHrTransferTitle').textContent='办理调岗 · '+(s.name||'');
+  document.getElementById('hrTransferNow').innerHTML='<b>当前：</b>'+escHtml(s.project||'—')+'　·　'+escHtml(s.post||'—');
+  document.getElementById('hrTransferDate').value=todayStr();
+  hrFillProjectSel('hrTransferProject', s.project||'');
+  document.getElementById('hrTransferPost').value=s.post||'';
+  document.getElementById('hrTransferReason').value='';
+  document.getElementById('modalHrTransfer').style.display='flex';
+}
+function hrStaffTransferConfirm(){
+  const s=hr.staff.find(x=>x.id===hrTransferId); if(!s){ closeModal('modalHrTransfer'); return; }
+  const d=document.getElementById('hrTransferDate').value || todayStr();
+  const np=document.getElementById('hrTransferProject').value||'';
+  const npost=String(document.getElementById('hrTransferPost').value||'').trim();
+  const reason=String(document.getElementById('hrTransferReason').value||'').trim();
+  const op=s.project||'', opost=s.post||'';
+  if(np===op && npost===opost){ showToast('项目和岗位都没变，不需要调岗'); return; }
+  s.transferLog = Array.isArray(s.transferLog)? s.transferLog : [];
+  s.transferLog.push({id:uid(), date:d, fromProject:op, toProject:np, fromPost:opost, toPost:npost, reason:reason, at:Date.now()});
+  s.project=np; s.post=npost;
+  hrTransferId=null;
+  saveAll(); closeModal('modalHrTransfer'); refreshAll();
+  const bits=[];
+  if(np!==op) bits.push('项目 '+op+' → '+np);
+  if(npost!==opost) bits.push('岗位 '+(opost||'—')+' → '+(npost||'—'));
+  showToast('✓ 已调岗（'+bits.join('，')+'），生效 '+d, 'info');
+}
+function hrTransferLogHtml(s){
+  const log=Array.isArray(s.transferLog)? s.transferLog : [];
+  if(!log.length) return '';
+  let h='<div class="hr-detail-sec"><div class="hr-detail-h">调岗记录（'+log.length+'）</div><div class="hr-tl">';
+  log.slice().reverse().forEach(l=>{
+    const ch=(l.fromProject||'—')+' → '+(l.toProject||'—');
+    const pc=(l.fromPost||'—')+' → '+(l.toPost||'—');
+    h+='<div class="hr-tl-row"><span class="hr-tl-d">'+escHtml(l.date||'')+'</span>'
+      +'<span class="hr-tl-it">项目 '+escHtml(ch)+'</span>'
+      +'<span class="hr-tl-ch">岗位 '+escHtml(pc)+'</span>'
+      +(l.reason?'<span class="hr-tl-r">'+escHtml(l.reason)+'</span>':'')+'</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
 function hrStaffDetail(s){
   let h='<div class="hr-detail">';
   const info=[];
@@ -11682,6 +11866,7 @@ function hrStaffDetail(s){
     });
     h+='</div></div>';
   }
+  h+=hrTransferLogHtml(s);   // v2.26 调岗记录
   if(s.note) h+='<div class="hr-detail-sec"><div class="hr-detail-h">备注</div><div class="hr-note">'+escHtml(s.note)+'</div></div>';
   // 人事资料（简历 / 劳动合同 / 解除协议 等）：列表 + 明细内联拖拽继续添加
   h+='<div class="hr-detail-sec"><div class="hr-detail-h">人事资料（'+((s.docs&&s.docs.length)||0)+'）</div>'+hrDocsHtml(s.docs)
@@ -11904,7 +12089,7 @@ function hrToProbationConfirm(){
       id: uid(), name: t.name||'', enName:'', gender: t.gender||'', birth: t.birth||'',
       project: '朗格斯', post: t.post||'', subAccount:'', edu: t.edu||'', school: t.school||'', major: t.major||'',
       phone: (t.phone||'')||(t.email||''), joinDate: d, probEnd:'', status:'probation', regularizeDate:'',
-      leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], commText:'', note:'由人才库转试用'+(t.remark?('：'+t.remark):''), createdAt: Date.now(),
+      leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], transferLog:[], commText:'', note:'由人才库转试用'+(t.remark?('：'+t.remark):''), createdAt: Date.now(),
       docs: (t.docs||[]).map(x=>Object.assign({},x))  // 简历 / 资料随人流转：转试用时一并带入在职档案
     });
   }
@@ -12591,6 +12776,8 @@ function init(){
     setTimeout(checkSyncHash, 100);
     asRenderStatus();
     if(asReady()) asAutoReceive();
+    // 运费：取回上次授权过的「保存到本地」目录句柄（界面显示当前保存位置 + 免二次选择）
+    frDirRecall().then(()=>{ if(frDirHandleMem) renderFreight(); }).catch(()=>{});
   });
 }
 
