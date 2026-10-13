@@ -876,6 +876,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fr-dropzone-inner{font-size:13px;line-height:1.7}
 .fr-blocktitle{font-size:14px;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fr-blocktitle .cnt{font-size:12px;font-weight:600;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:1px 9px}
+.fr-mtitle{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:4px;padding:2px 7px;margin-left:-7px;border-radius:6px}
+.fr-mtitle:hover{background:#eef4f8}
+.fr-mtitle .fr-caret{flex:0 0 12px}
+.fr-monthbody{margin-bottom:6px}
+.fr-col-month{width:78px;white-space:nowrap;color:var(--text-secondary);font-size:12px}
 .fr-tree{font-size:12.5px;color:var(--text-secondary);background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.5}
 .fr-tnode{display:flex;align-items:center;gap:5px;padding:2px 6px;border-radius:6px;user-select:none}
 .fr-tnode-c{cursor:pointer;font-weight:600;color:var(--text)}
@@ -1153,7 +1158,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.27 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.28 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1959,7 +1964,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.27';
+const APP_VERSION = 'v2.28';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6839,6 +6844,17 @@ function frMapSeller(name){
   return 'unassigned';
 }
 function frMonthLabel(m){ if(!m||m.length<6) return m||''; return m.slice(0,4)+'年'+parseInt(m.slice(4),10)+'月'; }
+// ---- 月份区块折叠（只改显示，不动数据；状态存内存，刷新后默认展开） ----
+let frClosedMonths = {};
+function frMonthKey(m){ return 'mk_' + String((m===undefined||m===null||m==='')?'none':m).replace(/[^0-9A-Za-z_-]/g,'_'); }
+function frToggleMonth(m){
+  const k=frMonthKey(m);
+  if(frClosedMonths[k]) delete frClosedMonths[k]; else frClosedMonths[k]=1;
+  const body=document.getElementById('frMb_'+k);
+  const t=document.getElementById('frMt_'+k);
+  if(body) body.style.display = frClosedMonths[k] ? 'none' : '';
+  if(t){ const c=t.querySelector('.fr-caret'); if(c) c.textContent = frClosedMonths[k] ? '▸' : '▾'; }
+}
 function freightHeal(){
   if(!freight || typeof freight!=='object') freight={bills:[],forwarders:{},sellerMap:{}};
   if(!Array.isArray(freight.bills)) freight.bills=[];
@@ -6947,7 +6963,9 @@ function renderFreight(){
   months.forEach(m=>{
     const list=freight.bills.filter(b=>b.month===m).sort((a,b)=>(a.forwarder||'').localeCompare(b.forwarder||''));
     const mTotal=list.reduce((s,b)=>s+(b.total||0),0);
-    h+='<div class="fr-blocktitle">'+escHtml(frMonthLabel(m))+' <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frSaveMonthLocal(\''+m+'\')">保存本月到本地</button> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">ZIP</button></div>';
+    const mk=frMonthKey(m), closed=!!frClosedMonths[mk];
+    h+='<div class="fr-blocktitle"><span class="fr-mtitle" id="frMt_'+mk+'" onclick="frToggleMonth(\''+m+'\')" title="'+(closed?'点击展开':'点击收起')+'这个月"><span class="fr-caret">'+(closed?'▸':'▾')+'</span>'+escHtml(frMonthLabel(m))+'</span> <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frSaveMonthLocal(\''+m+'\')">保存本月到本地</button> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">ZIP</button></div>';
+    h+='<div class="fr-monthbody" id="frMb_'+mk+'"'+(closed?' style="display:none"':'')+'>';
     const fwdMap={}; list.forEach(b=>{ (fwdMap[b.forwarder]=fwdMap[b.forwarder]||[]).push(b); });
     // 目录树：点文件夹展开/收起，点文件直接打开预览（不再是死文本）
     h+='<div class="fr-tree">';
@@ -6971,10 +6989,11 @@ function renderFreight(){
     h+=frTreeNode(true, '📁', escHtml(m), list.length+' 笔 · '+fmtCNY(mTotal), monthKids);
     h+='</div>';
     h+='<div class="hr-tablewrap"><table class="hr-table fr-table"><thead><tr>';
-    h+='<th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th class="fr-col-stage">状态</th><th class="fr-col-files">资料</th><th class="fr-col-note">备注</th>';
+    h+='<th class="fr-col-month">月份</th><th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th class="fr-col-stage">状态</th><th class="fr-col-files">资料</th><th class="fr-col-note">备注</th>';
     h+='</tr></thead><tbody>';
     list.forEach(b=>{
       h+='<tr>';
+      h+='<td class="fr-col-month">'+escHtml(frMonthLabel(b.month||m))+'</td>';
       h+='<td>'+escHtml(b.forwarder||'')+frRowActsHtml(b)+'</td>';
       h+='<td class="num">'+fmtCNY(b.total||0)+'</td>';
       h+='<td class="num">'+fmtCNY(b.langges||0)+'</td>';
@@ -6986,6 +7005,7 @@ function renderFreight(){
       h+='</tr>';
     });
     h+='</tbody></table></div>';
+    h+='</div>';
   });
   box.innerHTML=h;
 }
