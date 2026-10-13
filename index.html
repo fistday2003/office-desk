@@ -876,10 +876,33 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fr-dropzone-inner{font-size:13px;line-height:1.7}
 .fr-blocktitle{font-size:14px;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fr-blocktitle .cnt{font-size:12px;font-weight:600;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:1px 9px}
-.fr-tree{font-size:12px;color:var(--text-secondary);background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.9}
-.fr-tree-c{margin-left:14px}
-.fr-tree-c2{display:inline-block;margin:0 10px 0 14px;color:var(--text-muted)}
+.fr-tree{font-size:12.5px;color:var(--text-secondary);background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.5}
+.fr-tnode{display:flex;align-items:center;gap:5px;padding:2px 6px;border-radius:6px;user-select:none}
+.fr-tnode-c{cursor:pointer;font-weight:600;color:var(--text)}
+.fr-tnode-c:hover{background:#eef4f8}
+.fr-tkids{margin-left:15px;border-left:1px dashed var(--border);padding-left:8px}
+.fr-caret{display:inline-block;width:12px;flex:0 0 12px;text-align:center;color:var(--text-muted);font-size:10px}
+.fr-tic{flex:0 0 auto;font-size:13px}
+.fr-tnm{flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fr-tcnt{color:var(--text-muted);font-size:11px;font-weight:400;margin-left:2px}
+.fr-tfile{display:flex;align-items:center;gap:5px;padding:2px 6px;border-radius:6px;cursor:pointer;color:var(--primary)}
+.fr-tfile:hover{background:#eef4f8}
+.fr-tfile:hover .fr-tnm{text-decoration:underline}
+.fr-tsz{color:var(--text-muted);font-size:11px;margin-left:2px}
+.fr-tempty{padding:2px 6px;color:var(--text-muted);font-size:11.5px}
 .fr-table .fr-col-note{white-space:normal;word-break:break-word;min-width:120px;max-width:240px;line-height:1.5}
+.fr-autohint{margin-top:8px;border:1px solid #bbf7d0;background:#f0fdf4;border-radius:8px;padding:8px 11px;font-size:12.5px;line-height:1.75;color:#166534}
+.fr-autohint.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+.fr-autohint .fr-ah-t{font-weight:700;margin-bottom:2px}
+.fr-autohint .fr-ah-tag{display:inline-block;background:#fff;border:1px solid currentColor;border-radius:9px;padding:0 6px;font-size:11px;margin:0 4px 2px 0}
+.fr-dr-head{font-size:13px;font-weight:700;color:var(--text);margin:2px 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fr-dr-tip{font-size:11.5px;font-weight:400;color:var(--text-muted)}
+.fr-dr-table{font-size:12.5px}
+.fr-dr-table input,.fr-dr-table select{width:100%;padding:3px 6px;font-size:12.5px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--text)}
+.fr-dr-table td{padding:4px 8px}
+.fr-dr-table .fr-dr-nm{font-weight:600}
+.fr-dr-table tr.fr-dr-bad .fr-dr-nm{color:#b45309}
+.fr-dr-scroll{max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px}
 .fr-form-row{display:flex;gap:10px;flex-wrap:wrap}
 .fr-total-box{font-size:13px;color:var(--text-muted);margin:2px 0 10px}
 .fr-total-box b{color:var(--text);font-size:15px}
@@ -929,6 +952,26 @@ tr:hover .fr-fwd-acts{opacity:1}
 .hr-empty-box{color:var(--text-muted);font-size:12.5px;padding:30px;text-align:center}
 .btn-xs{padding:3px 9px;font-size:11.5px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-secondary);cursor:pointer;font-weight:600;font-family:inherit}
 .btn-xs:hover{border-color:var(--primary);color:var(--primary-dark)}
+
+/* ===== HR 资料（简历 / 劳动合同 / 解除协议 等） ===== */
+.hr-doc-zone{margin:8px 0 0;padding:12px}
+.hr-doc-zone .fr-dropzone-inner{font-size:12px}
+.hr-doc-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.hr-doc-empty{font-size:12px;color:var(--text-muted);padding:6px 2px}
+.hr-doc-row{display:flex;align-items:center;gap:8px;background:var(--bg-soft,#f7f8fa);border:1px solid var(--border);border-radius:8px;padding:5px 8px}
+.hr-doc-row .hr-doc-ic{font-size:15px;flex:0 0 auto}
+.hr-doc-row .hr-doc-name{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px}
+.hr-doc-row .hr-doc-size{font-size:11px;color:var(--text-muted);flex:0 0 auto}
+.hr-doc-row .hr-doc-kind-sel{flex:0 0 auto;font-size:11.5px;padding:2px 4px;border-radius:6px;border:1px solid var(--border);font-family:inherit}
+.hr-doc-row .btn-icon{flex:0 0 auto;margin-left:auto;border:none;background:none;cursor:pointer;color:var(--danger);font-size:14px}
+.hr-docs{display:flex;flex-wrap:wrap;gap:8px}
+.hr-doc{display:flex;align-items:center;gap:6px;background:var(--bg-soft,#f7f8fa);border:1px solid var(--border);border-radius:8px;padding:4px 9px;font-size:12.5px}
+.hr-doc .hr-doc-ic{font-size:15px}
+.hr-doc .hr-doc-kind{color:var(--primary);font-weight:700;font-size:11.5px}
+.hr-doc .hr-doc-link{color:var(--text);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.hr-doc .hr-doc-link:hover{color:var(--primary)}
+.hr-doc .hr-doc-size{color:var(--text-muted);font-size:11px}
+.hr-td-docs{text-align:center;white-space:nowrap}
 .btn-xs.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .btn-xs.btn-primary:hover{filter:brightness(1.05);color:#fff}
 .btn-xs.btn-warn{background:#fef3c7;border-color:#fcd34d;color:#b45309}
@@ -1082,7 +1125,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.21 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.22 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1462,7 +1505,7 @@ tr:hover .fr-fwd-acts{opacity:1}
   <div class="modal" style="width:min(740px,95vw)">
     <h3 id="frBillTitle">登记运费账单</h3>
     <div class="fr-form-row">
-      <div class="form-group" style="flex:1 1 160px"><label>运费月份 *</label><input type="month" id="frMonth"></div>
+      <div class="form-group" style="flex:1 1 160px"><label>运费月份 *</label><input type="month" id="frMonth" oninput="frMonthTouched=true"></div>
       <div class="form-group" style="flex:1 1 240px"><label>货代公司 *（可新增 / 删除）</label>
         <div class="hr-iv">
           <div class="hr-iv-sel" id="frFwdSel" onclick="frToggleForwarderPop()"></div>
@@ -1477,19 +1520,21 @@ tr:hover .fr-fwd-acts{opacity:1}
       <label>运费清单文件（表格 / 截图 / PDF，可多个）</label>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
         <button class="btn btn-sm" onclick="document.getElementById('frListInput').click()">选择文件</button>
-        <button class="btn btn-sm" onclick="frAutoReadCsv()">自动读取 CSV</button>
-        <span class="fr-tip">表格账单另存为 CSV 后点「自动读取」可一键按业务员分到朗格斯/凡适；截图账单把图发到对话里，我帮你识别数字</span>
+        <button class="btn btn-sm" onclick="frAutoExtract(true)">重新识别</button>
+        <span class="fr-tip">上传后自动识别月份 / 货代 / 金额（支持 CSV、Excel 表格；截图与 PDF 无法识别数字）</span>
       </div>
       <div class="fr-dropzone" id="frListDrop" onclick="frDropzoneClick(event)" ondragover="frListDragOver(event)" ondragenter="frListDragOver(event)" ondragleave="frListDragLeave(event)" ondrop="frListDrop(event)">
         <div class="fr-dropzone-inner">📥 把运费清单文件拖到这里上传<br><span style="font-size:11px">支持表格 / 截图 / PDF，可一次拖多个（也可点击此区域选择文件）</span></div>
       </div>
       <div class="task-files" id="frModalList"></div>
+      <div class="fr-autohint" id="frAutoHint" style="display:none"></div>
     </div>
     <div class="fr-form-row">
       <div class="form-group" style="flex:1 1 130px"><label>朗格斯运费(元)</label><input type="number" step="0.01" id="frLangges" oninput="frRecalcTotal()"></div>
       <div class="form-group" style="flex:1 1 130px"><label>凡适运费(元)</label><input type="number" step="0.01" id="frFansi" oninput="frRecalcTotal()"></div>
       <div class="form-group" style="flex:1 1 130px"><label>未分配/其他(元)</label><input type="number" step="0.01" id="frUnassigned" oninput="frRecalcTotal()"></div>
     </div>
+    <div id="frDetailBox" style="display:none"></div>
     <div class="fr-total-box">总金额（朗格斯＋凡适＋未分配，自动合计）：<b id="frTotal">¥0.00</b></div>
     <div class="form-group"><label>备注</label><textarea id="frNote" rows="2" placeholder="如：单项目账单(仅凡适) / 含退件补发 / 其他说明"></textarea></div>
     <div class="modal-actions">
@@ -1558,6 +1603,11 @@ tr:hover .fr-fwd-acts{opacity:1}
     </div>
     <div class="form-group"><label>提成 / 奖金（文字说明，如提成办法 / 奖金规则）</label><textarea id="hsCommText" rows="2" placeholder="例如：按销售额 3% 计提；样品单无提成，大货单额外 1% 奖金"></textarea></div>
     <div class="form-group"><label>备注</label><textarea id="hsNote" rows="2" placeholder="提成口径、转正结论、其他说明"></textarea></div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">📎 人事资料（简历 / 劳动合同 / 解除协议 等，可拖拽上传）</div>
+    <div class="fr-dropzone hr-doc-zone" id="hsDocZone" onclick="hrDocPick('staff')" ondragover="hrDocZoneOver(event,this)" ondragleave="hrDocZoneLeave(event,this)" ondrop="hrDocZoneDrop(event,this,'staff')">
+      <div class="fr-dropzone-inner">📥 把资料拖到这里上传<br><span style="font-size:11px">支持 PDF / Word / 图片 / 文本，可一次拖多个（也可点击此区域选择文件）</span></div>
+    </div>
+    <div class="hr-doc-list" id="hsDocList"></div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('modalHrStaff')">取消</button>
       <button class="btn btn-primary" id="btnHrStaffSave">保存</button>
@@ -1649,6 +1699,11 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group" style="flex:1 1 180px"><label>薪资说明</label><input type="text" id="htPayNote" placeholder="如 口径冲突：您说4500/人事说4000"></div>
     </div>
     <div class="form-group"><label>综合评价 / 结论</label><textarea id="htRemark" rows="3" placeholder="优势、短板、定位建议、下一步动作"></textarea></div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">📎 简历 / 资料（可拖拽上传，自动识别姓名 / 手机 / 邮箱）</div>
+    <div class="fr-dropzone hr-doc-zone" id="htDocZone" onclick="hrDocPick('talent')" ondragover="hrDocZoneOver(event,this)" ondragleave="hrDocZoneLeave(event,this)" ondrop="hrDocZoneDrop(event,this,'talent')">
+      <div class="fr-dropzone-inner">📥 把简历 / 资料拖到这里上传<br><span style="font-size:11px">支持 PDF / Word / 图片 / 文本，可一次拖多个（也可点击此区域选择文件）</span></div>
+    </div>
+    <div class="hr-doc-list" id="htDocList"></div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('modalHrTalent')">取消</button>
       <button class="btn btn-primary" id="btnHrTalentSave">保存</button>
@@ -1663,6 +1718,9 @@ tr:hover .fr-fwd-acts{opacity:1}
     <option value="内部推荐"></option>
   </datalist>
 </div>
+
+<!-- HR 资料上传：全局隐藏 file input（人才 / 在职弹窗与明细内联共用） -->
+<input type="file" id="hrDocInput" multiple style="display:none" onchange="hrDocInputChange()">
 
 <!-- ====== MODAL: 删除候选人（选原因） ====== -->
 <div class="modal-overlay" id="modalHrDelTalent" style="display:none">
@@ -1848,7 +1906,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.21';
+const APP_VERSION = 'v2.22';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -2039,12 +2097,14 @@ async function idbPutAll(arr){
 async function persistAllFiles(){
   const all=[];
   const recFiles = r => {
-    if(!r||!r.files) return [];
-    if(Array.isArray(r.files)) return r.files;
-    if(typeof r.files==='object'){ const out=[]; for(const k in r.files){ if(Array.isArray(r.files[k])) for(const f of r.files[k]) out.push(f); } return out; }
-    return [];
+    if(!r) return [];
+    let out=[];
+    if(Array.isArray(r.files)) out=out.concat(r.files);
+    else if(typeof r.files==='object'){ for(const k in r.files){ if(Array.isArray(r.files[k])) out=out.concat(r.files[k]); } }
+    if(Array.isArray(r.docs)) out=out.concat(r.docs);
+    return out;
   };
-  for(const arr of [expenses,claims,tasks,notes,projects,freight.bills]){
+  for(const arr of [expenses,claims,tasks,notes,projects,freight.bills,hr.staff,hr.talent]){
     if(!Array.isArray(arr)) continue;
     for(const r of arr){ for(const f of recFiles(r)){ if(f&&f.dataUrl){ if(!f.fid) f.fid='f_'+uid(); all.push({fid:f.fid,name:f.name,type:f.type,size:f.size,dataUrl:f.dataUrl}); } } }
   }
@@ -2054,13 +2114,15 @@ async function persistAllFiles(){
 async function initFiles(){
   const mods=[expenses,claims,tasks,notes,projects];
   const recFiles = r => {
-    if(!r||!r.files) return [];
-    if(Array.isArray(r.files)) return r.files;
-    if(typeof r.files==='object'){ const out=[]; for(const k in r.files){ if(Array.isArray(r.files[k])) for(const f of r.files[k]) out.push(f); } return out; }
-    return [];
+    if(!r) return [];
+    let out=[];
+    if(Array.isArray(r.files)) out=out.concat(r.files);
+    else if(typeof r.files==='object'){ for(const k in r.files){ if(Array.isArray(r.files[k])) out=out.concat(r.files[k]); } }
+    if(Array.isArray(r.docs)) out=out.concat(r.docs);
+    return out;
   };
   let changed=false;
-  for(const arr of mods){
+  for(const arr of mods.concat([hr.staff,hr.talent])){
     if(!Array.isArray(arr)) continue;
     for(const r of arr){ if(!r) continue;
       for(const f of recFiles(r)){ if(!f) continue;
@@ -2077,6 +2139,14 @@ async function initFiles(){
   }
   if(changed) await saveAll();
   return changed;
+}
+// 写 localStorage 前把 hr 里所有资料(doc)的 dataUrl 剥离，只留元数据（dataUrl 已由 persistAllFiles 落 IDB）
+function stripHrFiles(hrObj){
+  let cp;
+  try{ cp=JSON.parse(JSON.stringify(hrObj||{staff:[],talent:[]})); }catch(e){ cp={staff:[],talent:[]}; }
+  (cp.staff||[]).forEach(s=>{ if(Array.isArray(s.docs)) s.docs.forEach(d=>{ delete d.dataUrl; }); });
+  (cp.talent||[]).forEach(t=>{ if(Array.isArray(t.docs)) t.docs.forEach(d=>{ delete d.dataUrl; }); });
+  return cp;
 }
 let _saveBusy=false, _saveAgain=false;
 function saveAll(){
@@ -2096,7 +2166,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
       localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser(expenses)));
       localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser(claims)));
-      localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(hr));
+      localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(stripHrFiles(hr)));
       localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight()));
       localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
     }catch(e){
@@ -2111,7 +2181,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
         localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser2(expenses)));
         localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser2(claims)));
-        localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(hr));
+        localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(stripHrFiles(hr)));
         localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight2()));
         localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
         showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
@@ -3689,10 +3759,11 @@ function compressImageDataUrl(dataUrl, maxDim, quality, capBytes){
     img.src = dataUrl;
   });
 }
-function processTaskFile(file){
+function processTaskFile(file, maxBytes){
+  const cap = maxBytes || 3*1024*1024;
   return new Promise((resolve,reject)=>{
-    if(file.type.indexOf('image/')!==0 && file.size > 3*1024*1024){
-      reject(new Error(file.name+' 超过 3MB 限制，无法添加')); return;
+    if(file.type.indexOf('image/')!==0 && file.size > cap){
+      reject(new Error(file.name+' 超过 '+(Math.round(cap/1048576*10)/10)+'MB 限制，无法添加')); return;
     }
     const reader = new FileReader();
     reader.onload = ()=>{
@@ -6545,6 +6616,9 @@ let frModalDetail = [];
 let frCatTarget = null;          // 从列表补传文件时的 {id,cat}
 let frPreviewState = {id:'', cat:''};
 let frCurrFiles = [];            // 预览弹窗当前文件数组（供点击预览）
+const FR_MAX_FILE = 10*1024*1024; // 运费清单文件上限（表格/PDF 比图片大）
+let frMonthTouched = false;       // 用户是否手动改过「运费月份」（改过则不自动覆盖）
+let frAutoSrc = '';               // 本次自动识别用的文件名（给提示条显示）
 
 function frMapSeller(name){
   const k = String(name||'').trim().toLowerCase().replace(/\s+/g,'');
@@ -6658,12 +6732,26 @@ function renderFreight(){
     const mTotal=list.reduce((s,b)=>s+(b.total||0),0);
     h+='<div class="fr-blocktitle">'+escHtml(frMonthLabel(m))+' <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">下载本月 ZIP</button></div>';
     const fwdMap={}; list.forEach(b=>{ (fwdMap[b.forwarder]=fwdMap[b.forwarder]||[]).push(b); });
-    h+='<div class="fr-tree">📁 '+escHtml(m);
+    // 目录树：点文件夹展开/收起，点文件直接打开预览（不再是死文本）
+    h+='<div class="fr-tree">';
+    let monthKids='';
     Object.keys(fwdMap).sort().forEach(fw=>{
-      h+='<div class="fr-tree-c">📁 '+escHtml(fw||'未命名');
-      ['list','voucher','invoice'].forEach(cat=>{ const n=fwdMap[fw].reduce((s,b)=>s+(b.files[cat]?b.files[cat].length:0),0); h+='<span class="fr-tree-c2">📂 '+FR_CAT_NAMES[cat]+' ('+n+')</span>'; });
-      h+='</div>';
+      const bills=fwdMap[fw];
+      let fwKids='';
+      ['list','voucher','invoice'].forEach(cat=>{
+        const items=[];
+        bills.forEach(b=>{ (b.files[cat]||[]).forEach((f,i)=>items.push({billId:b.id, idx:i, f:f})); });
+        let catKids='';
+        if(items.length){
+          items.forEach(it=>{ catKids+='<div class="fr-tfile" onclick="frTreeOpenFile(\''+it.billId+'\',\''+cat+'\','+it.idx+')" title="点击打开：'+escAttr(it.f.name||'')+'"><span class="fr-tic">'+hrDocIcon(it.f)+'</span><span class="fr-tnm">'+escHtml(it.f.name||'附件')+'</span><span class="fr-tsz">'+fmtSize(it.f.size||0)+'</span></div>'; });
+        } else {
+          catKids='<div class="fr-tempty">（暂无文件）</div>';
+        }
+        fwKids+=frTreeNode(false, '📂', escHtml(FR_CAT_NAMES[cat]), String(items.length), catKids);
+      });
+      monthKids+=frTreeNode(true, '📁', escHtml(fw||'未命名'), bills.length+' 笔', fwKids);
     });
+    h+=frTreeNode(true, '📁', escHtml(m), list.length+' 笔 · '+fmtCNY(mTotal), monthKids);
     h+='</div>';
     h+='<div class="hr-tablewrap"><table class="hr-table fr-table"><thead><tr>';
     h+='<th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th class="fr-col-stage">状态</th><th class="fr-col-files">资料</th><th class="fr-col-note">备注</th>';
@@ -6683,6 +6771,31 @@ function renderFreight(){
     h+='</tbody></table></div>';
   });
   box.innerHTML=h;
+}
+
+// ---------------- 目录树交互（文件夹展开/收起 + 点文件打开预览） ----------------
+// 通用节点：有 kids 才可点击展开；caret 表示展开状态（▾ 展开 / ▸ 收起）
+function frTreeNode(open, icon, nameHtml, countHtml, kidsHtml){
+  const hasKids = !!kidsHtml;
+  const caret = hasKids ? '<span class="fr-caret">'+(open?'▾':'▸')+'</span>' : '<span class="fr-caret">·</span>';
+  const cls = hasKids ? 'fr-tnode fr-tnode-c' : 'fr-tnode';
+  const onclk = hasKids ? ' onclick="frTreeToggle(this)"' : '';
+  let h='<div class="'+cls+'"'+onclk+'>'+caret+'<span class="fr-tic">'+icon+'</span><span class="fr-tnm">'+nameHtml+'</span>'+(countHtml?('<span class="fr-tcnt">'+countHtml+'</span>'):'')+'</div>';
+  if(hasKids) h+='<div class="fr-tkids"'+(open?'':' style="display:none"')+'>'+kidsHtml+'</div>';
+  return h;
+}
+function frTreeToggle(el){
+  const kids=el.nextElementSibling; if(!kids||!kids.classList||!kids.classList.contains('fr-tkids')) return;
+  const willOpen=(kids.style.display==='none');
+  kids.style.display=willOpen?'':'none';
+  const c=el.querySelector('.fr-caret'); if(c) c.textContent=willOpen?'▾':'▸';
+}
+function frTreeOpenFile(billId,cat,idx){
+  const b=freight.bills.find(x=>x.id===billId); if(!b) return;
+  const f=(b.files&&b.files[cat]||[])[idx]; if(!f){ showToast('未找到该文件'); return; }
+  if(f.dataUrl){ expShowPreview(f); return; }
+  if(f.fid){ idbGet(f.fid).then(g=>{ if(g&&g.dataUrl) expShowPreview(Object.assign({},f,{dataUrl:g.dataUrl})); else showToast('该文件内容不在本机（可能未同步或为占位记录）'); }); return; }
+  showToast('该文件内容不在本机（仅记录了名称 / 大小）');
 }
 
 // ---------------- 货代公司可编辑下拉 ----------------
@@ -6733,8 +6846,11 @@ function openFreightBillModal(id){
   document.getElementById('frFansi').value = b ? (b.fansi||0) : '';
   document.getElementById('frUnassigned').value = b ? (b.unassigned||0) : '';
   document.getElementById('frNote').value = b ? (b.note||'') : '';
+  frMonthTouched = false; frAutoSrc='';
+  const hint=document.getElementById('frAutoHint'); if(hint){ hint.style.display='none'; hint.innerHTML=''; }
   frRenderForwarder();
   frRenderModalFiles();
+  frRenderDetailReview();
   frRecalcTotal();
   document.getElementById('modalFreightBill').style.display='flex';
 }
@@ -6762,7 +6878,14 @@ function frDropzoneClick(e){ if(e.target===this||(e.target.classList&&e.target.c
 function frAddFiles(fileList){
   const files=Array.from(fileList||[]);
   if(!files.length) return;
-  files.forEach(f=>{ processTaskFile(f).then(r=>{ frModalFiles.list.push(r); frRenderModalFiles(); }).catch(e=>showToast(e.message)); });
+  Promise.all(files.map(f=>processTaskFile(f, FR_MAX_FILE)
+      .then(r=>{ frModalFiles.list.push(r); return r; })
+      .catch(e=>{ showToast(e.message); return null; })))
+    .then(rs=>{
+      frRenderModalFiles();
+      const ok=rs.filter(Boolean);
+      if(ok.length) frAutoExtract(false, ok);
+    });
 }
 function handleFrListPick(){
   const inp=document.getElementById('frListInput'); const files=Array.from(inp.files||[]); inp.value='';
@@ -6792,6 +6915,7 @@ function saveFreightBill(){
   };
   if(frModalId){ const i=freight.bills.findIndex(x=>x.id===frModalId); if(i>=0) freight.bills[i]=rec; }
   else freight.bills.push(rec);
+  frLearnSellerMap();     // 记住这次核对过的业务员归属，下次自动分对
   frModalId=null;
   saveAll(); closeModal('modalFreightBill'); refreshAll();
   showToast('✓ 已保存运费账单','info');
@@ -6862,19 +6986,118 @@ function frRemoveCatFile(i){
   saveAll(); frRenderFilesModal(); renderFreight();
 }
 
-// ---------------- CSV 自动读取（按业务员分到项目） ----------------
+// ---------------- 运费清单自动识别（上传即读：月份 / 货代 / 金额明细） ----------------
 function frParseCsv(text){
-  return text.split(/\r?\n/).filter(l=>l.trim()!=='').map(l=> l.split(/[,;\t]/).map(c=>c.trim()));
+  return String(text||'').split(/\r?\n/).filter(l=>l.trim()!=='').map(l=> l.split(/[,;\t]/).map(c=>c.trim()));
 }
-function frApplyCsvRows(rows){
-  if(!rows||!rows.length){ showToast('CSV 为空'); return; }
+function frBytesOf(dataUrl){
+  const b64=String(dataUrl||'').split(',')[1]||'';
+  const bin=atob(b64); const u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+  return u;
+}
+// 文本解码：优先严格 UTF-8，失败退 GBK（Excel 导出的中文 CSV 默认常是 GBK）
+function frDecodeText(u8){
+  try{ return new TextDecoder('utf-8',{fatal:true}).decode(u8); }catch(e){}
+  try{ return new TextDecoder('gbk').decode(u8); }catch(e){}
+  return new TextDecoder('utf-8').decode(u8);
+}
+// 读 ZIP 中央目录（xlsx 本质就是个 zip）
+async function frZipEntries(u8){
+  const dv=new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let e=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-66000);i--){ if(dv.getUint32(i,true)===0x06054b50){ e=i; break; } }
+  if(e<0) throw new Error('不是有效的表格文件');
+  const cnt=dv.getUint16(e+10,true); let off=dv.getUint32(e+16,true); const out={};
+  for(let i=0;i<cnt;i++){
+    if(off+46>u8.length || dv.getUint32(off,true)!==0x02014b50) break;
+    const method=dv.getUint16(off+10,true), cSize=dv.getUint32(off+20,true);
+    const nLen=dv.getUint16(off+28,true), eLen=dv.getUint16(off+30,true), cLen=dv.getUint16(off+32,true);
+    const lho=dv.getUint32(off+42,true);
+    let nm=''; try{ nm=new TextDecoder('utf-8').decode(u8.subarray(off+46,off+46+nLen)); }catch(_){}
+    const lN=dv.getUint16(lho+26,true), lE=dv.getUint16(lho+28,true);
+    const st=lho+30+lN+lE;
+    out[nm]={method:method, raw:u8.subarray(st, st+cSize)};
+    off+=46+nLen+eLen+cLen;
+  }
+  return out;
+}
+async function frInflateRaw(u8){
+  if(typeof DecompressionStream!=='function') throw new Error('当前浏览器不支持解压表格，请在 Excel 里另存为 CSV 再上传');
+  const st=new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(st).arrayBuffer());
+}
+function frXmlUnesc(s){
+  return String(s||'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&#(\d+);/g,(m,d)=>String.fromCharCode(parseInt(d,10))).replace(/&amp;/g,'&');
+}
+function frColIdx(letters){
+  let n=0; for(let i=0;i<letters.length;i++) n=n*26+(letters.charCodeAt(i)-64); return n-1;
+}
+// xlsx → 二维数组（自己解 zip + 解压 + 读 XML，不依赖任何外部库）
+async function frXlsxToRows(u8){
+  const ent=await frZipEntries(u8);
+  const read=async(n)=>{ const it=ent[n]; if(!it) return ''; const raw=(it.method===0)? it.raw : await frInflateRaw(it.raw); return new TextDecoder('utf-8').decode(raw); };
+  const shared=[];
+  const ss=await read('xl/sharedStrings.xml');
+  if(ss){ const re=/<si\b[^>]*>([\s\S]*?)<\/si>/g; let m; while((m=re.exec(ss))){ let t=''; const tr=/<t\b[^>]*>([\s\S]*?)<\/t>/g; let x; while((x=tr.exec(m[1]))) t+=frXmlUnesc(x[1]); shared.push(t); } }
+  const sheets=Object.keys(ent).filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort((a,b)=>parseInt(a.replace(/\D+/g,''),10)-parseInt(b.replace(/\D+/g,''),10));
+  if(!sheets.length) throw new Error('表格里没找到工作表');
+  const xml=await read(sheets[0]);
+  const rows=[];
+  const rowRe=/<row\b[^>]*>([\s\S]*?)<\/row>/g; let rm;
+  while((rm=rowRe.exec(xml))){
+    const cells=[]; const cellRe=/<c\b([^>]*?)\/>|<c\b([^>]*?)>([\s\S]*?)<\/c>/g; let cm;
+    while((cm=cellRe.exec(rm[1]))){
+      const attrs=cm[1]||cm[2]||'', inner=cm[3]||'';
+      const rm2=/r="([A-Z]+)\d+"/.exec(attrs);
+      const idx=rm2? frColIdx(rm2[1]) : cells.length;
+      const tm=/t="([^"]+)"/.exec(attrs); const tp=tm?tm[1]:'';
+      let val='';
+      if(tp==='inlineStr'){ const im=/<t\b[^>]*>([\s\S]*?)<\/t>/.exec(inner); val=im? frXmlUnesc(im[1]) : ''; }
+      else { const vm=/<v>([\s\S]*?)<\/v>/.exec(inner); const v=vm?vm[1]:'';
+        if(tp==='s'){ const k=parseInt(v,10); val=(shared[k]!==undefined? shared[k]:''); } else val=frXmlUnesc(v); }
+      while(cells.length<idx) cells.push('');
+      cells[idx]=String(val);
+    }
+    rows.push(cells);
+  }
+  return rows;
+}
+// 任意文件 → 二维数组（认不出的类型返回 null）
+async function frRowsFromFile(f){
+  const name=String(f.name||'').toLowerCase(), type=String(f.type||'').toLowerCase();
+  const isCsv = /\.(csv|txt|tsv)$/.test(name) || type.indexOf('csv')>=0 || type.indexOf('text/plain')>=0 || String(f.dataUrl||'').indexOf('data:text/csv')>=0;
+  const isXls = /\.(xlsx|xlsm)$/.test(name) || type.indexOf('spreadsheetml')>=0 || type.indexOf('officedocument.spreadsheet')>=0;
+  if(isCsv) return frParseCsv(frDecodeText(frBytesOf(f.dataUrl)));
+  if(isXls) return await frXlsxToRows(frBytesOf(f.dataUrl));
+  return null;
+}
+// 文件名 / 内容里找月份（2026年9月 / 202609 / 2026-09 等）
+function frDetectMonth(s){
+  const t=String(s||''); let m;
+  if((m=/(20\d{2})\s*[-_年\/.]\s*(1[0-2]|0?[1-9])\s*月?/.exec(t))) return m[1]+String(parseInt(m[2],10)).padStart(2,'0');
+  if((m=/(20\d{2})(0[1-9]|1[0-2])(?!\d)/.exec(t))) return m[1]+m[2];
+  return '';
+}
+// 文件名 / 内容里找货代公司（拿现有名单匹配，支持简称）
+function frDetectForwarder(s){
+  const t=String(s||''); if(!t) return '';
+  const names=Object.keys(freight.forwarders||{});
+  for(const n of names){ if(n && t.indexOf(n)>=0) return n; }
+  for(const n of names){ if(n && n.length>=2 && t.indexOf(n.slice(0,2))>=0) return n; }
+  return '';
+}
+// 行 → 写入三个金额框 + 生成明细（返回识别结果，供提示条使用）
+function frApplyCsvRows(rows, silent){
+  const out={ok:false, count:0, lg:0, fs:0, un:0, unknown:[]};
+  if(!rows||!rows.length){ if(!silent) showToast('表格里没读到内容'); return out; }
   const head=rows[0].map(c=>String(c||'').toLowerCase());
   const sellerIdx=head.findIndex(c=>/(业务员|业务|销售|名称|姓名|客户|name|sales|seller|person)/.test(c));
   const amtIdx=head.findIndex(c=>/(金额|费用|运费|总价|合计|总额|amount|fee|cost|total|price|运费金额)/.test(c));
   let dataRows=rows, sIdx=sellerIdx, aIdx=amtIdx;
   if(sIdx<0||aIdx<0){ sIdx=0; aIdx=rows[0].length-1; }
   else dataRows=rows.slice(1);
-  if(sIdx===aIdx){ showToast('没认出「业务员」和「金额」两列，请检查表头或手动填'); return; }
+  if(sIdx===aIdx){ if(!silent) showToast('没认出「业务员」和「金额」两列，请检查表头或手动填'); return out; }
   let lg=0, fs=0, un=0; const detail=[];
   dataRows.forEach(r=>{
     const seller=String(r[sIdx]||'').trim();
@@ -6884,24 +7107,128 @@ function frApplyCsvRows(rows){
     if(proj==='langges') lg+=amt; else if(proj==='fansi') fs+=amt; else un+=amt;
     detail.push({seller:seller, amount:Math.round(amt*100)/100, project:proj});
   });
-  if(!detail.length){ showToast('CSV 里没解析出有效行（业务员 + 金额）'); return; }
+  if(!detail.length){ if(!silent) showToast('表格里没解析出有效行（需要「业务员」+「金额」两列）'); return out; }
   lg=Math.round(lg*100)/100; fs=Math.round(fs*100)/100; un=Math.round(un*100)/100;
   document.getElementById('frLangges').value=lg;
   document.getElementById('frFansi').value=fs;
   document.getElementById('frUnassigned').value=un;
   frModalDetail=detail;
-  frRecalcTotal();
-  const unknown=detail.filter(d=>d.project==='unassigned').length;
-  showToast('已从 CSV 读取 '+detail.length+' 行：朗格斯 '+fmtCNY(lg)+' / 凡适 '+fmtCNY(fs)+(unknown?(' / 未分配 '+fmtCNY(un)+'（'+unknown+' 个业务员待你确认，可在对话里发我名字我来定）'):''), 'info');
+  frRecalcTotal(); frRenderDetailReview();
+  out.ok=true; out.count=detail.length; out.lg=lg; out.fs=fs; out.un=un;
+  out.unknown=detail.filter(d=>d.project==='unassigned').map(d=>d.seller);
+  if(!silent){
+    showToast('已读取 '+detail.length+' 行：朗格斯 '+fmtCNY(lg)+' / 凡适 '+fmtCNY(fs)+(out.unknown.length?(' / 未分配 '+fmtCNY(un)+'（'+out.unknown.length+' 个业务员待确认）'):''), 'info');
+  }
+  return out;
 }
-function frAutoReadCsv(){
-  const csv=frModalFiles.list.find(f=>{
-    const n=(f.name||'').toLowerCase(), t=(f.type||'').toLowerCase();
-    return n.endsWith('.csv') || t.indexOf('csv')>=0 || /text\/csv/.test(t) || (f.dataUrl||'').indexOf('data:text/csv')>=0;
+// 手动「重新识别」（按钮）
+function frAutoReadCsv(){ frAutoExtract(true); }
+
+// 上传即自动识别：月份 / 货代 / 金额明细
+async function frAutoExtract(manual, fileList){
+  const files=(fileList && fileList.length)? fileList : (frModalFiles.list||[]);
+  if(!files.length){ if(manual) showToast('请先上传运费清单文件（CSV / Excel）'); return; }
+  let rows=null, src='', err='';
+  for(const f of files){
+    try{ const r=await frRowsFromFile(f); if(r && r.length){ rows=r; src=f.name||''; break; } }
+    catch(e){ if(!err) err=(f.name||'')+'：'+e.message; }
+  }
+  const contentTxt = rows? rows.slice(0,12).map(r=>r.join(' ')).join(' \n ') : '';
+  let month='', fwd='';
+  for(const f of files){ if(!month) month=frDetectMonth(f.name||''); }
+  if(!month) month=frDetectMonth(contentTxt);
+  for(const f of files){ if(!fwd) fwd=frDetectForwarder(f.name||''); }
+  if(!fwd) fwd=frDetectForwarder(contentTxt);
+  const done=[], notes=[];
+  if(month && !frMonthTouched && !frModalId){
+    document.getElementById('frMonth').value=month.slice(0,4)+'-'+month.slice(4);
+    done.push('月份 '+frMonthLabel(month));
+  } else if(month && (frMonthTouched||frModalId)){
+    notes.push('文件像是 '+frMonthLabel(month)+' 的，月份框没自动改，请核对');
+  }
+  if(fwd && !frModalForwarder){ frModalForwarder=fwd; frRenderForwarder(); done.push('货代 '+fwd); }
+  else if(fwd && frModalForwarder && frModalForwarder!==fwd){ notes.push('文件像是「'+fwd+'」的，当前选的是「'+frModalForwarder+'」'); }
+  const res = rows? frApplyCsvRows(rows, true) : null;
+  frAutoSrc=src;
+  frRenderAutoHint({src:src, rows:!!rows, res:res, done:done, notes:notes, err:err});
+  const hasOldXls=files.some(f=>/\.xls$/i.test(f.name||''));
+  if(res && res.ok){
+    showToast('✓ 已自动识别 '+res.count+' 行（月份/货代/金额已填），请核对后保存','info');
+  } else if(rows){
+    showToast('已读到表格，但没认出「业务员/金额」两列，请手动填或检查表头','warning');
+  } else if(hasOldXls){
+    showToast('老版 .xls 不能自动识别，请在 Excel 里另存为 .xlsx 或 CSV 再上传','warning');
+  } else if(manual){
+    showToast(err? ('没能识别：'+err) : '这个文件读不出数据（支持 CSV / Excel；截图与 PDF 请手动填）','warning');
+  } else {
+    showToast('文件已上传。截图 / PDF 无法自动识别数字，请手动填金额','warning');
+  }
+}
+// 自动识别结果提示条
+function frRenderAutoHint(info){
+  const box=document.getElementById('frAutoHint'); if(!box) return;
+  const good=!!(info.res && info.res.ok);
+  let h='';
+  if(good){
+    const tags=[];
+    if(info.src) tags.push('来源 '+info.src);
+    (info.done||[]).forEach(d=>tags.push(d));
+    tags.push('明细 '+info.res.count+' 行');
+    tags.push('朗格斯 '+fmtCNY(info.res.lg));
+    tags.push('凡适 '+fmtCNY(info.res.fs));
+    if(info.res.unknown.length) tags.push('未分配 '+info.res.unknown.length+' 个');
+    h+='<div class="fr-ah-t">✅ 已自动识别（请核对后再保存）</div>';
+    h+='<div>'+tags.map(t=>'<span class="fr-ah-tag">'+escHtml(t)+'</span>').join('')+'</div>';
+    if(info.res.unknown.length){
+      h+='<div style="margin-top:3px">⚠ 未分配业务员：<b>'+escHtml(info.res.unknown.join('、'))+'</b> —— 在下方明细里把「归属项目」改成朗格斯 / 凡适，改完自动重新合计，保存时会记住（下次自动分对）。</div>';
+    }
+    if(info.notes && info.notes.length) h+='<div style="margin-top:3px">'+info.notes.map(n=>'· '+escHtml(n)).join('<br>')+'</div>';
+  } else {
+    h+='<div class="fr-ah-t">⚠ 没能自动识别出金额数据</div>';
+    const tags=[]; (info.done||[]).forEach(d=>tags.push(d)); (info.notes||[]).forEach(n=>tags.push(n));
+    if(tags.length) h+='<div>'+tags.map(t=>'<span class="fr-ah-tag">'+escHtml(t)+'</span>').join('')+'</div>';
+    h+='<div style="margin-top:3px">'+(info.err? escHtml('读取失败：'+info.err)+'；' : '')+'支持 <b>CSV / Excel(.xlsx)</b> 自动识别（截图与 PDF 识别不了数字），也可以直接手动填下面的金额。</div>';
+  }
+  box.className='fr-autohint'+(good?'':' warn');
+  box.innerHTML=h; box.style.display='block';
+}
+// 明细核对表（可改归属 / 改金额 / 删行）
+function frRenderDetailReview(){
+  const box=document.getElementById('frDetailBox'); if(!box) return;
+  const d=frModalDetail||[];
+  if(!d.length){ box.innerHTML=''; box.style.display='none'; return; }
+  const PN={langges:'朗格斯',fansi:'凡适',unassigned:'未分配'};
+  let h='<div class="fr-dr-head">📋 识别到的明细 · 共 '+d.length+' 行 <span class="fr-dr-tip">核对「归属项目」，改动后自动重新合计（保存时记住归属）</span></div>';
+  h+='<div class="fr-dr-scroll"><table class="hr-table fr-dr-table"><thead><tr><th>业务员</th><th>金额(元)</th><th>归属项目</th><th style="width:38px"></th></tr></thead><tbody>';
+  d.forEach((r,i)=>{
+    h+='<tr'+(r.project==='unassigned'?' class="fr-dr-bad"':'')+'><td class="fr-dr-nm">'+escHtml(r.seller||'—')+'</td>';
+    h+='<td><input type="number" step="0.01" value="'+Number(r.amount||0)+'" onchange="frDetailAmountChange('+i+',this.value)"></td>';
+    h+='<td><select onchange="frDetailSetProject('+i+',this.value)">'+Object.keys(PN).map(k=>'<option value="'+k+'"'+(r.project===k?' selected':'')+'>'+PN[k]+'</option>').join('')+'</select></td>';
+    h+='<td style="text-align:center"><button class="btn-icon" title="删掉这行（不计入合计）" onclick="frDetailRemove('+i+')">✕</button></td></tr>';
   });
-  if(!csv){ showToast('没找到 CSV 文件：先把账单在 Excel 里「另存为 CSV」再上传，或手动填金额'); return; }
-  try{ const base64=csv.dataUrl.split(',')[1]||''; const text=decodeURIComponent(escape(atob(base64))); frApplyCsvRows(frParseCsv(text)); }
-  catch(e){ showToast('CSV 读取失败：'+e.message); }
+  h+='</tbody></table></div>';
+  box.innerHTML=h; box.style.display='block';
+}
+function frDetailRecalc(){
+  let lg=0, fs=0, un=0;
+  (frModalDetail||[]).forEach(r=>{ const a=Number(r.amount)||0; if(r.project==='langges') lg+=a; else if(r.project==='fansi') fs+=a; else un+=a; });
+  const r2=n=>Math.round(n*100)/100;
+  document.getElementById('frLangges').value=r2(lg);
+  document.getElementById('frFansi').value=r2(fs);
+  document.getElementById('frUnassigned').value=r2(un);
+  frRecalcTotal();
+}
+function frDetailSetProject(i,p){ if(!frModalDetail[i]) return; frModalDetail[i].project=p; frDetailRecalc(); frRenderDetailReview(); }
+function frDetailAmountChange(i,v){ if(!frModalDetail[i]) return; const a=parseFloat(v); frModalDetail[i].amount=isNaN(a)?0:Math.round(a*100)/100; frDetailRecalc(); }
+function frDetailRemove(i){ if(!frModalDetail[i]) return; frModalDetail.splice(i,1); frDetailRecalc(); frRenderDetailReview(); }
+// 保存时把用户确认过的归属记进 sellerMap（下次自动分对）
+function frLearnSellerMap(){
+  (frModalDetail||[]).forEach(r=>{
+    if(r.project==='langges'||r.project==='fansi'){
+      const k=String(r.seller||'').trim().toLowerCase().replace(/\s+/g,'');
+      if(k) freight.sellerMap[k]=r.project;
+    }
+  });
 }
 
 // ---------------- 打包下载 ZIP（完整文件夹结构） ----------------
@@ -10744,6 +11071,7 @@ function hrHeal(){
     if(s.regularizeDate===undefined) s.regularizeDate='';
     if(!Array.isArray(s.salaryLog)){ s.salaryLog=[]; changed=true; }
     if(!s.salary || typeof s.salary!=='object'){ s.salary={}; changed=true; }
+    if(!Array.isArray(s.docs)){ s.docs=[]; changed=true; }
     if(s.commText===undefined) s.commText='';
     if(s.salary && s.salary.comm!==undefined){ if(!s.commText) s.commText=String(s.salary.comm); delete s.salary.comm; changed=true; } // 旧版提成数值 → 文本说明
   });
@@ -10761,6 +11089,7 @@ function hrHeal(){
     if(t.offerPay===undefined){ t.offerPay=''; changed=true; }
     if(t.payNote===undefined){ t.payNote=''; changed=true; }
     if(t.remark===undefined){ t.remark=''; changed=true; }
+    if(!Array.isArray(t.docs)){ t.docs=[]; changed=true; }
   });
   hr.talent = hr.talent.filter(t=>t && t.name);
   if(changed) saveAll();
@@ -10819,6 +11148,8 @@ function openHrStaffModal(id){
   document.getElementById('hsOther').value = (sal.other!==undefined && sal.other!=='')?sal.other:'';
   hrCalcSalTotal();
   document.getElementById('hsNote').value = rec?(rec.note||''):'';
+  hsDocs = rec? (rec.docs||[]).map(x=>Object.assign({},x)) : [];
+  hrRenderStaffDocs();
   hrStaffLeaveToggle();
   document.getElementById('modalHrStaff').style.display='flex';
 }
@@ -10848,11 +11179,13 @@ function saveHrStaff(){
     commText: String(document.getElementById('hsCommText').value||'').trim(),
     salaryLog: [],
     note: String(document.getElementById('hsNote').value||'').trim(),
+    docs: hsDocs.slice(),
     createdAt: Date.now()
   };
   if(editingHrStaffId){ const old=hr.staff.find(s=>s.id===editingHrStaffId); if(old && Array.isArray(old.salaryLog)) rec.salaryLog=old.salaryLog; }
   if(editingHrStaffId){ const i=hr.staff.findIndex(s=>s.id===editingHrStaffId); if(i>=0) hr.staff[i]=rec; }
   else hr.staff.push(rec);
+  hsDocs=[];
   editingHrStaffId=null;
   saveAll(); closeModal('modalHrStaff'); refreshAll();
   showToast('✓ 已保存员工档案', 'info');
@@ -10938,6 +11271,8 @@ function openHrTalentModal(id){
   document.getElementById('htOfferPay').value = rec?(rec.offerPay||''):'';
   document.getElementById('htPayNote').value = rec?(rec.payNote||''):'';
   document.getElementById('htRemark').value = rec?(rec.remark||''):'';
+  htDocs = rec? (rec.docs||[]).map(x=>Object.assign({},x)) : [];
+  hrRenderTalentDocs();
   document.getElementById('modalHrTalent').style.display='flex';
 }
 function hrRenderInterviewers(){
@@ -11037,10 +11372,12 @@ function saveHrTalent(){
     offerPay: String(document.getElementById('htOfferPay').value||'').trim(),
     payNote: String(document.getElementById('htPayNote').value||'').trim(),
     remark: String(document.getElementById('htRemark').value||'').trim(),
+    docs: htDocs.slice(),
     createdAt: Date.now()
   };
   if(editingHrTalentId){ const i=hr.talent.findIndex(t=>t.id===editingHrTalentId); if(i>=0) hr.talent[i]=rec; }
   else hr.talent.push(rec);
+  htDocs=[];
   editingHrTalentId=null;
   saveAll(); closeModal('modalHrTalent'); refreshAll();
   showToast('✓ 已保存候选人', 'info');
@@ -11102,7 +11439,7 @@ function hrStaffHtml(){
   if(!active.length){ h+='<div class="hr-empty-box">当前没有在职或试用期员工，已离职员工见下方「已离职员工」。</div>'; }
   else {
     h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
-      +'<th>姓名</th><th>项目</th><th>岗位</th><th class="hr-col-comm">提成 / 奖金</th><th>状态</th><th>入职时间</th><th>试用至</th><th>转正时间</th><th class="num">月薪合计</th><th>操作</th>'
+      +'<th>姓名</th><th>项目</th><th>岗位</th><th class="hr-col-comm">提成 / 奖金</th><th>状态</th><th>入职时间</th><th>试用至</th><th>转正时间</th><th class="num">月薪合计</th><th>资料</th><th>操作</th>'
       +'</tr></thead><tbody>';
     active.forEach(s=>{
       const stLbl = s.status==='formal'?'正式':(s.status==='probation'?'试用期':(s.status==='leave'?'已离职':escHtml(s.status||'')));
@@ -11118,6 +11455,7 @@ function hrStaffHtml(){
       h+='<td>'+escHtml(s.probEnd||'')+'</td>';
       h+='<td>'+escHtml(s.regularizeDate||'')+'</td>';
       h+='<td class="num">'+(sal>0?('¥'+sal.toLocaleString('zh-CN')):'')+'</td>';
+      h+='<td class="hr-td-docs">'+(s.docs&&s.docs.length?('📎'+s.docs.length):'—')+'</td>';
       h+='<td class="hr-td-acts">';
       if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
       h+='<button class="btn btn-xs btn-warn" onclick="hrStaffLeave(\''+s.id+'\')">离职</button>';
@@ -11125,7 +11463,7 @@ function hrStaffHtml(){
       h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">删</button>';
       h+='</td></tr>';
-      h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="10">'+hrStaffDetail(s)+'</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="11">'+hrStaffDetail(s)+'</td></tr>';
     });
     h+='</tbody></table></div>';
     h+='<div class="hr-tip">提示：点姓名可展开「薪资明细 / 调薪记录 / 备注」</div>';
@@ -11134,7 +11472,7 @@ function hrStaffHtml(){
     h+='<div class="hr-collapsible">';
     h+='<div class="hr-collapsible-h" onclick="hrToggleBox(\'hrLeaveBox\')"><span class="hr-caret" id="hrLeaveBoxCare">▸</span>已离职员工 <span class="hr-cnt">'+leave.length+'</span></div>';
     h+='<div class="hr-collapsible-b" id="hrLeaveBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
-      +'<th>姓名</th><th>项目</th><th>岗位</th><th>入职时间</th><th>离职日期</th><th>离职原因 / 交接</th><th>操作</th>'
+      +'<th>姓名</th><th>项目</th><th>岗位</th><th>入职时间</th><th>离职日期</th><th>离职原因 / 交接</th><th>资料</th><th>操作</th>'
       +'</tr></thead><tbody>';
     leave.forEach(s=>{
       h+='<tr>';
@@ -11144,12 +11482,13 @@ function hrStaffHtml(){
       h+='<td>'+escHtml(s.joinDate||'')+'</td>';
       h+='<td>'+escHtml(s.leaveDate||'')+'</td>';
       h+='<td>'+(s.leaveReason?escHtml(s.leaveReason):'')+'</td>';
+      h+='<td class="hr-td-docs">'+(s.docs&&s.docs.length?('📎'+s.docs.length):'—')+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs" onclick="hrStaffRestore(\''+s.id+'\')">恢复</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="deleteHrStaff(\''+s.id+'\')">彻底删除</button>';
       h+='</td></tr>';
-      h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="7">'+hrStaffDetail(s)+'</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="8">'+hrStaffDetail(s)+'</td></tr>';
     });
     h+='</tbody></table></div></div></div>';
   }
@@ -11204,6 +11543,9 @@ function hrStaffDetail(s){
     h+='</div></div>';
   }
   if(s.note) h+='<div class="hr-detail-sec"><div class="hr-detail-h">备注</div><div class="hr-note">'+escHtml(s.note)+'</div></div>';
+  // 人事资料（简历 / 劳动合同 / 解除协议 等）：列表 + 明细内联拖拽继续添加
+  h+='<div class="hr-detail-sec"><div class="hr-detail-h">人事资料（'+((s.docs&&s.docs.length)||0)+'）</div>'+hrDocsHtml(s.docs)
+    +'<div class="fr-dropzone hr-doc-zone" onclick="hrDocPick(\'inline:staff:'+s.id+'\')" ondragover="hrDocZoneOver(event,this)" ondragleave="hrDocZoneLeave(event,this)" ondrop="hrDocZoneDrop(event,this,\'inline:staff:'+s.id+'\')"><div class="fr-dropzone-inner">＋ 拖拽或点击，继续添加资料（简历 / 劳动合同 / 解除协议 等）</div></div></div>';
   h+='</div>';
   return h;
 }
@@ -11270,6 +11612,7 @@ function hrTalentHtml(){
       +th('expectPay','期望薪资',true)
       +th('offerPay','承诺薪资',true)
       +'<th>备注</th>'
+      +'<th>资料</th>'
       +'<th>操作</th>'
       +'</tr></thead><tbody>';
     const rank=t=>{ if(t.status==='已流失'||t.status==='暂不考虑') return 9; const p={'A':0,'B':1,'C':2}; return (p[t.priority]!==undefined?p[t.priority]:5); };
@@ -11291,12 +11634,13 @@ function hrTalentHtml(){
       h+='<td>'+(t.expectPay?escHtml(t.expectPay):'')+'</td>';
       h+='<td>'+(t.offerPay?escHtml(t.offerPay):'')+'</td>';
       h+='<td>'+(t.remark?escHtml(t.remark):'')+'</td>';
+      h+='<td class="hr-td-docs">'+(t.docs&&t.docs.length?('📎'+t.docs.length):'—')+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs btn-primary" onclick="hrTalentToProbation(\''+t.id+'\')">转试用</button>';
       h+='<button class="btn btn-xs" onclick="openHrTalentModal(\''+t.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="deleteHrTalent(\''+t.id+'\')">删</button>';
       h+='</td></tr>';
-      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="11">'+hrTalentDetail(t)+'</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="12">'+hrTalentDetail(t)+'</td></tr>';
     });
     h+='</tbody></table></div>';
     h+='<div class="hr-tip">提示：点表头字段（姓名 / 岗位 / 优先级 / 状态 / 面试时间 / 联系方法 / 期望薪资 / 承诺薪资）可升、降序排序（再点一次切换方向）；点姓名展开明细；「转试用」转入在职；「删」移入「已删除资源」</div>';
@@ -11305,7 +11649,7 @@ function hrTalentHtml(){
     h+='<div class="hr-collapsible">';
     h+='<div class="hr-collapsible-h" onclick="hrToggleBox(\'hrDelBox\')"><span class="hr-caret" id="hrDelBoxCare">▸</span>已删除资源 <span class="hr-cnt">'+delT.length+'</span></div>';
     h+='<div class="hr-collapsible-b" id="hrDelBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
-      +'<th>姓名</th><th>应聘岗位</th><th>状态</th><th>删除原因</th><th>删除日期</th><th>操作</th>'
+      +'<th>姓名</th><th>应聘岗位</th><th>状态</th><th>删除原因</th><th>删除日期</th><th>资料</th><th>操作</th>'
       +'</tr></thead><tbody>';
     delT.forEach(t=>{
       h+='<tr>';
@@ -11314,11 +11658,12 @@ function hrTalentHtml(){
       h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
       h+='<td>'+(t.delReason?escHtml(t.delReason):'—')+'</td>';
       h+='<td>'+escHtml(t.delDate||'')+'</td>';
+      h+='<td class="hr-td-docs">'+(t.docs&&t.docs.length?('📎'+t.docs.length):'—')+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs" onclick="hrTalentRestore(\''+t.id+'\')">恢复</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="hrTalentPurge(\''+t.id+'\')">彻底删除</button>';
       h+='</td></tr>';
-      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="6">'+hrTalentDetail(t)+'</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="7">'+hrTalentDetail(t)+'</td></tr>';
     });
     h+='</tbody></table></div></div></div>';
   }
@@ -11357,6 +11702,9 @@ function hrTalentDetail(t){
   }
   if(t.expectPay||t.offerPay) h+='<div class="hr-detail-sec"><div class="hr-detail-h">薪资意向</div><div class="hr-money"><div class="hr-money-i"><span>期望薪资</span><b>'+escHtml(t.expectPay||'—')+'</b></div><div class="hr-money-i"><span>承诺薪资</span><b>'+(t.offerPay?escHtml(t.offerPay):'—')+'</b></div></div>'+(t.payNote?'<div class="hr-note">薪资说明：'+escHtml(t.payNote)+'</div>':'')+'</div>';
   if(t.remark) h+='<div class="hr-detail-sec"><div class="hr-detail-h">综合评价</div><div class="hr-note">'+escHtml(t.remark)+'</div></div>';
+  // 简历 / 资料：列表 + 明细内联拖拽继续添加
+  h+='<div class="hr-detail-sec"><div class="hr-detail-h">简历 / 资料（'+((t.docs&&t.docs.length)||0)+'）</div>'+hrDocsHtml(t.docs)
+    +'<div class="fr-dropzone hr-doc-zone" onclick="hrDocPick(\'inline:talent:'+t.id+'\')" ondragover="hrDocZoneOver(event,this)" ondragleave="hrDocZoneLeave(event,this)" ondrop="hrDocZoneDrop(event,this,\'inline:talent:'+t.id+'\')"><div class="fr-dropzone-inner">＋ 拖拽或点击，继续添加资料（简历 / 其他）</div></div></div>';
   h+='</div>';
   return h;
 }
@@ -11377,13 +11725,134 @@ function hrToProbationConfirm(){
       id: uid(), name: t.name||'', enName:'', gender: t.gender||'', birth: t.birth||'',
       project: '朗格斯', post: t.post||'', subAccount:'', edu: t.edu||'', school: t.school||'', major: t.major||'',
       phone: (t.phone||'')||(t.email||''), joinDate: d, probEnd:'', status:'probation', regularizeDate:'',
-      leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], commText:'', note:'由人才库转试用'+(t.remark?('：'+t.remark):''), createdAt: Date.now()
+      leaveDate:'', leaveReason:'', salary:{}, salaryLog:[], commText:'', note:'由人才库转试用'+(t.remark?('：'+t.remark):''), createdAt: Date.now(),
+      docs: (t.docs||[]).map(x=>Object.assign({},x))  // 简历 / 资料随人流转：转试用时一并带入在职档案
     });
   }
   hr.talent = hr.talent.filter(x=>x.id!==hrToProbId);
   hrToProbId=null;
   saveAll(); closeModal('modalHrToProb'); refreshAll();
   showToast(exist? ('「'+(t.name||'')+'」已在职，已从人才库移除') : ('✓ 已将「'+(t.name||'')+'」转入在职（试用期），试用起始：'+d), 'info');
+}
+
+// ---------------- HR 资料（简历 / 劳动合同 / 解除协议 等） ----------------
+let htDocs = [];   // 人才弹窗暂存资料
+let hsDocs = [];   // 在职弹窗暂存资料
+let hrDocMode = 'talent';
+const HR_DOC_KINDS = ['简历','劳动合同','解除协议','其他'];
+
+// 读取文件为 dataURL（HR 资料不压缩图片、上限 10MB，保持原始清晰）
+function hrProcessDocFile(file){
+  return new Promise((resolve,reject)=>{
+    if(!file || file.size > 10*1024*1024){ reject(new Error((file&&file.name||'文件')+' 超过 10MB，无法添加')); return; }
+    const reader = new FileReader();
+    reader.onload = ()=>resolve({fid:'f_'+uid(), name:file.name, type:file.type||'application/octet-stream', size:file.size, dataUrl:reader.result});
+    reader.onerror = ()=>reject(new Error((file&&file.name||'文件')+' 读取失败'));
+    reader.readAsDataURL(file);
+  });
+}
+function hrDocIcon(d){
+  const t=(d&&d.type)||'', n=(d&&d.name)||'';
+  if(t.indexOf('image/')===0) return '🖼️';
+  if(t==='application/pdf' || /\.pdf$/i.test(n)) return '📕';
+  if(/\.docx?$/i.test(n) || t.indexOf('word')>=0) return '📘';
+  if(/\.xlsx?$/i.test(n)) return '📗';
+  return '📄';
+}
+function hrDocPick(mode){ hrDocMode=mode; const inp=document.getElementById('hrDocInput'); if(!inp) return; inp.value=''; inp.click(); }
+function hrDocInputChange(){ const inp=document.getElementById('hrDocInput'); const files=Array.from(inp.files||[]); inp.value=''; hrDocHandle(files, hrDocMode); }
+function hrDocZoneOver(e,z){ e.preventDefault(); e.stopPropagation(); if(z) z.classList.add('fr-dropzone-on'); }
+function hrDocZoneLeave(e,z){ e.preventDefault(); e.stopPropagation(); if(z && !z.contains(e.relatedTarget)) z.classList.remove('fr-dropzone-on'); }
+function hrDocZoneDrop(e,z,mode){ e.preventDefault(); e.stopPropagation(); if(z) z.classList.remove('fr-dropzone-on'); hrDocHandle(e.dataTransfer&&e.dataTransfer.files, mode); }
+function hrDocDefaultKind(mode){ return (mode==='talent'||mode==='staff'||mode.indexOf('inline:talent')===0)?'简历':'其他'; }
+function hrDocHandle(files, mode){
+  const arr=Array.from(files||[]); if(!arr.length) return;
+  arr.forEach(f=>{
+    hrProcessDocFile(f).then(r=>{
+      const doc={fid:r.fid, name:r.name, type:r.type, size:r.size, dataUrl:r.dataUrl, kind:hrDocDefaultKind(mode)};
+      if(mode==='talent'){ htDocs.push(doc); hrRenderTalentDocs(); hrAutoExtractFromDoc(doc,null,true); }
+      else if(mode==='staff'){ hsDocs.push(doc); hrRenderStaffDocs(); }
+      else if(mode.indexOf('inline:')===0){
+        const parts=mode.split(':'); const typ=parts[1]; const id=parts[2];
+        const rec = typ==='staff'? hr.staff.find(s=>s.id===id): hr.talent.find(t=>t.id===id);
+        if(rec){ rec.docs=rec.docs||[]; rec.docs.push(doc); hrAutoExtractFromDoc(doc,rec,false); hrInlineDocDone(typ,id); }
+      }
+    }).catch(e=>showToast(e.message));
+  });
+}
+function hrRenderTalentDocs(){
+  const box=document.getElementById('htDocList'); if(!box) return;
+  if(!htDocs.length){ box.innerHTML='<div class="hr-doc-empty">尚未上传资料</div>'; return; }
+  box.innerHTML=htDocs.map((d,i)=>hrDocRowHtml(d,i,'talent')).join('');
+}
+function hrRenderStaffDocs(){
+  const box=document.getElementById('hsDocList'); if(!box) return;
+  if(!hsDocs.length){ box.innerHTML='<div class="hr-doc-empty">尚未上传资料</div>'; return; }
+  box.innerHTML=hsDocs.map((d,i)=>hrDocRowHtml(d,i,'staff')).join('');
+}
+function hrDocRowHtml(d,i,which){
+  const opts=HR_DOC_KINDS.map(k=>'<option '+(d.kind===k?'selected':'')+'>'+k+'</option>').join('');
+  return '<div class="hr-doc-row"><span class="hr-doc-ic">'+hrDocIcon(d)+'</span>'
+    +'<span class="hr-doc-name" title="'+escAttr(d.name)+'">'+escHtml(d.name)+'</span>'
+    +'<span class="hr-doc-size">'+fmtSize(d.size||0)+'</span>'
+    +'<select class="hr-doc-kind-sel" onchange="hrDocKindChange(\''+which+'\',\''+i+'\',this.value)">'+opts+'</select>'
+    +'<button type="button" class="btn-icon" title="移除" onclick="hrDocRemove(\''+which+'\',\''+i+'\')">✕</button></div>';
+}
+function hrDocKindChange(which,i,val){ const arr=(which==='talent')?htDocs:hsDocs; if(arr[i]) arr[i].kind=val; }
+function hrDocRemove(which,i){ if(which==='talent'){ htDocs.splice(i,1); hrRenderTalentDocs(); } else { hsDocs.splice(i,1); hrRenderStaffDocs(); } }
+// 自动识别：从文件名猜姓名（仅人才弹窗、且姓名为空时）；从文件文本扫手机号 / 邮箱
+function hrGuessNameFromFilename(name){
+  let n=String(name||'').replace(/\.[^.]+$/,'');
+  n=n.replace(/(个人)?简历|个人资料|求职|CV|cv|resume/gi,'').replace(/[-_·\s]+/g,'');
+  if(/^[\u4e00-\u9fa5]{2,4}$/.test(n)) return n;
+  return '';
+}
+function hrExtractText(doc){
+  try{
+    const m=String(doc.dataUrl||'').match(/^data:[^;]*;base64,(.*)$/); if(!m) return '';
+    const bin=atob(m[1]); let runs=[]; let cur='';
+    for(let i=0;i<bin.length;i++){ const c=bin.charCodeAt(i); if(c>=32&&c<127){ cur+=String.fromCharCode(c); } else { if(cur.length>=4) runs.push(cur); cur=''; } }
+    if(cur.length>=4) runs.push(cur);
+    return runs.join('\n');
+  }catch(e){ return ''; }
+}
+function hrAutoExtractFromDoc(doc, rec, isTalentModal){
+  if(isTalentModal){
+    const nm=hrGuessNameFromFilename(doc.name);
+    if(nm && !document.getElementById('htName').value){ document.getElementById('htName').value=nm; }
+  }
+  const txt=hrExtractText(doc); if(!txt) return;
+  const phone=(txt.match(/1[3-9]\d{9}/)||[])[0];
+  const email=(txt.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)||[])[0];
+  if(isTalentModal){
+    if(phone && !document.getElementById('htPhone').value) document.getElementById('htPhone').value=phone;
+    if(email && !document.getElementById('htEmail').value) document.getElementById('htEmail').value=email;
+  } else if(rec){
+    if(phone && !rec.phone) rec.phone=phone;
+    if(email && !rec.email) rec.email=email;
+  }
+}
+function hrInlineDocDone(typ,id){
+  saveAll(); renderHr();
+  const row=document.getElementById((typ==='staff'?'hrDs_':'hrDt_')+id);
+  if(row) row.style.display='table-row';
+}
+function hrDocsHtml(docs){
+  if(!docs||!docs.length) return '<div class="hr-note" style="color:var(--text-muted)">暂无资料</div>';
+  return '<div class="hr-docs">'+docs.map(d=>{
+    return '<div class="hr-doc"><span class="hr-doc-ic">'+hrDocIcon(d)+'</span>'
+      +'<span class="hr-doc-kind">['+(d.kind||'资料')+']</span>'
+      +'<a class="hr-doc-name hr-doc-link" onclick="hrViewDoc(\''+d.fid+'\')">'+escHtml(d.name)+'</a>'
+      +'<span class="hr-doc-size">'+fmtSize(d.size||0)+'</span></div>';
+  }).join('')+'</div>';
+}
+function hrViewDoc(fid){
+  let doc=null;
+  for(const s of hr.staff){ if(s.docs) for(const d of s.docs) if(d.fid===fid) doc=d; }
+  if(!doc) for(const t of hr.talent){ if(t.docs) for(const d of t.docs) if(d.fid===fid) doc=d; }
+  const openIt = g=>{ if(g&&g.dataUrl) window.open(g.dataUrl,'_blank'); else showToast('未找到该资料'); };
+  if(doc){ if(doc.dataUrl) openIt(doc); else idbGet(fid).then(openIt); }
+  else idbGet(fid).then(openIt);
 }
 
 // ---------------- 第一版初始数据（仅空库时种入，之后由用户自行修改） ----------------
