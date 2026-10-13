@@ -1147,7 +1147,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.23 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.24 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1539,14 +1539,14 @@ tr:hover .fr-fwd-acts{opacity:1}
       </div>
     </div>
     <div class="form-group">
-      <label>运费清单文件（表格 / 截图 / PDF，可多个）</label>
+      <label>运费清单文件（表格 / PDF / Word / 截图，可多个）</label>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
         <button class="btn btn-sm" onclick="document.getElementById('frListInput').click()">选择文件</button>
         <button class="btn btn-sm" onclick="frAutoExtract(true)">重新识别</button>
-        <span class="fr-tip">上传后自动识别月份 / 货代 / 金额（支持 CSV、Excel 表格；截图与 PDF 无法识别数字）</span>
+        <span class="fr-tip">上传后自动识别月份 / 货代 / 金额（支持 CSV、Excel、PDF、Word；截图 / 图片需联网 OCR）</span>
       </div>
       <div class="fr-dropzone" id="frListDrop" onclick="frDropzoneClick(event)" ondragover="frListDragOver(event)" ondragenter="frListDragOver(event)" ondragleave="frListDragLeave(event)" ondrop="frListDrop(event)">
-        <div class="fr-dropzone-inner">📥 把运费清单文件拖到这里上传<br><span style="font-size:11px">支持表格 / 截图 / PDF，可一次拖多个（也可点击此区域选择文件）</span></div>
+        <div class="fr-dropzone-inner">📥 把运费清单文件拖到这里上传<br><span style="font-size:11px">支持表格 / PDF / Word / 截图，可一次拖多个（也可点击此区域选择文件）</span></div>
       </div>
       <div class="task-files" id="frModalList"></div>
       <div class="fr-autohint" id="frAutoHint" style="display:none"></div>
@@ -1934,7 +1934,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.23';
+const APP_VERSION = 'v2.24';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -7100,6 +7100,94 @@ async function frRowsFromFile(f){
   if(isXls) return await frXlsxToRows(frBytesOf(f.dataUrl));
   return null;
 }
+// ---- 文档 / 图片识别增强（v2.24）：PDF · Word · 截图 也能读 ----
+// 已知业务员名单（小写，按长度降序，优先匹配更长名字，避免子串误命中）
+function frKnownSellers(){
+  const keys=Object.keys(freight.sellerMap||{}).map(k=>String(k).trim().toLowerCase()).filter(Boolean);
+  keys.sort((a,b)=>b.length-a.length);
+  return keys;
+}
+// 把一段自由文本（来自 PDF / Word / 图片 OCR）解析成「业务员 → 金额」明细
+function frParseFreightText(text){
+  const out={ok:false, count:0, lg:0, fs:0, un:0, unknown:[], detail:[]};
+  const t=String(text||''); if(!t.trim()) return out;
+  const known=frKnownSellers();
+  const SELLER_LABEL=/业务员|销售|业务|跟单|客服|客户/;
+  const agg={};
+  t.split(/\r?\n/).forEach(raw=>{
+    const line=raw.replace(/\s+/g,' ').trim();
+    if(!line) return;
+    const nums=(line.match(/\d[\d,]*(?:\.\d{1,2})?/g)||[])
+      .map(s=>parseFloat(String(s).replace(/,/g,'')))
+      .filter(n=>{ if(!isFinite(n)) return false;
+        if(n>=1900 && n<=2099) return false;                                   // 年份（如 2026）
+        if(String(Math.floor(Math.abs(n))).length>=11) return false;           // 手机号
+        return true; });
+    if(!nums.length) return;
+    const amount=nums[nums.length-1];                                          // 取行末最后的金额（运费通常在最右）
+    let seller='', proj='unassigned';
+    for(const k of known){ if(line.toLowerCase().indexOf(k)>=0){ seller=k; proj=frMapSeller(k); break; } }
+    if(!seller && SELLER_LABEL.test(line)){
+      const m=line.match(/(?:业务员|销售|业务|跟单|客服|客户)[：:\s]*([\u4e00-\u9fa5·]{2,4})/);
+      if(m && !hrIsFieldWord(m[1])){ seller=m[1]; proj='unassigned'; }        // 标注了业务员/客户且是中文名 → 待确认
+    }
+    if(!seller) return;                                                        // 没认出业务员就不计入，避免把合计/表头当数据
+    if(!agg[seller]) agg[seller]={seller:seller, amount:0, project:proj};
+    agg[seller].amount=Math.round((agg[seller].amount+amount)*100)/100;
+    if(proj==='unassigned') agg[seller].project='unassigned';
+  });
+  const detail=Object.values(agg).map(d=>({seller:d.seller, amount:d.amount, project:d.project}));
+  if(!detail.length) return out;
+  let lg=0, fs=0, un=0;
+  detail.forEach(d=>{ const a=d.amount; if(d.project==='langges') lg+=a; else if(d.project==='fansi') fs+=a; else un+=a; });
+  const r2=n=>Math.round(n*100)/100;
+  out.ok=true; out.count=detail.length; out.lg=r2(lg); out.fs=r2(fs); out.un=r2(un);
+  out.detail=detail; out.unknown=detail.filter(d=>d.project==='unassigned').map(d=>d.seller);
+  return out;
+}
+// 文档（PDF / Word）文本提取：复用简历模块的解包读取（零依赖、不联网）
+async function frDocTextFromFile(f){
+  const u8=frBytesOf(f.dataUrl); if(!u8 || !u8.length) return {text:'', err:'文件为空'};
+  const mg=hrMagic(u8);
+  try{
+    if(mg==='zip'){ const t=await hrDocxText(u8); if(t) return {text:t, type:'docx'}; }
+    else if(mg==='pdf'){ const t=await hrPdfText(u8); if(t) return {text:t, type:'pdf'}; }
+    else if(mg==='ole'){ const t=hrLegacyDocText(u8); if(t) return {text:t, type:'doc'}; }
+  }catch(e){ return {text:'', err:(e&&e.message)||'文档解析失败'}; }
+  return {text:'', err:''};
+}
+// ---- 图片 OCR（联网按需加载 Tesseract，离线则降级为手工填） ----
+let frTessLoading=null, frTessWorkerP=null;
+function frLoadTesseract(){
+  if(window.Tesseract) return Promise.resolve(window.Tesseract);
+  if(frTessLoading) return frTessLoading;
+  frTessLoading=new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+    s.onload=()=> resolve(window.Tesseract);
+    s.onerror=()=> reject(new Error('OCR 引擎加载失败（请检查网络连接）'));
+    document.head.appendChild(s);
+  });
+  return frTessLoading;
+}
+async function frGetWorker(){
+  const T=await frLoadTesseract();
+  if(!frTessWorkerP){
+    frTessWorkerP=(async()=>{ const w=await T.createWorker('chi_sim+eng', 1, {logger:()=>{}}); return w; })();
+  }
+  return frTessWorkerP;
+}
+async function frOcrImage(f){
+  try{ const w=await frGetWorker(); const r=await w.recognize(f.dataUrl); return {text:(r&&r.data&&r.data.text)||'', err:''}; }
+  catch(e){ return {text:'', err:'OCR 识别失败：'+((e&&e.message)||e)}; }
+}
+// 任意文件 → 文字（图片走 OCR；其余走文档解包）
+async function frTextFromFile(f){
+  const name=String(f.name||'').toLowerCase();
+  const isImg=/\.(png|jpe?g|gif|bmp|webp)$/.test(name) || String(f.type||'').indexOf('image/')>=0;
+  if(isImg) return frOcrImage(f);
+  return frDocTextFromFile(f);
+}
 // 文件名 / 内容里找月份（2026年9月 / 202609 / 2026-09 等）
 function frDetectMonth(s){
   const t=String(s||''); let m;
@@ -7152,16 +7240,31 @@ function frApplyCsvRows(rows, silent){
 // 手动「重新识别」（按钮）
 function frAutoReadCsv(){ frAutoExtract(true); }
 
-// 上传即自动识别：月份 / 货代 / 金额明细
+// 上传即自动识别：月份 / 货代 / 金额明细（CSV/Excel/PDF/Word/图片 全支持）
 async function frAutoExtract(manual, fileList){
   const files=(fileList && fileList.length)? fileList : (frModalFiles.list||[]);
-  if(!files.length){ if(manual) showToast('请先上传运费清单文件（CSV / Excel）'); return; }
-  let rows=null, src='', err='';
+  if(!files.length){ if(manual) showToast('请先上传运费清单文件（表格 / PDF / Word / 图片）'); return; }
+  let rows=null, src='', err='', textInfo=null, isOcr=false;
+  // 1) 结构化表格（CSV / Excel）
   for(const f of files){
     try{ const r=await frRowsFromFile(f); if(r && r.length){ rows=r; src=f.name||''; break; } }
     catch(e){ if(!err) err=(f.name||'')+'：'+e.message; }
   }
-  const contentTxt = rows? rows.slice(0,12).map(r=>r.join(' ')).join(' \n ') : '';
+  // 2) 文档 / 图片（PDF / Word / 截图）—— 取第一个能读出文字的
+  if(!rows){
+    for(const f of files){
+      try{
+        if(/\.(png|jpe?g|gif|bmp|webp)$/i.test(f.name||'') || String(f.type||'').indexOf('image/')>=0){
+          isOcr=true;
+          showToast('🖼 正在识别图片里的运费数字（首次需联网下载识别引擎，请稍候）…','info');
+        }
+        const g=await frTextFromFile(f);
+        if(g && g.text && g.text.trim()){ textInfo=g; src=f.name||''; break; }
+        if(g && g.err) err=(err? (err+'；') : '')+(f.name||'')+'：'+g.err;
+      }catch(e){ if(!err) err=(f.name||'')+'：'+((e&&e.message)||e); }
+    }
+  }
+  const contentTxt = rows? rows.slice(0,40).map(r=>r.join(' ')).join(' \n ') : (textInfo? textInfo.text.slice(0,4000) : '');
   let month='', fwd='';
   for(const f of files){ if(!month) month=frDetectMonth(f.name||''); }
   if(!month) month=frDetectMonth(contentTxt);
@@ -7176,20 +7279,24 @@ async function frAutoExtract(manual, fileList){
   }
   if(fwd && !frModalForwarder){ frModalForwarder=fwd; frRenderForwarder(); done.push('货代 '+fwd); }
   else if(fwd && frModalForwarder && frModalForwarder!==fwd){ notes.push('文件像是「'+fwd+'」的，当前选的是「'+frModalForwarder+'」'); }
-  const res = rows? frApplyCsvRows(rows, true) : null;
+  let res=null;
+  if(rows){ res=frApplyCsvRows(rows, true); }
+  else if(textInfo){ res=frParseFreightText(textInfo.text); if(res.ok){ frModalDetail=res.detail; frDetailRecalc(); frRenderDetailReview(); } }
   frAutoSrc=src;
-  frRenderAutoHint({src:src, rows:!!rows, res:res, done:done, notes:notes, err:err});
+  frRenderAutoHint({src:src, rows:!!rows, text:!!textInfo, res:res, done:done, notes:notes, err:err, ocr:isOcr});
   const hasOldXls=files.some(f=>/\.xls$/i.test(f.name||''));
   if(res && res.ok){
     showToast('✓ 已自动识别 '+res.count+' 行（月份/货代/金额已填），请核对后保存','info');
   } else if(rows){
     showToast('已读到表格，但没认出「业务员/金额」两列，请手动填或检查表头','warning');
+  } else if(textInfo){
+    showToast('已读取到文档文字，但没解析出（业务员+金额）明细，请核对或在明细里手动补','warning');
   } else if(hasOldXls){
     showToast('老版 .xls 不能自动识别，请在 Excel 里另存为 .xlsx 或 CSV 再上传','warning');
   } else if(manual){
-    showToast(err? ('没能识别：'+err) : '这个文件读不出数据（支持 CSV / Excel；截图与 PDF 请手动填）','warning');
+    showToast(err? ('没能识别：'+err) : (isOcr? '图片识别失败（可能未联网），请联网后重试或手动填' : '这个文件读不出数据（支持 CSV / Excel / PDF / Word；图片需联网 OCR）'),'warning');
   } else {
-    showToast('文件已上传。截图 / PDF 无法自动识别数字，请手动填金额','warning');
+    showToast('文件已上传。若是图片需联网才能识别数字；表格/PDF/Word 已支持，请核对或手动填','warning');
   }
 }
 // 自动识别结果提示条
@@ -7215,7 +7322,7 @@ function frRenderAutoHint(info){
     h+='<div class="fr-ah-t">⚠ 没能自动识别出金额数据</div>';
     const tags=[]; (info.done||[]).forEach(d=>tags.push(d)); (info.notes||[]).forEach(n=>tags.push(n));
     if(tags.length) h+='<div>'+tags.map(t=>'<span class="fr-ah-tag">'+escHtml(t)+'</span>').join('')+'</div>';
-    h+='<div style="margin-top:3px">'+(info.err? escHtml('读取失败：'+info.err)+'；' : '')+'支持 <b>CSV / Excel(.xlsx)</b> 自动识别（截图与 PDF 识别不了数字），也可以直接手动填下面的金额。</div>';
+    h+='<div style="margin-top:3px">'+(info.err? escHtml('读取失败：'+info.err)+'；' : '')+'已支持 <b>CSV / Excel / PDF / Word</b> 自动识别；<b>截图 / 图片</b>需在联网时自动加载识别引擎（离线请手动填）。也可直接手动填下面的金额。</div>';
   }
   box.className='fr-autohint'+(good?'':' warn');
   box.innerHTML=h; box.style.display='block';
