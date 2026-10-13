@@ -855,6 +855,10 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fr-stat-l{font-size:12px;color:var(--text-muted)}
 .fr-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .fr-tip{font-size:12px;color:var(--text-muted);line-height:1.6}
+.fr-dropzone{border:2px dashed var(--border,#ccc);border-radius:10px;background:var(--bg-soft,#f7f8fa);padding:16px;text-align:center;color:var(--text-muted);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.fr-dropzone:hover{border-color:var(--accent,#3b82f6);background:rgba(59,130,246,.05)}
+.fr-dropzone-on{border-color:var(--accent,#3b82f6);background:rgba(59,130,246,.12);transform:scale(1.01)}
+.fr-dropzone-inner{font-size:13px;line-height:1.7}
 .fr-blocktitle{font-size:14px;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fr-blocktitle .cnt{font-size:12px;font-weight:600;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:1px 9px}
 .fr-tree{font-size:12px;color:var(--text-secondary);background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.9}
@@ -1055,7 +1059,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.17 · 2026-10-12</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.18 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1453,6 +1457,9 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <button class="btn btn-sm" onclick="frAutoReadCsv()">自动读取 CSV</button>
         <span class="fr-tip">表格账单另存为 CSV 后点「自动读取」可一键按业务员分到朗格斯/凡适；截图账单把图发到对话里，我帮你识别数字</span>
       </div>
+      <div class="fr-dropzone" id="frListDrop" onclick="frDropzoneClick(event)" ondragover="frListDragOver(event)" ondragenter="frListDragOver(event)" ondragleave="frListDragLeave(event)" ondrop="frListDrop(event)">
+        <div class="fr-dropzone-inner">📥 把运费清单文件拖到这里上传<br><span style="font-size:11px">支持表格 / 截图 / PDF，可一次拖多个（也可点击此区域选择文件）</span></div>
+      </div>
       <div class="task-files" id="frModalList"></div>
     </div>
     <div class="fr-form-row">
@@ -1815,7 +1822,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.17';
+const APP_VERSION = 'v2.18';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6704,11 +6711,19 @@ function frRenderModalFiles(){
   });
   box.innerHTML=html;
 }
-function handleFrListPick(){
-  const inp=document.getElementById('frListInput'); const files=Array.from(inp.files||[]); inp.value='';
+function frDropzoneClick(e){ if(e.target===this||(e.target.classList&&e.target.classList.contains('fr-dropzone-inner'))) document.getElementById('frListInput').click(); }
+function frAddFiles(fileList){
+  const files=Array.from(fileList||[]);
   if(!files.length) return;
   files.forEach(f=>{ processTaskFile(f).then(r=>{ frModalFiles.list.push(r); frRenderModalFiles(); }).catch(e=>showToast(e.message)); });
 }
+function handleFrListPick(){
+  const inp=document.getElementById('frListInput'); const files=Array.from(inp.files||[]); inp.value='';
+  frAddFiles(files);
+}
+function frListDragOver(e){ e.preventDefault(); e.stopPropagation(); const z=document.getElementById('frListDrop'); if(z) z.classList.add('fr-dropzone-on'); }
+function frListDragLeave(e){ e.preventDefault(); e.stopPropagation(); const z=document.getElementById('frListDrop'); if(z && !z.contains(e.relatedTarget)) z.classList.remove('fr-dropzone-on'); }
+function frListDrop(e){ e.preventDefault(); e.stopPropagation(); const z=document.getElementById('frListDrop'); if(z) z.classList.remove('fr-dropzone-on'); frAddFiles(e.dataTransfer && e.dataTransfer.files); }
 function frRemoveModalFile(i){ frModalFiles.list.splice(i,1); frRenderModalFiles(); }
 function saveFreightBill(){
   const monthRaw=document.getElementById('frMonth').value||'';
