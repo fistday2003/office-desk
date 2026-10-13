@@ -626,6 +626,21 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
 .clm-group.open .clm-group-body{display:block}
 .clm-line3{font-size:12.5px;color:var(--text-secondary);margin-top:5px;line-height:1.65;word-break:break-word}
 .clm-line3 b{color:var(--text);font-weight:600}
+/* —— 货损列表表格化（v2.21） —— */
+.clm-table-wrap{overflow-x:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:10px;background:var(--card-bg)}
+.clm-table{border-collapse:collapse;width:100%;font-size:12.5px;background:var(--card-bg)}
+.clm-table th,.clm-table td{border:1px solid var(--border);padding:7px 9px;vertical-align:top;text-align:left;line-height:1.55}
+.clm-table thead th{background:#eef2f7;font-weight:700;color:var(--text);white-space:nowrap}
+.clm-table tbody tr:hover{background:#f8fafc}
+.clm-table .clm-c-sel{width:34px;text-align:center;white-space:nowrap}
+.clm-table .clm-c-amt{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--danger);font-weight:600}
+.clm-table .clm-c-amt.zero{color:var(--text-muted);font-weight:400}
+.clm-table .clm-wraptd{word-break:break-word;overflow-wrap:anywhere;min-width:120px}
+.clm-table .clm-c-files{min-width:120px}
+.clm-cell-files{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.clm-cell-files img{width:36px;height:36px;object-fit:cover;border-radius:5px;border:1px solid var(--border);cursor:pointer}
+.clm-cell-files .file-dl{font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--card-bg);color:var(--text-secondary);cursor:pointer;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clm-cell-ops{display:flex;gap:2px;white-space:nowrap}
 
 @media (max-width:768px){
   .mnav-item{flex:1 1 0;min-width:0;padding:10px 2px}
@@ -1067,7 +1082,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.20 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.21 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1833,7 +1848,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.20';
+const APP_VERSION = 'v2.21';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6999,44 +7014,49 @@ function clmAmountVal(r){
 }
 
 // ---------------- 列表渲染 ----------------
-function clmItemHtml(r, withCheck){
+// 表格行（v2.21）：withCheck=未汇报带勾选；reportedAt 有值=已汇报表多一列「汇报日期」
+function clmRowHtml(r, withCheck, reportedAt){
   const nf=(r.files||[]).length;
   const amt=clmAmountVal(r);
-  let h='<div class="exp-item">';
-  h+='<div class="exp-item-main">';
-  h+='<div class="exp-line1">';
-  if(withCheck) h+='<label class="exp-check"><input type="checkbox" '+(clmSel[r.id]?'checked':'')+' onchange="clmPick(\''+r.id+'\',this.checked)" title="勾选后一起导出 / 汇报"></label>';
-  h+=clmNatureTag(r.nature);
-  h+='<span class="exp-title">'+escHtml(r.customer||'（未填客户名）')+'</span></div>';
-  h+='<div class="exp-line2">';
-  h+=clmProjectTag(r.project);
-  h+='<span>'+escHtml(r.date||'')+'</span>';
-  if(r.owner) h+='<span>· 业务 '+escHtml(r.owner)+'</span>';
-  if(nf)      h+='<span>· 资料 '+nf+' 个</span>';
-  h+='</div>';
-  if(r.desc)          h+='<div class="clm-line3">'+escHtml(r.desc)+'</div>';
-  if(r.solution)      h+='<div class="clm-line3"><b>解决方案：</b>'+escHtml(r.solution)+'</div>';
-  if(r.responsibility)h+='<div class="clm-line3"><b>责任：</b>'+escHtml(r.responsibility)+'</div>';
-  if(nf){
-    h+='<div class="exp-thumbs">';
-    (r.files||[]).forEach((f,i)=>{
-      const isImg=(f.type||'').indexOf('image/')===0;
-      if(isImg && f.dataUrl) h+='<img src="'+f.dataUrl+'" onclick="viewClmFile(\''+r.id+'\','+i+')" title="点击预览">';
-    });
-    (r.files||[]).forEach((f,i)=>{
-      const isImg=(f.type||'').indexOf('image/')===0;
-      if(!isImg && f.dataUrl) h+='<button class="file-dl" onclick="viewClmFile(\''+r.id+'\','+i+')" title="点击预览 / 下载">'+escHtml(f.name)+'</button>';
-    });
-    h+='</div>';
+  let h='<tr>';
+  if(withCheck){
+    h+='<td class="clm-c-sel"><input type="checkbox" '+(clmSel[r.id]?'checked':'')+' onchange="clmPick(\''+r.id+'\',this.checked)" title="勾选后一起导出 / 汇报"></td>';
   }
-  h+='</div>';
-  h+='<div class="exp-right">';
-  if(amt) h+='<div class="exp-amt" title="货损金额">'+fmtCNY(amt)+'</div>';
-  if(r.reported) h+='<div style="font-size:11px;color:var(--text-muted);white-space:nowrap">汇报于 '+escHtml(r.reportedAt||'')+'</div>';
-  h+='<div style="display:flex;gap:2px">';
-  h+='<button class="btn-icon" onclick="openClmModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
-  h+='<button class="btn-icon" onclick="deleteClmRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
-  h+='</div></div></div>';
+  h+='<td>'+clmNatureTag(r.nature)+'</td>';
+  h+='<td><b>'+escHtml(r.customer||'（未填客户名）')+'</b></td>';
+  h+='<td>'+clmProjectTag(r.project)+'</td>';
+  h+='<td style="white-space:nowrap">'+escHtml(r.date||'')+'</td>';
+  h+='<td style="white-space:nowrap">'+escHtml(r.owner||'—')+'</td>';
+  h+='<td class="clm-wraptd">'+escHtml(r.desc||'')+'</td>';
+  h+='<td class="clm-wraptd">'+escHtml(r.solution||'')+'</td>';
+  h+='<td class="clm-wraptd">'+escHtml(r.responsibility||'')+'</td>';
+  h+='<td class="clm-c-amt'+(amt?'':' zero')+'">'+(amt?fmtCNY(amt):'—')+'</td>';
+  // 资料
+  h+='<td class="clm-c-files"><div class="clm-cell-files">';
+  (r.files||[]).forEach((f,i)=>{
+    const isImg=(f.type||'') .indexOf('image/')===0;
+    if(isImg && f.dataUrl) h+='<img src="'+f.dataUrl+'" onclick="viewClmFile(\''+r.id+'\','+i+')" title="点击预览">';
+    else if(f.dataUrl) h+='<button class="file-dl" onclick="viewClmFile(\''+r.id+'\','+i+')" title="点击预览 / 下载">'+escHtml(f.name||'附件')+'</button>';
+  });
+  if(!nf) h+='<span style="color:var(--text-muted);font-size:11px">无</span>';
+  h+='</div></td>';
+  if(reportedAt!==undefined) h+='<td style="white-space:nowrap">'+escHtml(reportedAt||'')+'</td>';
+  // 操作
+  h+='<td class="clm-cell-ops">'
+    +'<button class="btn-icon" onclick="openClmModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>'
+    +'<button class="btn-icon" onclick="deleteClmRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>'
+    +'</td>';
+  h+='</tr>';
+  return h;
+}
+// 货损列表表头（与 clmRowHtml 列序严格对应）
+function clmHeadHtml(withReportedAt){
+  let h='<tr>';
+  if(withReportedAt===false) h+='<th></th>';
+  h+='<th>性质</th><th>客户名</th><th>项目</th><th>日期</th><th>业务</th>'
+    +'<th>问题描述</th><th>解决方案</th><th>责任 / 部门</th><th>金额</th><th>资料</th>';
+  if(withReportedAt===true) h+='<th>汇报日期</th>';
+  h+='<th>操作</th></tr>';
   return h;
 }
 function renderClaims(){
@@ -7075,14 +7095,16 @@ function renderClaims(){
     h+='<button class="btn" onclick="clmClearSel()">清空勾选</button>';
   }
   h+='</div>';
-  // 未汇报（平铺，可勾选）
+  // 未汇报（表格，可勾选）
   h+='<div class="clm-blocktitle">未汇报 <span class="cnt">'+unreported.length+'</span></div>';
   if(!unreported.length){
     h+='<div style="font-size:13px;color:var(--text-muted);padding:6px 2px 10px">没有待汇报的记录</div>';
   } else {
-    unreported.forEach(r=>{ h+=clmItemHtml(r,true); });
+    h+='<div class="clm-table-wrap"><table class="clm-table"><thead>'+clmHeadHtml(false)+'</thead><tbody>';
+    unreported.forEach(r=>{ h+=clmRowHtml(r,true); });
+    h+='</tbody></table></div>';
   }
-  // 已汇报（按汇报日期分组折叠，默认收起）
+  // 已汇报（按汇报日期分组折叠，组内表格，默认收起）
   if(reported.length){
     h+='<div class="clm-blocktitle">已汇报 <span class="cnt">'+reported.length+'</span></div>';
     gkeys.forEach(gk=>{
@@ -7093,7 +7115,9 @@ function renderClaims(){
       h+='<div class="clm-group-head" onclick="clmToggleGroup(\''+gk+'\')">';
       h+='<span class="clm-arrow">▶</span><span>'+escHtml(fmtDate(gk))+' 已汇报</span><span class="clm-gsum">'+list.length+' 笔'+(total?' · 货损 '+fmtCNY(total):'')+'</span></div>';
       h+='<div class="clm-group-body">';
-      list.forEach(r=>{ h+=clmItemHtml(r,false); });
+      h+='<div class="clm-table-wrap"><table class="clm-table"><thead>'+clmHeadHtml(true)+'</thead><tbody>';
+      list.forEach(r=>{ h+=clmRowHtml(r,false,r.reportedAt); });
+      h+='</tbody></table></div>';
       h+='</div></div>';
     });
   }
@@ -7306,6 +7330,19 @@ function clmImgSize(dataUrl){
     img.src=dataUrl;
   });
 }
+// 估算行高（按最长文本列，避免导出后文字被截断）；返回像素高度
+function clmEstHeight(r){
+  const fields=[ [r.desc||'',34], [r.solution||'',34], [r.responsibility||'',16], [r.customer||'',16] ];
+  let lines=1;
+  fields.forEach(([t,w])=>{
+    const s=String(t); if(!s) return;
+    let units=0; for(let i=0;i<s.length;i++){ units += (s.charCodeAt(i)>255?1.0:0.5); }
+    const perLine=Math.max(6, w*0.55);
+    const l=Math.ceil(units/perLine);
+    if(l>lines) lines=l;
+  });
+  return Math.min(150, Math.max(20, lines*15+6));
+}
 function clmExportExcelAction(){
   const picked=claims.filter(r=>!r.reported && clmSel[r.id]);
   if(!picked.length){ showToast('先在「未汇报」里勾选要导出的条目'); return; }
@@ -7402,19 +7439,21 @@ async function clmBuildXlsx(list){
     const rn=k+2;
     const hasImg=rowImgs[k].length>0;
     const amt=parseFloat(r.amount);
-    rows+='<row r="'+rn+'"'+(hasImg?' ht="64" customHeight="1"':'')+'>'
-      +clmCell(0,rn,r.date||'')
-      +clmCell(1,rn,r.project||'')
-      +clmCell(2,rn,r.owner||'')
-      +clmCell(3,rn,r.customer||'')
-      +clmCell(4,rn,r.desc||'')
-      +clmCell(5,rn,r.nature||'')
-      +clmCell(6,rn,r.solution||'')
-      +(isNaN(amt)?'':clmCell(7,rn,Math.round(amt*100)/100))
-      +clmCell(8,rn,r.responsibility||'')
-      +clmCell(9,rn,r.reported?'已汇报':'未汇报')
-      +clmCell(10,rn,r.reported?(r.reportedAt||''):'')
-      +clmCell(11,rn,(fileNames[k]||[]).join('、'))
+    let hgt=clmEstHeight(r);
+    if(hasImg) hgt=Math.max(hgt,64);
+    rows+='<row r="'+rn+'" ht="'+hgt+'" customHeight="1">'
+      +clmCell(0,rn,r.date||'',2)
+      +clmCell(1,rn,r.project||'',2)
+      +clmCell(2,rn,r.owner||'',2)
+      +clmCell(3,rn,r.customer||'',2)
+      +clmCell(4,rn,r.desc||'',2)
+      +clmCell(5,rn,r.nature||'',2)
+      +clmCell(6,rn,r.solution||'',2)
+      +(isNaN(amt)?'':clmCell(7,rn,Math.round(amt*100)/100,3))
+      +clmCell(8,rn,r.responsibility||'',2)
+      +clmCell(9,rn,r.reported?'已汇报':'未汇报',2)
+      +clmCell(10,rn,r.reported?(r.reportedAt||''):'',2)
+      +clmCell(11,rn,(fileNames[k]||[]).join('、'),2)
       +'</row>';
   });
   const cols='<cols>'
@@ -7433,6 +7472,7 @@ async function clmBuildXlsx(list){
     +'</cols>';
   const sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
     +'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    +'<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
     +cols
     +'<sheetData>'+rows+'</sheetData>'
     +'<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>'
@@ -7487,13 +7527,15 @@ async function clmBuildXlsx(list){
     {name:'xl/styles.xml', data:
       '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
       +'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-      +'<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>'
-      +'<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDF2F7"/><bgColor indexed="64"/></patternFill></fill></fills>'
+      +'<fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts>'
+      +'<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF2F2F2"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF2F5597"/><bgColor indexed="64"/></patternFill></fill></fills>'
       +'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'
       +'<border><left style="thin"><color rgb="FFD9E2EC"/></left><right style="thin"><color rgb="FFD9E2EC"/></right><top style="thin"><color rgb="FFD9E2EC"/></top><bottom style="thin"><color rgb="FFD9E2EC"/></bottom><diagonal/></border></borders>'
       +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-      +'<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
-      +'<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/></cellXfs>'
+      +'<cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+      +'<xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
+      +'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+      +'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="top" wrapText="1"/></xf></cellXfs>'
       +'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
       +'</styleSheet>'},
     {name:'xl/worksheets/sheet1.xml', data:sheet}
