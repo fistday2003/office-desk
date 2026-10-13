@@ -972,6 +972,28 @@ tr:hover .fr-fwd-acts{opacity:1}
 .hr-doc .hr-doc-link:hover{color:var(--primary)}
 .hr-doc .hr-doc-size{color:var(--text-muted);font-size:11px}
 .hr-td-docs{text-align:center;white-space:nowrap}
+/* 列表「资料」列：可直接预览 / 下载（v2.23） */
+.hr-docs-mini{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.hr-docs-none{color:var(--text-muted)}
+.hr-doc-mini{display:inline-flex;align-items:center;gap:4px;max-width:200px}
+.hr-doc-mini-nm{color:var(--primary-dark);cursor:pointer;font-size:11.5px;max-width:158px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
+.hr-doc-mini-nm:hover{color:var(--primary)}
+.hr-doc-mini-dl{flex:0 0 auto;color:var(--text-muted);cursor:pointer;font-size:11.5px;border:1px solid var(--border);border-radius:5px;padding:0 4px;line-height:16px}
+.hr-doc-mini-dl:hover{color:var(--primary);border-color:var(--primary)}
+.hr-doc-btn{flex:0 0 auto;border:1px solid var(--border);background:var(--card-bg);border-radius:6px;cursor:pointer;font-size:11.5px;padding:1px 6px;color:var(--text-secondary);font-family:inherit}
+.hr-doc-btn:hover{color:var(--primary);border-color:var(--primary)}
+/* 列表内联下拉：应聘岗位 / 优先级 / 状态 直接改（v2.23） */
+.hr-inline-sel{border:1px solid var(--border);border-radius:6px;padding:2px 4px;font-size:12px;font-family:inherit;background:var(--card-bg);color:var(--text);max-width:158px;cursor:pointer}
+.hr-inline-sel.pri-a{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark);font-weight:700}
+.hr-inline-sel.pri-b{border-color:var(--accent);background:#ecfdf5;color:#065f46;font-weight:700}
+.hr-inline-sel.pri-c{border-color:#94a3b8;background:#f1f5f9;color:#475569;font-weight:700}
+.hr-col-paynote{white-space:normal;min-width:130px;max-width:210px;word-break:break-word;line-height:1.5;font-size:12px}
+/* 简历自动识别结果提示条（v2.23） */
+.hr-auto-box{margin:0 0 12px;border:1px solid #a7f3d0;background:#ecfdf5;color:#065f46;border-radius:8px;padding:8px 11px;font-size:12.5px;line-height:1.75}
+.hr-auto-box.warn{border-color:#fed7aa;background:#fff7ed;color:#b45309}
+.hr-auto-box .hd{font-weight:700;margin-bottom:2px}
+.hr-auto-tag{display:inline-block;background:rgba(255,255,255,.72);border:1px solid currentColor;border-radius:10px;padding:0 7px;margin:2px 4px 2px 0;font-size:11.5px}
+.hr-auto-box .ops{margin-left:6px;font-size:11.5px;opacity:.85}
 .btn-xs.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .btn-xs.btn-primary:hover{filter:brightness(1.05);color:#fff}
 .btn-xs.btn-warn{background:#fef3c7;border-color:#fcd34d;color:#b45309}
@@ -1125,7 +1147,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.22 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.23 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1563,6 +1585,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 <div class="modal-overlay" id="modalHrStaff" style="display:none">
   <div class="modal" style="width:min(760px,95vw)">
     <h3 id="modalHrStaffTitle">新增员工档案</h3>
+    <div class="hr-auto-box" id="hsAutoBox" style="display:none"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 140px"><label>姓名 *</label><input type="text" id="hsName" placeholder="如 陈曦"></div>
       <div class="form-group" style="flex:1 1 120px"><label>英文名</label><input type="text" id="hsEnName" placeholder="如 Nancy"></div>
@@ -1603,9 +1626,11 @@ tr:hover .fr-fwd-acts{opacity:1}
     </div>
     <div class="form-group"><label>提成 / 奖金（文字说明，如提成办法 / 奖金规则）</label><textarea id="hsCommText" rows="2" placeholder="例如：按销售额 3% 计提；样品单无提成，大货单额外 1% 奖金"></textarea></div>
     <div class="form-group"><label>备注</label><textarea id="hsNote" rows="2" placeholder="提成口径、转正结论、其他说明"></textarea></div>
-    <div class="hr-sec-h" style="margin:12px 0 6px">📎 人事资料（简历 / 劳动合同 / 解除协议 等，可拖拽上传）</div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">📎 人事资料（简历 / 劳动合同 / 解除协议 等，拖拽或点击上传，自动读取识别人事信息）
+      <button class="btn" style="padding:3px 9px;font-size:11.5px;margin-left:auto" onclick="hrReExtractStaff()">🔍 重新识别</button>
+    </div>
     <div class="fr-dropzone hr-doc-zone" id="hsDocZone" onclick="hrDocPick('staff')" ondragover="hrDocZoneOver(event,this)" ondragleave="hrDocZoneLeave(event,this)" ondrop="hrDocZoneDrop(event,this,'staff')">
-      <div class="fr-dropzone-inner">📥 把资料拖到这里上传<br><span style="font-size:11px">支持 PDF / Word / 图片 / 文本，可一次拖多个（也可点击此区域选择文件）</span></div>
+      <div class="fr-dropzone-inner">📥 把资料拖到这里上传<br><span style="font-size:11px">Word(.docx/.doc) / PDF / 图片 / 文本 均可，自动识别姓名·性别·出生·手机·邮箱·学历·学校·专业 并填入上方空白项</span></div>
     </div>
     <div class="hr-doc-list" id="hsDocList"></div>
     <div class="modal-actions">
@@ -1649,6 +1674,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 <div class="modal-overlay" id="modalHrTalent" style="display:none">
   <div class="modal" style="width:min(820px,95vw)">
     <h3 id="modalHrTalentTitle">新增候选人</h3>
+    <div class="hr-auto-box" id="htAutoBox" style="display:none"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 130px"><label>姓名 *</label><input type="text" id="htName"></div>
       <div class="form-group" style="flex:0 1 100px"><label>性别</label><select id="htGender"><option value="">未填</option><option>女</option><option>男</option></select></div>
@@ -1699,9 +1725,11 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group" style="flex:1 1 180px"><label>薪资说明</label><input type="text" id="htPayNote" placeholder="如 口径冲突：您说4500/人事说4000"></div>
     </div>
     <div class="form-group"><label>综合评价 / 结论</label><textarea id="htRemark" rows="3" placeholder="优势、短板、定位建议、下一步动作"></textarea></div>
-    <div class="hr-sec-h" style="margin:12px 0 6px">📎 简历 / 资料（可拖拽上传，自动识别姓名 / 手机 / 邮箱）</div>
+    <div class="hr-sec-h" style="margin:12px 0 6px">📎 简历 / 资料（拖拽或点击上传，自动读取简历内容识别人事信息）
+      <button class="btn" style="padding:3px 9px;font-size:11.5px;margin-left:auto" onclick="hrReExtractTalent()">🔍 重新识别</button>
+    </div>
     <div class="fr-dropzone hr-doc-zone" id="htDocZone" onclick="hrDocPick('talent')" ondragover="hrDocZoneOver(event,this)" ondragleave="hrDocZoneLeave(event,this)" ondrop="hrDocZoneDrop(event,this,'talent')">
-      <div class="fr-dropzone-inner">📥 把简历 / 资料拖到这里上传<br><span style="font-size:11px">支持 PDF / Word / 图片 / 文本，可一次拖多个（也可点击此区域选择文件）</span></div>
+      <div class="fr-dropzone-inner">📥 把简历 / 资料拖到这里上传<br><span style="font-size:11px">Word(.docx/.doc) / PDF / 图片 / 文本 均可，自动识别姓名·性别·出生·手机·邮箱·学历·学校·专业·现居·期望薪资·应聘岗位</span></div>
     </div>
     <div class="hr-doc-list" id="htDocList"></div>
     <div class="modal-actions">
@@ -1906,7 +1934,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.22';
+const APP_VERSION = 'v2.23';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -11014,6 +11042,7 @@ function switchTab(tab){
 const HR_PROJECTS = ['朗格斯','凡适','综合'];
 const HR_SALARY_ITEMS = ['基本工资','岗位工资','绩效工资','补贴','社保','其他'];
 const HR_TALENT_STATUS = ['待面试','面试中','已通过','已发offer','已入职','已流失','暂不考虑','未落地·可培养','兜底备选','待定'];
+const HR_TALENT_PRI_OPTS = [['','未评级'],['A','A 重点推进'],['B','B 培养 / 定向'],['C','C 兜底备选']];
 const HR_STAFF_STATUS = [
   {key:'formal', label:'正式'},
   {key:'probation', label:'试用期'},
@@ -11072,6 +11101,7 @@ function hrHeal(){
     if(!Array.isArray(s.salaryLog)){ s.salaryLog=[]; changed=true; }
     if(!s.salary || typeof s.salary!=='object'){ s.salary={}; changed=true; }
     if(!Array.isArray(s.docs)){ s.docs=[]; changed=true; }
+    s.docs.forEach(d=>{ if(d && !d.fid){ d.fid='f_'+uid(); changed=true; } }); // 旧记录补编号，保证能预览 / 下载
     if(s.commText===undefined) s.commText='';
     if(s.salary && s.salary.comm!==undefined){ if(!s.commText) s.commText=String(s.salary.comm); delete s.salary.comm; changed=true; } // 旧版提成数值 → 文本说明
   });
@@ -11090,6 +11120,7 @@ function hrHeal(){
     if(t.payNote===undefined){ t.payNote=''; changed=true; }
     if(t.remark===undefined){ t.remark=''; changed=true; }
     if(!Array.isArray(t.docs)){ t.docs=[]; changed=true; }
+    t.docs.forEach(d=>{ if(d && !d.fid){ d.fid='f_'+uid(); changed=true; } }); // 旧记录补编号，保证能预览 / 下载
   });
   hr.talent = hr.talent.filter(t=>t && t.name);
   if(changed) saveAll();
@@ -11116,6 +11147,7 @@ function hrStaffLeaveToggle(){
 // ---------------- 在职员工：弹窗与保存 ----------------
 function openHrStaffModal(id){
   editingHrStaffId = id || null;
+  hrAutoBoxReset('hsAutoBox');
   const rec = id ? hr.staff.find(s=>s.id===id) : null;
   const projSel=document.getElementById('hsProject');
   projSel.innerHTML = HR_PROJECTS.map(p=>'<option value="'+p+'">'+(p||'')+'</option>').join('');
@@ -11244,6 +11276,7 @@ function saveHrSalary(){
 // ---------------- 人才储备库：弹窗与保存 ----------------
 function openHrTalentModal(id){
   editingHrTalentId = id || null;
+  hrAutoBoxReset('htAutoBox');
   const rec = id? hr.talent.find(t=>t.id===id): null;
   const statusSel=document.getElementById('htStatus');
   statusSel.innerHTML = HR_TALENT_STATUS.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
@@ -11455,7 +11488,7 @@ function hrStaffHtml(){
       h+='<td>'+escHtml(s.probEnd||'')+'</td>';
       h+='<td>'+escHtml(s.regularizeDate||'')+'</td>';
       h+='<td class="num">'+(sal>0?('¥'+sal.toLocaleString('zh-CN')):'')+'</td>';
-      h+='<td class="hr-td-docs">'+(s.docs&&s.docs.length?('📎'+s.docs.length):'—')+'</td>';
+      h+='<td class="hr-td-docs">'+hrDocsCell(s.docs)+'</td>';
       h+='<td class="hr-td-acts">';
       if(s.status==='probation') h+='<button class="btn btn-xs btn-warn" onclick="hrRegularize(\''+s.id+'\')">转正</button>';
       h+='<button class="btn btn-xs btn-warn" onclick="hrStaffLeave(\''+s.id+'\')">离职</button>';
@@ -11482,7 +11515,7 @@ function hrStaffHtml(){
       h+='<td>'+escHtml(s.joinDate||'')+'</td>';
       h+='<td>'+escHtml(s.leaveDate||'')+'</td>';
       h+='<td>'+(s.leaveReason?escHtml(s.leaveReason):'')+'</td>';
-      h+='<td class="hr-td-docs">'+(s.docs&&s.docs.length?('📎'+s.docs.length):'—')+'</td>';
+      h+='<td class="hr-td-docs">'+hrDocsCell(s.docs)+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs" onclick="openHrStaffModal(\''+s.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs" onclick="hrStaffRestore(\''+s.id+'\')">恢复</button>';
@@ -11588,6 +11621,46 @@ function hrTalentCmp(a,b,key){
   if(key==='expectPay'||key==='offerPay'){ const num=v=>{ const m=String(v||'').match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):0; }; return num(a[key])-num(b[key]); }
   return String(a[key]||'').localeCompare(String(b[key]||''),'zh');
 }
+// ---- 列表内联下拉：应聘岗位 / 优先级 / 状态 直接在列表改（v2.23） ----
+function hrTalentPostSel(t){
+  const val=String(t.post||'');
+  const all=HR_POST_OPTIONS.slice();
+  if(val && all.indexOf(val)<0) all.push(val);
+  let h='<select class="hr-inline-sel" title="点开直接改应聘岗位" onchange="hrTalentInline(\''+t.id+'\',\'post\',this.value)">';
+  h+='<option value=""'+(!val?' selected':'')+'>— 未填 —</option>';
+  all.forEach(o=>{ h+='<option value="'+escAttr(o)+'"'+(o===val?' selected':'')+'>'+escHtml(o)+'</option>'; });
+  h+='<option value="__other__">✏️ 其他…（手动输入）</option>';
+  return h+'</select>';
+}
+function hrTalentPriSel(t){
+  const val=String(t.priority||'');
+  const cls= val==='A'?'pri-a':(val==='B'?'pri-b':(val==='C'?'pri-c':''));
+  let h='<select class="hr-inline-sel'+(cls?(' '+cls):'')+'" title="点开直接改优先级" onchange="hrTalentInline(\''+t.id+'\',\'priority\',this.value)">';
+  HR_TALENT_PRI_OPTS.forEach(o=>{ h+='<option value="'+escAttr(o[0])+'"'+(o[0]===val?' selected':'')+'>'+escHtml(o[1])+'</option>'; });
+  return h+'</select>';
+}
+function hrTalentStatusSel(t){
+  const val=String(t.status||'');
+  const all=HR_TALENT_STATUS.slice();
+  if(val && all.indexOf(val)<0) all.push(val);
+  let h='<select class="hr-inline-sel" title="点开直接改状态" onchange="hrTalentInline(\''+t.id+'\',\'status\',this.value)">';
+  all.forEach(o=>{ h+='<option value="'+escAttr(o)+'"'+(o===val?' selected':'')+'>'+escHtml(o)+'</option>'; });
+  return h+'</select>';
+}
+function hrTalentInline(id, key, val){
+  const t=hr.talent.find(x=>x.id===id); if(!t) return;
+  if(val==='__other__'){
+    let cur=null;
+    try{ cur=window.prompt('输入应聘岗位（留空则不改）', t.post||''); }catch(e){ cur=null; }
+    if(cur===null){ renderHr(); return; }
+    val=String(cur).trim();
+    if(!val){ renderHr(); return; }
+  }
+  t[key]=val;
+  saveAll(); renderHr();
+  const lbl={post:'应聘岗位',priority:'优先级',status:'状态'}[key]||key;
+  showToast('✓ 已更新'+lbl+'：'+(val||'—'), 'info');
+}
 function hrTalentHtml(){
   const all=hr.talent;
   const total=all.length;
@@ -11611,6 +11684,7 @@ function hrTalentHtml(){
       +th('contact','联系方法',true)
       +th('expectPay','期望薪资',true)
       +th('offerPay','承诺薪资',true)
+      +th('payNote','薪资说明',true)
       +'<th>备注</th>'
       +'<th>资料</th>'
       +'<th>操作</th>'
@@ -11620,30 +11694,28 @@ function hrTalentHtml(){
     if(hrTalentSort.key){ list.sort((a,b)=>hrTalentCmp(a,b,hrTalentSort.key)*hrTalentSort.dir); }
     else { list.sort((a,b)=>rank(a)-rank(b)); }
     list.forEach(t=>{
-      const pr=t.priority||'';
-      const prCls= pr==='A'?'a':(pr==='B'?'b':(pr==='C'?'c':''));
-      const prTxt= pr==='A'?'A 重点':(pr==='B'?'B 培养':(pr==='C'?'C 兜底':''));
       h+='<tr>';
       h+='<td class="hr-td-name"><b class="hr-name-link" onclick="hrToggleDetail(\'hrDt_'+t.id+'\')">'+escHtml(t.name||'')+'</b></td>';
-      h+='<td>'+escHtml(t.post||'')+'</td>';
-      h+='<td>'+(prCls?'<span class="hr-pill '+prCls+'">'+prTxt+'</span>':'')+'</td>';
-      h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
+      h+='<td>'+hrTalentPostSel(t)+'</td>';
+      h+='<td>'+hrTalentPriSel(t)+'</td>';
+      h+='<td>'+hrTalentStatusSel(t)+'</td>';
       h+='<td>'+escHtml(t.interviewDate||'')+'</td>';
       h+='<td>'+(t.interviewers&&t.interviewers.length?escHtml(t.interviewers.join('/')):'')+'</td>';
       h+='<td>'+(t.contact?escHtml(t.contact):'')+'</td>';
       h+='<td>'+(t.expectPay?escHtml(t.expectPay):'')+'</td>';
       h+='<td>'+(t.offerPay?escHtml(t.offerPay):'')+'</td>';
+      h+='<td class="hr-col-paynote">'+(t.payNote?escHtml(t.payNote):'')+'</td>';
       h+='<td>'+(t.remark?escHtml(t.remark):'')+'</td>';
-      h+='<td class="hr-td-docs">'+(t.docs&&t.docs.length?('📎'+t.docs.length):'—')+'</td>';
+      h+='<td class="hr-td-docs">'+hrDocsCell(t.docs)+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs btn-primary" onclick="hrTalentToProbation(\''+t.id+'\')">转试用</button>';
       h+='<button class="btn btn-xs" onclick="openHrTalentModal(\''+t.id+'\')">编辑</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="deleteHrTalent(\''+t.id+'\')">删</button>';
       h+='</td></tr>';
-      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="12">'+hrTalentDetail(t)+'</td></tr>';
+      h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="13">'+hrTalentDetail(t)+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="hr-tip">提示：点表头字段（姓名 / 岗位 / 优先级 / 状态 / 面试时间 / 联系方法 / 期望薪资 / 承诺薪资）可升、降序排序（再点一次切换方向）；点姓名展开明细；「转试用」转入在职；「删」移入「已删除资源」</div>';
+    h+='<div class="hr-tip">提示：点表头字段（姓名 / 岗位 / 优先级 / 状态 / 面试时间 / 联系方法 / 期望薪资 / 承诺薪资 / 薪资说明）可升、降序排序（再点一次切换方向）；<b>应聘岗位 · 优先级 · 状态可直接在列表里点下拉改</b>；「资料」列每条都能点开预览、点 ⬇ 下载；点姓名展开明细；「转试用」转入在职；「删」移入「已删除资源」</div>';
   }
   if(delT.length){
     h+='<div class="hr-collapsible">';
@@ -11658,7 +11730,7 @@ function hrTalentHtml(){
       h+='<td><span class="hr-pill">'+escHtml(t.status||'')+'</span></td>';
       h+='<td>'+(t.delReason?escHtml(t.delReason):'—')+'</td>';
       h+='<td>'+escHtml(t.delDate||'')+'</td>';
-      h+='<td class="hr-td-docs">'+(t.docs&&t.docs.length?('📎'+t.docs.length):'—')+'</td>';
+      h+='<td class="hr-td-docs">'+hrDocsCell(t.docs)+'</td>';
       h+='<td class="hr-td-acts">';
       h+='<button class="btn btn-xs" onclick="hrTalentRestore(\''+t.id+'\')">恢复</button>';
       h+='<button class="btn btn-xs btn-danger" onclick="hrTalentPurge(\''+t.id+'\')">彻底删除</button>';
@@ -11770,12 +11842,12 @@ function hrDocHandle(files, mode){
   arr.forEach(f=>{
     hrProcessDocFile(f).then(r=>{
       const doc={fid:r.fid, name:r.name, type:r.type, size:r.size, dataUrl:r.dataUrl, kind:hrDocDefaultKind(mode)};
-      if(mode==='talent'){ htDocs.push(doc); hrRenderTalentDocs(); hrAutoExtractFromDoc(doc,null,true); }
-      else if(mode==='staff'){ hsDocs.push(doc); hrRenderStaffDocs(); }
+      if(mode==='talent'){ htDocs.push(doc); hrRenderTalentDocs(); hrAutoExtractFromDoc(doc,'talent',null); }
+      else if(mode==='staff'){ hsDocs.push(doc); hrRenderStaffDocs(); hrAutoExtractFromDoc(doc,'staff',null); }
       else if(mode.indexOf('inline:')===0){
         const parts=mode.split(':'); const typ=parts[1]; const id=parts[2];
         const rec = typ==='staff'? hr.staff.find(s=>s.id===id): hr.talent.find(t=>t.id===id);
-        if(rec){ rec.docs=rec.docs||[]; rec.docs.push(doc); hrAutoExtractFromDoc(doc,rec,false); hrInlineDocDone(typ,id); }
+        if(rec){ rec.docs=rec.docs||[]; rec.docs.push(doc); hrInlineDocDone(typ,id); hrAutoExtractFromDoc(doc, mode, rec); }
       }
     }).catch(e=>showToast(e.message));
   });
@@ -11796,41 +11868,395 @@ function hrDocRowHtml(d,i,which){
     +'<span class="hr-doc-name" title="'+escAttr(d.name)+'">'+escHtml(d.name)+'</span>'
     +'<span class="hr-doc-size">'+fmtSize(d.size||0)+'</span>'
     +'<select class="hr-doc-kind-sel" onchange="hrDocKindChange(\''+which+'\',\''+i+'\',this.value)">'+opts+'</select>'
+    +'<button type="button" class="hr-doc-btn" title="预览" onclick="hrPreviewLocalDoc(\''+which+'\','+i+')">预览</button>'
+    +'<button type="button" class="hr-doc-btn" title="下载到电脑" onclick="hrDownloadLocalDoc(\''+which+'\','+i+')">下载</button>'
     +'<button type="button" class="btn-icon" title="移除" onclick="hrDocRemove(\''+which+'\',\''+i+'\')">✕</button></div>';
+}
+// 弹窗内暂存资料的预览 / 下载（dataUrl 就在内存里）
+function hrLocalDoc(which,i){ const arr=(which==='talent')?htDocs:hsDocs; return arr[i]||null; }
+function hrPreviewLocalDoc(which,i){ const d=hrLocalDoc(which,i); if(!d) return; expShowPreview(d); }
+function hrDownloadLocalDoc(which,i){ const d=hrLocalDoc(which,i); if(!d) return; hrSaveAs(d.dataUrl, d.name); }
+// 统一的「另存为」：dataUrl → 本机文件
+function hrSaveAs(dataUrl, name){
+  if(!dataUrl){ showToast('未找到该资料'); return; }
+  const a=document.createElement('a');
+  a.href=dataUrl; a.setAttribute('download', name||'资料');
+  document.body.appendChild(a); a.click(); a.remove();
+  showToast('已开始下载：'+(name||'资料'),'info');
 }
 function hrDocKindChange(which,i,val){ const arr=(which==='talent')?htDocs:hsDocs; if(arr[i]) arr[i].kind=val; }
 function hrDocRemove(which,i){ if(which==='talent'){ htDocs.splice(i,1); hrRenderTalentDocs(); } else { hsDocs.splice(i,1); hrRenderStaffDocs(); } }
-// 自动识别：从文件名猜姓名（仅人才弹窗、且姓名为空时）；从文件文本扫手机号 / 邮箱
+// ============================================================
+//  简历 / 资料「内容读取 + 人事信息自动识别」（v2.23 重做）
+//  —— 不再是"扫 ASCII 字符"，而是真正解开文件内容：
+//     · Word .docx  → 解 zip 取 word/document.xml
+//     · PDF         → 解 FlateDecode 流 + Tj/TJ 文本 + ToUnicode CMap
+//     · .doc (OLE2) → 按 UTF-16LE / GBK 双解码取更可读的一份
+//     · 文本 / HTML → 直接解码并去标签
+//  纯前端零依赖（zip 用 DecompressionStream，不联网、不上传服务器）
+// ============================================================
+const HR_AUTO_LABELS = {name:'姓名',gender:'性别',birth:'出生年月',post:'应聘岗位',edu:'学历',school:'毕业学校',major:'专业',phone:'联系方式',email:'邮箱',city:'现居地',contact:'联系方法',expectPay:'期望薪资',workYears:'工作年限'};
+const HR_FIELD_WORDS = ['姓名','性别','年龄','出生','生日','民族','学历','学位','电话','手机','邮箱','专业','学校','毕业','院校','现居','住址','地址','期望','薪资','待遇','应聘','岗位','职位','求职','意向','政治面貌','婚姻','身高','体重','籍贯','健康','联系','备注','特长','技能','经历','评价','背景','情况','时间','日期','状态','编号','照片','简历','信息','姓名：'];
+function hrIsFieldWord(s){ s=String(s||'').trim(); if(!s) return true; return HR_FIELD_WORDS.some(w=>s.indexOf(w)>=0); }
+// 只用来挡"标签本身"，不挡正常取值（例如"中原工学院"要放行，"毕业学校"要挡掉）
+const HR_LABEL_ONLY = ['毕业学校','毕业院校','学校','院校','学校名称','毕业','毕业时间','毕业年份','专业','学历','学位','期望薪资','薪资','待遇','应聘岗位','应聘职位','岗位','职位','求职意向','联系电话','联系方式','联系方法','手机','电话','邮箱','姓名','性别','年龄','民族','政治面貌','婚姻状况','身高','体重','籍贯','健康状况','现居住地','现居地','居住地','住址','地址','备注','特长','技能','工作经历','项目经历','教育背景','自我评价','个人信息','基本信息','个人简历','简历','照片','编号','状态','时间','日期','评价','经验','经历','姓名：'];
+function hrIsLabelOnly(s){ s=String(s||'').trim(); return !s || HR_LABEL_ONLY.indexOf(s)>=0; }
 function hrGuessNameFromFilename(name){
   let n=String(name||'').replace(/\.[^.]+$/,'');
-  n=n.replace(/(个人)?简历|个人资料|求职|CV|cv|resume/gi,'').replace(/[-_·\s]+/g,'');
-  if(/^[\u4e00-\u9fa5]{2,4}$/.test(n)) return n;
+  n=n.replace(/(个人)?简历|个人资料|求职|登记表|应聘|CV|cv|resume/gi,'').replace(/[-_·\s（）()\[\]]+/g,'');
+  if(/^[\u4e00-\u9fa5]{2,4}$/.test(n) && !hrIsFieldWord(n)) return n;
   return '';
 }
-function hrExtractText(doc){
-  try{
-    const m=String(doc.dataUrl||'').match(/^data:[^;]*;base64,(.*)$/); if(!m) return '';
-    const bin=atob(m[1]); let runs=[]; let cur='';
-    for(let i=0;i<bin.length;i++){ const c=bin.charCodeAt(i); if(c>=32&&c<127){ cur+=String.fromCharCode(c); } else { if(cur.length>=4) runs.push(cur); cur=''; } }
-    if(cur.length>=4) runs.push(cur);
-    return runs.join('\n');
-  }catch(e){ return ''; }
+function hrDocBytes(doc){
+  try{ return frBytesOf(doc && doc.dataUrl); }catch(e){ return new Uint8Array(0); }
 }
-function hrAutoExtractFromDoc(doc, rec, isTalentModal){
-  if(isTalentModal){
-    const nm=hrGuessNameFromFilename(doc.name);
-    if(nm && !document.getElementById('htName').value){ document.getElementById('htName').value=nm; }
+function hrMagic(u8){
+  if(!u8 || u8.length<4) return '';
+  if(u8[0]===0x50&&u8[1]===0x4B) return 'zip';
+  if(u8[0]===0x25&&u8[1]===0x50&&u8[2]===0x44&&u8[3]===0x46) return 'pdf';
+  if(u8[0]===0xD0&&u8[1]===0xCF&&u8[2]===0x11&&u8[3]===0xE0) return 'ole';
+  return '';
+}
+function hrCleanText(s){
+  let t=String(s||'').replace(/\u0000/g,'');
+  t=t.replace(/[\u0001-\u0008\u000b\u000c\u000e-\u001f]/g,' ');
+  t=t.replace(/\uFFFD/g,'');
+  t=t.replace(/[\u00a0\u3000]/g,' ');
+  t=t.replace(/[ \t]{2,}/g,' ');
+  t=t.replace(/\n{3,}/g,'\n\n');
+  return t.trim();
+}
+// 判断读出来的文字"像不像简历"，避免把乱码灌进表单
+function hrReadable(txt){
+  if(!txt) return false;
+  const zh=(txt.match(/[\u4e00-\u9fa5]/g)||[]).length;
+  if(zh<8) return false;
+  const hits=['姓名','性别','电话','手机','邮箱','学历','毕业','专业','工作','经验','教育','简历','应聘','期望','薪资','出生','现居','地址','实习','评价','岗位','职位'];
+  let n=0; hits.forEach(w=>{ if(txt.indexOf(w)>=0) n++; });
+  return n>=2;
+}
+// docx：解 zip 取正文 XML，把段落 / 单元格 / 制表符还原成可读文本
+async function hrDocxText(u8){
+  const ent=await frZipEntries(u8);
+  let key=null;
+  for(const k in ent){ if(/^word\/document\d*\.xml$/i.test(k)){ key=k; break; } }
+  if(!key){ for(const k in ent){ if(/^word\/[^/]*\.xml$/i.test(k)){ key=k; break; } } }
+  if(!key) return '';
+  const it=ent[key];
+  const raw=(it.method===0)? it.raw : await frInflateRaw(it.raw);
+  let xml=new TextDecoder('utf-8').decode(raw);
+  xml=xml.replace(/<w:tab\b[^>]*\/?>/g,'\t')
+         .replace(/<w:br\b[^>]*\/?>/g,'\n')
+         .replace(/<\/w:p>/g,'\n')
+         .replace(/<w:tc\b[^>]*>/g,'\t');
+  xml=xml.replace(/<[^>]*>/g,'');
+  return hrCleanText(frXmlUnesc(xml));
+}
+// .doc（OLE2 老 Word）：正文多为 UTF-16LE，也有 GBK；两种都解，取"更通顺"的那份
+function hrLegacyDocText(u8){
+  const cands=[];
+  try{ cands.push(new TextDecoder('utf-16le').decode(u8)); }catch(e){}
+  try{ cands.push(frDecodeText(u8)); }catch(e){}
+  let best='', score=-1e9;
+  cands.forEach(s=>{
+    const t=hrCleanText(s);
+    const zh=(t.match(/[\u4e00-\u9fa5]/g)||[]).length;
+    const noise=(t.match(/[\uFFFD]/g)||[]).length;
+    const sc=zh-noise*4;
+    if(sc>score){ score=sc; best=t; }
+  });
+  return best;
+}
+function hrLatin1(u8){
+  let out=''; const CH=8192;
+  for(let i=0;i<u8.length;i+=CH) out+=String.fromCharCode.apply(null, u8.subarray(i, Math.min(i+CH, u8.length)));
+  return out;
+}
+// PDF 里某段「字节串」（latin1）→ 解压后的文本；解不开就原样返回
+async function hrInflateStr(s){
+  const u8=new Uint8Array(s.length);
+  for(let i=0;i<s.length;i++) u8[i]=s.charCodeAt(i)&0xff;
+  let end=u8.length;
+  while(end>0 && (u8[end-1]===0x0a||u8[end-1]===0x0d||u8[end-1]===0x20)) end--;
+  const body=u8.subarray(0,end);
+  const fmts=['deflate-raw','deflate'];
+  for(let i=0;i<fmts.length;i++){
+    try{
+      const st=new Blob([body]).stream().pipeThrough(new DecompressionStream(fmts[i]));
+      return new TextDecoder('latin1').decode(new Uint8Array(await new Response(st).arrayBuffer()));
+    }catch(e){}
   }
-  const txt=hrExtractText(doc); if(!txt) return;
-  const phone=(txt.match(/1[3-9]\d{9}/)||[])[0];
-  const email=(txt.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)||[])[0];
-  if(isTalentModal){
-    if(phone && !document.getElementById('htPhone').value) document.getElementById('htPhone').value=phone;
-    if(email && !document.getElementById('htEmail').value) document.getElementById('htEmail').value=email;
+  return s;
+}
+function hrHexToStr(h){
+  h=String(h||'').replace(/[<>\s]/g,'');
+  if(!h) return '';
+  if(h.length<=2){ const c=parseInt(h,16); return isNaN(c)?'':String.fromCharCode(c); }
+  let out='';
+  for(let i=0;i+4<=h.length;i+=4){ const c=parseInt(h.substr(i,4),16); if(!isNaN(c)&&c) out+=String.fromCharCode(c); }
+  return out;
+}
+// ToUnicode CMap：把 PDF 里字形的编号映射回真正的汉字
+function hrCmapInto(txt, map){
+  let m;
+  const re=/beginbfchar([\s\S]*?)endbfchar/g;
+  while((m=re.exec(txt))){
+    const pr=/<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]*)>/g; let x;
+    while((x=pr.exec(m[1]))) map[parseInt(x[1],16)]=hrHexToStr(x[2]);
+  }
+  const re2=/beginbfrange([\s\S]*?)endbfrange/g;
+  while((m=re2.exec(txt))){
+    const pr=/<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*(?:<([0-9A-Fa-f]*)>|\[([\s\S]*?)\])/g; let x;
+    while((x=pr.exec(m[1]))){
+      const lo=parseInt(x[1],16), hi=parseInt(x[2],16);
+      if(hi-lo>3000) break;
+      if(x[3]!==undefined && x[3]!==''){ const base=hrHexToStr(x[3]); for(let c=lo;c<=hi;c++) map[c]=base; }
+      else if(x[4]!==undefined){
+        const items=x[4].match(/<([0-9A-Fa-f]*)>/g)||[];
+        items.forEach((it,i)=>{ map[lo+i]=hrHexToStr(it); });
+      }
+    }
+  }
+}
+function hrPdfUnescape(s){
+  let r=String(s||'').replace(/\\([nrtbf()\\])/g,(m,c)=>({n:'\n',r:'\r',t:'\t',b:'',f:'','(':'(',')':')','\\':'\\'}[c]!==undefined?{n:'\n',r:'\r',t:'\t',b:'',f:'','(':'(',')':')','\\':'\\'}[c]:c));
+  r=r.replace(/\\([0-7]{1,3})/g,(m,o)=>String.fromCharCode(parseInt(o,8)));
+  return r;
+}
+function hrPdfHexMap(hex, cmap){
+  const h=String(hex||'').replace(/[^0-9A-Fa-f]/g,'');
+  if(!h) return '';
+  if(h.length<=2) return hrHexToStr(h);
+  let out='';
+  for(let i=0;i+4<=h.length;i+=4){
+    const code=parseInt(h.substr(i,4),16);
+    out += (cmap && cmap[code]!==undefined)? cmap[code] : hrHexToStr(h.substr(i,4));
+  }
+  return out;
+}
+function hrPdfBlockText(block, cmap, out){
+  const re=/\[((?:[^\[\]\\]|\\.)*)\]\s*TJ|\(((?:[^()\\]|\\.)*)\)\s*Tj|<([0-9A-Fa-f\s]+)>\s*Tj|(T\*|Td|TD|ET)/g;
+  let m;
+  while((m=re.exec(block))){
+    if(m[1]!==undefined){
+      const parts=m[1].match(/\((?:[^()\\]|\\.)*\)|<[0-9A-Fa-f\s]+>/g)||[];
+      parts.forEach(p=>{ if(p.charAt(0)==='(') out.push(hrPdfUnescape(p.slice(1,-1))); else out.push(hrPdfHexMap(p.slice(1,-1), cmap)); });
+    } else if(m[2]!==undefined){ out.push(hrPdfUnescape(m[2])); }
+    else if(m[3]!==undefined){ out.push(hrPdfHexMap(m[3], cmap)); }
+    else { out.push('\n'); }
+  }
+}
+// PDF：逐个 obj 取 stream，先有 ToUnicode 就先建映射，再解析文本操作符
+async function hrPdfText(u8){
+  const raw=hrLatin1(u8);
+  const objs=[];
+  const re=/(\d+)\s+\d+\s+obj\b/g; let m; const marks=[];
+  while((m=re.exec(raw))) marks.push(m.index+m[0].length);
+  for(let i=0;i<marks.length;i++){
+    const end=(i+1<marks.length)? marks[i+1] : raw.length;
+    const seg=raw.slice(marks[i], Math.min(end, marks[i]+4000000));
+    if(seg.length>3000000 && !/stream/.test(seg)) { /* 超大非流对象跳过 */ }
+    const o={dict:'', body:''};
+    const si=seg.indexOf('stream');
+    if(si>=0){
+      o.dict=seg.slice(0,si);
+      let st=si+6; if(seg.charAt(st)==='\r') st++; if(seg.charAt(st)==='\n') st++;
+      const en=seg.indexOf('endstream', st);
+      if(en>0) o.body=await hrInflateStr(seg.slice(st,en));
+    } else { o.dict=seg; }
+    objs.push(o);
+  }
+  if(!objs.length) return '';
+  const cmap={};
+  objs.forEach(o=>{ if(o.body && /beginbfchar|beginbfrange/.test(o.body)) hrCmapInto(o.body, cmap); });
+  const out=[];
+  objs.forEach(o=>{
+    if(!o.body) return;
+    if(/beginbfchar|beginbfrange/.test(o.body) && !/\bBT\b/.test(o.body)) return; // 纯 CMap 流
+    if(!/\bBT\b/.test(o.body)) return;
+    hrPdfBlockText(o.body, cmap, out);
+  });
+  return hrCleanText(out.join(''));
+}
+async function hrReadDocText(doc){
+  const u8=hrDocBytes(doc);
+  if(!u8 || !u8.length) return '';
+  const mg=hrMagic(u8);
+  try{
+    if(mg==='zip'){ const t=await hrDocxText(u8); if(t) return t; }
+    else if(mg==='pdf'){ const t=await hrPdfText(u8); if(t) return t; }
+    else if(mg==='ole'){ const t=hrLegacyDocText(u8); if(t) return t; }
+  }catch(e){}
+  let s='';
+  try{ s=frDecodeText(u8); }catch(e){ s=''; }
+  if(/<\s*(html|body|p|div|table|span|br)\b/i.test(s)){
+    s=s.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ')
+       .replace(/<\/t[dh]>/gi,'\t').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|div|tr|li|h[1-6])>/gi,'\n')
+       .replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ');
+  }
+  return hrCleanText(s);
+}
+// ---- 从简历文字里抓字段（覆盖中文简历常见写法） ----
+function hrParseResume(text){
+  const raw=String(text||'').replace(/\r/g,'\n');
+  const flat=raw.replace(/[ \t\u00a0\u3000]+/g,' ');
+  const one=flat.replace(/\n+/g,' ');
+  const out={};
+  const g1=re=>{ const m=one.match(re); return m? String(m[1]||'').trim():''; };
+  // 姓名
+  let name=g1(/姓\s*名[：:]\s*([\u4e00-\u9fa5·]{2,4})/);
+  if(!name) name=g1(/姓\s*名[\s：:]+([\u4e00-\u9fa5·]{2,4})/);
+  if(name && hrIsFieldWord(name)) name='';
+  if(!name){
+    const lines=flat.split('\n').map(l=>l.replace(/\s+/g,'').trim()).filter(Boolean);
+    for(let i=0;i<Math.min(lines.length,14);i++){
+      const l=lines[i];
+      if(/^[\u4e00-\u9fa5·]{2,4}$/.test(l) && !hrIsFieldWord(l)){ name=l; break; }
+    }
+  }
+  if(name) out.name=name;
+  // 性别
+  let gender='';
+  const gm=one.match(/性\s*别[\s：:]*([男女])/); if(gm) gender=gm[1];
+  if(!gender){ if(/性\s*别[\s：:]*[^\n]{0,4}男/.test(one)) gender='男'; else if(/性\s*别[\s：:]*[^\n]{0,4}女/.test(one)) gender='女'; }
+  if(gender) out.gender=gender;
+  // 出生年月（必须年+月才填，避免乱补月份）
+  let bm=one.match(/(?:出\s*生(?:年\s*月|日\s*期|日)?|生\s*日)[\s：:]*((?:19|20)\d{2})\s*[年\-/\.]\s*(\d{1,2})/);
+  if(!bm) bm=one.match(/((?:19|20)\d{2})\s*[年\-/\.]\s*(\d{1,2})\s*月?\s*(?:出\s*生|生)/);
+  if(bm){
+    const mo=parseInt(bm[2],10);
+    if(mo>=1 && mo<=12) out.birth=bm[1]+'-'+('0'+mo).slice(-2);
+    else out.birthYear=bm[1];
+  } else {
+    const yo=one.match(/(?:出\s*生(?:年\s*月|日\s*期|日)?)[\s：:]*((?:19|20)\d{2})/);
+    if(yo) out.birthYear=yo[1];
+  }
+  const ag=one.match(/年\s*龄[\s：:]*(\d{1,2})/); if(ag) out.age=ag[1];
+  // 学历
+  const eduList=[['博士','博士'],['硕士','硕士'],['研究生','硕士'],['本科','本科'],['大专','大专'],['专科','大专'],['高职','大专'],['中专','其他'],['高中','其他']];
+  for(let i=0;i<eduList.length;i++){ if(one.indexOf(eduList[i][0])>=0){ out.edu=eduList[i][1]; break; } }
+  // 学校：先按「毕业学校：xxx」这类带标签的写法取，再退回全文找第一家院校（跳过"毕业学校"这种标签词）
+  let sch='';
+  const sm=one.match(/(?:毕业(?:院校|学校)|毕\s*业\s*于|就读(?:于)?|学校名称|院\s*校)[\s：:]*([\u4e00-\u9fa5]{2,16}(?:大学|学院|学校|职业学院|职业技术学院|技师学院))/);
+  if(sm && !hrIsLabelOnly(sm[1])) sch=sm[1];
+  if(!sch){
+    const sre=/([\u4e00-\u9fa5]{2,16}(?:大学|学院|职业学院|职业技术学院|技师学院|学校))/g; let sx;
+    while((sx=sre.exec(one))){ if(!hrIsLabelOnly(sx[1])){ sch=sx[1]; break; } }
+  }
+  if(sch) out.school=sch;
+  // 专业
+  const maj=one.match(/(?:专\s*业|主\s*修|所学专业)[\s：:]*([^\s，,；;、。|]{2,18})/);
+  if(maj && !hrIsFieldWord(maj[1])) out.major=maj[1];
+  // 手机 / 邮箱
+  const ph=one.match(/1[3-9]\d{9}/); if(ph) out.phone=ph[0];
+  const em=one.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/); if(em) out.email=em[0];
+  // 现居地
+  const ct=one.match(/(?:现居(?:地|城市)?|现居住地|居住地|所在城市|居住城市|现住址|家庭住址|户籍所在地|籍贯)[\s：:]*([\u4e00-\u9fa5]{2,12})/);
+  if(ct && !hrIsFieldWord(ct[1])) out.city=ct[1].replace(/[省市区县]$/,'')||ct[1];
+  // 期望薪资
+  const pay=one.match(/(?:期望薪资|期望月薪|期望工资|期望薪酬|期望待遇|薪资要求|待遇要求)[\s：:]*([0-9][0-9,，.．kK万\-~～至到+\s\/月元]{0,18})/);
+  if(pay) out.expectPay=String(pay[1]).replace(/\s+$/,'').trim();
+  // 应聘岗位 / 求职意向
+  const po=one.match(/(?:应聘(?:岗位|职位)|求职(?:意向|岗位|职位)|意向(?:岗位|职位)|目标(?:岗位|职位))[\s：:]*([^\s，,；;、。|]{2,20})/);
+  if(po && !hrIsFieldWord(po[1])) out.post=po[1];
+  // 工作年限
+  const wy=one.match(/(\d{1,2})\s*年(?:以上)?(?:的)?(?:工作)?(?:经验|经历)/); if(wy) out.workYears=wy[1];
+  return out;
+}
+async function hrFieldsFromDoc(doc){
+  const txt=await hrReadDocText(doc);
+  const ok=hrReadable(txt);
+  const fields = ok? hrParseResume(txt) : {};
+  if(!fields.name){ const nm=hrGuessNameFromFilename(doc && doc.name); if(nm) fields.name=nm; }
+  return {fields:fields, ok:ok, txt:txt};
+}
+// 把识别结果写进表单：只填空项，已有内容一律不动
+function hrApplyToForm(fields, pairs){
+  const filled={}, skipped={};
+  pairs.forEach(p=>{
+    const v=fields[p[0]]; if(!v) return;
+    const el=document.getElementById(p[1]); if(!el) return;
+    if(String(el.value||'').trim()){ skipped[p[0]]=v; return; }
+    el.value=v; filled[p[0]]=v;
+  });
+  return {filled:filled, skipped:skipped};
+}
+function hrApplyToRec(fields, rec, isStaff){
+  const keys = isStaff
+    ? ['name','gender','birth','post','edu','school','major','phone']
+    : ['name','gender','birth','post','edu','school','major','phone','email','city','contact','expectPay'];
+  const filled={}, skipped={};
+  keys.forEach(k=>{ const v=fields[k]; if(!v) return; if(rec[k]){ skipped[k]=v; return; } rec[k]=v; filled[k]=v; });
+  return {filled:filled, skipped:skipped};
+}
+function hrAutoHintHtml(res, extra, warn){
+  const keys=Object.keys(res.filled);
+  let h='<div class="hd">'+(warn
+      ? ('⚠ 没读出这份文件里的文字'+(keys.length? ('，只从文件名猜到了：'+keys.map(k=>HR_AUTO_LABELS[k]||k).join('、')) : ''))
+      : (keys.length? ('✓ 已自动读取简历内容，识别并填入 '+keys.length+' 项（只填空白项，已填内容一律不动）') : '已读取文件内容，但没有可自动填入的空白项'))+'</div>';
+  if(keys.length && !warn) h+=keys.map(k=>'<span class="hr-auto-tag">'+escHtml(HR_AUTO_LABELS[k]||k)+'：'+escHtml(String(res.filled[k]).slice(0,26))+'</span>').join('');
+  if(extra) h+='<div style="margin-top:3px">'+extra+'</div>';
+  if(!warn && keys.length && keys.length<3) h+='<div class="ops">没抓全属正常：简历写法千差万别，缺的项手工补一下即可。</div>';
+  return h;
+}
+function hrAutoBoxReset(boxId){
+  const box=document.getElementById(boxId); if(!box) return;
+  box.className='hr-auto-box'; box.innerHTML=''; box.style.display='none';
+}
+function hrShowAutoBox(boxId, res, extra, warn){
+  const box=document.getElementById(boxId); if(!box) return;
+  if(!res || (!Object.keys(res.filled).length && !extra)){ box.style.display='none'; box.innerHTML=''; return; }
+  box.className='hr-auto-box'+(warn?' warn':'');
+  box.innerHTML=hrAutoHintHtml(res, extra, warn);
+  box.style.display='block';
+}
+function hrAutoReadNote(ok, fields, txt){
+  if(ok) return fields.birthYear && !fields.birth ? ('只读到出生年份 '+fields.birthYear+'，月份未识别，请自行补全。') : '';
+  const len=(txt||'').length;
+  return '没读出这份文件里的文字（'+(len?('只解出 '+len+' 个字符') :'文件内无可读文本')+'）。多为扫描件 / 图片版简历——纯离线环境不支持图片识别，请手工填写，或换成 Word(.docx) / 文字版 PDF 再上传。';
+}
+async function hrAutoExtractFromDoc(doc, mode, rec){
+  const r=await hrFieldsFromDoc(doc);
+  hrApplyExtract(r, mode, rec);
+  return r;
+}
+function hrApplyExtract(r, mode, rec){
+  const fields=r.fields;
+  if(mode==='talent'){
+    const res=hrApplyToForm(fields, [['name','htName'],['gender','htGender'],['birth','htBirth'],['post','htPost'],['edu','htEdu'],['school','htSchool'],['major','htMajor'],['phone','htPhone'],['email','htEmail'],['city','htCity'],['contact','htContact'],['expectPay','htExpectPay']]);
+    hrShowAutoBox('htAutoBox', res, hrAutoReadNote(r.ok, fields, r.txt), !r.ok);
+  } else if(mode==='staff'){
+    const res=hrApplyToForm(fields, [['name','hsName'],['gender','hsGender'],['birth','hsBirth'],['post','hsPost'],['edu','hsEdu'],['school','hsSchool'],['major','hsMajor'],['phone','hsPhone']]);
+    hrShowAutoBox('hsAutoBox', res, hrAutoReadNote(r.ok, fields, r.txt), !r.ok);
   } else if(rec){
-    if(phone && !rec.phone) rec.phone=phone;
-    if(email && !rec.email) rec.email=email;
+    const isStaff=!!hr.staff.find(s=>s.id===rec.id);
+    const res=hrApplyToRec(fields, rec, isStaff);
+    const names=Object.keys(res.filled).map(k=>HR_AUTO_LABELS[k]||k);
+    if(names.length){
+      saveAll(); renderHr();
+      const row=document.getElementById((isStaff?'hrDs_':'hrDt_')+rec.id);
+      if(row) row.style.display='table-row';
+    }
+    showToast(names.length? ('已从资料识别并补全：'+names.join('、')) : (r.ok? '资料已保存（无新的空白字段需要补全）' : '资料已保存；文件里没读出文字（多为扫描件），可手工补全'), 'info');
   }
+}
+async function hrReExtractTalent(){
+  if(!htDocs.length){ showToast('还没有上传简历，先拖一份进来再识别'); return; }
+  let merged={}, okAny=false;
+  for(let i=0;i<htDocs.length;i++){ const r=await hrFieldsFromDoc(htDocs[i]); if(r.ok) okAny=true; merged=Object.assign(merged, r.fields); }
+  const res=hrApplyToForm(merged, [['name','htName'],['gender','htGender'],['birth','htBirth'],['post','htPost'],['edu','htEdu'],['school','htSchool'],['major','htMajor'],['phone','htPhone'],['email','htEmail'],['city','htCity'],['contact','htContact'],['expectPay','htExpectPay']]);
+  const extra = okAny? (merged.birthYear&&!merged.birth? ('只读到出生年份 '+merged.birthYear+'，月份未识别。') : '') : '这批资料里都没读出文字（多为扫描件 / 图片），请手工填写。';
+  hrShowAutoBox('htAutoBox', res, extra, !okAny);
+  showToast(Object.keys(res.filled).length? ('已重新识别并补全 '+Object.keys(res.filled).length+' 项') : '重新识别完成，没有新的空白项可填', 'info');
+}
+async function hrReExtractStaff(){
+  if(!hsDocs.length){ showToast('还没有上传资料，先拖一份进来再识别'); return; }
+  let merged={}, okAny=false;
+  for(let i=0;i<hsDocs.length;i++){ const r=await hrFieldsFromDoc(hsDocs[i]); if(r.ok) okAny=true; merged=Object.assign(merged, r.fields); }
+  const res=hrApplyToForm(merged, [['name','hsName'],['gender','hsGender'],['birth','hsBirth'],['post','hsPost'],['edu','hsEdu'],['school','hsSchool'],['major','hsMajor'],['phone','hsPhone']]);
+  const extra = okAny? (merged.birthYear&&!merged.birth? ('只读到出生年份 '+merged.birthYear+'，月份未识别。') : '') : '这批资料里都没读出文字（多为扫描件 / 图片），请手工填写。';
+  hrShowAutoBox('hsAutoBox', res, extra, !okAny);
+  showToast(Object.keys(res.filled).length? ('已重新识别并补全 '+Object.keys(res.filled).length+' 项') : '重新识别完成，没有新的空白项可填', 'info');
 }
 function hrInlineDocDone(typ,id){
   saveAll(); renderHr();
@@ -11842,17 +12268,44 @@ function hrDocsHtml(docs){
   return '<div class="hr-docs">'+docs.map(d=>{
     return '<div class="hr-doc"><span class="hr-doc-ic">'+hrDocIcon(d)+'</span>'
       +'<span class="hr-doc-kind">['+(d.kind||'资料')+']</span>'
-      +'<a class="hr-doc-name hr-doc-link" onclick="hrViewDoc(\''+d.fid+'\')">'+escHtml(d.name)+'</a>'
-      +'<span class="hr-doc-size">'+fmtSize(d.size||0)+'</span></div>';
+      +'<a class="hr-doc-name hr-doc-link" onclick="hrViewDoc(\''+escAttr(d.fid||'')+'\')">'+escHtml(d.name)+'</a>'
+      +'<span class="hr-doc-size">'+fmtSize(d.size||0)+'</span>'
+      +'<button type="button" class="hr-doc-btn" title="下载到电脑" onclick="hrDownloadDoc(\''+escAttr(d.fid||'')+'\',\''+escAttr(String(d.name||'资料'))+'\')">⬇ 下载</button></div>';
   }).join('')+'</div>';
 }
-function hrViewDoc(fid){
+// 人员列表「资料」列：每条都能点开预览、点 ⬇ 下载（v2.23）
+function hrDocsCell(docs){
+  if(!docs||!docs.length) return '<span class="hr-docs-none">—</span>';
+  return '<div class="hr-docs-mini">'+docs.map(d=>{
+    const nm=String(d.name||'资料');
+    const short=nm.length>12? (nm.slice(0,11)+'…') : nm;
+    return '<span class="hr-doc-mini">'
+      +'<a class="hr-doc-mini-nm" title="预览 '+escAttr(nm)+'" onclick="hrViewDoc(\''+escAttr(d.fid||'')+'\')">'+hrDocIcon(d)+' '+escHtml(short)+'</a>'
+      +'<a class="hr-doc-mini-dl" title="下载 '+escAttr(nm)+'" onclick="hrDownloadDoc(\''+escAttr(d.fid||'')+'\',\''+escAttr(nm)+'\')">⬇</a>'
+      +'</span>';
+  }).join('')+'</div>';
+}
+// 从内存或 IndexedDB 取回资料本体（两种入口都能预览 / 下载）
+async function hrGetDoc(fid){
   let doc=null;
   for(const s of hr.staff){ if(s.docs) for(const d of s.docs) if(d.fid===fid) doc=d; }
   if(!doc) for(const t of hr.talent){ if(t.docs) for(const d of t.docs) if(d.fid===fid) doc=d; }
-  const openIt = g=>{ if(g&&g.dataUrl) window.open(g.dataUrl,'_blank'); else showToast('未找到该资料'); };
-  if(doc){ if(doc.dataUrl) openIt(doc); else idbGet(fid).then(openIt); }
-  else idbGet(fid).then(openIt);
+  if(doc && doc.dataUrl) return doc;
+  const g=await idbGet(fid);
+  if(g && g.dataUrl) return {name:(doc&&doc.name)||g.name, type:(doc&&doc.type)||g.type, dataUrl:g.dataUrl, size:(doc&&doc.size)||g.size};
+  return doc||null;
+}
+async function hrViewDoc(fid){
+  if(!fid){ showToast('该资料缺少编号，请重新上传一次'); return; }
+  const g=await hrGetDoc(fid);
+  if(g && g.dataUrl) expShowPreview(g);
+  else showToast('资料文件没找到（可能已被清理），请重新上传一次');
+}
+async function hrDownloadDoc(fid, name){
+  if(!fid){ showToast('该资料缺少编号，请重新上传一次'); return; }
+  const g=await hrGetDoc(fid);
+  if(g && g.dataUrl) hrSaveAs(g.dataUrl, g.name||name||'资料');
+  else showToast('资料文件没找到（可能已被清理），请重新上传一次');
 }
 
 // ---------------- 第一版初始数据（仅空库时种入，之后由用户自行修改） ----------------
