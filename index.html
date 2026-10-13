@@ -968,7 +968,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         <span class="as-dot" id="asDot"></span>同步设置
       </button>
-      <button class="btn-header" id="btnImport" title="从文件导入恢复">
+      <button class="btn-header" id="btnImport" data-drop-to="importFile" title="从文件导入恢复（也可把备份 JSON 拖到此处）">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         导入文件
       </button>
@@ -1059,7 +1059,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.18 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.19 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1165,11 +1165,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
           <p class="section-subtitle">导入阿里后台导出的「订单列表」和「收款明细」，自动算双店实收、新老客户、业务员提成（参考值）与市场分布；支持导入聊天记录做意向与响应分析</p>
         </div>
         <div class="biz-tools">
-          <label class="btn btn-primary" for="bizFileInput" style="cursor:pointer">
+          <label class="btn btn-primary" for="bizFileInput" data-drop-to="bizFileInput" style="cursor:pointer" title="点选，或把订单/收款表文件拖到此处">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             导入订单 / 收款表
           </label>
-          <label class="btn" for="bizChatInput" style="cursor:pointer">导入聊天记录</label>
+          <label class="btn" data-drop-to="bizChatInput" for="bizChatInput" style="cursor:pointer" title="点选，或把聊天记录文件拖到此处">导入聊天记录</label>
           <button class="btn" id="btnBizExport" onclick="bizExport()">导出分析</button>
           <button class="btn" id="btnBizClear" onclick="bizClearAll()">清空经营数据</button>
         </div>
@@ -1481,6 +1481,9 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
   <div class="modal" style="width:min(560px,95vw)">
     <h3 id="frFilesTitle">资料</h3>
     <div class="task-files" id="frFilesList"></div>
+    <div class="fr-dropzone" data-drop-fr-cat="1" onclick="frUploadCat(frPreviewState.id, frPreviewState.cat)" style="margin:10px 0 0">
+      <div class="fr-dropzone-inner">📥 把文件拖到这里上传<br><span style="font-size:11px">支持图片 / PDF，可一次拖多个（也可点击此区域选择文件）</span></div>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="frUploadCat(frPreviewState.id, frPreviewState.cat)">添加文件</button>
       <button class="btn btn-primary" onclick="closeModal('modalFrFiles')">关闭</button>
@@ -1822,7 +1825,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.18';
+const APP_VERSION = 'v2.19';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -2863,7 +2866,7 @@ function renderDash(){
   html+='<label class="plan-chk"><input type="checkbox" '+(planSplit?'checked':'')+' onchange="planToggleSplit(this.checked)"> 分线显示</label>';
   html+='<span class="plan-spacer"></span>';
   html+='<button class="btn" onclick="planFetchActual(false)">⚡ 从经营分析抓取实际</button>';
-  html+='<label class="btn" for="planImportInput" style="cursor:pointer">导入计划 / 实际</label>';
+  html+='<label class="btn" for="planImportInput" data-drop-to="planImportInput" style="cursor:pointer" title="点选，或把 CSV / JSON 文件拖到此处">导入计划 / 实际</label>';
   html+='<button class="btn" onclick="planExportCsv()">导出 CSV</button>';
   html+='<button class="btn btn-primary" onclick="openPlanModalAt()">＋ 录入</button>';
   html+='</div>';
@@ -3900,7 +3903,7 @@ function viewNoteFile(nid, idx){
 
 // ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 速记卡片 / 新建编辑弹窗）=====
 function dropZoneFromEvent(e){
-  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal],[data-drop-clm-modal]') : null;
+  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal],[data-drop-clm-modal],[data-drop-fr-cat],[data-drop-fr-action],[data-drop-to]') : null;
 }
 document.addEventListener('dragover', e=>{
   const zone = dropZoneFromEvent(e);
@@ -3928,7 +3931,19 @@ document.addEventListener('drop', e=>{
   else if(zone.dataset.dropModal) addProjectModalFilesFromList(files);
   else if(zone.dataset.dropTask) addTaskFilesFromList(zone.dataset.dropTask, files);
   else if(zone.dataset.projectId) addProjectFilesFromList(zone.dataset.projectId, files);
+  else if(zone.dataset.dropFrAction){ const p=(zone.dataset.dropFrAction||'').split('|'); frAddCatFilesFromList(p[0], p[1], files); }
+  else if(zone.dataset.dropFrCat) frAddCatFilesFromList(frPreviewState.id, frPreviewState.cat, files);
+  else if(zone.dataset.dropTo) dropFilesToInput(zone.dataset.dropTo, files);
 });
+
+// 通用：把拖入的文件塞进指定 file input，并触发其 change（用于「导入文件」等各种文件选择按钮）
+function dropFilesToInput(inputId, files){
+  const inp=document.getElementById(inputId); if(!inp||!files||!files.length) return;
+  try{
+    const dt=new DataTransfer(); files.forEach(f=>dt.items.add(f)); inp.files=dt.files;
+    inp.dispatchEvent(new Event('change'));
+  }catch(e){ showToast('拖拽上传失败，请改用按钮选择文件','warning'); }
+}
 
 function toggleTask(id){
   const t = tasks.find(t=>t.id===id);
@@ -6579,8 +6594,8 @@ function frActsHtml(b){
   h+='<button class="btn-icon" title="编辑" onclick="openFreightBillModal(\''+b.id+'\')">'+ICON_EDIT+'</button>';
   h+='<button class="btn-icon" title="删除" onclick="deleteFreightBill(\''+b.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>';
   if(b.status==='清单已上传') h+='<button class="btn btn-xs btn-warn" onclick="frAdvance(\''+b.id+'\',\'已申请付款\')">申请付款</button>';
-  else if(b.status==='已申请付款') h+='<button class="btn btn-xs" onclick="frUploadCat(\''+b.id+'\',\'voucher\')">上传凭证</button>';
-  else if(b.status==='已付款') h+='<button class="btn btn-xs btn-primary" onclick="frUploadCat(\''+b.id+'\',\'invoice\')">上传发票</button>';
+  else if(b.status==='已申请付款') h+='<button class="btn btn-xs" data-drop-fr-action="'+b.id+'|voucher" onclick="frUploadCat(\''+b.id+'\',\'voucher\')" title="点选，或把付款凭证文件拖到此处上传">上传凭证</button>';
+  else if(b.status==='已付款') h+='<button class="btn btn-xs btn-primary" data-drop-fr-action="'+b.id+'|invoice" onclick="frUploadCat(\''+b.id+'\',\'invoice\')" title="点选，或把发票文件拖到此处上传">上传发票</button>';
   return h;
 }
 function renderFreight(){
@@ -6770,14 +6785,20 @@ function frUploadCat(id,cat){
 function handleFrCatPick(){
   const inp=document.getElementById('frCatInput'); const files=Array.from(inp.files||[]); inp.value='';
   if(!files.length||!frCatTarget){ frCatTarget=null; return; }
-  const b=freight.bills.find(x=>x.id===frCatTarget.id); const cat=frCatTarget.cat;
-  if(!b){ frCatTarget=null; return; }
-  let pending=files.length, done=0;
+  const t=frCatTarget; frCatTarget=null;
+  frAddCatFilesFromList(t.id, t.cat, files);
+}
+// 统一的「往某笔账单的某类资料追加文件」——点选与拖拽共用
+function frAddCatFilesFromList(id, cat, files){
+  files=Array.from(files||[]); if(!files.length||!id||!cat) return;
+  const b=freight.bills.find(x=>x.id===id); if(!b){ showToast('没找到这笔账单'); return; }
+  if(!b.files) b.files={list:[],voucher:[],invoice:[]};
+  if(!Array.isArray(b.files[cat])) b.files[cat]=[];
+  let done=0;
   files.forEach(f=>{ processTaskFile(f).then(r=>{
     b.files[cat].push(r); done++;
     if(done>=files.length){ if(cat==='voucher') b.status='已付款'; if(cat==='invoice') b.status='已收发票'; saveAll(); renderFreight(); frRenderFilesModal(); showToast(cat==='voucher'?'✓ 已上传付款凭证，请通知货代公司已付款':'✓ 已上传发票，流程完成','info'); }
   }).catch(e=>{ showToast(e.message); done++; if(done>=files.length){ saveAll(); renderFreight(); } }); });
-  frCatTarget=null;
 }
 function frPreviewCat(id,cat){
   const b=freight.bills.find(x=>x.id===id); if(!b) return;
@@ -9142,7 +9163,7 @@ function bizFetchPanel(){
   h+='<div class="biz-fetch-row">'
     +'<button class="btn" id="bizFetchBtn" onclick="bizFetchRun()">获取订单列表</button>'
     +'<button class="btn" onclick="bizFetchRun(1)" style="background:var(--card-bg);color:var(--primary);border:1px solid var(--primary)">强制重新取</button>'
-    +'<button class="btn" onclick="document.getElementById(\'bizFetchFile\').click()" title="服务连不上时用：先跑一次取数服务，再把导出的文件选进来" style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--border)">从文件导入</button>'
+    +'<button class="btn" data-drop-to="bizFetchFile" onclick="document.getElementById(\'bizFetchFile\').click()" title="服务连不上时用：先跑一次取数服务，再把导出的文件选进来（也可直接拖到此处）" style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--border)">从文件导入</button>'
     +'<input type="file" id="bizFetchFile" accept=".json,application/json" style="display:none" onchange="bizFetchImportFile(this)">'
     +'<span class="biz-fetch-hint" id="bizFetchMsg" style="margin-left:auto"></span></div>';
   h+='<div id="bizFetchRes"></div>';
