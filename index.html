@@ -868,15 +868,23 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fr-form-row{display:flex;gap:10px;flex-wrap:wrap}
 .fr-total-box{font-size:13px;color:var(--text-muted);margin:2px 0 10px}
 .fr-total-box b{color:var(--text);font-size:15px}
-.fr-pipe{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
-.fr-pipe-s{width:18px;height:18px;border-radius:50%;background:#e2e8f0;color:#64748b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.fr-pipe{display:flex;align-items:flex-start;gap:0;min-width:246px}
+.fr-pipe-node{display:flex;flex-direction:column;align-items:center;gap:3px;width:54px;flex:0 0 auto}
+.fr-pipe-s{width:20px;height:20px;border-radius:50%;background:#e2e8f0;color:#64748b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .fr-pipe-s.on{background:var(--primary);color:#fff}
-.fr-pipe-bar{width:14px;height:2px;background:#e2e8f0;flex:0 0 auto}
+.fr-pipe-n{font-size:10.5px;color:var(--text-muted);line-height:1.25;white-space:nowrap;text-align:center}
+.fr-pipe-n.on{color:var(--primary);font-weight:700}
+.fr-pipe-bar{width:12px;height:2px;background:#e2e8f0;flex:0 0 auto;margin-top:9px}
 .fr-pipe-bar.on{background:var(--primary)}
-.fr-pipe-t{width:100%;font-size:11px;color:var(--text-secondary);margin-top:2px}
-.fr-filebadge{display:inline-block;margin:1px 2px;padding:2px 7px;border:1px solid var(--border);border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer;white-space:nowrap}
+.fr-pipe-t{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--text-secondary);margin-top:7px;white-space:nowrap}
+.fr-filebadge{display:inline-block;margin:0;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer;white-space:nowrap;line-height:1.6}
 .fr-filebadge:hover{border-color:var(--primary);color:var(--primary)}
-.fr-acts{white-space:nowrap}
+.fr-filebadge-empty{color:var(--text-muted);border-style:dashed;background:transparent}
+.fr-files{display:flex;flex-wrap:wrap;gap:4px;min-width:150px}
+.fr-fwd-acts{display:inline-flex;gap:2px;margin-left:6px;opacity:0;transition:opacity .15s;vertical-align:middle}
+tr:hover .fr-fwd-acts{opacity:1}
+.fr-table .fr-col-stage{min-width:252px}
+.fr-table .fr-col-files{min-width:158px}
 .hr-iv-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1;display:inline-block;margin-right:2px}
 .hr-iv-dot.on{background:var(--primary)}
 .hr-collapsible{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);overflow:hidden}
@@ -1059,7 +1067,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.19 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.20 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1825,7 +1833,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.19';
+const APP_VERSION = 'v2.20';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6574,29 +6582,37 @@ function frBadge(){
 }
 
 // ---------------- 渲染 ----------------
+// 状态节点短名（显示在圆圈下方，方便一眼看懂走到哪一步）
+const FR_STAGE_SHORT=['运费单','申请付款','已付款','发票'];
 function frStageHtml(b){
   const cur=FR_STAGES.indexOf(b.status);
   let h='<div class="fr-pipe">';
-  FR_STAGES.forEach((s,i)=>{ const cls=i<=cur?'on':''; h+='<span class="fr-pipe-s '+cls+'">'+(i+1)+'</span>'; if(i<FR_STAGES.length-1) h+='<span class="fr-pipe-bar '+(i<cur?'on':'')+'"></span>'; });
-  h+='<div class="fr-pipe-t">'+escHtml(b.status)+'</div></div>';
+  FR_STAGES.forEach((s,i)=>{ const cls=i<=cur?'on':'';
+    h+='<div class="fr-pipe-node"><span class="fr-pipe-s '+cls+'">'+(i+1)+'</span><span class="fr-pipe-n '+cls+'">'+escHtml(FR_STAGE_SHORT[i]||s)+'</span></div>';
+    if(i<FR_STAGES.length-1) h+='<span class="fr-pipe-bar '+(i<cur?'on':'')+'"></span>'; });
+  h+='</div>';
+  h+='<div class="fr-pipe-t">当前：'+escHtml(b.status);
+  if(b.status==='清单已上传') h+='<button class="btn btn-xs btn-warn" onclick="frAdvance(\''+b.id+'\',\'已申请付款\')">申请付款 ›</button>';
+  h+='</div>';
   return h;
 }
+// 资料列：三类资料徽章 —— 点击=预览/上传（弹窗内可选文件或拖入），也可把文件直接拖到徽章上
 function frFilesHtml(b){
-  let h='';
+  let h='<div class="fr-files">';
   ['list','voucher','invoice'].forEach(cat=>{
     const n=(b.files[cat]||[]).length;
-    h+='<button class="fr-filebadge" title="'+FR_CAT_NAMES[cat]+'：'+n+' 个，点击预览 / 补传" onclick="frPreviewCat(\''+b.id+'\',\''+cat+'\')">'+FR_CAT_NAMES[cat].slice(0,2)+' '+n+'</button>';
+    const nm=FR_CAT_NAMES[cat];
+    const tip=n? (nm+'：已上传 '+n+' 个。点击预览 / 继续补充，也可把文件直接拖到这里上传') : (nm+'：暂未上传。点击打开上传，也可把文件直接拖到这里');
+    h+='<button class="fr-filebadge'+(n?'':' fr-filebadge-empty')+'" data-drop-fr-action="'+b.id+'|'+cat+'" onclick="frPreviewCat(\''+b.id+'\',\''+cat+'\')" title="'+escHtml(tip)+'">'+escHtml(nm.slice(0,2))+(n?' '+n:' ＋')+'</button>';
   });
+  h+='</div>';
   return h;
 }
-function frActsHtml(b){
-  let h='';
-  h+='<button class="btn-icon" title="编辑" onclick="openFreightBillModal(\''+b.id+'\')">'+ICON_EDIT+'</button>';
-  h+='<button class="btn-icon" title="删除" onclick="deleteFreightBill(\''+b.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>';
-  if(b.status==='清单已上传') h+='<button class="btn btn-xs btn-warn" onclick="frAdvance(\''+b.id+'\',\'已申请付款\')">申请付款</button>';
-  else if(b.status==='已申请付款') h+='<button class="btn btn-xs" data-drop-fr-action="'+b.id+'|voucher" onclick="frUploadCat(\''+b.id+'\',\'voucher\')" title="点选，或把付款凭证文件拖到此处上传">上传凭证</button>';
-  else if(b.status==='已付款') h+='<button class="btn btn-xs btn-primary" data-drop-fr-action="'+b.id+'|invoice" onclick="frUploadCat(\''+b.id+'\',\'invoice\')" title="点选，或把发票文件拖到此处上传">上传发票</button>';
-  return h;
+function frRowActsHtml(b){
+  return '<span class="fr-fwd-acts">'
+    +'<button class="btn-icon" title="编辑这笔账单" onclick="openFreightBillModal(\''+b.id+'\')">'+ICON_EDIT+'</button>'
+    +'<button class="btn-icon" title="删除这笔账单" onclick="deleteFreightBill(\''+b.id+'\')" style="color:var(--danger)">'+ICON_DEL+'</button>'
+    +'</span>';
 }
 function renderFreight(){
   const box=document.getElementById('frContent'); if(!box) return;
@@ -6633,11 +6649,11 @@ function renderFreight(){
     });
     h+='</div>';
     h+='<div class="hr-tablewrap"><table class="hr-table fr-table"><thead><tr>';
-    h+='<th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th>状态</th><th>资料</th><th class="fr-col-note">备注</th><th class="fr-acts">操作</th>';
+    h+='<th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th class="fr-col-stage">状态</th><th class="fr-col-files">资料</th><th class="fr-col-note">备注</th>';
     h+='</tr></thead><tbody>';
     list.forEach(b=>{
       h+='<tr>';
-      h+='<td>'+escHtml(b.forwarder||'')+'</td>';
+      h+='<td>'+escHtml(b.forwarder||'')+frRowActsHtml(b)+'</td>';
       h+='<td class="num">'+fmtCNY(b.total||0)+'</td>';
       h+='<td class="num">'+fmtCNY(b.langges||0)+'</td>';
       h+='<td class="num">'+fmtCNY(b.fansi||0)+'</td>';
@@ -6645,7 +6661,6 @@ function renderFreight(){
       h+='<td>'+frStageHtml(b)+'</td>';
       h+='<td>'+frFilesHtml(b)+'</td>';
       h+='<td class="fr-col-note">'+escHtml(b.note||'')+'</td>';
-      h+='<td class="fr-acts">'+frActsHtml(b)+'</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div>';
