@@ -876,9 +876,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fr-dropzone-inner{font-size:13px;line-height:1.7}
 .fr-blocktitle{font-size:14px;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fr-blocktitle .cnt{font-size:12px;font-weight:600;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:1px 9px}
-.fr-mtitle{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:4px;padding:2px 7px;margin-left:-7px;border-radius:6px}
-.fr-mtitle:hover{background:#eef4f8}
-.fr-mtitle .fr-caret{flex:0 0 12px}
+.fr-blocktitle.fr-mhead{cursor:pointer;border-radius:8px;padding:4px 8px;margin-left:-8px;transition:background .12s}
+.fr-blocktitle.fr-mhead:hover{background:#eef4f8}
+.fr-blocktitle.fr-mhead .fr-mtitle{user-select:none;display:inline-flex;align-items:center;gap:5px}
+.fr-blocktitle.fr-mhead .fr-caret{font-size:12px;color:var(--text-secondary)}
+.fr-tnode-month{cursor:pointer}
 .fr-monthbody{margin-bottom:6px}
 .fr-col-month{width:78px;white-space:nowrap;color:var(--text-secondary);font-size:12px}
 .fr-tree{font-size:12.5px;color:var(--text-secondary);background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.5}
@@ -1158,7 +1160,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.28 · 2026-10-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.29 · 2026-10-13</div>
     </div>
   </aside>
 
@@ -1964,7 +1966,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.28';
+const APP_VERSION = 'v2.29';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6855,6 +6857,14 @@ function frToggleMonth(m){
   if(body) body.style.display = frClosedMonths[k] ? 'none' : '';
   if(t){ const c=t.querySelector('.fr-caret'); if(c) c.textContent = frClosedMonths[k] ? '▸' : '▾'; }
 }
+// 一键收起 / 展开全部月份（同样只改显示，不动数据）
+function frToggleAllMonths(){
+  const months=[...new Set(freight.bills.map(b=>b.month))];
+  const anyOpen = months.some(m=>!frClosedMonths[frMonthKey(m)]);
+  frClosedMonths={};
+  if(anyOpen) months.forEach(m=>{ frClosedMonths[frMonthKey(m)]=1; });
+  renderFreight();
+}
 function freightHeal(){
   if(!freight || typeof freight!=='object') freight={bills:[],forwarders:{},sellerMap:{}};
   if(!Array.isArray(freight.bills)) freight.bills=[];
@@ -6943,6 +6953,8 @@ function renderFreight(){
   const totalAll = freight.bills.reduce((s,b)=>s+(b.total||0),0);
   const unpaid = freight.bills.filter(b=>b.status!=='已收发票');
   const unpaidAmt = unpaid.reduce((s,b)=>s+(b.total||0),0);
+  const months=[...new Set(freight.bills.map(b=>b.month))].sort().reverse();
+  const allMonthsOpen = months.some(m=>!frClosedMonths[frMonthKey(m)]);
   let h='';
   h+='<div class="fr-summary">';
   h+='<div class="fr-stat"><span class="fr-stat-n">'+fmtCNY(totalAll)+'</span><span class="fr-stat-l">累计运费总额</span></div>';
@@ -6954,17 +6966,18 @@ function renderFreight(){
   h+='<button class="btn" onclick="frSaveMonthLocal()">保存全部到本地</button>';
   h+='<button class="btn btn-sm" onclick="frChangeLandingDir()">更改保存位置</button>';
   h+='<button class="btn btn-sm" onclick="frDownloadZip()">下载 ZIP（备用）</button>';
+  h+='<button class="btn btn-sm" onclick="frToggleAllMonths()">'+(allMonthsOpen?'收起全部月份':'展开全部月份')+'</button>';
   h+='<span class="fr-tip">保存结构：'+escHtml(FR_ROOT)+'\\<b>年月</b>\\物流公司\\{运费清单 / 付款凭证 / 运费发票}</span>';
   h+='<div class="fr-tip" style="flex-basis:100%;margin-bottom:2px">当前保存位置：'+(frDirHandleMem
       ? escHtml(frDirLabel())+' ✓ 已记住（文件会按上面结构自动建好文件夹再放进去）'
       : '<b>未设置</b> —— 首次点「保存…」会让你选一次文件夹（建议选「外贸运费自动管理」），选完就记住了，以后一键直存')+'</div>';
+  h+='<div class="fr-tip" style="flex-basis:100%;margin-bottom:2px">小提示：<b>点每个月份那一行（含「N 笔 · 金额」和目录树里的月份节点）就能收起 / 展开这个月</b>，表格和资料会一起收起。</div>';
   h+='</div>';
-  const months=[...new Set(freight.bills.map(b=>b.month))].sort().reverse();
   months.forEach(m=>{
     const list=freight.bills.filter(b=>b.month===m).sort((a,b)=>(a.forwarder||'').localeCompare(b.forwarder||''));
     const mTotal=list.reduce((s,b)=>s+(b.total||0),0);
     const mk=frMonthKey(m), closed=!!frClosedMonths[mk];
-    h+='<div class="fr-blocktitle"><span class="fr-mtitle" id="frMt_'+mk+'" onclick="frToggleMonth(\''+m+'\')" title="'+(closed?'点击展开':'点击收起')+'这个月"><span class="fr-caret">'+(closed?'▸':'▾')+'</span>'+escHtml(frMonthLabel(m))+'</span> <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="frSaveMonthLocal(\''+m+'\')">保存本月到本地</button> <button class="btn btn-sm" onclick="frDownloadZip(\''+m+'\')">ZIP</button></div>';
+    h+='<div class="fr-blocktitle fr-mhead" onclick="frToggleMonth(\''+m+'\')" title="点击这一行收起 / 展开 '+escAttr(frMonthLabel(m))+'"><span class="fr-mtitle" id="frMt_'+mk+'"><span class="fr-caret">'+(closed?'▸':'▾')+'</span>'+escHtml(frMonthLabel(m))+'</span> <span class="cnt">'+list.length+' 笔 · '+fmtCNY(mTotal)+'</span> <button class="btn btn-sm" onclick="event.stopPropagation();frSaveMonthLocal(\''+m+'\')">保存本月到本地</button> <button class="btn btn-sm" onclick="event.stopPropagation();frDownloadZip(\''+m+'\')">ZIP</button></div>';
     h+='<div class="fr-monthbody" id="frMb_'+mk+'"'+(closed?' style="display:none"':'')+'>';
     const fwdMap={}; list.forEach(b=>{ (fwdMap[b.forwarder]=fwdMap[b.forwarder]||[]).push(b); });
     // 目录树：点文件夹展开/收起，点文件直接打开预览（不再是死文本）
@@ -6986,7 +6999,7 @@ function renderFreight(){
       });
       monthKids+=frTreeNode(true, '📁', escHtml(fw||'未命名'), bills.length+' 笔', fwKids);
     });
-    h+=frTreeNode(true, '📁', escHtml(m), list.length+' 笔 · '+fmtCNY(mTotal), monthKids);
+    h+=frTreeNode(true, '📁', escHtml(m), list.length+' 笔 · '+fmtCNY(mTotal), monthKids, 'frToggleMonth(\''+m+'\')', 'fr-tnode-month');
     h+='</div>';
     h+='<div class="hr-tablewrap"><table class="hr-table fr-table"><thead><tr>';
     h+='<th class="fr-col-month">月份</th><th>货代公司</th><th class="num">总金额</th><th class="num">朗格斯</th><th class="num">凡适</th><th class="num">未分配</th><th class="fr-col-stage">状态</th><th class="fr-col-files">资料</th><th class="fr-col-note">备注</th>';
@@ -7012,11 +7025,12 @@ function renderFreight(){
 
 // ---------------- 目录树交互（文件夹展开/收起 + 点文件打开预览） ----------------
 // 通用节点：有 kids 才可点击展开；caret 表示展开状态（▾ 展开 / ▸ 收起）
-function frTreeNode(open, icon, nameHtml, countHtml, kidsHtml){
+function frTreeNode(open, icon, nameHtml, countHtml, kidsHtml, clickJs, extraCls){
   const hasKids = !!kidsHtml;
   const caret = hasKids ? '<span class="fr-caret">'+(open?'▾':'▸')+'</span>' : '<span class="fr-caret">·</span>';
-  const cls = hasKids ? 'fr-tnode fr-tnode-c' : 'fr-tnode';
-  const onclk = hasKids ? ' onclick="frTreeToggle(this)"' : '';
+  const canClick = hasKids || !!clickJs;
+  const cls = (canClick ? 'fr-tnode fr-tnode-c' : 'fr-tnode') + (extraCls ? (' ' + extraCls) : '');
+  const onclk = clickJs ? (' onclick="' + clickJs + '"') : (hasKids ? ' onclick="frTreeToggle(this)"' : '');
   let h='<div class="'+cls+'"'+onclk+'>'+caret+'<span class="fr-tic">'+icon+'</span><span class="fr-tnm">'+nameHtml+'</span>'+(countHtml?('<span class="fr-tcnt">'+countHtml+'</span>'):'')+'</div>';
   if(hasKids) h+='<div class="fr-tkids"'+(open?'':' style="display:none"')+'>'+kidsHtml+'</div>';
   return h;
