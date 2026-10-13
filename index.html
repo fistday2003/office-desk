@@ -880,11 +880,11 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fr-filebadge{display:inline-block;margin:0;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer;white-space:nowrap;line-height:1.6}
 .fr-filebadge:hover{border-color:var(--primary);color:var(--primary)}
 .fr-filebadge-empty{color:var(--text-muted);border-style:dashed;background:transparent}
-.fr-files{display:flex;flex-wrap:wrap;gap:4px;min-width:150px}
+.fr-files{display:flex;flex-wrap:wrap;gap:4px;min-width:168px}
 .fr-fwd-acts{display:inline-flex;gap:2px;margin-left:6px;opacity:0;transition:opacity .15s;vertical-align:middle}
 tr:hover .fr-fwd-acts{opacity:1}
 .fr-table .fr-col-stage{min-width:252px}
-.fr-table .fr-col-files{min-width:158px}
+.fr-table .fr-col-files{min-width:186px}
 .hr-iv-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1;display:inline-block;margin-right:2px}
 .hr-iv-dot.on{background:var(--primary)}
 .hr-collapsible{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);overflow:hidden}
@@ -6596,6 +6596,8 @@ function frStageHtml(b){
   h+='</div>';
   return h;
 }
+// 资料列短名（避免「运费清单 / 运费发票」都截成「运费」而混淆）
+const FR_CAT_SHORT={list:'清单',voucher:'付款',invoice:'发票'};
 // 资料列：三类资料徽章 —— 点击=预览/上传（弹窗内可选文件或拖入），也可把文件直接拖到徽章上
 function frFilesHtml(b){
   let h='<div class="fr-files">';
@@ -6603,7 +6605,7 @@ function frFilesHtml(b){
     const n=(b.files[cat]||[]).length;
     const nm=FR_CAT_NAMES[cat];
     const tip=n? (nm+'：已上传 '+n+' 个。点击预览 / 继续补充，也可把文件直接拖到这里上传') : (nm+'：暂未上传。点击打开上传，也可把文件直接拖到这里');
-    h+='<button class="fr-filebadge'+(n?'':' fr-filebadge-empty')+'" data-drop-fr-action="'+b.id+'|'+cat+'" onclick="frPreviewCat(\''+b.id+'\',\''+cat+'\')" title="'+escHtml(tip)+'">'+escHtml(nm.slice(0,2))+(n?' '+n:' ＋')+'</button>';
+    h+='<button class="fr-filebadge'+(n?'':' fr-filebadge-empty')+'" data-drop-fr-action="'+b.id+'|'+cat+'" onclick="frPreviewCat(\''+b.id+'\',\''+cat+'\')" title="'+escHtml(tip)+'">'+escHtml(FR_CAT_SHORT[cat])+(n?' '+n:' ＋')+'</button>';
   });
   h+='</div>';
   return h;
