@@ -751,6 +751,26 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fc-warn b{color:#b45309}
 .fc-ok{display:inline-block;color:#15803d;font-weight:600}
 .fc-miss{display:inline-block;color:#b91c1c;font-weight:600}
+/* v2.32：指标×两店×合计 三栏表 + 淡旺季系数条 */
+.fc-3col{width:100%;border-collapse:collapse;font-size:12.5px}
+.fc-3col th,.fc-3col td{border:1px solid var(--border);padding:7px 10px;text-align:center;vertical-align:middle}
+.fc-3col th{background:#f8fafc;font-weight:600;color:var(--text-secondary);font-size:11.5px}
+.fc-3col td.k{text-align:left;font-weight:600;color:var(--text);white-space:nowrap}
+.fc-3col td.num{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text)}
+.fc-3col td.sumcell{background:#f0f9ff;font-weight:700;color:var(--primary-dark)}
+.fc-3col .sub{display:block;font-size:10.5px;color:var(--text-muted);font-weight:400;margin-top:2px}
+.fc-3col .u{font-size:11px;font-weight:500;color:var(--text-muted);margin-left:2px}
+.fc-sbar{display:flex;align-items:flex-end;gap:5px;height:86px;margin:8px 0 2px}
+.fc-sbar .b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%}
+.fc-sbar .bar{width:100%;background:#93c5fd;border-radius:3px 3px 0 0;min-height:3px}
+.fc-sbar .bar.up{background:#f97316}
+.fc-sbar .bar.dn{background:#cbd5e1}
+.fc-sbar .vv{font-size:10px;color:var(--text-secondary);font-variant-numeric:tabular-nums;font-weight:600}
+.fc-sbar .lb{font-size:10px;color:var(--text-muted)}
+.fc-slegend{font-size:11px;color:var(--text-muted);line-height:1.7}
+.fc-chatbox{border:1px dashed var(--border);border-radius:8px;padding:10px 12px;background:var(--card-bg);font-size:12px;color:var(--text-secondary);line-height:1.8}
+.fc-na{color:var(--text-muted)}
+.fc-fileline{font-size:11.5px;color:var(--text-muted);line-height:1.8;margin-top:6px;word-break:break-all}
 @media (max-width:768px){
   .fc-grid{grid-template-columns:repeat(2,1fr)}
   .fc-tools .fc-sep{display:none}
@@ -1203,7 +1223,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.31 · 2026-10-14</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.32 · 2026-10-14</div>
     </div>
   </aside>
 
@@ -2054,7 +2074,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.31';
+const APP_VERSION = 'v2.32';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -12963,25 +12983,36 @@ function hrSeedIfEmpty(){
 // ============================================================
 const FC_SAMPLE_LINE = 500;
 const FC_FX = 6.8;
+// src: biz=从订单/收款表统计；chat=从聊天记录解析（抓不到就是没有，不猜）
 const FC_METRICS = [
-  {key:'orders', name:'订单数',     unit:'单'},
-  {key:'sample', name:'样品数',     unit:'单'},
-  {key:'bulk',   name:'大货数',     unit:'单'},
-  {key:'amount', name:'金额',       unit:'USD'},
-  {key:'buyers', name:'成交客户数', unit:'个'}
+  {key:'orders', name:'订单数',     unit:'单', src:'biz'},
+  {key:'sample', name:'样品单数',   unit:'单', src:'biz'},
+  {key:'pcs',    name:'样品件数',   unit:'件', src:'chat'},
+  {key:'bulk',   name:'大货订单数', unit:'单', src:'biz'},
+  {key:'styles', name:'大货款式数', unit:'款', src:'chat'},
+  {key:'amount', name:'金额',       unit:'USD', src:'biz'},
+  {key:'buyers', name:'成交客户数', unit:'个', src:'biz'}
 ];
 const FC_METHODS  = [['mix','混合（趋势+近3月）'],['avg3','近3月平均'],['trend','趋势外推']];
 const FC_SCOPES   = [['all','全公司'],['langges','朗格斯'],['fansi','凡适']];
+const FC_SHOPS    = [['langges','朗格斯'],['fansi','凡适']];   // 做「两店 + 合计」时只取这两个真实店铺
 const FC_SRCS     = [['pays','收款口径'],['orders','下单口径']];
-const FC_HORIZONS = [1,3,6];
-function fcBlank(){ return {months:{}, goals:{}, cfg:{src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}}; }
+const FC_HORIZONS = [1,3,6,12];
+const FC_MAX_H    = 12;                      // 往后最多推 12 个月，每个月都能单独选
+const FC_KEYS     = ['orders','sample','pcs','bulk','styles','amount','buyers'];
+function fcBlank(){ return {months:{}, goals:{}, chat:fcChatBlank(), cfg:{src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}}; }
+function fcChatBlank(){ return {files:[], months:{}, updated:''}; }
 let fc = fcBlank();
 function fcHeal(){
   if(!fc || typeof fc!=='object' || Array.isArray(fc)) fc = fcBlank();
   if(!fc.months || typeof fc.months!=='object' || Array.isArray(fc.months)) fc.months={};
   if(!fc.goals  || typeof fc.goals !=='object' || Array.isArray(fc.goals))  fc.goals={};
+  if(!fc.chat   || typeof fc.chat  !=='object' || Array.isArray(fc.chat))   fc.chat=fcChatBlank();
+  if(!Array.isArray(fc.chat.files)) fc.chat.files=[];
+  if(!fc.chat.months || typeof fc.chat.months!=='object' || Array.isArray(fc.chat.months)) fc.chat.months={};
   const c = Object.assign({src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}, fc.cfg||{});
-  c.horizon = (FC_HORIZONS.indexOf(Number(c.horizon))>=0) ? Number(c.horizon) : 3;
+  const _h = Number(c.horizon);
+  c.horizon = (isFinite(_h) && _h>=1 && _h<=FC_MAX_H) ? Math.round(_h) : 3;
   if(!FC_SCOPES.some(s=>s[0]===c.scope)) c.scope='all';
   if(!FC_SRCS.some(s=>s[0]===c.src)) c.src='pays';
   if(!FC_METHODS.some(m=>m[0]===c.method)) c.method='mix';
@@ -13031,11 +13062,20 @@ function fcAutoMap(scope){
   });
   return map;
 }
+// 聊天解析值：样品件数 / 大货款式数（没有就是 null，绝不猜数）
+function fcChatVal(m, scope, key){
+  const c=(fc.chat && fc.chat.months && fc.chat.months[m]) || null;
+  if(!c) return null;
+  if(!scope || scope==='all') return (typeof c[key]==='number') ? c[key] : null;
+  const b=c.byShop && c.byShop[scope];
+  return (b && typeof b[key]==='number') ? b[key] : null;
+}
 // 月度序列（手工修正优先于自动统计；当月按已过天数折算成整月预估 est）
 function fcSeries(scope){
   fcHeal();
   const auto=fcAutoMap(scope), months=Object.keys(auto);
   Object.keys(fc.months||{}).forEach(m=>{ if(months.indexOf(m)<0) months.push(m); });
+  Object.keys((fc.chat&&fc.chat.months)||{}).forEach(m=>{ if(months.indexOf(m)<0) months.push(m); });
   months.sort();
   const cur=fcCurMonth(), dim=fcDaysInMonth(cur), day=new Date().getDate();
   return months.map(m=>{
@@ -13047,14 +13087,47 @@ function fcSeries(scope){
     const amount = has(man.amount) ? Number(man.amount) : a.amount;
     const buyers = has(man.buyers) ? Number(man.buyers) : a.buyers;
     const bulk   = has(man.bulk)   ? Number(man.bulk)   : Math.max(0, orders-sample);
+    // 样品件数 / 大货款式数：只来自聊天解析，抓不到就是 null（不参与预测，也不显示 0）
+    const pcs    = fcChatVal(m, scope, 'pcs');
+    const styles = fcChatVal(m, scope, 'styles');
     const partial = (m===cur && day<dim);
     const scale = partial ? (dim/Math.max(1,day)) : 1;
-    const est = {orders:orders*scale, sample:sample*scale, bulk:bulk*scale, amount:amount*scale, buyers:buyers*scale};
+    const est = {orders:orders*scale, sample:sample*scale, bulk:bulk*scale, amount:amount*scale, buyers:buyers*scale,
+                 pcs:(pcs===null?null:pcs*scale), styles:(styles===null?null:styles*scale)};
     const manN = Object.keys(man).filter(k=>k!=='note' && has(man[k])).length;
     return {month:m, orders:orders, sample:sample, bulk:bulk, amount:amount, buyers:buyers,
+            pcs:pcs, styles:styles,
             partial:partial, scale:scale, est:est,
             man:manN>0 || !!man.note, note:man.note||''};
   });
+}
+// ---------- 淡旺季：只用「自己家的历史」算（同月平均法），不套行业预设 ----------
+// 做法：把历史按自然月分组求平均，再除以总平均 → 该月的季节系数，最后归一化让 12 个月平均=1。
+// >=24 个月才全量套用（w=1）；12~23 个月半量套用（w=0.5）并提示样本偏少；<12 个月不套用（w=0）。
+function fcSeasonIdx(series, key){
+  const g={}, vals=[];
+  (series||[]).forEach(s=>{
+    const e=(s.est&&typeof s.est[key]==='number')?s.est[key]:(Number(s[key])||0);
+    if(e===null || e===undefined || !isFinite(e)) return;
+    const mm=Number(String(s.month||'').split('-')[1]);
+    if(!mm || mm<1 || mm>12) return;
+    (g[mm]=g[mm]||[]).push(Number(e)||0);
+    vals.push(Number(e)||0);
+  });
+  const idx={}; for(let i=1;i<=12;i++) idx[i]=1;
+  const monthsN=Object.keys(g).length;
+  const grand = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+  if(!grand || monthsN<12 || vals.length<12) return {ok:false, w:0, n:vals.length, months:monthsN, idx:idx};
+  let sum=0;
+  for(let i=1;i<=12;i++){
+    const arr=g[i]||[];
+    let f = arr.length ? ((arr.reduce((a,b)=>a+b,0)/arr.length)/grand) : 1;
+    f = Math.max(0.25, Math.min(3, f));
+    idx[i]=f; sum+=f;
+  }
+  const avg=sum/12 || 1;
+  for(let i=1;i<=12;i++) idx[i]=Math.round(idx[i]/avg*1000)/1000;
+  return {ok:true, w:(vals.length>=24?1:0.5), n:vals.length, months:monthsN, idx:idx};
 }
 // 最小二乘拟合 y = a + b·x
 function fcFit(vals){
@@ -13065,51 +13138,96 @@ function fcFit(vals){
   const b = den ? (n*sxy - sx*sy)/den : 0;
   return {a:(sy - b*sx)/n, b:b};
 }
-// 单指标预测：返回 [{v, lo, hi}]，趋势随期数衰减，避免越推越离谱
-function fcPredictMetric(vals, horizon, method){
+// 单指标预测：先按自家淡旺季系数「去季节化」→ 拟合外推 → 再乘回该月的季节系数
+// 返回 [{v, lo, hi}]；趋势随期数衰减，避免越推越离谱
+function fcPredictMetric(vals, horizon, method, opt){
+  opt=opt||{};
+  const months=opt.months||[];
+  const season=(opt.season && opt.season.ok && opt.season.w>0) ? opt.season : null;
+  const w=season ? (season.w||0) : 0;
+  const mmOf=s=>Number(String(s||'').split('-')[1]);
+  const fOf=mm=>{ if(!season||!mm) return 1; const f=season.idx[mm]; return (f&&f>0)?Math.pow(f,w):1; };
   const n=vals.length, out=[];
   if(!n) return [];
-  const tail=vals.slice(-3);
+  const ds=vals.map((v,i)=>{ const f=fOf(mmOf(months[i])); return f>0 ? (v/f) : v; });
+  const tail=ds.slice(-3);
   const avg3 = tail.reduce((x,y)=>x+y,0)/(tail.length||1);
-  const fit=fcFit(vals), last=vals[n-1];
+  const fit=fcFit(ds);
   let dev=0;
   if(n>=3){
-    let s=0; for(let i=0;i<n;i++){ const p=fit.a+fit.b*i; s+=(vals[i]-p)*(vals[i]-p); }
+    let s=0; for(let i=0;i<n;i++){ const p=fit.a+fit.b*i; s+=(ds[i]-p)*(ds[i]-p); }
     dev=Math.sqrt(s/(n-2));
   }
-  for(let i=1;i<n;i++) dev=Math.max(dev, Math.abs(vals[i]-vals[i-1])*0.5);
+  for(let i=1;i<n;i++) dev=Math.max(dev, Math.abs(ds[i]-ds[i-1])*0.5);
+  const lastM=months[n-1]||'';
   for(let h=1;h<=horizon;h++){
     const damp=Math.pow(0.85, h-1);
     const trend = fit.a + fit.b*(n-1+h*damp);
-    let v;
-    if(method==='avg3') v=avg3;
-    else if(method==='trend') v=trend;
-    else v=0.5*trend+0.5*avg3;
-    v=Math.max(0, v);
-    out.push({v:v, lo:Math.max(0, v-dev), hi:v+dev});
+    let base;
+    if(method==='avg3') base=avg3;
+    else if(method==='trend') base=trend;
+    else base=0.5*trend+0.5*avg3;
+    base=Math.max(0, base);
+    const f=fOf(mmOf(fcMonthAdd(lastM,h)));
+    const v=base*f, d=dev*f;
+    out.push({v:v, lo:Math.max(0, v-d), hi:v+d});
   }
   return out;
 }
 function fcForecast(series, horizon, method){
   horizon = Number(horizon)||3;
-  const keys=['orders','sample','amount','buyers'];
   const res={};
-  keys.forEach(k=>{
-    const vals=series.map(s=>{ const e=(s.est&&typeof s.est[k]==='number')?s.est[k]:(Number(s[k])||0); return Number(e)||0; });
-    res[k]=fcPredictMetric(vals, horizon, method);
+  FC_KEYS.forEach(k=>{
+    // 聊天抓不到的月份（pcs / styles 为 null）不参与这条指标的预测，也不拿 0 充数
+    const sub=series.filter(s=>{ const e=(s.est&&typeof s.est[k]==='number')?s.est[k]:null; return (e!==null&&e!==undefined&&isFinite(e)); });
+    if(!sub.length){ res[k]=null; return; }
+    const vals=sub.map(s=>Number(s.est[k])||0), ms=sub.map(s=>s.month);
+    res[k]=fcPredictMetric(vals, horizon, method, {months:ms, season:fcSeasonIdx(sub, k)});
   });
   const lastM = series.length ? series[series.length-1].month : fcCurMonth();
   const r0=v=>Math.max(0, Math.round(v));
   const out=[];
   for(let h=1;h<=horizon;h++){
     const i=h-1;
-    const o=res.orders[i]||{v:0,lo:0,hi:0}, s=res.sample[i]||{v:0,lo:0,hi:0},
-          a=res.amount[i]||{v:0,lo:0,hi:0}, b=res.buyers[i]||{v:0,lo:0,hi:0};
-    const orders=r0(o.v), sample=Math.min(orders, r0(s.v));
-    out.push({month:fcMonthAdd(lastM,h), pred:true,
-      orders:orders, sample:sample, bulk:Math.max(0, orders-sample), amount:r0(a.v), buyers:r0(b.v),
-      lo:{orders:r0(o.lo), sample:r0(s.lo), amount:r0(a.lo), buyers:r0(b.lo)},
-      hi:{orders:r0(o.hi), sample:r0(s.hi), amount:r0(a.hi), buyers:r0(b.hi)}});
+    const g=k=>{ const a=res[k]; return (a&&a[i]) ? a[i] : null; };
+    const o=g('orders'), s=g('sample'), a=g('amount'), b=g('buyers'), p=g('pcs'), st=g('styles');
+    const orders = o?r0(o.v):0, sample = s?Math.min(orders, r0(s.v)):0;
+    const item={month:fcMonthAdd(lastM,h), pred:true,
+      orders:orders, sample:sample, bulk:Math.max(0, orders-sample),
+      pcs:(p?r0(p.v):null), styles:(st?r0(st.v):null),
+      amount:(a?r0(a.v):0), buyers:(b?r0(b.v):0), lo:{}, hi:{}};
+    FC_KEYS.forEach(k=>{
+      const x=g(k);
+      item.lo[k]= x?r0(x.lo):null;
+      item.hi[k]= x?r0(x.hi):null;
+    });
+    if(item.lo.sample!=null) item.lo.sample=Math.min(item.lo.sample, item.lo.orders==null?item.lo.sample:item.lo.orders);
+    if(item.hi.sample!=null) item.hi.sample=Math.min(item.hi.sample, item.hi.orders==null?item.hi.sample:item.hi.orders);
+    out.push(item);
+  }
+  return out;
+}
+// 按范围取预测：全公司 = 朗格斯 + 凡适 逐项相加（保证「两店 + 合计」三栏自洽，而不是另算一条）
+function fcForecastScope(scope, horizon, method){
+  horizon=Number(horizon)||3;
+  if(scope && scope!=='all'){
+    const series=fcSeries(scope);
+    return series.length ? fcForecast(series, horizon, method) : [];
+  }
+  const A=fcForecastScope('langges',horizon,method), B=fcForecastScope('fansi',horizon,method);
+  const H=Math.max(A.length,B.length), out=[];
+  for(let i=0;i<H;i++){
+    const a=A[i]||{}, b=B[i]||{};
+    const o={month:a.month||b.month||'', pred:true, lo:{}, hi:{}};
+    FC_KEYS.forEach(k=>{
+      const va=(typeof a[k]==='number')?a[k]:null, vb=(typeof b[k]==='number')?b[k]:null;
+      o[k]=(va===null&&vb===null)?null:((va||0)+(vb||0));
+      const la=(a.lo&&typeof a.lo[k]==='number')?a.lo[k]:null, lb=(b.lo&&typeof b.lo[k]==='number')?b.lo[k]:null;
+      o.lo[k]=(la===null&&lb===null)?null:((la||0)+(lb||0));
+      const ha=(a.hi&&typeof a.hi[k]==='number')?a.hi[k]:null, hb=(b.hi&&typeof b.hi[k]==='number')?b.hi[k]:null;
+      o.hi[k]=(ha===null&&hb===null)?null:((ha||0)+(hb||0));
+    });
+    out.push(o);
   }
   return out;
 }
@@ -13118,6 +13236,13 @@ function fcNum(v, dec){
   return n.toLocaleString('zh-CN', {minimumFractionDigits:dec||0, maximumFractionDigits:dec||0});
 }
 function fcUsd(v){ return '$'+fcNum(v,0); }
+// 聊天抓不到的指标：显示「—」而不是 0，避免看着像"这个月一个样品都没有"
+function fcNumCell(v){ return (v===null||v===undefined)?'<span class="fc-na">—</span>':fcNum(v); }
+function fcRangeCell(lo, hi, isMoney){
+  if(lo===null||lo===undefined||hi===null||hi===undefined) return '';
+  const f=isMoney?fcUsd:fcNum;
+  return '<div style="font-size:10.5px;color:var(--text-muted)">'+f(lo)+'~'+f(hi)+'</div>';
+}
 function fcCny(v, fx){ return '≈¥'+fcNum(Math.round((Number(v)||0)*((fx||FC_FX))),0); }
 function fcAxisNum(v){
   const n=Math.round(Number(v)||0);
@@ -13202,6 +13327,21 @@ function fcChartSvg(series, pred, metric){
   return '<svg class="fc-chart" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+g+'</svg>';
 }
 function fcScopeName(){ const s=FC_SCOPES.filter(x=>x[0]===fc.cfg.scope)[0]; return s?s[1]:'全公司'; }
+let fcViewH=0;                                   // 三栏表看的是「未来第几个月」（0=下个月）
+function fcSetH(i){ fcViewH=Number(i)||0; renderFc(); }
+// 直接点名要预测哪一个具体月份（往后 12 个月以内都行）
+function fcPickMonth(m){
+  if(!m) return;
+  fcHeal();
+  const series=fcSeries(fc.cfg.scope);
+  const last=series.length?series[series.length-1].month:fcCurMonth();
+  let h=1, cur=fcMonthAdd(last,1);
+  while(cur!==m && h<FC_MAX_H){ h++; cur=fcMonthAdd(last,h); }
+  if(cur!==m){ showToast('只能选往后 '+FC_MAX_H+' 个月以内的月份'); return; }
+  fc.cfg.horizon=Math.max(1,h);
+  fcViewH=h-1;
+  saveAll(); renderFc();
+}
 function fcSet(key, val){
   fcHeal();
   if(key==='horizon') fc.cfg.horizon=Number(val)||3;
@@ -13214,7 +13354,7 @@ function renderFc(){
   fcHeal();
   const cfg=fc.cfg;
   const series=fcSeries(cfg.scope);
-  const pred = series.length ? fcForecast(series, cfg.horizon, cfg.method) : [];
+  const pred = series.length ? fcForecastScope(cfg.scope, cfg.horizon, cfg.method) : [];
   const nAct=series.length;
   const sel=(list, cur)=>list.map(x=>'<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+escHtml(x[1])+'</option>').join('');
   let h='';
@@ -13223,7 +13363,9 @@ function renderFc(){
   h+='<span class="fc-sep"></span><span class="fc-lab">范围</span><select class="fc-sel" onchange="fcSet(\'scope\',this.value)">'+sel(FC_SCOPES,cfg.scope)+'</select>';
   h+='<span class="fc-sep"></span><span class="fc-lab">方法</span><select class="fc-sel" onchange="fcSet(\'method\',this.value)">'+sel(FC_METHODS,cfg.method)+'</select>';
   h+='<span class="fc-sep"></span><span class="fc-lab">预测</span><select class="fc-sel" onchange="fcSet(\'horizon\',this.value)">'+FC_HORIZONS.map(v=>'<option value="'+v+'"'+(v===cfg.horizon?' selected':'')+'>未来 '+v+' 个月</option>').join('')+'</select>';
+  h+='<span class="fc-sep"></span><button class="btn btn-sm btn-primary" onclick="document.getElementById(\'fcChatFile\').click()">导入聊天 CSV（取样品件数 / 款式数）</button>';
   h+='<span class="fc-sep"></span><button class="btn btn-sm" onclick="fcExportCsv()">导出 CSV</button>';
+  h+='<input type="file" id="fcChatFile" multiple accept=".csv,.txt" style="display:none" onchange="fcImportChat()">';
   h+='</div>';
   if(!nAct){
     h+='<div class="fc-warn"><b>还没有历史数据。</b>请先到「经营分析」导入订单表 / 收款表，本模块会自动按月份统计；如果暂时不想导入，也可以直接点下面「手工补录一个月」自己填。</div>';
@@ -13234,20 +13376,48 @@ function renderFc(){
   if(lastS && lastS.partial){
     h+='<div class="fc-warn">'+escHtml(fcMonthLabel(lastS.month))+' <b>还没过完</b>（已过 '+new Date().getDate()+' / '+fcDaysInMonth(lastS.month)+' 天），预测时会按已过天数把它折算成整月（约 ×'+lastS.scale.toFixed(2)+'），否则会低估。</div>';
   }
-  // 预测卡片
+  // ---------- 两店分开 + 合计（核心诉求） ----------
+  const pL=fcForecastScope('langges', cfg.horizon, cfg.method);
+  const pF=fcForecastScope('fansi',   cfg.horizon, cfg.method);
+  const sAll=fcSeries('all'), lastAll=sAll.length?sAll[sAll.length-1]:null;
+  const baseAll=k=> lastAll ? ((lastAll.est&&typeof lastAll.est[k]==='number')?lastAll.est[k]:(Number(lastAll[k])||0)) : undefined;
+  const fmtV=(k,v,u)=> (k==='amount') ? fcUsd(v) : (fcNum(v)+'<span class="u">'+u+'</span>');
   if(pred.length){
-    const p0=pred[0];
-    const base=(k)=> lastS ? ((lastS.est&&typeof lastS.est[k]==='number')?lastS.est[k]:(Number(lastS[k])||0)) : undefined;
-    h+='<div class="fc-grid">';
+    const hi=Math.min(fcViewH||0, pred.length-1);
+    const m0=pred[hi].month;
+    // 预测月份：往后 12 个月里，每个具体月份都能单独点名（不受当前预测范围限制）
+    const lastM0 = series.length ? series[series.length-1].month : fcCurMonth();
+    let mOpts='';
+    for(let hh=1; hh<=FC_MAX_H; hh++){
+      const mm=fcMonthAdd(lastM0,hh);
+      mOpts+='<option value="'+mm+'"'+(mm===m0?' selected':'')+'>'+escHtml(fcMonthLabel(mm))+'</option>';
+    }
+    h+='<div class="biz-panel"><h4>'+escHtml(fcMonthLabel(m0))+' 预测 <span class="tag">朗格斯 / 凡适 / 合计</span>'
+      +'<span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
+      +'<span class="fc-lab">预测月份</span><select class="fc-sel" onchange="fcPickMonth(this.value)">'+mOpts+'</select>'
+      +'<button class="btn btn-sm" onclick="fcOpenReport()">生成预测报告</button>'
+      +'</span></h4>';
+    h+='<div class="biz-tbl-wrap"><table class="fc-3col"><thead><tr>'
+      +'<th style="text-align:left">指标</th><th>朗格斯</th><th>凡适</th><th>合计</th><th>合计环比</th>'
+      +'</tr></thead><tbody>';
     FC_METRICS.forEach(m=>{
-      const v=p0[m.key], lo=p0.lo[m.key], hi=p0.hi[m.key];
-      const main = (m.key==='amount') ? fcUsd(v) : (fcNum(v)+' <span style="font-size:12px;font-weight:500;color:var(--text-muted)">'+m.unit+'</span>');
-      const range= (m.key==='amount') ? (fcUsd(lo)+' ~ '+fcUsd(hi)) : (fcNum(lo)+' ~ '+fcNum(hi));
-      h+='<div class="fc-card pred"><div class="k">'+m.name+'（'+escHtml(fcMonthLabel(p0.month))+'）</div>'
-        +'<div class="v">'+main+'</div>'
-        +'<div class="s">波动区间 '+range+(m.key==='amount'?('<br>'+fcCny(v,cfg.fx)):'')+'</div>'
-        +'<div class="d">'+fcDelta(v, base(m.key), '')+'</div></div>';
+      const k=m.key;
+      const td=p=>{
+        if(!p) return '<td class="fc-na">—</td>';
+        const v=p[k];
+        if(v===null||v===undefined) return '<td class="fc-na">—<span class="sub">聊天未解析到</span></td>';
+        let s='<td class="num">'+fmtV(k,v,m.unit);
+        const lo=p.lo?p.lo[k]:null, hv=p.hi?p.hi[k]:null;
+        if(lo!=null&&hv!=null) s+='<span class="sub">'+((k==='amount')?(fcUsd(lo)+'~'+fcUsd(hv)):(fcNum(lo)+'~'+fcNum(hv)))+'</span>';
+        return s+'</td>';
+      };
+      const sv=pred[hi][k];
+      const sumTd=(sv===null||sv===undefined)?'<td class="sumcell fc-na">—</td>':('<td class="sumcell">'+fmtV(k,sv,m.unit)+'</td>');
+      h+='<tr><td class="k">'+escHtml(m.name)+(m.src==='chat'?' <span class="fc-badge man">聊天</span>':'')+'</td>'
+        +td(pL[hi])+td(pF[hi])+sumTd+'<td>'+fcDelta(sv, baseAll(k), '')+'</td></tr>';
     });
+    h+='</tbody></table></div>';
+    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>（不是另算一条，所以三栏一定对得上）。括号里是波动区间。带「聊天」蓝标的两个指标来自聊天记录解析，抓不到的月份显示「—」，且不参与预测，不会拿 0 充数。</div>';
     h+='</div>';
   }
   // 图表
@@ -13264,7 +13434,7 @@ function renderFc(){
   h+='<div class="biz-panel"><h4>月度明细 <span class="tag">实际 '+nAct+' 个月 · 预测 '+pred.length+' 个月</span>'
     +'<span style="margin-left:auto"><button class="btn btn-sm" onclick="fcOpenMonth(\'\')">＋ 手工补录 / 定目标</button></span></h4>';
   h+='<div class="biz-tbl-wrap"><table class="biz-tbl fc-tbl"><thead><tr>'
-    +'<th>月份</th><th>类型</th><th class="r">订单数</th><th class="r">样品</th><th class="r">大货</th><th class="r">金额(USD)</th><th class="r">约合¥</th><th class="r">客户数</th><th>环比订单</th><th>目标</th><th>达成</th><th>操作</th>'
+    +'<th>月份</th><th>类型</th><th class="r">订单数</th><th class="r">样品单</th><th class="r">样品件</th><th class="r">大货单</th><th class="r">大货款</th><th class="r">金额(USD)</th><th class="r">约合¥</th><th class="r">客户数</th><th>环比订单</th><th>目标</th><th>达成</th><th>操作</th>'
     +'</tr></thead><tbody>';
   const rowsAll=[];
   let prevOrders=undefined, prevAmount=undefined;
@@ -13278,7 +13448,7 @@ function renderFc(){
     prevOrders=p.orders; prevAmount=p.amount;
   });
   if(!rowsAll.length){
-    h+='<tr><td colspan="12" style="text-align:center;color:var(--text-secondary);padding:24px">还没有数据 —— 去「经营分析」导入订单 / 收款表，或用上面的按钮手工补录</td></tr>';
+    h+='<tr><td colspan="14" style="text-align:center;color:var(--text-secondary);padding:24px">还没有数据 —— 去「经营分析」导入订单 / 收款表，或用上面的按钮手工补录</td></tr>';
   }
   rowsAll.forEach(r=>{
     const goal = (fc.goals||{})[r.s?r.s.month:(r.p?r.p.month:'')] || {};
@@ -13290,9 +13460,11 @@ function renderFc(){
       h+='<tr'+(s.man?' class="fc-row-man"':'')+'>';
       h+='<td>'+escHtml(fcMonthLabel(s.month))+partialTip+'</td>';
       h+='<td>'+badge+manTag+'</td>';
-      h+='<td class="r">'+(s.partial?fcNum(s.orders):fcNum(s.orders))+'</td>';
+      h+='<td class="r">'+fcNum(s.orders)+'</td>';
       h+='<td class="r">'+fcNum(s.sample)+'</td>';
+      h+='<td class="r">'+fcNumCell(s.pcs)+'</td>';
       h+='<td class="r">'+fcNum(s.bulk)+'</td>';
+      h+='<td class="r">'+fcNumCell(s.styles)+'</td>';
       h+='<td class="r">'+fcNum(s.amount)+'</td>';
       h+='<td class="r">'+fcNum(Math.round(s.amount*(cfg.fx||FC_FX)))+'</td>';
       h+='<td class="r">'+fcNum(s.buyers)+'</td>';
@@ -13306,10 +13478,12 @@ function renderFc(){
       h+='<tr class="fc-row-pred">';
       h+='<td>'+escHtml(fcMonthLabel(p.month))+'</td>';
       h+='<td><span class="fc-badge pre">预测</span></td>';
-      h+='<td class="r"><b>'+fcNum(p.orders)+'</b><div style="font-size:10.5px;color:var(--text-muted)">'+fcNum(p.lo.orders)+'~'+fcNum(p.hi.orders)+'</div></td>';
+      h+='<td class="r"><b>'+fcNum(p.orders)+'</b>'+fcRangeCell(p.lo.orders,p.hi.orders)+'</td>';
       h+='<td class="r">'+fcNum(p.sample)+'</td>';
+      h+='<td class="r">'+fcNumCell(p.pcs)+fcRangeCell(p.lo.pcs,p.hi.pcs)+'</td>';
       h+='<td class="r">'+fcNum(p.bulk)+'</td>';
-      h+='<td class="r"><b>'+fcNum(p.amount)+'</b><div style="font-size:10.5px;color:var(--text-muted)">'+fcNum(p.lo.amount)+'~'+fcNum(p.hi.amount)+'</div></td>';
+      h+='<td class="r">'+fcNumCell(p.styles)+fcRangeCell(p.lo.styles,p.hi.styles)+'</td>';
+      h+='<td class="r"><b>'+fcNum(p.amount)+'</b>'+fcRangeCell(p.lo.amount,p.hi.amount)+'</td>';
       h+='<td class="r">'+fcNum(Math.round(p.amount*(cfg.fx||FC_FX)))+'</td>';
       h+='<td class="r">'+fcNum(p.buyers)+'</td>';
       h+='<td>'+fcDelta(p.orders, r.prevOrders, '')+'</td>';
@@ -13320,7 +13494,56 @@ function renderFc(){
     }
   });
   h+='</tbody></table></div>';
-  h+='<div class="fc-note">「修正」只影响本模块的预测输入，<b>不会改动经营分析里的原始订单 / 收款数据</b>；留空的字段仍然用自动统计值。</div>';
+  h+='<div class="fc-note">「修正」只影响本模块的预测输入，<b>不会改动经营分析里的原始订单 / 收款数据</b>；留空的字段仍然用自动统计值。「样品件」「大货款」两列只来自聊天解析，不能在弹窗里手填。</div>';
+  h+='</div>';
+  // ---------- 淡旺季（只用自己的历史算） ----------
+  const seas=fcSeasonIdx(series, cfg.metric);
+  h+='<div class="biz-panel"><h4>淡旺季系数 <span class="tag">只用你自己 '+nAct+' 个月的历史算</span>'
+    +'<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">看的是「'+escHtml((FC_METRICS.filter(x=>x.key===cfg.metric)[0]||{}).name||'订单数')+'」</span></h4>';
+  if(!nAct){
+    h+='<div class="fc-note">还没有历史数据，暂时算不出淡旺季。</div>';
+  } else if(!seas.ok){
+    h+='<div class="fc-warn">历史只有 <b>'+nAct+'</b> 个月，<b>暂不套用淡旺季</b> —— 月份还没走满一轮，硬套会把偶发波动当成规律。攒够 12 个月（最好 24 个月）会自动启用。</div>';
+  } else {
+    const idx=seas.idx; let mx=0; for(let i=1;i<=12;i++) mx=Math.max(mx, idx[i]);
+    h+='<div class="fc-sbar">';
+    for(let i=1;i<=12;i++){
+      const f=idx[i], hpx=Math.max(4, Math.round(f/(mx||1)*58));
+      const cls = f>=1.08 ? 'up' : (f<=0.92 ? 'dn' : '');
+      h+='<div class="b"><span class="vv">'+f.toFixed(2)+'</span><span class="bar '+cls+'" style="height:'+hpx+'px"></span><span class="lb">'+i+'月</span></div>';
+    }
+    h+='</div>';
+    h+='<div class="fc-slegend">系数 = 该月历史平均 ÷ 总平均（已归一化，12 个月平均正好 1.00）。<b>橙色 ≥1.08 偏旺、灰色 ≤0.92 偏淡</b>。预测时先按这个系数把历史「去掉季节」再拟合，最后乘回目标月的系数，所以淡旺季会体现在预测值里。'
+      +(seas.w<1?('<br><span style="color:#b45309">样本只有 '+seas.n+' 条（不到 24 个月），目前按 <b>半量</b> 套用，避免把偶然波动当规律。</span>'):'')
+      +(seas.n>=24?('<br>样本 '+seas.n+' 条（≥24 个月），已按 <b>全量</b> 套用。'):'')
+      +'</div>';
+  }
+  h+='</div>';
+  // ---------- 聊天解析（样品件数 / 大货款式数唯一来源） ----------
+  const cm=fc.chat.months||{}, cfiles=fc.chat.files||[];
+  h+='<div class="biz-panel"><h4>聊天解析：样品件数 / 大货款式数 <span class="tag">'+(cfiles.length?cfiles.length+' 个文件':'还没导入')+'</span>'
+    +'<span style="margin-left:auto;display:flex;gap:6px">'
+    +'<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'fcChatFile\').click()">导入 / 追加聊天 CSV</button>'
+    +(cfiles.length?'<button class="btn btn-sm" onclick="fcChatClear()">清空</button>':'')
+    +'</span></h4>';
+  if(!cfiles.length){
+    h+='<div class="fc-chatbox">「样品件数」和「大货款式数」这两个数，<b>订单表 / 收款表里没有，只能从聊天记录里解析</b>（一个样品单不一定只要一件样品，一个订单也可能好几个款式）。<br>'
+      +'点上面按钮选后台导出的聊天记录（可多选，CSV / TXT）：系统按月扫描消息里的数量，例如 <code>3 samples</code>、<code>5个样品</code>、<code>3 designs</code>、<code>2款</code>，只存统计结果、<b>不存聊天原文</b>。<br>'
+      +'同一买家同一天只算一次（取最大值），业务员复述一遍不会翻倍；「样品费 / 设计费」这类金额不会被当成件数。</div>';
+  } else {
+    const mons=Object.keys(cm).sort().reverse();
+    let tp=0, ts=0; mons.forEach(m=>{ tp+=(cm[m].pcs||0); ts+=(cm[m].styles||0); });
+    h+='<div class="fc-note">已解析 <b>'+mons.length+'</b> 个月 · 累计样品 <b>'+tp+'</b> 件 / 大货款式 <b>'+ts+'</b> 款'+(fc.chat.updated?('（更新于 '+escHtml(fc.chat.updated)+'）'):'')+'。</div>';
+    h+='<div class="biz-tbl-wrap"><table class="biz-tbl fc-tbl"><thead><tr><th>月份</th><th class="r">样品件数</th><th class="r">大货款式数</th><th class="r">朗格斯 件/款</th><th class="r">凡适 件/款</th></tr></thead><tbody>';
+    mons.slice(0,24).forEach(m=>{
+      const a=cm[m]||{}, lg=(a.byShop||{}).langges||{}, fs2=(a.byShop||{}).fansi||{};
+      h+='<tr><td>'+escHtml(fcMonthLabel(m))+'</td><td class="r">'+fcNum(a.pcs||0)+'</td><td class="r">'+fcNum(a.styles||0)+'</td>'
+        +'<td class="r">'+fcNum(lg.pcs||0)+' / '+fcNum(lg.styles||0)+'</td><td class="r">'+fcNum(fs2.pcs||0)+' / '+fcNum(fs2.styles||0)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="fc-fileline">来源文件：'+escHtml(cfiles.map(x=>x.n).join('、').slice(0,320))+'</div>';
+    h+='<div class="fc-note">聊天里没明说数量的月份就是<b>没有</b>：表格显示「—」，且不参与那条指标的预测 —— 不会拿金额倒推一个假数出来。</div>';
+  }
   h+='</div>';
   // 说明
   h+='<div class="biz-panel"><h4>怎么算的</h4><div class="fc-note">'
@@ -13330,9 +13553,127 @@ function renderFc(){
     +'· <b>趋势外推</b>：对历史做最小二乘直线拟合再往后推，越远的月份趋势衰减越多（避免越推越离谱）。<br>'
     +'· <b>混合</b>（默认）：上面两者各占一半，兼顾"稳"和"看趋势"。<br>'
     +'· <b>波动区间</b>：用历史对趋势线的偏离程度 + 相邻月份最大波动估算，不是保证能落在这个范围里。<br>'
+    +'· <b>淡旺季</b>：<b>只用你自己导入的历史</b>算（同月平均法，12 个月平均 = 1.00），不套行业预设。做法是先把历史「去掉季节」再拟合，最后乘回目标月的系数；不足 12 个月不启用，12~23 个月半量套用。<br>'
+    +'· <b>样品件数 / 大货款式数</b>：<b>只来自聊天记录解析</b>（订单表 / 收款表里没有这两个数）。抓不到的月份显示「—」，并且不拿它参与该指标的预测，不会用金额倒推一个假数。<br>'
+    +'· <b>两店 + 合计</b>：朗格斯、凡适各自独立预测，<b>合计 = 两店逐项相加</b>，所以三栏一定对得上。<br>'
     +'· 汇率按 1 美元 = '+(cfg.fx||FC_FX)+' 元人民币折算，仅用于直观感受金额。'
-    +'</div></div>';
+    +'</div>'
+    +'<div style="margin-top:10px"><button class="btn btn-primary" onclick="fcOpenReport()">生成预测报告（含数据 + 说明 + 依据，可打印 / 转 PDF）</button>'
+    +' <button class="btn" onclick="fcDownloadReport()">下载报告 HTML</button></div>'
+    +'</div>';
   box.innerHTML=h;
+}
+// ---------- 聊天记录 → 样品件数 / 大货款式数（v2.32 新增，唯一来源） ----------
+// 思路：聊天 CSV 动辄几十 MB，导入时即时扫描、只把「按月 × 分店铺」的数量存下来，不存原文。
+// 抓不到就留空（表里有数据就画、没数据就不画），绝不用金额去倒推一个假数。
+const FC_PCS_MAX = 200, FC_STY_MAX = 100;
+const FC_PCS_CTX = /sampl(e|es|ing)|swatch|样品|样衣|打样|样版|样件/i;
+// 注意：这里不能用裸「款」（会把"付款/退款/货款"也算进来），所以中文只认「款式/款型」和「数字+款」
+const FC_STY_CTX = /designs?|styles?|款式|款型|花样|pattern|bulk|大货|批量|mass\s*production|\d{1,3}\s*款/i;
+const FC_MONEY_SKIP = /sample\s*fee|样品费|打样费|design\s*fee|设计费|打版费|版费/i;
+const FC_PAT_PCS = [
+  /(\d{1,3})\s*(?:pcs|pieces|sets|units|pairs|件|个|套|款)?\s*(?:of\s+)?samples?\b/i,   // 3 samples / 3 pcs sample
+  /samples?\s*(?:qty|quantity)?\s*[x×*:=]\s*(\d{1,3})/i,                                // samples x 3
+  /(\d{1,3})\s*(?:个|件|套|款)?\s*样品/,                                                 // 5个样品
+  /样品\s*(?:数量)?\s*[x×*:=]?\s*(\d{1,3})\s*(?:个|件|套|款)?/,                          // 样品 5 件
+  /(\d{1,3})\s*(?:pcs|pieces|件|个)\s*(?:for|of)?\s*sampl(?:e|es)/i
+];
+const FC_PAT_STY = [
+  /(\d{1,3})\s*(?:different\s*)?(?:designs?|styles?|models?|skus?|colourways?|colorways?)/i, // 3 designs
+  /(?:designs?|styles?|款式)\s*[x×*:=]\s*(\d{1,3})/i,                                        // designs: 3
+  /(\d{1,3})\s*(?:个)?\s*(?:款式|款型|花样)/,                                                // 3个款式
+  /(\d{1,3})\s*款/                                                                           // 3款
+];
+function fcPickNum(pats, txt){
+  for(let i=0;i<pats.length;i++){
+    const m=String(txt||'').match(pats[i]);
+    if(m){ const n=parseInt(m[1],10); if(isFinite(n)&&n>0) return n; }
+  }
+  return null;
+}
+// 扫描消息 → {'2026-08':{pcs:n, styles:n, byShop:{langges:{pcs,styles}, ...}}}
+// 同一买家同一天同一指标只取一次（取最大值），避免业务员复述一遍就翻倍
+function fcChatScan(msgs){
+  const seen={};
+  (msgs||[]).forEach(m=>{
+    if(!m || !m.t) return;
+    // ⚠️ bizChatParseFile 给的是 Date 对象（不是字符串），必须按日期归一化再取年月
+    const dt=(m.t instanceof Date) ? m.t : new Date(m.t);
+    if(isNaN(dt.getTime())) return;
+    const pad=n=>String(n).padStart(2,'0');
+    const month=dt.getFullYear()+'-'+pad(dt.getMonth()+1);
+    const day=month+'-'+pad(dt.getDate());
+    const c=String(m.content||''); if(!c) return;
+    if(FC_MONEY_SKIP.test(c)) return;                 // 「sample fee $30」不是件数
+    const shop=String(m.shop||''), buyer=String(m.buyer||'');
+    if(FC_PCS_CTX.test(c)){
+      const n=fcPickNum(FC_PAT_PCS,c);
+      if(n && n<=FC_PCS_MAX){ const k=buyer+'|'+day+'|pcs'; if(!seen[k]||n>seen[k].n) seen[k]={n:n,month:month,shop:shop}; }
+    }
+    if(FC_STY_CTX.test(c)){
+      const n=fcPickNum(FC_PAT_STY,c);
+      if(n && n<=FC_STY_MAX){ const k=buyer+'|'+day+'|sty'; if(!seen[k]||n>seen[k].n) seen[k]={n:n,month:month,shop:shop}; }
+    }
+  });
+  const agg={};
+  Object.keys(seen).forEach(k=>{
+    const e=seen[k], kind=k.split('|')[2];
+    const a=agg[e.month]||(agg[e.month]={pcs:0,styles:0,byShop:{}});
+    const bs=a.byShop[e.shop]||(a.byShop[e.shop]={pcs:0,styles:0});
+    if(kind==='pcs'){ a.pcs+=e.n; bs.pcs+=e.n; } else { a.styles+=e.n; bs.styles+=e.n; }
+  });
+  return agg;
+}
+async function fcImportChat(){
+  fcHeal();
+  const inp=document.getElementById('fcChatFile');
+  if(!inp || !inp.files || !inp.files.length){ showToast('先选聊天 CSV 文件（后台导出的那种）'); return; }
+  const files=[].slice.call(inp.files), log=[], aggAll={};
+  let msgsAll=0, pcsAll=0, styAll=0;
+  for(const f of files){
+    if(!/\.(csv|txt)$/i.test(f.name||'')){ log.push(f.name+'：只认 CSV / TXT'); continue; }
+    const dup=(fc.chat.files||[]).find(x=>x.n===f.name && x.s===(f.size||0));
+    if(dup){ log.push(f.name+'：已导入过（同名同大小，自动跳过）'); continue; }
+    try{
+      const text=await f.text();
+      const msgs=bizChatParseFile(text, bizShopFromFileName(f.name));
+      if(!msgs.length){ log.push(f.name+'：没解析出有效消息（表头要有时间列和内容列）'); continue; }
+      if(!msgs[0].shop){ msgs.forEach(m=>{ if(!m.shop) m.shop=bizShopFromText(m.sellerRaw+' '+m.content)||'langges'; }); }
+      const agg=fcChatScan(msgs);
+      let pc=0, sy=0;
+      Object.keys(agg).forEach(mo=>{ pc+=agg[mo].pcs; sy+=agg[mo].styles;
+        const a=aggAll[mo]||(aggAll[mo]={pcs:0,styles:0,byShop:{}});
+        a.pcs+=agg[mo].pcs; a.styles+=agg[mo].styles;
+        Object.keys(agg[mo].byShop||{}).forEach(sp=>{
+          const b=a.byShop[sp]||(a.byShop[sp]={pcs:0,styles:0});
+          b.pcs+=agg[mo].byShop[sp].pcs; b.styles+=agg[mo].byShop[sp].styles;
+        });
+      });
+      msgsAll+=msgs.length; pcsAll+=pc; styAll+=sy;
+      fc.chat.files.push({n:f.name, s:f.size||0, m:msgs.length, at:new Date().toISOString().slice(0,16).replace('T',' ')});
+      log.push(f.name+'：'+msgs.length+' 条消息 → 命中 '+Object.keys(agg).length+' 个月（样品 '+pc+' 件 / 款式 '+sy+' 款）');
+    }catch(err){ log.push(f.name+'：读取失败 '+err.message); }
+  }
+  // 只增不减：和已有解析结果累加，不覆盖
+  Object.keys(aggAll).forEach(mo=>{
+    const a=fc.chat.months[mo]||(fc.chat.months[mo]={pcs:0,styles:0,byShop:{}});
+    a.pcs=(a.pcs||0)+aggAll[mo].pcs; a.styles=(a.styles||0)+aggAll[mo].styles;
+    Object.keys(aggAll[mo].byShop||{}).forEach(sp=>{
+      const b=a.byShop[sp]||(a.byShop[sp]={pcs:0,styles:0});
+      b.pcs=(b.pcs||0)+aggAll[mo].byShop[sp].pcs; b.styles=(b.styles||0)+aggAll[mo].byShop[sp].styles;
+    });
+  });
+  fc.chat.updated=new Date().toISOString().slice(0,16).replace('T',' ');
+  inp.value='';
+  saveAll(); renderFc();
+  showToast('✓ 解析 '+msgsAll+' 条消息：样品 '+pcsAll+' 件 / 款式 '+styAll+' 款，覆盖 '+Object.keys(aggAll).length+' 个月', 'success');
+  if(log.length) console.log('[聊天解析] '+log.join(' | '));
+}
+function fcChatClear(){
+  const n=(fc.chat&&fc.chat.files)?fc.chat.files.length:0;
+  showConfirm('确定清空聊天解析结果吗？\n已导入 '+n+' 个聊天文件的解析结果会删掉（CSV 原件还在你电脑里，重新导入即可）。', ()=>{
+    fc.chat=fcChatBlank(); saveAll(); renderFc(); showToast('聊天解析结果已清空');
+  });
 }
 function fcReach(v, goal){
   const g=Number(goal)||0;
@@ -13361,9 +13702,10 @@ function fcOpenMonth(m){
   const isFuture = !s;
   document.getElementById('modalFcMonthTitle').textContent = (isFuture?'设定目标 / 补录 · ':'手工修正 · ')+fcMonthLabel(m);
   document.getElementById('fcMonthKey').value=m;
-  document.getElementById('fcMonthHint').innerHTML = isFuture
+  const chatTip = '<br><span style="color:var(--text-muted)">「样品件数」「大货款式数」不在这个弹窗里改 —— 这两个数只能由聊天记录解析出来（当前：样品 '+((s&&s.pcs!=null)?fcNum(s.pcs):'—')+' 件 / 款式 '+((s&&s.styles!=null)?fcNum(s.styles):'—')+' 款）。</span>';
+  document.getElementById('fcMonthHint').innerHTML = (isFuture
     ? '这个月还没有实际数据 —— 填「目标」即可（预测值会自动和它比达成率）；如果已经知道实际数，也可以直接填在上面。'
-    : '留空表示继续用自动统计值（订单 '+fcNum(s?s.orders:0)+' / 样品 '+fcNum(s?s.sample:0)+' / 金额 '+fcNum(s?s.amount:0)+' / 客户 '+fcNum(s?s.buyers:0)+'）。';
+    : '留空表示继续用自动统计值（订单 '+fcNum(s?s.orders:0)+' / 样品单 '+fcNum(s?s.sample:0)+' / 金额 '+fcNum(s?s.amount:0)+' / 客户 '+fcNum(s?s.buyers:0)+'）。') + chatTip;
   const elO=document.getElementById('fcMorders'), elS=document.getElementById('fcMsample'),
         elB=document.getElementById('fcMbulk'),   elA=document.getElementById('fcMamount'),
         elY=document.getElementById('fcMbuyers');
@@ -13404,21 +13746,258 @@ function fcClearMonth(){
   saveAll(); renderFc();
   showToast('已清除 '+fcMonthLabel(m)+' 的手工数据和目标');
 }
+// ---------- 预测报告（v2.32）：数据 + 简要说明 + 依据，可打印/转 PDF ----------
+// 行业节奏参考：来自日常整理的行业资料（order-forecast 技能里的 seasonality 知识），只作解释与校验，
+// 预测系数本身仍只用「自家历史」算，不把行业值混进数字里。
+const FC_INDUSTRY = {
+  langges:{ name:'朗格斯', cat:'穆斯林服饰（Abaya / 长袍 / 头巾）', mkt:'中东（沙特 / 阿联酋 / 土耳其）+ 欧美穆斯林社群',
+    drive:['斋月前备货（回历驱动，逐年前移）','白五 White Friday（11 月下旬，中东版黑五）','年末大促'],
+    rhythm:[['9 月底前','海湾买家锁定 Q4 订单量与交期','核心下单期'],
+            ['10 月','发货与到仓（第一批货需 10 月底前到杰贝阿里 / 吉达）','发货高峰'],
+            ['11 月','白五补货 + 斋月备货启动','下单高峰'],
+            ['12 月','斋月备货延续 + 年末大促','高位']],
+    memo:'中东海湾买家惯例提前 3-4 个月为斋月下单 → 斋月前一年的 11-12 月即是备货窗口起点；中东零售商斋月营销通常提前约 3 个月启动，采购必须在此之前到货。行业公开口径：Q4 是中东服装传统旺季。' },
+  fansi:{ name:'凡适', cat:'运动服饰（BJJ 柔术服 / MMA / 健身）', mkt:'欧美（美 / 德 / 法 / 西 / 北欧）',
+    drive:['黑五 / 网一（11 月下旬，全年最深折扣）','1 月清仓','7-8 月赛事季（世锦赛 / ADCC）'],
+    rhythm:[['9-10 月','品牌方为黑五备货','供应商下单高峰'],
+            ['11 月下旬','黑五 / 网一开卖','转为「卖得好就补单」'],
+            ['1 月','清仓','上年库存出清，新单偏低'],
+            ['7-8 月','赛事季备货','次级高峰']],
+    memo:'BJJ 装备全年最大折扣窗口是黑五至网一，品牌方须提前 4-8 周备货 → 中国供应商备货订单高峰在 9-10 月；11 月属温和补单期，通常低于 10 月。阿里国际站武术服饰品类活跃买家同比 +28.53%，欧洲市场高增长（德国 +131%、法国 +109%、西班牙 +91%）。' }
+};
+function fcEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fcReportCtx(){
+  fcHeal();
+  const cfg=fc.cfg, series=fcSeries(cfg.scope);
+  const pred=series.length?fcForecastScope(cfg.scope,cfg.horizon,cfg.method):[];
+  const pL=fcForecastScope('langges',cfg.horizon,cfg.method);
+  const pF=fcForecastScope('fansi',cfg.horizon,cfg.method);
+  const nAct=series.length;
+  const hi=Math.min(fcViewH||0, Math.max(0,pred.length-1));
+  const target=pred.length?pred[hi].month:fcCurMonth();
+  const seas=fcSeasonIdx(series,cfg.metric);
+  const last=series.length?series[series.length-1]:null;
+  return {cfg:cfg, series:series, pred:pred, pL:pL, pF:pF, nAct:nAct, hi:hi, target:target,
+          seas:seas, last:last, chatMonths:Object.keys(fc.chat.months||{}).length,
+          chatFiles:(fc.chat.files||[]).length,
+          methodName:(FC_METHODS.filter(x=>x[0]===cfg.method)[0]||['','混合'])[1],
+          scopeName:fcScopeName()};
+}
+// 自然语言简述（页面上也用它，报告第一章就是它）
+function fcSummaryText(ctx){
+  const c=ctx||fcReportCtx();
+  const i=c.hi, t=c.target;
+  const pt=c.pred[i];
+  if(!c.nAct || !pt){
+    return '还没有足够的历史数据，暂时无法给出 '+fcMonthLabel(t)+' 的预测。请先到「经营分析」导入订单表 / 收款表（历史越长越准，建议 6 个月以上）。';
+  }
+  const A=c.pL[i]||{}, B=c.pF[i]||{};
+  const num=(v,u)=>((v===null||v===undefined)?'—':(fcNum(v)+(u||'')));
+  const base=(k)=> c.last ? ((c.last.est&&typeof c.last.est[k]==='number')?c.last.est[k]:(Number(c.last[k])||0)) : undefined;
+  const dTxt=(k,unit)=>{
+    const b=base(k); if(b===undefined||!b) return '';
+    const d=(pt[k]===null?0:pt[k])-b, pct=d/b*100;
+    if(Math.abs(pct)<0.5) return '基本持平';
+    return (d>0?'上升':'下降')+' '+Math.abs(pct).toFixed(0)+'%';
+  };
+  const mm=Number(String(t).split('-')[1]);
+  const f=c.seas.ok?c.seas.idx[mm]:null;
+  const L=[];
+  L.push('【'+fcMonthLabel(t)+'（'+c.scopeName+'）预测】订单 '+num(pt.orders,' 单')
+    +'（朗格斯 '+num(A.orders,' 单')+' / 凡适 '+num(B.orders,' 单')+'）'
+    +'，其中样品单 '+num(pt.sample,' 单')+'、样品件数 '+num(pt.pcs,' 件')+'，'
+    +'大货订单 '+num(pt.bulk,' 单')+'、大货款式 '+num(pt.styles,' 款')+'，'
+    +'预计成交客户 '+num(pt.buyers,' 个')+'，金额 '+(pt.amount?('$'+fcNum(pt.amount,0)):'—')+'（约合 ¥'+fcNum(Math.round((pt.amount||0)*(c.cfg.fx||FC_FX)),0)+'）。');
+  if(pt.orders!=null) L.push('订单数波动区间大约 '+num(pt.lo.orders,'')+' ~ '+num(pt.hi.orders,'')+' 单。与上月（'+fcMonthLabel(c.last.month)+'，当月未过完已折算成整月）相比，订单数 '+dTxt('orders')+'。');
+  L.push('主要依据：① 用你自己导入的 '+c.nAct+' 个月历史（'+fcMonthLabel(c.series[0].month)+' ~ '+fcMonthLabel(c.series[c.series.length-1].month)+'）做 '+c.methodName+'；'
+    +(c.seas.ok?('② 淡旺季按自家历史算：'+mm+' 月系数 '+f.toFixed(2)+(f>=1.08?'（偏旺）':(f<=0.92?'（偏淡）':'（接近平常）'))+'，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量':'半量')+'套用；')
+             :('② 历史不足 12 个月，本次<b>未套用淡旺季</b>；'))
+    +'③ 样品件数 / 大货款式数来自聊天记录解析（覆盖 '+c.chatMonths+' 个月，'+(c.chatMonths?('抓不到的月份留空、不参与该指标预测'):'目前还没导入聊天记录')+'）；'
+    +'④ 季节节奏参考了平时整理的行业规律（见第三节），只用于解释，不直接改数字。');
+  return L.join('');
+}
+function fcReportHtml(){
+  const c=fcReportCtx(), cfg=c.cfg, i=c.hi, t=c.target, pt=c.pred[i]||null;
+  const now=new Date();
+  const gen=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '
+    +String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const A=c.pL[i]||{}, B=c.pF[i]||{};
+  const cell=(k,p)=>{
+    if(!p) return '<td>—</td>';
+    const v=p[k];
+    if(v===null||v===undefined) return '<td style="color:#94a3b8">—</td>';
+    const lo=p.lo?p.lo[k]:null, hh=p.hi?p.hi[k]:null;
+    const main=(k==='amount')?('$'+fcNum(v,0)):fcNum(v);
+    const rg=(lo!=null&&hh!=null)?('<br><span style="font-size:11px;color:#94a3b8">'+((k==='amount')?('$'+fcNum(lo,0)+'~$'+fcNum(hh,0)):(fcNum(lo)+'~'+fcNum(hh)))+'</span>'):'';
+    return '<td><b>'+main+'</b>'+rg+'</td>';
+  };
+  let H='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>订单与样品数量预测报告 '+fcEsc(t)+'</title>'
+    +'<style>body{font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;max-width:1000px;margin:0 auto;padding:34px 30px;color:#1e293b;line-height:1.8;font-size:14px}'
+    +'h1{font-size:23px;margin:0 0 8px}h2{font-size:16px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #0ea5e9}'
+    +'h3{font-size:14px;margin:16px 0 6px}table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}'
+    +'th,td{border:1px solid #e2e8f0;padding:7px 10px;text-align:center}th{background:#f1f5f9;font-weight:600}'
+    +'td.l{text-align:left;font-weight:600}td.r{text-align:right;font-variant-numeric:tabular-nums}tr.sum td{background:#f0f9ff;font-weight:700}'
+    +'.meta{font-size:12.5px;color:#64748b;line-height:1.9}.box{border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;background:#fafafa;font-size:13px}'
+    +'.warn{border-left:3px solid #f59e0b;background:#fffbeb;padding:10px 14px;border-radius:6px;font-size:12.5px;margin:8px 0}'
+    +'ul{margin:6px 0;padding-left:22px}li{margin:4px 0}.sm{font-size:12px;color:#64748b}'
+    +'@media print{body{padding:0;font-size:12.5px}h2{page-break-after:avoid}table{page-break-inside:avoid}}</style></head><body>';
+  H+='<h1>'+fcEsc(fcMonthLabel(t))+' 订单与样品数量预测报告</h1>';
+  H+='<div class="meta"><b>范围</b>：'+fcEsc(c.scopeName)+'（朗格斯 + 凡适 分别预测，合计为两店相加）<br>'
+    +'<b>预测月份</b>：'+fcEsc(fcMonthLabel(t))+'　|　<b>生成时间</b>：'+gen+'<br>'
+    +'<b>数据基础</b>：'+(c.nAct?('经营分析已导入的订单 / 收款表，共 '+c.nAct+' 个月（'+fcEsc(fcMonthLabel(c.series[0].month))+' ~ '+fcEsc(fcMonthLabel(c.series[c.series.length-1].month))+'）'):'（暂无历史数据）')
+    +'，'+fcEsc((FC_SRCS.filter(x=>x[0]===cfg.src)[0]||['',''])[1])+'，方法「'+fcEsc(c.methodName)+'」</div>';
+  // 一、结论
+  H+='<h2>一、预测结论</h2>';
+  H+='<div class="box">'+fcSummaryText(c).replace(/<b>/g,'<b>')+'</div>';
+  if(pt){
+    H+='<table><thead><tr><th style="text-align:left">指标</th><th>朗格斯</th><th>凡适</th><th>合计</th></tr></thead><tbody>';
+    FC_METRICS.forEach(m=>{
+      const sum=pt[m.key];
+      H+='<tr><td class="l">'+fcEsc(m.name)+'（'+m.unit+'）</td>'+cell(m.key,A)+cell(m.key,B)
+        +'<td style="background:#f0f9ff"><b>'+((sum===null||sum===undefined)?'—':((m.key==='amount')?('$'+fcNum(sum,0)):fcNum(sum)))+'</b></td></tr>';
+    });
+    H+='</tbody></table>';
+    H+='<div class="sm">注：合计 = 朗格斯 + 凡适 逐项相加；「样品件数」「大货款式数」来自聊天记录解析，聊天里没提到数量的月份不计入该指标预测。</div>';
+    if(c.pred.length>1){
+      H+='<h3>后续各月预测一览</h3><table><thead><tr><th>月份</th><th>订单数</th><th>样品单</th><th>样品件数</th><th>大货订单</th><th>大货款式</th><th>金额(USD)</th><th>客户数</th></tr></thead><tbody>';
+      c.pred.forEach(p=>{
+        const g=v=>(v===null||v===undefined)?'—':fcNum(v);
+        H+='<tr><td>'+fcEsc(fcMonthLabel(p.month))+'</td><td>'+g(p.orders)+'</td><td>'+g(p.sample)+'</td><td>'+g(p.pcs)+'</td><td>'+g(p.bulk)+'</td><td>'+g(p.styles)+'</td><td>'+(p.amount==null?'—':('$'+fcNum(p.amount,0)))+'</td><td>'+g(p.buyers)+'</td></tr>';
+      });
+      H+='</tbody></table>';
+    }
+  } else {
+    H+='<div class="warn">历史数据不足，本次没有产生预测值。</div>';
+  }
+  // 二、依据
+  H+='<h2>二、预测依据与算法说明</h2><ul>';
+  H+='<li><b>数据来源</b>：全部来自你自己导入的数据 —— 订单表 / 收款表（「经营分析」导入）+ 聊天记录解析。没有用任何外部推测的数字。</li>';
+  H+='<li><b>归月口径</b>：'+(cfg.src==='pays'?'收款口径，按放款月份统计，同一订单多笔收款只算一单':'下单口径，按订单创建时间统计')+'。</li>';
+  H+='<li><b>样品 / 大货划分</b>：单笔金额 ≤ $'+fcNum(cfg.line)+' 记样品单，&gt; $'+fcNum(cfg.line)+' 记大货单（与经营分析、提成规则同一条线）。</li>';
+  H+='<li><b>预测方法</b>：'+fcEsc(c.methodName)+'。'+(cfg.method==='avg3'?'取最近 3 个月平均值，稳但不看趋势。':(cfg.method==='trend'?'对历史做最小二乘直线拟合再外推，越远的月份趋势衰减越多（避免越推越离谱）。':'把「趋势外推」和「近 3 月平均」各取一半，兼顾走势和稳定。'))+'</li>';
+  H+='<li><b>淡旺季处理</b>：'+(c.seas.ok?('用自家历史按<b>同月平均法</b>算出每个月的季节系数（12 个月平均=1.00），先把历史去掉季节再拟合，最后乘回目标月系数。'+fcEsc(String(Number(String(t).split('-')[1])))+' 月系数 <b>'+c.seas.idx[Number(String(t).split('-')[1])].toFixed(2)+'</b>，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量套用':'半量套用（样本不足 24 个月）')+'。'):('淡旺季采用<b>同月平均法</b>（自家历史按自然月分组求平均 ÷ 总平均），但当前历史只有 '+c.nAct+' 个月、不足 12 个月，月份还没走满一轮，<b>本次未套用</b> —— 硬套会把偶发波动当规律。<b>只用自己的历史算，不套行业预设值。</b>'))+'</li>';
+  H+='<li><b>波动区间</b>：按历史对趋势线的偏离程度 + 相邻月份最大波动估算，<b>不是保证能落在这个范围里</b>。</li>';
+  if(c.last && c.last.partial) H+='<li><b>当月折算</b>：'+fcEsc(fcMonthLabel(c.last.month))+' 还没过完，已按已过天数折算成整月（约 ×'+c.last.scale.toFixed(2)+'），否则会低估。</li>';
+  H+='<li><b>样品件数 / 大货款式数</b>：从聊天记录里解析（覆盖 '+(c.chatMonths||0)+' 个月、'+(c.chatFiles||0)+' 个文件）。一个样品单不等于一件样品、一个订单也可能多个款式，所以这两个数单独统计。</li>';
+  H+='</ul>';
+  // 三、行业节奏参考
+  H+='<h2>三、行业淡旺季参考（外部规律，仅用于解释与校验）</h2>';
+  ['langges','fansi'].forEach(k=>{
+    const g=FC_INDUSTRY[k];
+    H+='<h3>'+fcEsc(g.name)+' —— '+fcEsc(g.cat)+'（'+fcEsc(g.mkt)+'）</h3>';
+    H+='<table><thead><tr><th>时间节点</th><th>市场含义</th><th>对下单的影响</th></tr></thead><tbody>';
+    g.rhythm.forEach(r=>{ H+='<tr><td><b>'+fcEsc(r[0])+'</b></td><td>'+fcEsc(r[1])+'</td><td>'+fcEsc(r[2])+'</td></tr>'; });
+    H+='</tbody></table>';
+    H+='<div class="sm"><b>旺季驱动</b>：'+fcEsc(g.drive.join('、'))+'<br><b>判断依据</b>：'+fcEsc(g.memo)+'</div>';
+  });
+  H+='<div class="warn">行业规律只作对照。本报告里的数字<b>全部由自家历史算出来</b>，没有把行业值掺进预测里 —— 如果你的实际节奏和上面不一样，以自家历史（第四节）为准。</div>';
+  // 四、自制季节系数
+  H+='<h2>四、自家淡旺季系数（12 个月）</h2>';
+  if(c.seas.ok){
+    H+='<table><thead><tr><th>月份</th>'+[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>'<th>'+m+'月</th>').join('')+'</tr></thead><tbody><tr><td class="l">系数</td>';
+    for(let m=1;m<=12;m++){
+      const f=c.seas.idx[m];
+      const col=f>=1.08?'#c2410c':(f<=0.92?'#64748b':'#1e293b');
+      H+='<td style="color:'+col+';font-weight:700">'+f.toFixed(2)+'</td>';
+    }
+    H+='</tr></tbody></table><div class="sm">系数 = 该月历史平均 ÷ 总平均，已归一化（平均 1.00）。≥1.08 偏旺、≤0.92 偏淡。样本 '+c.seas.n+' 条。</div>';
+  } else {
+    H+='<div class="warn">历史不足 12 个月（当前 '+c.nAct+' 个月），暂不计算季节系数。</div>';
+  }
+  // 五、明细
+  H+='<h2>五、历史与预测明细</h2>';
+  H+='<table><thead><tr><th>月份</th><th>类型</th><th>订单数</th><th>样品单</th><th>样品件数</th><th>大货订单</th><th>大货款式</th><th>金额(USD)</th><th>客户数</th></tr></thead><tbody>';
+  c.series.forEach(s=>{
+    const g=v=>(v===null||v===undefined)?'—':fcNum(v);
+    H+='<tr><td>'+fcEsc(fcMonthLabel(s.month))+'</td><td>'+((s.partial?'实际(进行中)':'实际')+(s.man?' · 手工':''))+'</td>'
+      +'<td>'+g(s.orders)+'</td><td>'+g(s.sample)+'</td><td>'+g(s.pcs)+'</td><td>'+g(s.bulk)+'</td><td>'+g(s.styles)+'</td>'
+      +'<td>'+(s.amount?('$'+fcNum(s.amount,0)):'0')+'</td><td>'+g(s.buyers)+'</td></tr>';
+  });
+  c.pred.forEach(p=>{
+    const g=v=>(v===null||v===undefined)?'—':fcNum(v);
+    H+='<tr class="sum"><td>'+fcEsc(fcMonthLabel(p.month))+'</td><td>预测</td>'
+      +'<td>'+g(p.orders)+'</td><td>'+g(p.sample)+'</td><td>'+g(p.pcs)+'</td><td>'+g(p.bulk)+'</td><td>'+g(p.styles)+'</td>'
+      +'<td>'+(p.amount==null?'—':('$'+fcNum(p.amount,0)))+'</td><td>'+g(p.buyers)+'</td></tr>';
+  });
+  H+='</tbody></table>';
+  if(c.chatMonths){
+    const cm=fc.chat.months, mons=Object.keys(cm).sort().reverse().slice(0,24);
+    H+='<h3>聊天解析明细（样品件数 / 大货款式数来源）</h3><table><thead><tr><th>月份</th><th>样品件数</th><th>大货款式数</th><th>朗格斯 件/款</th><th>凡适 件/款</th></tr></thead><tbody>';
+    mons.forEach(m=>{
+      const a=cm[m]||{}, lg=(a.byShop||{}).langges||{}, fs2=(a.byShop||{}).fansi||{};
+      H+='<tr><td>'+fcEsc(fcMonthLabel(m))+'</td><td>'+fcNum(a.pcs||0)+'</td><td>'+fcNum(a.styles||0)+'</td><td>'+fcNum(lg.pcs||0)+' / '+fcNum(lg.styles||0)+'</td><td>'+fcNum(fs2.pcs||0)+' / '+fcNum(fs2.styles||0)+'</td></tr>';
+    });
+    H+='</tbody></table>';
+  }
+  // 六、风险
+  H+='<h2>六、风险提示与不确定性</h2><ul>';
+  if(c.nAct<6) H+='<li><b>样本偏少</b>：只有 '+c.nAct+' 个月历史，预测误差会明显偏大，建议至少攒到 6 个月再看。</li>';
+  if(!c.seas.ok) H+='<li><b>未含淡旺季</b>：历史不足 12 个月，季节性没进入模型，旺季/淡季月份的偏差可能较大。</li>';
+  else if(c.seas.w<1) H+='<li><b>淡旺季系数半量套用</b>：样本 '+c.seas.n+' 条（不足 24 个月），系数本身也有噪声。</li>';
+  if(!c.chatFiles) H+='<li><b>样品件数 / 大货款式数缺失</b>：还没导入聊天记录，这两个指标无法预测。</li>';
+  else if(c.chatMonths<3) H+='<li><b>聊天覆盖月份偏少</b>：只有 '+c.chatMonths+' 个月，样品件数 / 款式数的趋势判断很不可靠。</li>';
+  H+='<li><b>规则变化</b>：提成规则、样品线（$'+fcNum(cfg.line)+'）、店铺运营策略一旦调整，历史规律会失效，需要重新观察。</li>';
+  H+='<li><b>大环境</b>：平台流量、类目政策、汇率、客户自身库存都会影响实际下单，模型只能反映"惯性和季节"，反映不了突发事件。</li>';
+  H+='</ul>';
+  // 七、建议
+  H+='<h2>七、行动建议</h2><ul>';
+  if(pt){
+    H+='<li>按<b>基准 '+fcNum(pt.orders)+' 单</b>（样品 '+fcNum(pt.sample)+' / 大货 '+fcNum(pt.bulk)+'，大货款式 '+((pt.styles==null)?'待补':fcNum(pt.styles))+' 款）向工厂预排产能，大货档期优先锁定。</li>';
+    H+='<li>'+fcEsc(fcMonthLabel(t))+' 月中复盘一次实际值，与预测基准偏差超过 20% 时回来重跑一次。</li>';
+  }
+  ['langges','fansi'].forEach(k=>{
+    const g=FC_INDUSTRY[k];
+    H+='<li>【'+fcEsc(g.name)+'】针对旺季驱动（'+fcEsc(g.drive.join('、'))+'）提前触达历史大货客户。</li>';
+  });
+  if(!c.chatFiles) H+='<li>把后台导出的聊天记录导入本模块，补齐「样品件数 / 大货款式数」这两个指标。</li>';
+  H+='</ul>';
+  // 八、口径
+  H+='<h2>八、口径与可复现</h2><ul>'
+    +'<li>本报告由「办公工作台 · 订单预测」模块生成，随时可重跑：换预测月份、换口径 / 范围 / 方法，报告会跟着变。</li>'
+    +'<li>样品线 $'+fcNum(cfg.line)+'，汇率 1 美元 = '+(cfg.fx||FC_FX)+' 元人民币（仅金额换算用）。</li>'
+    +'<li>报告里的所有数字都可在页面上逐行核对；手工修正过的月份在明细表里带「手工」标记。</li>'
+    +'</ul>';
+  H+='<div class="sm" style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:10px">生成时间 '+gen+'　·　办公工作台 v'+fcEsc(APP_VERSION)+'</div>';
+  H+='</body></html>';
+  return H;
+}
+function fcOpenReport(){
+  const html=fcReportHtml();
+  let w=null;
+  try{ w=window.open('','_blank'); }catch(err){ w=null; }
+  if(!w){ fcDownloadReport(); return; }
+  try{ w.document.open(); w.document.write(html); w.document.close(); w.focus(); }
+  catch(err){ fcDownloadReport(); }
+}
+function fcDownloadReport(){
+  fcHeal();
+  const c=fcReportCtx();
+  bkDownloadBlob(new Blob([fcReportHtml()],{type:'text/html;charset=utf-8'}), '订单预测报告_'+c.scopeName+'_'+c.target+'.html');
+  showToast('✓ 报告已下载（浏览器直接打开，可打印 / 另存为 PDF）','success');
+}
 function fcExportCsv(){
   fcHeal();
-  const cfg=fc.cfg, series=fcSeries(cfg.scope), pred=fcForecast(series, cfg.horizon, cfg.method);
-  const rows=[['月份','类型','订单数','样品数','大货数','金额USD','约合人民币','成交客户数','订单数区间低','订单数区间高','目标订单数','目标金额USD','达成率%','备注']];
-  series.forEach(s=>{
-    const goal=(fc.goals||{})[s.month]||{};
-    rows.push([s.month, s.partial?'实际(进行中)':'实际', s.orders, s.sample, s.bulk, s.amount, Math.round(s.amount*(cfg.fx||FC_FX)), s.buyers, '', '', goal.orders||'', goal.amount||'', goal.orders?Math.round(s.orders/goal.orders*100):'', s.note||'']);
-  });
-  pred.forEach(p=>{
-    const goal=(fc.goals||{})[p.month]||{};
-    rows.push([p.month, '预测', p.orders, p.sample, p.bulk, p.amount, Math.round(p.amount*(cfg.fx||FC_FX)), p.buyers, p.lo.orders, p.hi.orders, goal.orders||'', goal.amount||'', goal.orders?Math.round(p.orders/goal.orders*100):'', '']);
-  });
+  const cfg=fc.cfg;
+  const na=v=>(v===null||v===undefined)?'':v;
+  const rows=[['范围','月份','类型','订单数','样品单数','样品件数','大货订单数','大货款式数','金额USD','约合人民币','成交客户数','订单数区间低','订单数区间高','目标订单数','目标金额USD','达成率%','备注']];
+  const push=(scope,label)=>{
+    fcSeries(scope).forEach(s=>{
+      const goal=(fc.goals||{})[s.month]||{};
+      rows.push([label, s.month, s.partial?'实际(进行中)':(s.man?'实际(手工)':'实际'),
+        s.orders, s.sample, na(s.pcs), s.bulk, na(s.styles), s.amount, Math.round(s.amount*(cfg.fx||FC_FX)), s.buyers,
+        '', '', goal.orders||'', goal.amount||'', goal.orders?Math.round(s.orders/goal.orders*100):'', s.note||'']);
+    });
+    fcForecastScope(scope, cfg.horizon, cfg.method).forEach(p=>{
+      const goal=(fc.goals||{})[p.month]||{};
+      rows.push([label, p.month, '预测',
+        p.orders, p.sample, na(p.pcs), p.bulk, na(p.styles), na(p.amount), Math.round((p.amount||0)*(cfg.fx||FC_FX)), na(p.buyers),
+        na(p.lo.orders), na(p.hi.orders), goal.orders||'', goal.amount||'', goal.orders?Math.round(p.orders/goal.orders*100):'', '']);
+    });
+  };
+  push('all','合计'); push('langges','朗格斯'); push('fansi','凡适');
   const csv='\ufeff'+rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
-  bkDownloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}), '订单与样品预测_'+fcScopeName()+'_'+todayStr()+'.csv');
-  showToast('✓ 已导出 CSV（'+rows.length+' 行）', 'success');
+  bkDownloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}), '订单与样品预测_两店+合计_'+todayStr()+'.csv');
+  showToast('✓ 已导出 CSV（'+rows.length+' 行：合计 / 朗格斯 / 凡适 三段）', 'success');
 }
 
 function renderCurrentTab(){
