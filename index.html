@@ -692,6 +692,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .biz-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px}
 .biz-panel h4{margin:0 0 10px;font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .biz-panel h4 .tag{font-size:11px;font-weight:600;color:var(--text-muted);background:#f1f5f9;padding:2px 7px;border-radius:8px}
+.biz-panel h4 .tag-ok{font-size:11px;font-weight:600;color:#166534;background:#dcfce7;padding:2px 7px;border-radius:8px}
 .biz-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .biz-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .biz-tbl th{text-align:left;padding:8px;background:#f8fafc;color:var(--text-secondary);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -752,6 +753,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fc-ok{display:inline-block;color:#15803d;font-weight:600}
 .fc-miss{display:inline-block;color:#b91c1c;font-weight:600}
 /* v2.32：指标×两店×合计 三栏表 + 淡旺季系数条 */
+/* v2.33：接入阿里后台订单明细（Accio 导出的 CSV），件数/款式数直接用平台明细，不再靠聊天估算 */
 .fc-3col{width:100%;border-collapse:collapse;font-size:12.5px}
 .fc-3col th,.fc-3col td{border:1px solid var(--border);padding:7px 10px;text-align:center;vertical-align:middle}
 .fc-3col th{background:#f8fafc;font-weight:600;color:var(--text-secondary);font-size:11.5px}
@@ -1223,7 +1225,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.32 · 2026-10-14</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.33 · 2026-10-15</div>
     </div>
   </aside>
 
@@ -2074,7 +2076,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.32';
+const APP_VERSION = 'v2.33';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -13001,7 +13003,8 @@ const FC_HORIZONS = [1,3,6,12];
 const FC_MAX_H    = 12;                      // 往后最多推 12 个月，每个月都能单独选
 const FC_KEYS     = ['orders','sample','pcs','bulk','styles','amount','buyers'];
 function fcBlank(){ return {months:{}, goals:{}, chat:fcChatBlank(), cfg:{src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}}; }
-function fcChatBlank(){ return {files:[], months:{}, updated:''}; }
+function fcChatBlank(){ return {files:[], months:{}, updated:'', accio:fcAccioBlank()}; }
+function fcAccioBlank(){ return {files:[], updated:''}; }
 let fc = fcBlank();
 function fcHeal(){
   if(!fc || typeof fc!=='object' || Array.isArray(fc)) fc = fcBlank();
@@ -13010,6 +13013,8 @@ function fcHeal(){
   if(!fc.chat   || typeof fc.chat  !=='object' || Array.isArray(fc.chat))   fc.chat=fcChatBlank();
   if(!Array.isArray(fc.chat.files)) fc.chat.files=[];
   if(!fc.chat.months || typeof fc.chat.months!=='object' || Array.isArray(fc.chat.months)) fc.chat.months={};
+  if(!fc.chat.accio || typeof fc.chat.accio!=='object' || Array.isArray(fc.chat.accio)) fc.chat.accio=fcAccioBlank();
+  if(!Array.isArray(fc.chat.accio.files)) fc.chat.accio.files=[];
   const c = Object.assign({src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}, fc.cfg||{});
   const _h = Number(c.horizon);
   c.horizon = (isFinite(_h) && _h>=1 && _h<=FC_MAX_H) ? Math.round(_h) : 3;
@@ -13405,7 +13410,7 @@ function renderFc(){
       const td=p=>{
         if(!p) return '<td class="fc-na">—</td>';
         const v=p[k];
-        if(v===null||v===undefined) return '<td class="fc-na">—<span class="sub">聊天未解析到</span></td>';
+        if(v===null||v===undefined) return '<td class="fc-na">—<span class="sub">未导入明细</span></td>';
         let s='<td class="num">'+fmtV(k,v,m.unit);
         const lo=p.lo?p.lo[k]:null, hv=p.hi?p.hi[k]:null;
         if(lo!=null&&hv!=null) s+='<span class="sub">'+((k==='amount')?(fcUsd(lo)+'~'+fcUsd(hv)):(fcNum(lo)+'~'+fcNum(hv)))+'</span>';
@@ -13413,11 +13418,11 @@ function renderFc(){
       };
       const sv=pred[hi][k];
       const sumTd=(sv===null||sv===undefined)?'<td class="sumcell fc-na">—</td>':('<td class="sumcell">'+fmtV(k,sv,m.unit)+'</td>');
-      h+='<tr><td class="k">'+escHtml(m.name)+(m.src==='chat'?' <span class="fc-badge man">聊天</span>':'')+'</td>'
+      h+='<tr><td class="k">'+escHtml(m.name)+(m.src==='chat'?' <span class="fc-badge man">明细</span>':'')+'</td>'
         +td(pL[hi])+td(pF[hi])+sumTd+'<td>'+fcDelta(sv, baseAll(k), '')+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>（不是另算一条，所以三栏一定对得上）。括号里是波动区间。带「聊天」蓝标的两个指标来自聊天记录解析，抓不到的月份显示「—」，且不参与预测，不会拿 0 充数。</div>';
+    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>（不是另算一条，所以三栏一定对得上）。括号里是波动区间。带「明细」蓝标的两个指标来自<b>订单产品明细</b>（或聊天记录兜底），没导入的月份显示「—」，且不参与预测，不会拿 0 充数。</div>';
     h+='</div>';
   }
   // 图表
@@ -13519,17 +13524,38 @@ function renderFc(){
       +'</div>';
   }
   h+='</div>';
-  // ---------- 聊天解析（样品件数 / 大货款式数唯一来源） ----------
+  // ---------- 阿里后台订单明细（Accio）：件数 / 款式数的精确来源 ----------
+  const af=(fc.chat.accio&&fc.chat.accio.files)||[];
+  h+='<div class="biz-panel"><h4>阿里后台订单明细（Accio）<span class="tag tag-ok">'+(af.length?af.length+' 个文件':'还没导入')+'</span>'
+    +'<span style="margin-left:auto;display:flex;gap:6px;align-items:center">'
+    +'<select class="fc-sel" id="fcAccioShop" title="这批数据属于哪个店铺">'
+    +FC_SHOPS.map(s=>'<option value="'+s[0]+'">'+escHtml(s[1])+'</option>').join('')
+    +'</select>'
+    +'<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'fcAccioFile\').click()">导入订单明细 CSV</button>'
+    +(af.length?'<button class="btn btn-sm" onclick="fcAccioClear()">清空</button>':'')
+    +'</span></h4>';
+  h+='<input type="file" id="fcAccioFile" accept=".csv,.txt" multiple style="display:none" onchange="fcImportAccio()">';
+  if(!af.length){
+    h+='<div class="fc-chatbox"><b>推荐用这条：数据最准。</b>「样品件数」和「大货款式数」是从<b>订单里的产品明细</b>直接数出来的（一个订单含几个款式、每款多少件，平台都记着），不是靠聊天记录猜。<br>'
+      +'用法：左边选店铺 → 点「导入订单明细 CSV」→ 选 <code>Accio取数-订单款式与件数.js</code> 导出的 CSV。<b>一次只能导一个店</b>（Accio 同一时刻只登录一个账号），朗格斯导完切到凡适再导一次。<br>'
+      +'导入后按店铺覆盖，重复导同一个店不会翻倍。</div>';
+  } else {
+    h+='<div class="fc-note">已导入 <b>'+af.length+'</b> 个文件，共覆盖 <b>'+Object.keys(fc.chat.months||{}).length+'</b> 个月'+(fc.chat.accio.updated?('（更新于 '+escHtml(fc.chat.accio.updated)+'）'):'')
+      +'。分店明细：'+af.map(x=>escHtml(((FC_SHOPS.find(s=>s[0]===x.shop)||[x.shop,x.shop])[1]))+' '+x.m+'个月').join('、')+'</div>';
+    h+='<div class="fc-fileline">文件：'+escHtml(af.map(x=>x.n).join('、').slice(0,320))+'</div>';
+  }
+  h+='</div>';
+  // ---------- 聊天解析（样品件数 / 大货款式数补充来源） ----------
   const cm=fc.chat.months||{}, cfiles=fc.chat.files||[];
-  h+='<div class="biz-panel"><h4>聊天解析：样品件数 / 大货款式数 <span class="tag">'+(cfiles.length?cfiles.length+' 个文件':'还没导入')+'</span>'
+  h+='<div class="biz-panel"><h4>聊天解析（补充来源）<span class="tag">'+(cfiles.length?cfiles.length+' 个文件':'还没导入')+'</span>'
     +'<span style="margin-left:auto;display:flex;gap:6px">'
-    +'<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'fcChatFile\').click()">导入 / 追加聊天 CSV</button>'
+    +'<button class="btn btn-sm" onclick="document.getElementById(\'fcChatFile\').click()">导入 / 追加聊天 CSV</button>'
     +(cfiles.length?'<button class="btn btn-sm" onclick="fcChatClear()">清空</button>':'')
     +'</span></h4>';
   if(!cfiles.length){
-    h+='<div class="fc-chatbox">「样品件数」和「大货款式数」这两个数，<b>订单表 / 收款表里没有，只能从聊天记录里解析</b>（一个样品单不一定只要一件样品，一个订单也可能好几个款式）。<br>'
-      +'点上面按钮选后台导出的聊天记录（可多选，CSV / TXT）：系统按月扫描消息里的数量，例如 <code>3 samples</code>、<code>5个样品</code>、<code>3 designs</code>、<code>2款</code>，只存统计结果、<b>不存聊天原文</b>。<br>'
-      +'同一买家同一天只算一次（取最大值），业务员复述一遍不会翻倍；「样品费 / 设计费」这类金额不会被当成件数。</div>';
+    h+='<div class="fc-chatbox"><b>优先用上面「阿里后台订单明细」</b>，那是平台记的准确数。这块只在订单明细导不了时兜底：从聊天记录里<u>估算</u>件数 / 款式数。<br>'
+      +'⚠️ 聊天里的数量经常是 <b>MOQ 讨论</b>（例如「MOQ is 50 pcs」「50,000 pieces」），不是实际成交数，估算结果可能偏高。<br>'
+      +'要用的话点上面按钮选后台导出的聊天记录（可多选，CSV / TXT）：按月扫描 <code>3 samples</code>、<code>5个样品</code>、<code>3 designs</code>、<code>2款</code> 这类数量，只存统计结果、<b>不存聊天原文</b>；同一买家同一天只算一次（取最大值）。</div>';
   } else {
     const mons=Object.keys(cm).sort().reverse();
     let tp=0, ts=0; mons.forEach(m=>{ tp+=(cm[m].pcs||0); ts+=(cm[m].styles||0); });
@@ -13669,10 +13695,122 @@ async function fcImportChat(){
   showToast('✓ 解析 '+msgsAll+' 条消息：样品 '+pcsAll+' 件 / 款式 '+styAll+' 款，覆盖 '+Object.keys(aggAll).length+' 个月', 'success');
   if(log.length) console.log('[聊天解析] '+log.join(' | '));
 }
+// ---------- 阿里后台订单明细（Accio）直读 ----------
+// 比聊天文本可靠得多：件数 / 款式数直接从订单里每条产品明细（productId / quantity）算出来，不用猜。
+// CSV 形如：月份,订单数,样品单数,样品件数,大货订单数,大货款式数,大货件数,金额USD
+function fcAccioSplit(line){
+  const out=[]; let cur='', q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){ if(q && line[i+1]==='"'){ cur+='"'; i++; } else q=!q; }
+    else if(c===',' && !q){ out.push(cur); cur=''; }
+    else cur+=c;
+  }
+  out.push(cur); return out.map(s=>String(s).trim());
+}
+function fcAccioParse(text){
+  const lines=String(text||'').replace(/^\ufeff/,'').split(/\r?\n/).filter(l=>l.replace(/\s+/g,'')!=='');
+  if(!lines.length) return {ok:false, err:'空文件', months:{}, rows:0};
+  const head=fcAccioSplit(lines[0]).map(s=>s.toLowerCase());
+  const pick=names=>{ for(const n of names){ const i=head.findIndex(h=>h===n||h.indexOf(n)>=0); if(i>=0) return i; } return -1; };
+  const iM=pick(['月份','month','年月','日期']);
+  const iP=pick(['样品件数','样品件','samplepcs','sample_pcs','件数']);
+  const iS=pick(['大货款式数','大货款','bulkstyles','bulk_styles','款式数','款式']);
+  if(iM<0) return {ok:false, err:'没找到「月份」列', months:{}, rows:0};
+  if(iP<0 && iS<0) return {ok:false, err:'没找到「样品件数」或「大货款式数」列', months:{}, rows:0};
+  const months={}; let rows=0;
+  for(let i=1;i<lines.length;i++){
+    const c=fcAccioSplit(lines[i]); if(c.length<=iM) continue;
+    let m=String(c[iM]||'').trim();
+    const mm=m.match(/(\d{4})\D?(\d{1,2})/);
+    if(!mm) continue;
+    m=mm[1]+'-'+('0'+mm[2]).slice(-2);
+    const num=v=>{ const n=Number(String(v||'').replace(/[,，\s]/g,'')); return isFinite(n)?n:null; };
+    const pcs=iP>=0?num(c[iP]):null, sty=iS>=0?num(c[iS]):null;
+    if(pcs===null && sty===null) continue;
+    const a=months[m]||(months[m]={pcs:0,styles:0});
+    a.pcs+=(pcs===null?0:pcs); a.styles+=(sty===null?0:sty); rows++;
+  }
+  return {ok:rows>0, err:rows?'':'没解析出有效月份行', months:months, rows:rows};
+}
+function fcNowLabel(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+async function fcImportAccio(){
+  fcHeal();
+  const sel=document.getElementById('fcAccioShop');
+  const shop=(sel&&sel.value)||'langges';
+  if(!FC_SHOPS.some(s=>s[0]===shop)){ showToast('先选这条数据属于哪个店铺'); return; }
+  const shopName=(FC_SHOPS.find(s=>s[0]===shop)||[shop,shop])[1];
+  const inp=document.getElementById('fcAccioFile');
+  if(!inp || !inp.files || !inp.files.length){ showToast('先选 Accio 导出的订单明细 CSV'); return; }
+  const files=[].slice.call(inp.files), log=[], aggAll={};
+  let rows=0, tp=0, ts=0;
+  for(const f of files){
+    if(!/\.(csv|txt)$/i.test(f.name||'')){ log.push(f.name+'：只认 CSV / TXT'); continue; }
+    try{
+      const r=fcAccioParse(await f.text());
+      if(!r.ok){ log.push(f.name+'：'+r.err); continue; }
+      Object.keys(r.months).forEach(m=>{
+        const a=aggAll[m]||(aggAll[m]={pcs:0,styles:0});
+        a.pcs+=r.months[m].pcs; a.styles+=r.months[m].styles;
+        tp+=r.months[m].pcs; ts+=r.months[m].styles;
+      });
+      rows+=r.rows;
+      const dup=(fc.chat.accio.files||[]).find(x=>x.n===f.name && x.s===(f.size||0));
+      if(dup) dup.shop=shop;
+      else fc.chat.accio.files.push({n:f.name, s:f.size||0, shop:shop, m:r.rows, at:fcNowLabel()});
+      log.push(f.name+'：'+r.rows+' 个月');
+    }catch(err){ log.push(f.name+'：读取失败 '+err.message); }
+  }
+  if(!rows){ inp.value=''; showToast('没导入任何数据：'+(log.join('；')||'文件为空')); return; }
+  // 该店铺覆盖写入（Accio 是精确值，优先于聊天估算）；汇总 = 各店之和
+  Object.keys(aggAll).forEach(m=>{
+    const a=fc.chat.months[m]||(fc.chat.months[m]={pcs:0,styles:0,byShop:{}});
+    a.byShop=a.byShop||{};
+    a.byShop[shop]=Object.assign({}, a.byShop[shop]||{}, {pcs:aggAll[m].pcs, styles:aggAll[m].styles, src:'accio'});
+    let sp=0, ss=0;
+    Object.keys(a.byShop).forEach(k=>{ sp+=Number(a.byShop[k].pcs||0)||0; ss+=Number(a.byShop[k].styles||0)||0; });
+    a.pcs=sp; a.styles=ss;
+  });
+  fc.chat.accio.updated=fcNowLabel(); fc.chat.updated=fcNowLabel();
+  inp.value='';
+  saveAll(); renderFc();
+  showToast('✓ '+shopName+'：'+rows+' 个月 · 样品 '+fcNum(tp)+' 件 / 大货款式 '+fcNum(ts)+' 款', 'success');
+  if(log.length) console.log('[Accio 订单明细] '+log.join(' | '));
+}
+function fcAccioClear(){
+  const n=((fc.chat&&fc.chat.accio&&fc.chat.accio.files)||[]).length;
+  showConfirm('确定清空「阿里后台订单明细」数据吗？\n已导入 '+n+' 个文件。清空后这两个指标会变回「—」（预测时自动跳过），CSV 原件还在你电脑里，重新导入即可。', ()=>{
+    fcHeal();
+    const keep={};
+    Object.keys(fc.chat.months||{}).forEach(m=>{
+      const a=fc.chat.months[m]||{}, bs=a.byShop||{}, left={};
+      Object.keys(bs).forEach(sp=>{ if(bs[sp] && bs[sp].src!=='accio') left[sp]=bs[sp]; });
+      const ks=Object.keys(left);
+      if(ks.length){
+        let tp=0, ts=0; ks.forEach(sp=>{ tp+=Number(left[sp].pcs||0)||0; ts+=Number(left[sp].styles||0)||0; });
+        keep[m]={pcs:tp, styles:ts, byShop:left};
+      }
+    });
+    fc.chat.months=keep; fc.chat.accio=fcAccioBlank();
+    saveAll(); renderFc(); showToast('后台订单明细数据已清空');
+  });
+}
 function fcChatClear(){
   const n=(fc.chat&&fc.chat.files)?fc.chat.files.length:0;
-  showConfirm('确定清空聊天解析结果吗？\n已导入 '+n+' 个聊天文件的解析结果会删掉（CSV 原件还在你电脑里，重新导入即可）。', ()=>{
-    fc.chat=fcChatBlank(); saveAll(); renderFc(); showToast('聊天解析结果已清空');
+  showConfirm('确定清空聊天解析结果吗？\n已导入 '+n+' 个聊天文件的解析结果会删掉（CSV 原件还在你电脑里，重新导入即可）。\n从阿里后台订单明细导入的精确数据会保留。', ()=>{
+    fcHeal();
+    const keep={};
+    Object.keys(fc.chat.months||{}).forEach(m=>{
+      const a=fc.chat.months[m]||{}, bs=a.byShop||{}, acc={};
+      Object.keys(bs).forEach(sp=>{ if(bs[sp] && bs[sp].src==='accio') acc[sp]=bs[sp]; });
+      const ks=Object.keys(acc);
+      if(ks.length){
+        let tp=0, ts=0; ks.forEach(sp=>{ tp+=Number(acc[sp].pcs||0)||0; ts+=Number(acc[sp].styles||0)||0; });
+        keep[m]={pcs:tp, styles:ts, byShop:acc};
+      }
+    });
+    fc.chat.files=[]; fc.chat.months=keep; fc.chat.updated='';
+    saveAll(); renderFc(); showToast('聊天解析结果已清空（后台订单明细数据保留）');
   });
 }
 function fcReach(v, goal){
