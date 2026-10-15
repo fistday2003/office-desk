@@ -758,6 +758,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 /* v2.35：件数/款式数改「实测系数」折算（实测值 ÷ 单数），订单明细降级为备选（平台 quantity 是下单量，会虚高） */
 /* v2.36：① 三栏表「合计」固定按两店相加，不再跟着「范围」下拉走；② 系数可以直接手工改（留空=自动） */
 /* v2.37：预置 2026-07~09 两店实测值，装好即按系数折算；三栏表格子里直接标出 ×系数 */
+/* v2.38：① 件数/款式数不再单独拟合一条线，改为「预测单数 × 固定系数」反算（修：43×1.51 本该 65 却显示 55）；② 「件数 / 款式数系数」面板上移到预测表前面 */
 .fc-3col{width:100%;border-collapse:collapse;font-size:12.5px}
 .fc-3col th,.fc-3col td{border:1px solid var(--border);padding:7px 10px;text-align:center;vertical-align:middle}
 .fc-3col th{background:#f8fafc;font-weight:600;color:var(--text-secondary);font-size:11.5px}
@@ -1229,7 +1230,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.37 · 2026-10-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.38 · 2026-10-15</div>
     </div>
   </aside>
 
@@ -2080,7 +2081,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.37';
+const APP_VERSION = 'v2.38';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -13416,8 +13417,12 @@ function fcPredictMetric(vals, horizon, method, opt){
   }
   return out;
 }
-function fcForecast(series, horizon, method){
+// v2.38：kk = 该店的固定系数。配了系数时，件数 / 款式数不再单独拟合一条曲线，
+// 而是「用预测出来的单数 × 系数」反算 —— 否则会出现「样品单数 43 × 1.51 本该 65，表里却写 55」这种对不上的数。
+function fcForecast(series, horizon, method, kk){
   horizon = Number(horizon)||3;
+  const kp=(kk&&kk.pcs)   ? Number(kk.pcs.k)   : 0;
+  const ks=(kk&&kk.styles)? Number(kk.styles.k): 0;
   const res={};
   FC_KEYS.forEach(k=>{
     // 聊天抓不到的月份（pcs / styles 为 null）不参与这条指标的预测，也不拿 0 充数
@@ -13445,6 +13450,17 @@ function fcForecast(series, horizon, method){
     });
     if(item.lo.sample!=null) item.lo.sample=Math.min(item.lo.sample, item.lo.orders==null?item.lo.sample:item.lo.orders);
     if(item.hi.sample!=null) item.hi.sample=Math.min(item.hi.sample, item.hi.orders==null?item.hi.sample:item.hi.orders);
+    // v2.38：件数 = 预测样品单数 × 系数；款式数 = 预测大货单数 × 系数（区间也按单数的区间折算，保证跟单数栏永远对得上）
+    if(kp>0){ item.pcs = (item.sample>0) ? Math.round(item.sample*kp) : null; }
+    if(ks>0){ item.styles = (item.bulk>0) ? Math.round(item.bulk*ks) : null; }
+    if(kp>0){
+      item.lo.pcs = (item.sample>0 && item.lo.sample!=null) ? r0(item.lo.sample*kp) : null;
+      item.hi.pcs = (item.sample>0 && item.hi.sample!=null) ? r0(item.hi.sample*kp) : null;
+    }
+    if(ks>0){
+      item.lo.styles = (item.bulk>0 && item.lo.bulk!=null) ? r0(item.lo.bulk*ks) : null;
+      item.hi.styles = (item.bulk>0 && item.hi.bulk!=null) ? r0(item.hi.bulk*ks) : null;
+    }
     out.push(item);
   }
   return out;
@@ -13454,7 +13470,8 @@ function fcForecastScope(scope, horizon, method){
   horizon=Number(horizon)||3;
   if(scope && scope!=='all'){
     const series=fcSeries(scope);
-    return series.length ? fcForecast(series, horizon, method) : [];
+    // v2.38：把该店的固定系数传进去，件数 / 款式数按「预测单数 × 系数」算
+    return series.length ? fcForecast(series, horizon, method, fcCalK(scope)) : [];
   }
   const A=fcForecastScope('langges',horizon,method), B=fcForecastScope('fansi',horizon,method);
   const H=Math.max(A.length,B.length), out=[];
@@ -13618,6 +13635,132 @@ function renderFc(){
   if(lastS && lastS.partial){
     h+='<div class="fc-warn">'+escHtml(fcMonthLabel(lastS.month))+' <b>还没过完</b>（已过 '+new Date().getDate()+' / '+fcDaysInMonth(lastS.month)+' 天），预测时会按已过天数把它折算成整月（约 ×'+lastS.scale.toFixed(2)+'），否则会低估。</div>';
   }
+  // ---------- v2.35 件数 / 款式数系数（固定值，可手改） ----------
+  const calRows=(fc.cal&&fc.cal.rows)||[];
+  const autoBy={}; FC_SHOPS.forEach(s=>{ autoBy[s[0]]=fcAutoMap(s[0])||{}; });
+  const KK={}; FC_SHOPS.forEach(s=>{ KK[s[0]]=fcCalK(s[0]); });
+  const anyK = FC_SHOPS.some(s=>{ const k=KK[s[0]]; return k && (k.pcs||k.styles); });
+  const anyMan = FC_SHOPS.some(s=>{ const m=(fc.cal.manual||{})[s[0]]||{}; return m.pcs||m.styles; });
+  h+='<div class="biz-panel"><h4>件数 / 款式数系数<span class="tag tag-ok">'+(anyMan?'已设好':'未设')+'</span>'
+    +'<span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">'
+    +'<button class="btn btn-sm" onclick="fcCalAutoAll()">恢复初始系数</button>'
+    +'<button class="btn btn-sm" onclick="fcCalAdd()">＋ 加一行实测记录</button>'
+    +(calRows.length?'<button class="btn btn-sm" onclick="fcCalClear()">清空记录</button>':'')
+    +'</span></h4>';
+  h+='<div class="fc-chatbox"><b style="color:#1d4ed8">这一块是下面预测表的「输入」</b> —— 系数一改，下面表里的样品件数 / 大货款式数立刻跟着变。<br>'
+    +'<b>样品件数 = 样品单数 × 系数；大货款式数 = 大货单数 × 系数。</b>'
+    +'<b style="color:#1d4ed8">系数已经填好了 —— 朗格斯 1.51 / 0.88，凡适 1.36 / 1.44</b>（按 2026 年 7~9 月三个月的实测值算的：217 件÷144 单、43 款÷49 单、83 件÷61 单、26 款÷18 单）。<br>'
+    +'<b>这个系数是个固定值，不会跟着数据自己变</b> —— 预测本来就是估个大概，不用天天重算。要调就直接改下面格子里的数，改完预测立刻跟着变；改乱了点「恢复初始系数」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
+    +'底下的「实测记录」只是这个系数的<b>依据</b>，留着以后好追溯：改记录<b>不会</b>自动改上面的系数，想按新月份更新系数就自己改格子，或点「恢复初始系数」让它按记录重算。'
+    +'</div>';
+  // 系数（直接改）—— 初始值就是按 7~9 月实测值算好的那四个数；改了就存下来，不跟数据实时算
+  if(anyK || anyMan || calRows.length){
+    h+='<div style="overflow-x:auto;margin-top:10px"><table class="fc-3col" id="fcCalKTable" style="min-width:560px"><thead><tr>'
+      +'<th style="text-align:left">店铺</th><th>样品件数系数<br><span class="sub">样品件数 ÷ 样品单数</span></th>'
+      +'<th>大货款式系数<br><span class="sub">大货款式数 ÷ 大货单数</span></th><th>来源</th></tr></thead><tbody>';
+    FC_SHOPS.forEach(s=>{
+      const sh=s[0], kk=KK[sh]||{}, mv=(fc.cal.manual||{})[sh]||{};
+      const cell=(k,label)=>{
+        const cur=kk[k]?kk[k].k:null;
+        const val=(mv[k]!==null&&mv[k]!==undefined)?mv[k]:(cur!==null?(Math.round(cur*1000)/1000):'');
+        return '<td><input type="number" min="0" step="0.01" style="width:104px;text-align:right" value="'+val+'"'
+          +' placeholder="自动" onchange="fcCalSetK(\''+sh+'\',\''+k+'\',this.value)" title="'+label+'，改这里就是改系数，留空 = 按实测记录重算"></td>';
+      };
+      const sd=FC_CAL_K_SEED[sh]||{};
+      const isSeed=(mv.pcs!==null&&mv.pcs!==undefined&&mv.styles!==null&&mv.styles!==undefined
+                    && Math.abs(Number(mv.pcs)-Number(sd.pcs||0))<1e-6 && Math.abs(Number(mv.styles)-Number(sd.styles||0))<1e-6);
+      const srcTag = isSeed ? '<span style="color:#1d4ed8">初始系数</span>'
+                    : ((mv.pcs||mv.styles) ? '<span style="color:#b45309">你改过</span>' : (anyK?'按实测记录算':'—'));
+      h+='<tr><td class="k">'+escHtml(s[1])+'</td>'+cell('pcs','样品件数系数')+cell('styles','大货款式系数')
+        +'<td class="sub">'+srcTag+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="fc-note"><b>这四个数直接改就行</b>（改完立即生效，预测马上跟着变）。它们是固定值，不会自己变；改乱了点上面的「<b>恢复初始系数</b>」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
+      +'留空的算法（一般不用管）：<b>该店实测记录里的实测值合计 ÷ 单数合计</b>。朗格斯 7–9 月共 144 个样品单、实际寄出 217 件样品 → 1.51。</div>';
+  }
+  if(calRows.length){
+    h+='<div class="fc-note" style="margin-top:10px"><b>系数的依据：实测记录</b>（2026 年 7~9 月 · 来自「样品单跟进表」）—— 只作留档，<b>改这里不会自动改上面的系数</b>。</div>';
+    h+='<div style="overflow-x:auto"><table class="fc-3col" id="fcCalTable" style="min-width:720px"><thead><tr>'
+      +'<th style="text-align:left">店铺</th><th style="text-align:left">月份</th>'
+      +'<th>实测样品件数</th><th>该月样品单数</th>'
+      +'<th>实测大货款式数</th><th>该月大货单数</th><th></th></tr></thead><tbody>';
+    calRows.forEach((r,i)=>{
+      const b=fcCalRowCounts(r, autoBy[r.shop]);
+      const mOpts=fcMonthOptions().map(mm=>'<option value="'+mm+'"'+(mm===r.month?' selected':'')+'>'+mm+'</option>').join('');
+      const sOpts=FC_SHOPS.map(s=>'<option value="'+s[0]+'"'+(s[0]===r.shop?' selected':'')+'>'+escHtml(s[1])+'</option>').join('');
+      const numCell=(key,val,ph,ti)=>'<td><input type="number" min="0" step="1" style="width:88px;text-align:right" value="'+((val===null||val===undefined||val==='')?'':val)+'" placeholder="'+ph+'" title="'+ti+'" onchange="fcCalSet('+i+',\''+key+'\',this.value)"></td>';
+      h+='<tr>'
+        +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'shop\',this.value)">'+sOpts+'</select></td>'
+        +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'month\',this.value)">'+mOpts+'</select></td>'
+        +numCell('pcs', r.pcs, '如 120', '这个月实际寄出的样品件数')
+        +numCell('ord', r.ord, String(b.sampleAuto), '这个月的样品单数。留空 = 用经营分析里这月的样品单数（'+b.sampleAuto+' 单）')
+        +numCell('styles', r.styles, '如 30', '这个月实际做的大货款式数')
+        +numCell('ordB', r.ordB, String(b.bulkAuto), '这个月的大货单数。留空 = 用经营分析里这月的大货单数（'+b.bulkAuto+' 单）')
+        +'<td><button class="btn btn-sm" onclick="fcCalDel('+i+')">删</button></td>'
+        +'</tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="fc-note">「该月样品单数 / 大货单数」也能改：<b>留空</b>就用你经营分析里这个月的数（格子里的灰字就是它），<b>填数</b>就用你填的。'
+      +'这 6 行已经把单数填好了，所以你就算还没导入经营分析数据，系数也照样准。'
+      +'想按这几个月的数<b>更新系数</b>：先把上面的系数格子清空（留空 = 按记录重算），或直接点「恢复初始系数」。</div>';
+    let hasK=false, miss=[];
+    FC_SHOPS.forEach(s=>{
+      const kk=KK[s[0]];
+      if(!kk.pcs || !kk.styles) miss.push(escHtml(s[1])+(!kk.pcs&&!kk.styles?'（件数 + 款式数都）':(!kk.pcs?'（样品件数）':'（大货款式数）')));
+      if(!kk.pcs && !kk.styles) return; hasK=true;
+      const desc=(o,unit)=>{
+        if(!o) return null;
+        const v=(Math.round(o.k*100)/100);
+        const sd=FC_CAL_K_SEED[s[0]]||{};
+        const isSeed=(Math.abs(Number(o.k)-Number(unit==='件'?(sd.pcs||0):(sd.styles||0)))<1e-6);
+        if(o.manual){
+          const a=isSeed ? '（初始系数）' : ((o.auto!==null&&o.auto!==undefined)?('（你改的；按实测记录算是 '+(Math.round(o.auto*100)/100)+'）'):'（你设的）');
+          return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+a;
+        }
+        return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+'（'+o.n+' 个月合计 '+Math.round(o.act)+' '+unit+' ÷ '+o.ord+' 单）';
+      };
+      h+='<div class="fc-note"><b>'+escHtml(s[1])+'：</b>'
+        +((desc(kk.pcs,'件')||'样品件数还没填'))
+        +'　·　'
+        +((desc(kk.styles,'款')||'大货款式数还没填'))
+        +'</div>';
+    });
+    if(!hasK) h+='<div class="fc-note">还没算出系数 —— 在上面填至少一行的实测件数或款式数。</div>';
+    if(miss.length) h+='<div class="fc-note" style="color:#b45309">⚠️ '+miss.join('、')+'<b>还没配系数</b>：该店这两项在「合计」里<b>不计入</b>（宁可少算，也不拿虚高的数凑），所以合计会偏低。补上实测值就齐了。</div>';
+    // 两店综合系数：把两个店的实际值和单数各自加总后相除，等于两店合并以后的平均水平
+    if(FC_SHOPS.length>1){
+      // 两店综合：优先按「单数加权」= Σ(系数×单数) ÷ Σ单数（自动算的时候它等价于 实测合计÷单数合计）
+      const comb=(key,unit)=>{
+        let wsum=0, w=0, simple=[], n=0;
+        FC_SHOPS.forEach(s=>{
+          const o=(KK[s[0]]||{})[key]; if(!o) return;
+          n++; simple.push(o.k);
+          if(o.ord>0){ wsum+=o.k*o.ord; w+=o.ord; }
+        });
+        if(!n) return null;
+        const kv = w>0 ? wsum/w : simple.reduce((a,b)=>a+b,0)/simple.length;
+        return {k:kv, byOrder:w>0, n:n, ord:w, unit:unit};
+      };
+      const cp=comb('pcs','件'), cs=comb('styles','款');
+      const howTxt=(o, unit)=>{
+        const head='1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+(Math.round(o.k*100)/100)+'</b> '+unit+'（';
+        const tail = o.byOrder ? ('按单数加权，共 '+o.ord+' 单）') : (o.n+' 店平均'+(unit==='件'&&o.ord===0?'，手工系数没有单数可加权':'')+'）');
+        return head+tail;
+      };
+      if(cp || cs){
+        h+='<div class="fc-note" style="background:#f0fdf4;border-left:3px solid #16a34a"><b>两店综合（合计口径）：</b>'
+          +(cp ? howTxt(cp,'件') : '样品件数还不够算综合')
+          +'　·　'
+          +(cs ? howTxt(cs,'款') : '大货款式数还不够算综合')
+          +'</div>';
+      }
+    }
+    h+='<div class="fc-note">提醒：当月还没过完的话，<b>实测值和单数要取同一时段</b>（比如都取到当月 14 日），否则系数会偏。<br>'
+      +'系数小于 1 不代表算错 —— 说明「按金额划出来的大货单」里有一部分其实没产生大货款式（或那部分算样品了）。只要<b>预测时用的是同一套单数口径</b>，折算照样成立。<br>'
+      +'但如果系数小得离谱（比如 0.2），或者两个店差出好几倍，就说明分母口径跟实测表对不上，这时候要改用自己系统里的单数重新算。</div>';
+    if(fc.cal.updated) h+='<div class="fc-fileline">更新于 '+escHtml(fc.cal.updated)+'</div>';
+  }
+  h+='</div>';
   // ---------- 两店分开 + 合计（核心诉求） ----------
   const pL=fcForecastScope('langges', cfg.horizon, cfg.method);
   const pF=fcForecastScope('fansi',   cfg.horizon, cfg.method);
@@ -13643,7 +13786,7 @@ function renderFc(){
       +'<span class="fc-lab">预测月份</span><select class="fc-sel" onchange="fcPickMonth(this.value)">'+mOpts+'</select>'
       +'<button class="btn btn-sm" onclick="fcOpenReport()">生成预测报告</button>'
       +'</span></h4>';
-    h+='<div class="biz-tbl-wrap"><table class="fc-3col"><thead><tr>'
+    h+='<div class="biz-tbl-wrap"><table class="fc-3col" id="fcPredTable"><thead><tr>'
       +'<th style="text-align:left">指标</th><th>朗格斯</th><th>凡适</th><th>合计</th><th>合计环比</th>'
       +'</tr></thead><tbody>';
     // v2.37：件数 / 款式数在格子里直接标出用的系数（×1.51），一眼能看出是不是按系数算的
@@ -13774,131 +13917,6 @@ function renderFc(){
       +(seas.w<1?('<br><span style="color:#b45309">样本只有 '+seas.n+' 条（不到 24 个月），目前按 <b>半量</b> 套用，避免把偶然波动当规律。</span>'):'')
       +(seas.n>=24?('<br>样本 '+seas.n+' 条（≥24 个月），已按 <b>全量</b> 套用。'):'')
       +'</div>';
-  }
-  h+='</div>';
-  // ---------- v2.35 件数 / 款式数系数（固定值，可手改） ----------
-  const calRows=(fc.cal&&fc.cal.rows)||[];
-  const autoBy={}; FC_SHOPS.forEach(s=>{ autoBy[s[0]]=fcAutoMap(s[0])||{}; });
-  const KK={}; FC_SHOPS.forEach(s=>{ KK[s[0]]=fcCalK(s[0]); });
-  const anyK = FC_SHOPS.some(s=>{ const k=KK[s[0]]; return k && (k.pcs||k.styles); });
-  const anyMan = FC_SHOPS.some(s=>{ const m=(fc.cal.manual||{})[s[0]]||{}; return m.pcs||m.styles; });
-  h+='<div class="biz-panel"><h4>件数 / 款式数系数<span class="tag tag-ok">'+(anyMan?'已设好':'未设')+'</span>'
-    +'<span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">'
-    +'<button class="btn btn-sm" onclick="fcCalAutoAll()">恢复初始系数</button>'
-    +'<button class="btn btn-sm" onclick="fcCalAdd()">＋ 加一行实测记录</button>'
-    +(calRows.length?'<button class="btn btn-sm" onclick="fcCalClear()">清空记录</button>':'')
-    +'</span></h4>';
-  h+='<div class="fc-chatbox"><b>样品件数 = 样品单数 × 系数；大货款式数 = 大货单数 × 系数。</b>'
-    +'<b style="color:#1d4ed8">系数已经填好了 —— 朗格斯 1.51 / 0.88，凡适 1.36 / 1.44</b>（按 2026 年 7~9 月三个月的实测值算的：217 件÷144 单、43 款÷49 单、83 件÷61 单、26 款÷18 单）。<br>'
-    +'<b>这个系数是个固定值，不会跟着数据自己变</b> —— 预测本来就是估个大概，不用天天重算。要调就直接改下面格子里的数，改完预测立刻跟着变；改乱了点「恢复初始系数」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
-    +'底下的「实测记录」只是这个系数的<b>依据</b>，留着以后好追溯：改记录<b>不会</b>自动改上面的系数，想按新月份更新系数就自己改格子，或点「恢复初始系数」让它按记录重算。'
-    +'</div>';
-  // 系数（直接改）—— 初始值就是按 7~9 月实测值算好的那四个数；改了就存下来，不跟数据实时算
-  if(anyK || anyMan || calRows.length){
-    h+='<div style="overflow-x:auto;margin-top:10px"><table class="fc-3col" id="fcCalKTable" style="min-width:560px"><thead><tr>'
-      +'<th style="text-align:left">店铺</th><th>样品件数系数<br><span class="sub">样品件数 ÷ 样品单数</span></th>'
-      +'<th>大货款式系数<br><span class="sub">大货款式数 ÷ 大货单数</span></th><th>来源</th></tr></thead><tbody>';
-    FC_SHOPS.forEach(s=>{
-      const sh=s[0], kk=KK[sh]||{}, mv=(fc.cal.manual||{})[sh]||{};
-      const cell=(k,label)=>{
-        const cur=kk[k]?kk[k].k:null;
-        const val=(mv[k]!==null&&mv[k]!==undefined)?mv[k]:(cur!==null?(Math.round(cur*1000)/1000):'');
-        return '<td><input type="number" min="0" step="0.01" style="width:104px;text-align:right" value="'+val+'"'
-          +' placeholder="自动" onchange="fcCalSetK(\''+sh+'\',\''+k+'\',this.value)" title="'+label+'，改这里就是改系数，留空 = 按实测记录重算"></td>';
-      };
-      const sd=FC_CAL_K_SEED[sh]||{};
-      const isSeed=(mv.pcs!==null&&mv.pcs!==undefined&&mv.styles!==null&&mv.styles!==undefined
-                    && Math.abs(Number(mv.pcs)-Number(sd.pcs||0))<1e-6 && Math.abs(Number(mv.styles)-Number(sd.styles||0))<1e-6);
-      const srcTag = isSeed ? '<span style="color:#1d4ed8">初始系数</span>'
-                    : ((mv.pcs||mv.styles) ? '<span style="color:#b45309">你改过</span>' : (anyK?'按实测记录算':'—'));
-      h+='<tr><td class="k">'+escHtml(s[1])+'</td>'+cell('pcs','样品件数系数')+cell('styles','大货款式系数')
-        +'<td class="sub">'+srcTag+'</td></tr>';
-    });
-    h+='</tbody></table></div>';
-    h+='<div class="fc-note"><b>这四个数直接改就行</b>（改完立即生效，预测马上跟着变）。它们是固定值，不会自己变；改乱了点上面的「<b>恢复初始系数</b>」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
-      +'留空的算法（一般不用管）：<b>该店实测记录里的实测值合计 ÷ 单数合计</b>。朗格斯 7–9 月共 144 个样品单、实际寄出 217 件样品 → 1.51。</div>';
-  }
-  if(calRows.length){
-    h+='<div class="fc-note" style="margin-top:10px"><b>系数的依据：实测记录</b>（2026 年 7~9 月 · 来自「样品单跟进表」）—— 只作留档，<b>改这里不会自动改上面的系数</b>。</div>';
-    h+='<div style="overflow-x:auto"><table class="fc-3col" id="fcCalTable" style="min-width:720px"><thead><tr>'
-      +'<th style="text-align:left">店铺</th><th style="text-align:left">月份</th>'
-      +'<th>实测样品件数</th><th>该月样品单数</th>'
-      +'<th>实测大货款式数</th><th>该月大货单数</th><th></th></tr></thead><tbody>';
-    calRows.forEach((r,i)=>{
-      const b=fcCalRowCounts(r, autoBy[r.shop]);
-      const mOpts=fcMonthOptions().map(mm=>'<option value="'+mm+'"'+(mm===r.month?' selected':'')+'>'+mm+'</option>').join('');
-      const sOpts=FC_SHOPS.map(s=>'<option value="'+s[0]+'"'+(s[0]===r.shop?' selected':'')+'>'+escHtml(s[1])+'</option>').join('');
-      const numCell=(key,val,ph,ti)=>'<td><input type="number" min="0" step="1" style="width:88px;text-align:right" value="'+((val===null||val===undefined||val==='')?'':val)+'" placeholder="'+ph+'" title="'+ti+'" onchange="fcCalSet('+i+',\''+key+'\',this.value)"></td>';
-      h+='<tr>'
-        +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'shop\',this.value)">'+sOpts+'</select></td>'
-        +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'month\',this.value)">'+mOpts+'</select></td>'
-        +numCell('pcs', r.pcs, '如 120', '这个月实际寄出的样品件数')
-        +numCell('ord', r.ord, String(b.sampleAuto), '这个月的样品单数。留空 = 用经营分析里这月的样品单数（'+b.sampleAuto+' 单）')
-        +numCell('styles', r.styles, '如 30', '这个月实际做的大货款式数')
-        +numCell('ordB', r.ordB, String(b.bulkAuto), '这个月的大货单数。留空 = 用经营分析里这月的大货单数（'+b.bulkAuto+' 单）')
-        +'<td><button class="btn btn-sm" onclick="fcCalDel('+i+')">删</button></td>'
-        +'</tr>';
-    });
-    h+='</tbody></table></div>';
-    h+='<div class="fc-note">「该月样品单数 / 大货单数」也能改：<b>留空</b>就用你经营分析里这个月的数（格子里的灰字就是它），<b>填数</b>就用你填的。'
-      +'这 6 行已经把单数填好了，所以你就算还没导入经营分析数据，系数也照样准。'
-      +'想按这几个月的数<b>更新系数</b>：先把上面的系数格子清空（留空 = 按记录重算），或直接点「恢复初始系数」。</div>';
-    let hasK=false, miss=[];
-    FC_SHOPS.forEach(s=>{
-      const kk=KK[s[0]];
-      if(!kk.pcs || !kk.styles) miss.push(escHtml(s[1])+(!kk.pcs&&!kk.styles?'（件数 + 款式数都）':(!kk.pcs?'（样品件数）':'（大货款式数）')));
-      if(!kk.pcs && !kk.styles) return; hasK=true;
-      const desc=(o,unit)=>{
-        if(!o) return null;
-        const v=(Math.round(o.k*100)/100);
-        const sd=FC_CAL_K_SEED[s[0]]||{};
-        const isSeed=(Math.abs(Number(o.k)-Number(unit==='件'?(sd.pcs||0):(sd.styles||0)))<1e-6);
-        if(o.manual){
-          const a=isSeed ? '（初始系数）' : ((o.auto!==null&&o.auto!==undefined)?('（你改的；按实测记录算是 '+(Math.round(o.auto*100)/100)+'）'):'（你设的）');
-          return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+a;
-        }
-        return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+'（'+o.n+' 个月合计 '+Math.round(o.act)+' '+unit+' ÷ '+o.ord+' 单）';
-      };
-      h+='<div class="fc-note"><b>'+escHtml(s[1])+'：</b>'
-        +((desc(kk.pcs,'件')||'样品件数还没填'))
-        +'　·　'
-        +((desc(kk.styles,'款')||'大货款式数还没填'))
-        +'</div>';
-    });
-    if(!hasK) h+='<div class="fc-note">还没算出系数 —— 在上面填至少一行的实测件数或款式数。</div>';
-    if(miss.length) h+='<div class="fc-note" style="color:#b45309">⚠️ '+miss.join('、')+'<b>还没配系数</b>：该店这两项在「合计」里<b>不计入</b>（宁可少算，也不拿虚高的数凑），所以合计会偏低。补上实测值就齐了。</div>';
-    // 两店综合系数：把两个店的实际值和单数各自加总后相除，等于两店合并以后的平均水平
-    if(FC_SHOPS.length>1){
-      // 两店综合：优先按「单数加权」= Σ(系数×单数) ÷ Σ单数（自动算的时候它等价于 实测合计÷单数合计）
-      const comb=(key,unit)=>{
-        let wsum=0, w=0, simple=[], n=0;
-        FC_SHOPS.forEach(s=>{
-          const o=(KK[s[0]]||{})[key]; if(!o) return;
-          n++; simple.push(o.k);
-          if(o.ord>0){ wsum+=o.k*o.ord; w+=o.ord; }
-        });
-        if(!n) return null;
-        const kv = w>0 ? wsum/w : simple.reduce((a,b)=>a+b,0)/simple.length;
-        return {k:kv, byOrder:w>0, n:n, ord:w, unit:unit};
-      };
-      const cp=comb('pcs','件'), cs=comb('styles','款');
-      const howTxt=(o, unit)=>{
-        const head='1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+(Math.round(o.k*100)/100)+'</b> '+unit+'（';
-        const tail = o.byOrder ? ('按单数加权，共 '+o.ord+' 单）') : (o.n+' 店平均'+(unit==='件'&&o.ord===0?'，手工系数没有单数可加权':'')+'）');
-        return head+tail;
-      };
-      if(cp || cs){
-        h+='<div class="fc-note" style="background:#f0fdf4;border-left:3px solid #16a34a"><b>两店综合（合计口径）：</b>'
-          +(cp ? howTxt(cp,'件') : '样品件数还不够算综合')
-          +'　·　'
-          +(cs ? howTxt(cs,'款') : '大货款式数还不够算综合')
-          +'</div>';
-      }
-    }
-    h+='<div class="fc-note">提醒：当月还没过完的话，<b>实测值和单数要取同一时段</b>（比如都取到当月 14 日），否则系数会偏。<br>'
-      +'系数小于 1 不代表算错 —— 说明「按金额划出来的大货单」里有一部分其实没产生大货款式（或那部分算样品了）。只要<b>预测时用的是同一套单数口径</b>，折算照样成立。<br>'
-      +'但如果系数小得离谱（比如 0.2），或者两个店差出好几倍，就说明分母口径跟实测表对不上，这时候要改用自己系统里的单数重新算。</div>';
-    if(fc.cal.updated) h+='<div class="fc-fileline">更新于 '+escHtml(fc.cal.updated)+'</div>';
   }
   h+='</div>';
   // ---------- 阿里后台订单明细（Accio）：件数 / 款式数的备选来源 ----------
