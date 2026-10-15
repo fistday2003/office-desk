@@ -755,6 +755,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 /* v2.32：指标×两店×合计 三栏表 + 淡旺季系数条 */
 /* v2.33：接入阿里后台订单明细（Accio 导出的 CSV），件数/款式数直接用平台明细，不再靠聊天估算 */
 /* v2.34：季节系数改「年内相对比 + 多年中位数」，修掉异常月顶满系数、早期小基数压低系数两个坑 */
+/* v2.35：件数/款式数改「实测系数」折算（实测值 ÷ 单数），订单明细降级为备选（平台 quantity 是下单量，会虚高） */
 .fc-3col{width:100%;border-collapse:collapse;font-size:12.5px}
 .fc-3col th,.fc-3col td{border:1px solid var(--border);padding:7px 10px;text-align:center;vertical-align:middle}
 .fc-3col th{background:#f8fafc;font-weight:600;color:var(--text-secondary);font-size:11.5px}
@@ -1226,7 +1227,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.34 · 2026-10-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.35 · 2026-10-15</div>
     </div>
   </aside>
 
@@ -2077,7 +2078,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.34';
+const APP_VERSION = 'v2.35';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -13003,9 +13004,11 @@ const FC_SRCS     = [['pays','收款口径'],['orders','下单口径']];
 const FC_HORIZONS = [1,3,6,12];
 const FC_MAX_H    = 12;                      // 往后最多推 12 个月，每个月都能单独选
 const FC_KEYS     = ['orders','sample','pcs','bulk','styles','amount','buyers'];
-function fcBlank(){ return {months:{}, goals:{}, chat:fcChatBlank(), cfg:{src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}}; }
+function fcBlank(){ return {months:{}, goals:{}, chat:fcChatBlank(), cal:fcCalBlank(), cfg:{src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}}; }
 function fcChatBlank(){ return {files:[], months:{}, updated:'', accio:fcAccioBlank()}; }
 function fcAccioBlank(){ return {files:[], updated:''}; }
+// v2.35：实测校准 —— 用「实际件数 ÷ 单数」反推系数，替代订单明细里虚高的数
+function fcCalBlank(){ return {rows:[], updated:''}; }
 let fc = fcBlank();
 function fcHeal(){
   if(!fc || typeof fc!=='object' || Array.isArray(fc)) fc = fcBlank();
@@ -13016,6 +13019,14 @@ function fcHeal(){
   if(!fc.chat.months || typeof fc.chat.months!=='object' || Array.isArray(fc.chat.months)) fc.chat.months={};
   if(!fc.chat.accio || typeof fc.chat.accio!=='object' || Array.isArray(fc.chat.accio)) fc.chat.accio=fcAccioBlank();
   if(!Array.isArray(fc.chat.accio.files)) fc.chat.accio.files=[];
+  if(!fc.cal || typeof fc.cal!=='object' || Array.isArray(fc.cal)) fc.cal=fcCalBlank();
+  if(!Array.isArray(fc.cal.rows)) fc.cal.rows=[];
+  fc.cal.rows=fc.cal.rows.filter(r=>r && typeof r==='object').map(r=>({
+    shop: FC_SHOPS.some(s=>s[0]===r.shop) ? r.shop : 'langges',
+    month: /^\d{4}-\d{2}$/.test(String(r.month||'')) ? String(r.month) : fcCurMonth(),
+    pcs: (r.pcs===''||r.pcs===null||r.pcs===undefined) ? null : Number(r.pcs),
+    styles:(r.styles===''||r.styles===null||r.styles===undefined) ? null : Number(r.styles)
+  }));
   const c = Object.assign({src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}, fc.cfg||{});
   const _h = Number(c.horizon);
   c.horizon = (isFinite(_h) && _h>=1 && _h<=FC_MAX_H) ? Math.round(_h) : 3;
@@ -13076,6 +13087,84 @@ function fcChatVal(m, scope, key){
   const b=c.byShop && c.byShop[scope];
   return (b && typeof b[key]==='number') ? b[key] : null;
 }
+// ---------- v2.35 实测校准：用「实际件数 ÷ 单数」反推系数 ----------
+// 背景：阿里订单明细里 quantity 是「下单数量」（一单动辄几百件），拿来当「样品件数 / 款式数」会严重虚高。
+// 思路：订单数、样品单数、大货单数是平台实打实的数，可以信；
+//       件数 / 款式数则按你填的实测值反推系数 —— 平均一个样品单几件样品、平均一个大货单几个款式。
+// 系数 = Σ实测值 ÷ Σ对应单数（只用填了实测的月份，多月份合并算一个综合系数）
+function fcCalOrders(shop, month, auto, monthsMan){
+  const a=(auto&&auto[month])||{orders:0, sample:0, bulk:0};
+  const man=(monthsMan&&monthsMan[month])||{};
+  const has=v=>(v!==undefined && v!==null && v!=='' && !isNaN(Number(v)));
+  const orders=has(man.orders)?Number(man.orders):(Number(a.orders)||0);
+  const sample=has(man.sample)?Number(man.sample):(Number(a.sample)||0);
+  const bulk  =has(man.bulk)  ?Number(man.bulk)  :Math.max(0, orders-sample);
+  return {orders:orders, sample:sample, bulk:bulk};
+}
+function fcCalK(shop){
+  fcHeal();
+  const rows=(fc.cal&&fc.cal.rows)||[];
+  if(!rows.length) return {pcs:null, styles:null};
+  const auto=fcAutoMap(shop)||{}, man=fc.months||{};
+  const acc={pcs:{act:0,ord:0,n:0,ms:[]}, styles:{act:0,ord:0,n:0,ms:[]}};
+  rows.forEach(r=>{
+    if(r.shop!==shop) return;
+    const b=fcCalOrders(shop, r.month, auto, man);
+    if(r.pcs!==null && isFinite(r.pcs) && b.sample>0){ acc.pcs.act+=r.pcs; acc.pcs.ord+=b.sample; acc.pcs.n++; acc.pcs.ms.push(r.month); }
+    if(r.styles!==null && isFinite(r.styles) && b.bulk>0){ acc.styles.act+=r.styles; acc.styles.ord+=b.bulk; acc.styles.n++; acc.styles.ms.push(r.month); }
+  });
+  const out={};
+  ['pcs','styles'].forEach(k=>{
+    const a=acc[k];
+    out[k]=(a.n>0 && a.ord>0) ? {k:a.act/a.ord, n:a.n, act:a.act, ord:a.ord, ms:a.ms} : null;
+  });
+  return out;
+}
+// 单店某月的 件数 / 款式数：优先用系数折算，没配系数才退回订单明细 / 聊天解析
+function fcPcsStyles(shop, month, K, shopAuto){
+  const kk=(K&&K[shop])||null;
+  const b=fcCalOrders(shop, month, shopAuto, fc.months||{});
+  const kp=kk&&kk.pcs ? kk.pcs.k : 0;
+  const ks=kk&&kk.styles ? kk.styles.k : 0;
+  const pcs    = (kp>0 && b.sample>0) ? b.sample*kp : fcChatVal(month, shop, 'pcs');
+  const styles = (ks>0 && b.bulk>0)   ? b.bulk*ks   : fcChatVal(month, shop, 'styles');
+  return {pcs:pcs, styles:styles};
+}
+function fcR2(v){ const n=Number(v); return isFinite(n) ? Math.round(n*100)/100 : 0; }
+// 是否已经配了任何一店的实测系数（决定指标标签写「系数」还是「明细」）
+function fcHasCal(){
+  fcHeal();
+  return FC_SHOPS.some(s=>{ const k=fcCalK(s[0]); return !!(k.pcs||k.styles); });
+}
+function fcCalAdd(){
+  fcHeal();
+  const m=fcCurMonth(), pm=fcPrevMonth(m);
+  fc.cal.rows.push({shop:'langges', month:pm, pcs:null, styles:null});
+  saveAll(); renderFc();
+}
+function fcCalDel(i){
+  fcHeal();
+  if(i<0 || i>=fc.cal.rows.length) return;
+  fc.cal.rows.splice(i,1);
+  fc.cal.updated=fcNowLabel();
+  saveAll(); renderFc(); showToast('已删除该行');
+}
+function fcCalSet(i, field, val){
+  fcHeal();
+  const r=fc.cal.rows[i]; if(!r) return;
+  if(field==='shop'){ r.shop=FC_SHOPS.some(s=>s[0]===val)?val:'langges'; }
+  else if(field==='month'){ if(/^\d{4}-\d{2}$/.test(String(val))) r.month=String(val); }
+  else { const n=(val===''||val===null)?null:Number(val); r[field]=(n===null||isFinite(n))?n:r[field]; }
+  fc.cal.updated=fcNowLabel();
+  saveAll(); renderFc();
+}
+function fcCalClear(){
+  const n=(fc.cal&&fc.cal.rows)?fc.cal.rows.length:0;
+  if(!n){ showToast('本来就是空的'); return; }
+  showConfirm('确定清空实测校准吗？\n已录的 '+n+' 行实测值会删掉，系数也会失效（件数/款式数将退回订单明细或显示「—」）。', ()=>{
+    fc.cal=fcCalBlank(); saveAll(); renderFc(); showToast('实测校准已清空');
+  });
+}
 // 月度序列（手工修正优先于自动统计；当月按已过天数折算成整月预估 est）
 function fcSeries(scope){
   fcHeal();
@@ -13084,6 +13173,10 @@ function fcSeries(scope){
   Object.keys((fc.chat&&fc.chat.months)||{}).forEach(m=>{ if(months.indexOf(m)<0) months.push(m); });
   months.sort();
   const cur=fcCurMonth(), dim=fcDaysInMonth(cur), day=new Date().getDate();
+  // v2.35：件数 / 款式数优先按「实测系数」折算
+  const shops = (!scope || scope==='all') ? FC_SHOPS.map(s=>s[0]) : [scope];
+  const K={}, shopAuto={};
+  shops.forEach(sh=>{ K[sh]=fcCalK(sh); shopAuto[sh]=fcAutoMap(sh)||{}; });
   return months.map(m=>{
     const a = auto[m] || {orders:0, sample:0, bulk:0, amount:0, buyers:0};
     const man = (fc.months||{})[m] || {};
@@ -13093,9 +13186,20 @@ function fcSeries(scope){
     const amount = has(man.amount) ? Number(man.amount) : a.amount;
     const buyers = has(man.buyers) ? Number(man.buyers) : a.buyers;
     const bulk   = has(man.bulk)   ? Number(man.bulk)   : Math.max(0, orders-sample);
-    // 样品件数 / 大货款式数：只来自聊天解析，抓不到就是 null（不参与预测，也不显示 0）
-    const pcs    = fcChatVal(m, scope, 'pcs');
-    const styles = fcChatVal(m, scope, 'styles');
+    // 样品件数 / 大货款式数：v2.35 起优先按实测系数折算（单数 × 系数）；没配系数才退回明细 / 聊天解析
+    let pcs=null, styles=null;
+    if(shops.length===1){
+      const v=fcPcsStyles(shops[0], m, K, shopAuto[shops[0]]);
+      pcs=v.pcs; styles=v.styles;
+    }else{
+      let sp=0, ss=0, hp=false, hs=false;
+      shops.forEach(sh=>{
+        const v=fcPcsStyles(sh, m, K, shopAuto[sh]);
+        if(v.pcs!==null && v.pcs!==undefined){ sp+=v.pcs; hp=true; }
+        if(v.styles!==null && v.styles!==undefined){ ss+=v.styles; hs=true; }
+      });
+      pcs = hp?sp:null; styles = hs?ss:null;
+    }
     const partial = (m===cur && day<dim);
     const scale = partial ? (dim/Math.max(1,day)) : 1;
     const est = {orders:orders*scale, sample:sample*scale, bulk:bulk*scale, amount:amount*scale, buyers:buyers*scale,
@@ -13443,7 +13547,8 @@ function renderFc(){
       };
       const sv=pred[hi][k];
       const sumTd=(sv===null||sv===undefined)?'<td class="sumcell fc-na">—</td>':('<td class="sumcell">'+fmtV(k,sv,m.unit)+'</td>');
-      h+='<tr><td class="k">'+escHtml(m.name)+(m.src==='chat'?' <span class="fc-badge man">明细</span>':'')+'</td>'
+      const srcTag = (m.src!=='chat') ? '' : (fcHasCal() ? '<span class="fc-badge man">系数</span>' : '<span class="fc-badge man">明细</span>');
+      h+='<tr><td class="k">'+escHtml(m.name)+srcTag+'</td>'
         +td(pL[hi])+td(pF[hi])+sumTd+'<td>'+fcDelta(sv, baseAll(k), '')+'</td></tr>';
     });
     h+='</tbody></table></div>';
@@ -13549,9 +13654,74 @@ function renderFc(){
       +'</div>';
   }
   h+='</div>';
-  // ---------- 阿里后台订单明细（Accio）：件数 / 款式数的精确来源 ----------
+  // ---------- v2.35 实测校准：件数 / 款式数系数（主来源） ----------
+  const calRows=(fc.cal&&fc.cal.rows)||[];
+  const autoBy={}; FC_SHOPS.forEach(s=>{ autoBy[s[0]]=fcAutoMap(s[0])||{}; });
+  const KK={}; FC_SHOPS.forEach(s=>{ KK[s[0]]=fcCalK(s[0]); });
+  h+='<div class="biz-panel"><h4>实测校准：件数 / 款式数系数<span class="tag tag-ok">'+(calRows.length?calRows.length+' 行':'还没录')+'</span>'
+    +'<span style="margin-left:auto;display:flex;gap:6px">'
+    +'<button class="btn btn-sm btn-primary" onclick="fcCalAdd()">＋ 加一行</button>'
+    +(calRows.length?'<button class="btn btn-sm" onclick="fcCalClear()">清空</button>':'')
+    +'</span></h4>';
+  h+='<div class="fc-chatbox"><b>件数 / 款式数按「实测系数」折算，这是现在的主来源。</b><br>'
+    +'订单数、样品单数、大货单数是平台实打实的数，可以信；件数和款式数则按你填的实测值反推：<br>'
+    +'<b>系数 = 你填的实测值合计 ÷ 对应单数合计</b>。比如 3 个月共 57 个样品单、实际发了 120 件样品，系数就是 2.1 —— 以后预测出 60 个样品单，就推 126 件。<br>'
+    +'填 3 个月左右最稳（月份越多越抗偶然）；只填件数或只填款式数也行，另一个会单独算。'
+    +'</div>';
+  if(calRows.length){
+    h+='<div style="overflow-x:auto"><table class="fc-3col" id="fcCalTable" style="min-width:720px"><thead><tr>'
+      +'<th style="text-align:left">店铺</th><th style="text-align:left">月份</th>'
+      +'<th>实测样品件数</th><th>该月样品单数</th>'
+      +'<th>实测大货款式数</th><th>该月大货单数</th><th></th></tr></thead><tbody>';
+    calRows.forEach((r,i)=>{
+      const b=fcCalOrders(r.shop, r.month, autoBy[r.shop], fc.months||{});
+      const mOpts=fcMonthOptions().map(mm=>'<option value="'+mm+'"'+(mm===r.month?' selected':'')+'>'+mm+'</option>').join('');
+      const sOpts=FC_SHOPS.map(s=>'<option value="'+s[0]+'"'+(s[0]===r.shop?' selected':'')+'>'+escHtml(s[1])+'</option>').join('');
+      h+='<tr>'
+        +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'shop\',this.value)">'+sOpts+'</select></td>'
+        +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'month\',this.value)">'+mOpts+'</select></td>'
+        +'<td><input type="number" min="0" step="1" style="width:96px;text-align:right" value="'+(r.pcs===null?'':r.pcs)+'" placeholder="如 120" onchange="fcCalSet('+i+',\'pcs\',this.value)"></td>'
+        +'<td class="sub">'+b.sample+' 单</td>'
+        +'<td><input type="number" min="0" step="1" style="width:96px;text-align:right" value="'+(r.styles===null?'':r.styles)+'" placeholder="如 30" onchange="fcCalSet('+i+',\'styles\',this.value)"></td>'
+        +'<td class="sub">'+b.bulk+' 单</td>'
+        +'<td><button class="btn btn-sm" onclick="fcCalDel('+i+')">删</button></td>'
+        +'</tr>';
+    });
+    h+='</tbody></table></div>';
+    let hasK=false, miss=[];
+    FC_SHOPS.forEach(s=>{
+      const kk=KK[s[0]];
+      if(!kk.pcs || !kk.styles) miss.push(escHtml(s[1])+(!kk.pcs&&!kk.styles?'（件数 + 款式数都）':(!kk.pcs?'（样品件数）':'（大货款式数）')));
+      if(!kk.pcs && !kk.styles) return; hasK=true;
+      h+='<div class="fc-note"><b>'+escHtml(s[1])+'：</b>'
+        +(kk.pcs?('1 个样品单 ≈ <b>'+(Math.round(kk.pcs.k*100)/100)+'</b> 件样品（'+kk.pcs.n+' 个月合计 '+Math.round(kk.pcs.act)+' 件 ÷ '+kk.pcs.ord+' 单）'):'样品件数还没填')
+        +'　·　'
+        +(kk.styles?('1 个大货单 ≈ <b>'+(Math.round(kk.styles.k*100)/100)+'</b> 个款式（'+kk.styles.n+' 个月合计 '+Math.round(kk.styles.act)+' 款 ÷ '+kk.styles.ord+' 单）'):'大货款式数还没填')
+        +'</div>';
+    });
+    if(!hasK) h+='<div class="fc-note">还没算出系数 —— 在上面填至少一行的实测件数或款式数。</div>';
+    if(miss.length) h+='<div class="fc-note" style="color:#b45309">⚠️ '+miss.join('、')+'<b>还没配系数</b>：该店这两项在「合计」里<b>不计入</b>（宁可少算，也不拿虚高的数凑），所以合计会偏低。补上实测值就齐了。</div>';
+    // 两店综合系数：把两个店的实际值和单数各自加总后相除，等于两店合并以后的平均水平
+    if(FC_SHOPS.length>1){
+      let ap=0, ao=0, sp=0, so=0;
+      FC_SHOPS.forEach(s=>{ const k=KK[s[0]]; if(k.pcs){ap+=k.pcs.act; ao+=k.pcs.ord;} if(k.styles){sp+=k.styles.act; so+=k.styles.ord;} });
+      if(ao>0 || so>0){
+        h+='<div class="fc-note" style="background:#f0fdf4;border-left:3px solid #16a34a"><b>两店综合（合计口径）：</b>'
+          +(ao>0?('1 个样品单 ≈ <b>'+(Math.round(ap/ao*100)/100)+'</b> 件样品（两店合计 '+Math.round(ap)+' 件 ÷ '+ao+' 单）'):'样品件数还不够算综合')
+          +'　·　'
+          +(so>0?('1 个大货单 ≈ <b>'+(Math.round(sp/so*100)/100)+'</b> 个款式（两店合计 '+Math.round(sp)+' 款 ÷ '+so+' 单）'):'大货款式数还不够算综合')
+          +'</div>';
+      }
+    }
+    h+='<div class="fc-note">提醒：当月还没过完的话，<b>实测值和单数要取同一时段</b>（比如都取到当月 14 日），否则系数会偏。<br>'
+      +'系数小于 1 不代表算错 —— 说明「按金额划出来的大货单」里有一部分其实没产生大货款式（或那部分算样品了）。只要<b>预测时用的是同一套单数口径</b>，折算照样成立。<br>'
+      +'但如果系数小得离谱（比如 0.2），或者两个店差出好几倍，就说明分母口径跟实测表对不上，这时候要改用自己系统里的单数重新算。</div>';
+    if(fc.cal.updated) h+='<div class="fc-fileline">更新于 '+escHtml(fc.cal.updated)+'</div>';
+  }
+  h+='</div>';
+  // ---------- 阿里后台订单明细（Accio）：件数 / 款式数的备选来源 ----------
   const af=(fc.chat.accio&&fc.chat.accio.files)||[];
-  h+='<div class="biz-panel"><h4>阿里后台订单明细（Accio）<span class="tag tag-ok">'+(af.length?af.length+' 个文件':'还没导入')+'</span>'
+  h+='<div class="biz-panel"><h4>阿里后台订单明细（Accio）<span class="tag">'+(af.length?af.length+' 个文件':'还没导入')+'</span>'
     +'<span style="margin-left:auto;display:flex;gap:6px;align-items:center">'
     +'<select class="fc-sel" id="fcAccioShop" title="这批数据属于哪个店铺">'
     +FC_SHOPS.map(s=>'<option value="'+s[0]+'">'+escHtml(s[1])+'</option>').join('')
@@ -13561,9 +13731,10 @@ function renderFc(){
     +'</span></h4>';
   h+='<input type="file" id="fcAccioFile" accept=".csv,.txt" multiple style="display:none" onchange="fcImportAccio()">';
   if(!af.length){
-    h+='<div class="fc-chatbox"><b>推荐用这条：数据最准。</b>「样品件数」和「大货款式数」是从<b>订单里的产品明细</b>直接数出来的（一个订单含几个款式、每款多少件，平台都记着），不是靠聊天记录猜。<br>'
-      +'用法：左边选店铺 → 点「导入订单明细 CSV」→ 选 <code>Accio取数-订单款式与件数.js</code> 导出的 CSV。<b>一次只能导一个店</b>（Accio 同一时刻只登录一个账号），朗格斯导完切到凡适再导一次。<br>'
-      +'导入后按店铺覆盖，重复导同一个店不会翻倍。</div>';
+    h+='<div class="fc-chatbox"><b>备选来源（v2.35 起已降级）。</b>这里是从<b>订单产品明细</b>里数出来的 quantity 合计。<br>'
+      +'<span style="color:#b45309">⚠️ 实测发现这个数偏大：平台记的是「下单数量」，一个样品单可能记几百件，跟实际发出去的样品件数不是一回事。</span>'
+      +'现在默认走上面的<b>实测校准系数</b>；只有某店没配系数时，才退回用这里的数。<br>'
+      +'要用就：左边选店铺 → 点「导入订单明细 CSV」→ 选 <code>Accio取数-订单款式与件数.js</code> 导出的 CSV（一次只能导一个店）。</div>';
   } else {
     h+='<div class="fc-note">已导入 <b>'+af.length+'</b> 个文件，共覆盖 <b>'+Object.keys(fc.chat.months||{}).length+'</b> 个月'+(fc.chat.accio.updated?('（更新于 '+escHtml(fc.chat.accio.updated)+'）'):'')
       +'。分店明细：'+af.map(x=>escHtml(((FC_SHOPS.find(s=>s[0]===x.shop)||[x.shop,x.shop])[1]))+' '+x.m+'个月').join('、')+'</div>';
@@ -13759,6 +13930,18 @@ function fcAccioParse(text){
   return {ok:rows>0, err:rows?'':'没解析出有效月份行', months:months, rows:rows};
 }
 function fcNowLabel(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+function fcPrevMonth(m){
+  const p=String(m||'').split('-'); let y=Number(p[0]), mm=Number(p[1]);
+  if(!y || !mm) return fcCurMonth();
+  mm--; if(mm<1){ mm=12; y--; }
+  return y+'-'+String(mm).padStart(2,'0');
+}
+// 可选月份：最近 24 个月（含当月），供实测校准下拉用
+function fcMonthOptions(){
+  const out=[], cur=fcCurMonth(); let m=cur;
+  for(let i=0;i<24;i++){ out.push(m); m=fcPrevMonth(m); }
+  return out;
+}
 async function fcImportAccio(){
   fcHeal();
   const sel=document.getElementById('fcAccioShop');
@@ -13943,6 +14126,9 @@ function fcReportCtx(){
   return {cfg:cfg, series:series, pred:pred, pL:pL, pF:pF, nAct:nAct, hi:hi, target:target,
           seas:seas, last:last, chatMonths:Object.keys(fc.chat.months||{}).length,
           chatFiles:(fc.chat.files||[]).length,
+          calRows:(fc.cal&&fc.cal.rows)?fc.cal.rows.length:0,
+          calK:{langges:fcCalK('langges'), fansi:fcCalK('fansi')},
+          hasCal:fcHasCal(),
           methodName:(FC_METHODS.filter(x=>x[0]===cfg.method)[0]||['','混合'])[1],
           scopeName:fcScopeName()};
 }
@@ -13975,7 +14161,15 @@ function fcSummaryText(ctx){
   L.push('主要依据：① 用你自己导入的 '+c.nAct+' 个月历史（'+fcMonthLabel(c.series[0].month)+' ~ '+fcMonthLabel(c.series[c.series.length-1].month)+'）做 '+c.methodName+'；'
     +(c.seas.ok?('② 淡旺季按自家历史算：'+mm+' 月系数 '+f.toFixed(2)+(f>=1.08?'（偏旺）':(f<=0.92?'（偏淡）':'（接近平常）'))+'，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量':'半量')+'套用；')
              :('② 历史不足 12 个月，本次<b>未套用淡旺季</b>；'))
-    +'③ 样品件数 / 大货款式数来自聊天记录解析（覆盖 '+c.chatMonths+' 个月，'+(c.chatMonths?('抓不到的月份留空、不参与该指标预测'):'目前还没导入聊天记录')+'）；'
+    +'③ '+(c.hasCal
+        ? ('样品件数 / 大货款式数按<b>实测系数</b>折算：'+FC_SHOPS.map(s=>{
+             const k=c.calK[s[0]]||{};
+             const a=k.pcs?('样品单 ×'+fcR2(k.pcs.k)):'';
+             const b=k.styles?('大货单 ×'+fcR2(k.styles.k)):'';
+             const t=[a,b].filter(Boolean).join('、');
+             return escHtml(s[1])+'（'+t+'）';
+           }).filter(x=>!/（）/.test(x)).join('；')+'，系数来自你录入的 '+c.calRows+' 个月实测值；')
+        : ('样品件数 / 大货款式数来自订单产品明细 / 聊天解析（覆盖 '+c.chatMonths+' 个月，'+(c.chatMonths?('抓不到的月份留空、不参与该指标预测'):'目前还没有数据，建议去上面做「实测校准」')+'）；'))
     +'④ 季节节奏参考了平时整理的行业规律（见第三节），只用于解释，不直接改数字。');
   return L.join('');
 }
@@ -14034,14 +14228,14 @@ function fcReportHtml(){
   }
   // 二、依据
   H+='<h2>二、预测依据与算法说明</h2><ul>';
-  H+='<li><b>数据来源</b>：全部来自你自己导入的数据 —— 订单表 / 收款表（「经营分析」导入）+ 聊天记录解析。没有用任何外部推测的数字。</li>';
+  H+='<li><b>数据来源</b>：全部来自你自己的数据 —— 订单表 / 收款表（「经营分析」导入）+ 你录入的实测值（件数 / 款式数）。没有用任何外部推测的数字。</li>';
   H+='<li><b>归月口径</b>：'+(cfg.src==='pays'?'收款口径，按放款月份统计，同一订单多笔收款只算一单':'下单口径，按订单创建时间统计')+'。</li>';
   H+='<li><b>样品 / 大货划分</b>：单笔金额 ≤ $'+fcNum(cfg.line)+' 记样品单，&gt; $'+fcNum(cfg.line)+' 记大货单（与经营分析、提成规则同一条线）。</li>';
   H+='<li><b>预测方法</b>：'+fcEsc(c.methodName)+'。'+(cfg.method==='avg3'?'取最近 3 个月平均值，稳但不看趋势。':(cfg.method==='trend'?'对历史做最小二乘直线拟合再外推，越远的月份趋势衰减越多（避免越推越离谱）。':'把「趋势外推」和「近 3 月平均」各取一半，兼顾走势和稳定。'))+'</li>';
-  H+='<li><b>淡旺季处理</b>：'+(c.seas.ok?('用自家历史按<b>同月平均法</b>算出每个月的季节系数（12 个月平均=1.00），先把历史去掉季节再拟合，最后乘回目标月系数。'+fcEsc(String(Number(String(t).split('-')[1])))+' 月系数 <b>'+c.seas.idx[Number(String(t).split('-')[1])].toFixed(2)+'</b>，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量套用':'半量套用（样本不足 24 个月）')+'。'):('淡旺季采用<b>同月平均法</b>（自家历史按自然月分组求平均 ÷ 总平均），但当前历史只有 '+c.nAct+' 个月、不足 12 个月，月份还没走满一轮，<b>本次未套用</b> —— 硬套会把偶发波动当规律。<b>只用自己的历史算，不套行业预设值。</b>'))+'</li>';
+  H+='<li><b>淡旺季处理</b>：'+(c.seas.ok?('用自家历史算每个月的季节系数（12 个月平均=1.00）：先算「该月 ÷ 该年均值」的相对比抹掉年份间基数差异，再对多年取中位数（满 3 年时去掉最高最低），然后先把历史去掉季节再拟合、最后乘回目标月系数。'+fcEsc(String(Number(String(t).split('-')[1])))+' 月系数 <b>'+c.seas.idx[Number(String(t).split('-')[1])].toFixed(2)+'</b>，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量套用':'半量套用（样本不足 24 个月）')+'。'):('淡旺季采用<b>年内相对比 + 多年中位数</b>（该月 ÷ 该年均值，再多年取中位数），但当前历史只有 '+c.nAct+' 个月、不足 12 个月，月份还没走满一轮，<b>本次未套用</b> —— 硬套会把偶发波动当规律。<b>只用自己的历史算，不套行业预设值。</b>'))+'</li>';
   H+='<li><b>波动区间</b>：按历史对趋势线的偏离程度 + 相邻月份最大波动估算，<b>不是保证能落在这个范围里</b>。</li>';
   if(c.last && c.last.partial) H+='<li><b>当月折算</b>：'+fcEsc(fcMonthLabel(c.last.month))+' 还没过完，已按已过天数折算成整月（约 ×'+c.last.scale.toFixed(2)+'），否则会低估。</li>';
-  H+='<li><b>样品件数 / 大货款式数</b>：从聊天记录里解析（覆盖 '+(c.chatMonths||0)+' 个月、'+(c.chatFiles||0)+' 个文件）。一个样品单不等于一件样品、一个订单也可能多个款式，所以这两个数单独统计。</li>';
+  H+='<li><b>样品件数 / 大货款式数</b>：'+(c.hasCal?('按<b>实测系数</b>折算 —— 系数 = 你录入的实测值合计 ÷ 对应单数合计（共 '+(c.calRows||0)+' 个月的实测值）。一个样品单不等于一件样品、一个订单也可能多个款式，所以按「平均一个样品单几件样品 / 平均一个大货单几个款式」折算。系数在「<b>实测校准</b>」面板录入，可随时改。'):('目前来自订单产品明细解析（覆盖 '+(c.chatMonths||0)+' 个月），建议改用「<b>实测校准</b>」的实测系数（明细里的数量是下单量，会虚高）。'))+'</li>';
   H+='</ul>';
   // 三、行业节奏参考
   H+='<h2>三、行业淡旺季参考（外部规律，仅用于解释与校验）</h2>';
@@ -14097,8 +14291,8 @@ function fcReportHtml(){
   if(c.nAct<6) H+='<li><b>样本偏少</b>：只有 '+c.nAct+' 个月历史，预测误差会明显偏大，建议至少攒到 6 个月再看。</li>';
   if(!c.seas.ok) H+='<li><b>未含淡旺季</b>：历史不足 12 个月，季节性没进入模型，旺季/淡季月份的偏差可能较大。</li>';
   else if(c.seas.w<1) H+='<li><b>淡旺季系数半量套用</b>：样本 '+c.seas.n+' 条（不足 24 个月），系数本身也有噪声。</li>';
-  if(!c.chatFiles) H+='<li><b>样品件数 / 大货款式数缺失</b>：还没导入聊天记录，这两个指标无法预测。</li>';
-  else if(c.chatMonths<3) H+='<li><b>聊天覆盖月份偏少</b>：只有 '+c.chatMonths+' 个月，样品件数 / 款式数的趋势判断很不可靠。</li>';
+  if(!c.hasCal) H+='<li><b>样品件数 / 大货款式数还没配系数</b>：这两个指标目前没有可靠来源，建议到上面「实测校准」填 2~3 个月的实测件数 / 款式数。</li>';
+  else if((c.calRows||0)<2) H+='<li><b>实测样本偏少</b>：只填了 '+(c.calRows||0)+' 个月，系数容易被单个月的偶然情况带偏，建议补到 3 个月左右。</li>';
   H+='<li><b>规则变化</b>：提成规则、样品线（$'+fcNum(cfg.line)+'）、店铺运营策略一旦调整，历史规律会失效，需要重新观察。</li>';
   H+='<li><b>大环境</b>：平台流量、类目政策、汇率、客户自身库存都会影响实际下单，模型只能反映"惯性和季节"，反映不了突发事件。</li>';
   H+='</ul>';
@@ -14112,7 +14306,7 @@ function fcReportHtml(){
     const g=FC_INDUSTRY[k];
     H+='<li>【'+fcEsc(g.name)+'】针对旺季驱动（'+fcEsc(g.drive.join('、'))+'）提前触达历史大货客户。</li>';
   });
-  if(!c.chatFiles) H+='<li>把后台导出的聊天记录导入本模块，补齐「样品件数 / 大货款式数」这两个指标。</li>';
+  if(!c.hasCal) H+='<li>打开上面的「实测校准」，把最近 2~3 个月两个店的<b>实际样品件数</b>和<b>实际大货款式数</b>填进去，这两个指标才算有据可依。</li>';
   H+='</ul>';
   // 八、口径
   H+='<h2>八、口径与可复现</h2><ul>'
