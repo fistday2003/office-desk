@@ -757,6 +757,7 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 /* v2.34：季节系数改「年内相对比 + 多年中位数」，修掉异常月顶满系数、早期小基数压低系数两个坑 */
 /* v2.35：件数/款式数改「实测系数」折算（实测值 ÷ 单数），订单明细降级为备选（平台 quantity 是下单量，会虚高） */
 /* v2.36：① 三栏表「合计」固定按两店相加，不再跟着「范围」下拉走；② 系数可以直接手工改（留空=自动） */
+/* v2.37：预置 2026-07~09 两店实测值，装好即按系数折算；三栏表格子里直接标出 ×系数 */
 .fc-3col{width:100%;border-collapse:collapse;font-size:12.5px}
 .fc-3col th,.fc-3col td{border:1px solid var(--border);padding:7px 10px;text-align:center;vertical-align:middle}
 .fc-3col th{background:#f8fafc;font-weight:600;color:var(--text-secondary);font-size:11.5px}
@@ -1228,7 +1229,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.36 · 2026-10-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.37 · 2026-10-15</div>
     </div>
   </aside>
 
@@ -2079,7 +2080,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.36';
+const APP_VERSION = 'v2.37';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -13008,11 +13009,29 @@ const FC_KEYS     = ['orders','sample','pcs','bulk','styles','amount','buyers'];
 function fcBlank(){ return {months:{}, goals:{}, chat:fcChatBlank(), cal:fcCalBlank(), cfg:{src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}}; }
 function fcChatBlank(){ return {files:[], months:{}, updated:'', accio:fcAccioBlank()}; }
 function fcAccioBlank(){ return {files:[], updated:''}; }
-// v2.35：实测校准 —— 用「实际件数 ÷ 单数」反推系数，替代订单明细里虚高的数
-// v2.36：coefficients 里可以手工覆盖自动算出来的系数（留空 = 用自动算的）
+// v2.35：件数 / 款式数系数 —— 用「实际件数 ÷ 单数」定出固定系数，替代订单明细里虚高的数
+// v2.36：manual 里可以手工覆盖自动算出来的系数（留空 = 用自动算的）
+// v2.37：预置一批实测值，装好即用（不用手动录入就能按系数折算）；清空后不会再自动回来
+// ord = 该月样品单数，ordB = 该月大货单数（来自「样品单跟进表」，跟实测值同源、同月）
+// 单数直接写进行里 → 系数不依赖经营分析有没有那几个月的数据，打开就能算出来
+const FC_CAL_SEED = [
+  {shop:'langges', month:'2026-07', ord:55, pcs:58, ordB:19, styles:11},
+  {shop:'langges', month:'2026-08', ord:45, pcs:77, ordB:16, styles:16},
+  {shop:'langges', month:'2026-09', ord:44, pcs:82, ordB:14, styles:16},
+  {shop:'fansi',   month:'2026-07', ord:12, pcs:16, ordB:7,  styles:14},
+  {shop:'fansi',   month:'2026-08', ord:15, pcs:28, ordB:2,  styles:6},
+  {shop:'fansi',   month:'2026-09', ord:34, pcs:39, ordB:9,  styles:6}
+];
+const FC_CAL_SEED_NOTE = '预置实测值（2026-07~09 月，来自「样品单跟进表」）';
+// v2.37：初始系数 —— 就是按上面 3 个月实测值算出来的（217÷144、43÷49、83÷61、26÷18），取两位小数写死当起点。
+// 预测本来就是估个大概，系数不需要天天算；它是「固定值」，只有你手动改才会变。
+const FC_CAL_K_SEED = {
+  langges:{pcs:1.51, styles:0.88},
+  fansi  :{pcs:1.36, styles:1.44}
+};
 function fcCalBlank(){
   const man={}; FC_SHOPS.forEach(s=>{ man[s[0]]={pcs:null, styles:null}; });
-  return {rows:[], manual:man, updated:''};
+  return {rows:[], manual:man, updated:'', seeded:false};
 }
 let fc = fcBlank();
 function fcHeal(){
@@ -13032,12 +13051,29 @@ function fcHeal(){
     const ok=v=>(v===null||v===undefined||v==='')?null:(isFinite(Number(v))&&Number(v)>0?Number(v):null);
     fc.cal.manual[s[0]] = {pcs: ok(m&&m.pcs), styles: ok(m&&m.styles)};
   });
-  fc.cal.rows=fc.cal.rows.filter(r=>r && typeof r==='object').map(r=>({
-    shop: FC_SHOPS.some(s=>s[0]===r.shop) ? r.shop : 'langges',
-    month: /^\d{4}-\d{2}$/.test(String(r.month||'')) ? String(r.month) : fcCurMonth(),
-    pcs: (r.pcs===''||r.pcs===null||r.pcs===undefined) ? null : Number(r.pcs),
-    styles:(r.styles===''||r.styles===null||r.styles===undefined) ? null : Number(r.styles)
-  }));
+  // v2.37：第一次用（没录过、也没手动清空过）就自动装上「初始系数 + 实测记录」，打开即可按系数折算。
+  // 系数是固定值：装好之后就存下来了，不会跟着订单数据自己变；要改就改系数格子里的数。
+  if(!fc.cal.seeded && !fc.cal.rows.length &&
+     !(fc.cal.manual.langges.pcs || fc.cal.manual.langges.styles || fc.cal.manual.fansi.pcs || fc.cal.manual.fansi.styles)){
+    fc.cal.rows = FC_CAL_SEED.map(r=>Object.assign({},r));
+    FC_SHOPS.forEach(s=>{
+      const k=FC_CAL_K_SEED[s[0]]||{};
+      const kk=v=>(v===null||v===undefined||v==='')?null:(isFinite(Number(v))&&Number(v)>0?Number(v):null);
+      fc.cal.manual[s[0]]={pcs:kk(k.pcs), styles:kk(k.styles)};
+    });
+    fc.cal.seeded = true;
+    fc.cal.updated = FC_CAL_SEED_NOTE;
+  }
+  fc.cal.rows=fc.cal.rows.filter(r=>r && typeof r==='object').map(r=>{
+    const shop=FC_SHOPS.some(s=>s[0]===r.shop) ? r.shop : 'langges';
+    const month=/^\d{4}-\d{2}$/.test(String(r.month||'')) ? String(r.month) : fcCurMonth();
+    const n=v=>(v===''||v===null||v===undefined)?null:Number(v);
+    // 老数据（v2.35/2.36 录的行）没有单数列：跟预置值同店同月的，把单数补上，免得系数要去依赖经营分析
+    const sd=FC_CAL_SEED.filter(x=>x.shop===shop && x.month===month)[0];
+    let ord=n(r.ord), ordB=n(r.ordB);
+    if(sd){ if(ord===null || !isFinite(ord)) ord=sd.ord; if(ordB===null || !isFinite(ordB)) ordB=sd.ordB; }
+    return {shop:shop, month:month, ord:ord, pcs:n(r.pcs), ordB:ordB, styles:n(r.styles)};
+  });
   const c = Object.assign({src:'pays', method:'mix', horizon:3, scope:'all', metric:'orders', line:FC_SAMPLE_LINE, fx:FC_FX}, fc.cfg||{});
   const _h = Number(c.horizon);
   c.horizon = (isFinite(_h) && _h>=1 && _h<=FC_MAX_H) ? Math.round(_h) : 3;
@@ -13098,7 +13134,7 @@ function fcChatVal(m, scope, key){
   const b=c.byShop && c.byShop[scope];
   return (b && typeof b[key]==='number') ? b[key] : null;
 }
-// ---------- v2.35 实测校准：用「实际件数 ÷ 单数」反推系数 ----------
+// ---------- v2.35 件数 / 款式数系数：按「实际件数 ÷ 单数」定出固定系数 ----------
 // 背景：阿里订单明细里 quantity 是「下单数量」（一单动辄几百件），拿来当「样品件数 / 款式数」会严重虚高。
 // 思路：订单数、样品单数、大货单数是平台实打实的数，可以信；
 //       件数 / 款式数则按你填的实测值反推系数 —— 平均一个样品单几件样品、平均一个大货单几个款式。
@@ -13111,6 +13147,18 @@ function fcCalOrders(shop, month, auto, monthsMan){
   const sample=has(man.sample)?Number(man.sample):(Number(a.sample)||0);
   const bulk  =has(man.bulk)  ?Number(man.bulk)  :Math.max(0, orders-sample);
   return {orders:orders, sample:sample, bulk:bulk};
+}
+// v2.37：这一行的「单数」（分母）——行里手填的优先，其次月度手工补录，最后用经营分析里按 $500 划出来的数
+// 行里存了单数，系数就不用等经营分析那几个月的数据，装上实测值立刻能算
+function fcCalRowCounts(r, auto){
+  const b=fcCalOrders(r.shop, r.month, auto, fc.months||{});
+  const has=v=>(v!==undefined && v!==null && v!=='' && isFinite(Number(v)));
+  return {
+    sample: has(r.ord)  ? Number(r.ord)  : b.sample,
+    bulk  : has(r.ordB) ? Number(r.ordB) : b.bulk,
+    sampleAuto: b.sample,
+    bulkAuto  : b.bulk
+  };
 }
 function fcCalK(shop){
   fcHeal();
@@ -13128,13 +13176,14 @@ function fcCalK(shop){
       return {pcs:null, styles:null};
     }
   }
-  const auto=fcAutoMap(shop)||{}, man=fc.months||{};
+  const auto=fcAutoMap(shop)||{};
   const acc={pcs:{act:0,ord:0,n:0,ms:[]}, styles:{act:0,ord:0,n:0,ms:[]}};
+  const hasN=v=>(v!==undefined && v!==null && v!=='' && isFinite(Number(v)));
   rows.forEach(r=>{
     if(r.shop!==shop) return;
-    const b=fcCalOrders(shop, r.month, auto, man);
-    if(r.pcs!==null && isFinite(r.pcs) && b.sample>0){ acc.pcs.act+=r.pcs; acc.pcs.ord+=b.sample; acc.pcs.n++; acc.pcs.ms.push(r.month); }
-    if(r.styles!==null && isFinite(r.styles) && b.bulk>0){ acc.styles.act+=r.styles; acc.styles.ord+=b.bulk; acc.styles.n++; acc.styles.ms.push(r.month); }
+    const b=fcCalRowCounts(r, auto);   // 行里存了单数就用行里的，否则用经营分析里这个月的数
+    if(hasN(r.pcs) && b.sample>0){ acc.pcs.act+=Number(r.pcs); acc.pcs.ord+=b.sample; acc.pcs.n++; acc.pcs.ms.push(r.month); }
+    if(hasN(r.styles) && b.bulk>0){ acc.styles.act+=Number(r.styles); acc.styles.ord+=b.bulk; acc.styles.n++; acc.styles.ms.push(r.month); }
   });
   const manK=(fc.cal&&fc.cal.manual&&fc.cal.manual[shop])||{};
   const out={};
@@ -13151,7 +13200,7 @@ function fcCalK(shop){
   });
   return out;
 }
-// 手工改系数（留空 = 恢复自动算）
+// 手工改系数（改完就存下来，不跟数据实时算；留空 = 回到「按实测记录算」的值）
 function fcCalSetK(shop, key, val){
   fcHeal();
   if(!FC_SHOPS.some(s=>s[0]===shop)) return;
@@ -13161,23 +13210,28 @@ function fcCalSetK(shop, key, val){
   fc.cal.manual[shop][key]=(t===''||!isFinite(n)||n<=0)?null:n;
   fc.cal.updated=fcNowLabel();
   saveAll(); renderFc();
-  showToast(t===''?'已恢复自动计算':'系数已改成 '+n);
+  showToast(t===''?'已清空这一格，回到按实测记录算':'系数已改成 '+n);
 }
-// 清掉所有手工系数，全部回到自动算
+// v2.37：一键恢复成「初始系数」（我按 7~9 月实测值算好的那四个数），并把实测记录补回来
 function fcCalAutoAll(){
   fcHeal();
-  FC_SHOPS.forEach(s=>{ fc.cal.manual[s[0]]={pcs:null, styles:null}; });
-  fc.cal.updated=fcNowLabel();
-  saveAll(); renderFc(); showToast('已全部恢复自动计算');
+  FC_SHOPS.forEach(s=>{
+    const k=FC_CAL_K_SEED[s[0]]||{};
+    fc.cal.manual[s[0]]={pcs:(k.pcs||null), styles:(k.styles||null)};
+  });
+  FC_CAL_SEED.forEach(r=>{ if(!fc.cal.rows.some(x=>x.shop===r.shop && x.month===r.month)) fc.cal.rows.push(Object.assign({},r)); });
+  fc.cal.seeded=true;
+  fc.cal.updated=FC_CAL_SEED_NOTE;
+  saveAll(); renderFc(); showToast('已恢复初始系数（朗格斯 1.51 / 0.88，凡适 1.36 / 1.44）');
 }
-// 单店某月的 件数 / 款式数：优先用系数折算，没配系数才退回订单明细 / 聊天解析
-function fcPcsStyles(shop, month, K, shopAuto){
-  const kk=(K&&K[shop])||null;
-  const b=fcCalOrders(shop, month, shopAuto, fc.months||{});
-  const kp=kk&&kk.pcs ? kk.pcs.k : 0;
-  const ks=kk&&kk.styles ? kk.styles.k : 0;
-  const pcs    = (kp>0 && b.sample>0) ? b.sample*kp : fcChatVal(month, shop, 'pcs');
-  const styles = (ks>0 && b.bulk>0)   ? b.bulk*ks   : fcChatVal(month, shop, 'styles');
+// 单店某月的 件数 / 款式数：配了系数就「单数 × 系数」；没配系数才退回订单明细 / 聊天解析。
+// ⚠️ 配了系数之后就不再退回明细 —— 明细里的 quantity 是「下单量」，动辄几千件，一退回去数就虚高了。
+function fcPcsStyles(shop, month, kk, sampleN, bulkN){
+  const kp=(kk&&kk.pcs)   ? kk.pcs.k   : 0;
+  const ks=(kk&&kk.styles)? kk.styles.k: 0;
+  const sv=Number(sampleN)||0, bv=Number(bulkN)||0;
+  const pcs    = (kp>0) ? (sv>0 ? sv*kp : null) : fcChatVal(month, shop, 'pcs');
+  const styles = (ks>0) ? (bv>0 ? bv*ks : null) : fcChatVal(month, shop, 'styles');
   return {pcs:pcs, styles:styles};
 }
 function fcR2(v){ const n=Number(v); return isFinite(n) ? Math.round(n*100)/100 : 0; }
@@ -13189,7 +13243,7 @@ function fcHasCal(){
 function fcCalAdd(){
   fcHeal();
   const m=fcCurMonth(), pm=fcPrevMonth(m);
-  fc.cal.rows.push({shop:'langges', month:pm, pcs:null, styles:null});
+  fc.cal.rows.push({shop:'langges', month:pm, ord:null, pcs:null, ordB:null, styles:null});
   saveAll(); renderFc();
 }
 function fcCalDel(i){
@@ -13211,8 +13265,10 @@ function fcCalSet(i, field, val){
 function fcCalClear(){
   const n=(fc.cal&&fc.cal.rows)?fc.cal.rows.length:0;
   if(!n){ showToast('本来就是空的'); return; }
-  showConfirm('确定清空实测校准吗？\n已录的 '+n+' 行实测值会删掉，系数也会失效（件数/款式数将退回订单明细或显示「—」）。', ()=>{
-    fc.cal=fcCalBlank(); saveAll(); renderFc(); showToast('实测校准已清空');
+  showConfirm('只清「实测记录」这 '+n+' 行，不动上面的系数（系数是固定值，要改直接改格子里的数，或点「恢复初始系数」）。\n确定清吗？', ()=>{
+    fc.cal.rows=[];                        // 只清记录
+    fc.cal.seeded=true;                    // 记住「是主动清空的」，别下次刷新又自动装回来
+    saveAll(); renderFc(); showToast('实测记录已清空（系数保留）');
   });
 }
 // 月度序列（手工修正优先于自动统计；当月按已过天数折算成整月预估 est）
@@ -13236,15 +13292,17 @@ function fcSeries(scope){
     const amount = has(man.amount) ? Number(man.amount) : a.amount;
     const buyers = has(man.buyers) ? Number(man.buyers) : a.buyers;
     const bulk   = has(man.bulk)   ? Number(man.bulk)   : Math.max(0, orders-sample);
-    // 样品件数 / 大货款式数：v2.35 起优先按实测系数折算（单数 × 系数）；没配系数才退回明细 / 聊天解析
+    // 样品件数 / 大货款式数：v2.35 起按「这个月自己的单数 × 系数」折算 —— 单数就用上面这几个数，
+    // 保证表里显示的「样品单数」和折算用的单数是同一个数（v2.37 修正：以前这里会再取一次单数，可能对不上）
     let pcs=null, styles=null;
     if(shops.length===1){
-      const v=fcPcsStyles(shops[0], m, K, shopAuto[shops[0]]);
+      const v=fcPcsStyles(shops[0], m, K[shops[0]], sample, bulk);
       pcs=v.pcs; styles=v.styles;
     }else{
       let sp=0, ss=0, hp=false, hs=false;
       shops.forEach(sh=>{
-        const v=fcPcsStyles(sh, m, K, shopAuto[sh]);
+        const b=fcCalOrders(sh, m, shopAuto[sh], fc.months||{});
+        const v=fcPcsStyles(sh, m, K[sh], b.sample, b.bulk);
         if(v.pcs!==null && v.pcs!==undefined){ sp+=v.pcs; hp=true; }
         if(v.styles!==null && v.styles!==undefined){ ss+=v.styles; hs=true; }
       });
@@ -13588,25 +13646,35 @@ function renderFc(){
     h+='<div class="biz-tbl-wrap"><table class="fc-3col"><thead><tr>'
       +'<th style="text-align:left">指标</th><th>朗格斯</th><th>凡适</th><th>合计</th><th>合计环比</th>'
       +'</tr></thead><tbody>';
+    // v2.37：件数 / 款式数在格子里直接标出用的系数（×1.51），一眼能看出是不是按系数算的
+    const kL=fcCalK('langges'), kF=fcCalK('fansi');
     FC_METRICS.forEach(m=>{
       const k=m.key;
-      const td=p=>{
+      const coefOf=sh=>{
+        if(m.src!=='chat') return null;
+        const o=(sh==='langges'?kL:kF)||{};
+        const x=o[k];
+        return (x && x.k>0) ? x.k : null;
+      };
+      const td=(p,sh)=>{
         if(!p) return '<td class="fc-na">—</td>';
         const v=p[k];
-        if(v===null||v===undefined) return '<td class="fc-na">—<span class="sub">未导入明细</span></td>';
+        const cf=coefOf(sh);
+        if(v===null||v===undefined) return '<td class="fc-na">—<span class="sub">还没配系数</span></td>';
         let s='<td class="num">'+fmtV(k,v,m.unit);
         const lo=p.lo?p.lo[k]:null, hv=p.hi?p.hi[k]:null;
         if(lo!=null&&hv!=null) s+='<span class="sub">'+((k==='amount')?(fcUsd(lo)+'~'+fcUsd(hv)):(fcNum(lo)+'~'+fcNum(hv)))+'</span>';
+        if(cf) s+='<span class="sub" style="color:#1d4ed8">×'+(Math.round(cf*100)/100)+'</span>';
         return s+'</td>';
       };
       const sv=(predAll[hi]&&predAll[hi][k]!==undefined)?predAll[hi][k]:null;
       const sumTd=(sv===null||sv===undefined)?'<td class="sumcell fc-na">—</td>':('<td class="sumcell">'+fmtV(k,sv,m.unit)+'</td>');
-      const srcTag = (m.src!=='chat') ? '' : (fcHasCal() ? '<span class="fc-badge man">系数</span>' : '<span class="fc-badge man">明细</span>');
+      const srcTag = (m.src!=='chat') ? '' : (fcHasCal() ? '<span class="fc-badge man">折算</span>' : '<span class="fc-badge man">明细</span>');
       h+='<tr><td class="k">'+escHtml(m.name)+srcTag+'</td>'
-        +td(pL[hi])+td(pF[hi])+sumTd+'<td>'+fcDelta(sv, baseAll(k), '')+'</td></tr>';
+        +td(pL[hi],'langges')+td(pF[hi],'fansi')+sumTd+'<td>'+fcDelta(sv, baseAll(k), '')+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>，<b>与上面「范围」下拉无关</b>（范围只影响下面的趋势图和月度明细），所以三栏永远对得上。下面小字是波动区间。带蓝标的两个指标：写「<b>系数</b>」= 按实测校准的系数折算，写「<b>明细</b>」= 还没配系数、退回订单产品明细。</div>';
+    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>，<b>与上面「范围」下拉无关</b>（范围只影响下面的趋势图和月度明细），所以三栏永远对得上。下面小字是波动区间。带蓝标的两个指标：写「<b>折算</b>」= 按固定的件数 / 款式数系数折算出来，写「<b>明细</b>」= 系数没设、退回订单产品明细。</div>';
     h+='</div>';
   }
   // 图表
@@ -13708,65 +13776,73 @@ function renderFc(){
       +'</div>';
   }
   h+='</div>';
-  // ---------- v2.35 实测校准：件数 / 款式数系数（主来源） ----------
+  // ---------- v2.35 件数 / 款式数系数（固定值，可手改） ----------
   const calRows=(fc.cal&&fc.cal.rows)||[];
   const autoBy={}; FC_SHOPS.forEach(s=>{ autoBy[s[0]]=fcAutoMap(s[0])||{}; });
   const KK={}; FC_SHOPS.forEach(s=>{ KK[s[0]]=fcCalK(s[0]); });
-  h+='<div class="biz-panel"><h4>实测校准：件数 / 款式数系数<span class="tag tag-ok">'+(calRows.length?calRows.length+' 行':'还没录')+'</span>'
-    +'<span style="margin-left:auto;display:flex;gap:6px">'
-    +'<button class="btn btn-sm btn-primary" onclick="fcCalAdd()">＋ 加一行</button>'
-    +(calRows.length?'<button class="btn btn-sm" onclick="fcCalClear()">清空</button>':'')
-    +'</span></h4>';
-  h+='<div class="fc-chatbox"><b>件数 / 款式数按「实测系数」折算，这是现在的主来源；系数可以直接手工改。</b><br>'
-    +'订单数、样品单数、大货单数是平台实打实的数，可以信；件数和款式数则按你填的实测值反推：<br>'
-    +'<b>系数 = 你填的实测值合计 ÷ 对应单数合计</b>。比如 3 个月共 57 个样品单、实际发了 120 件样品，系数就是 2.1 —— 以后预测出 60 个样品单，就推 126 件。<br>'
-    +'填 3 个月左右最稳（月份越多越抗偶然）；只填件数或只填款式数也行，另一个会单独算。<br>'
-    +'<b>算完下面那四个系数可以手动改</b> —— 你有别的判断（比如这几个月正好特殊）就直接覆盖，改完预测立刻跟着变。'
-    +'</div>';
-  // 系数（可直接改）—— 自动算出来的只是建议值，随时能手工覆盖
   const anyK = FC_SHOPS.some(s=>{ const k=KK[s[0]]; return k && (k.pcs||k.styles); });
   const anyMan = FC_SHOPS.some(s=>{ const m=(fc.cal.manual||{})[s[0]]||{}; return m.pcs||m.styles; });
+  h+='<div class="biz-panel"><h4>件数 / 款式数系数<span class="tag tag-ok">'+(anyMan?'已设好':'未设')+'</span>'
+    +'<span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">'
+    +'<button class="btn btn-sm" onclick="fcCalAutoAll()">恢复初始系数</button>'
+    +'<button class="btn btn-sm" onclick="fcCalAdd()">＋ 加一行实测记录</button>'
+    +(calRows.length?'<button class="btn btn-sm" onclick="fcCalClear()">清空记录</button>':'')
+    +'</span></h4>';
+  h+='<div class="fc-chatbox"><b>样品件数 = 样品单数 × 系数；大货款式数 = 大货单数 × 系数。</b>'
+    +'<b style="color:#1d4ed8">系数已经填好了 —— 朗格斯 1.51 / 0.88，凡适 1.36 / 1.44</b>（按 2026 年 7~9 月三个月的实测值算的：217 件÷144 单、43 款÷49 单、83 件÷61 单、26 款÷18 单）。<br>'
+    +'<b>这个系数是个固定值，不会跟着数据自己变</b> —— 预测本来就是估个大概，不用天天重算。要调就直接改下面格子里的数，改完预测立刻跟着变；改乱了点「恢复初始系数」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
+    +'底下的「实测记录」只是这个系数的<b>依据</b>，留着以后好追溯：改记录<b>不会</b>自动改上面的系数，想按新月份更新系数就自己改格子，或点「恢复初始系数」让它按记录重算。'
+    +'</div>';
+  // 系数（直接改）—— 初始值就是按 7~9 月实测值算好的那四个数；改了就存下来，不跟数据实时算
   if(anyK || anyMan || calRows.length){
     h+='<div style="overflow-x:auto;margin-top:10px"><table class="fc-3col" id="fcCalKTable" style="min-width:560px"><thead><tr>'
       +'<th style="text-align:left">店铺</th><th>样品件数系数<br><span class="sub">样品件数 ÷ 样品单数</span></th>'
-      +'<th>大货款式系数<br><span class="sub">大货款式数 ÷ 大货单数</span></th><th>当前算法</th></tr></thead><tbody>';
+      +'<th>大货款式系数<br><span class="sub">大货款式数 ÷ 大货单数</span></th><th>来源</th></tr></thead><tbody>';
     FC_SHOPS.forEach(s=>{
       const sh=s[0], kk=KK[sh]||{}, mv=(fc.cal.manual||{})[sh]||{};
       const cell=(k,label)=>{
         const cur=kk[k]?kk[k].k:null;
         const val=(mv[k]!==null&&mv[k]!==undefined)?mv[k]:(cur!==null?(Math.round(cur*1000)/1000):'');
         return '<td><input type="number" min="0" step="0.01" style="width:104px;text-align:right" value="'+val+'"'
-          +' placeholder="自动" onchange="fcCalSetK(\''+sh+'\',\''+k+'\',this.value)" title="'+label+'，留空 = 用自动算的"></td>';
+          +' placeholder="自动" onchange="fcCalSetK(\''+sh+'\',\''+k+'\',this.value)" title="'+label+'，改这里就是改系数，留空 = 按实测记录重算"></td>';
       };
+      const sd=FC_CAL_K_SEED[sh]||{};
+      const isSeed=(mv.pcs!==null&&mv.pcs!==undefined&&mv.styles!==null&&mv.styles!==undefined
+                    && Math.abs(Number(mv.pcs)-Number(sd.pcs||0))<1e-6 && Math.abs(Number(mv.styles)-Number(sd.styles||0))<1e-6);
+      const srcTag = isSeed ? '<span style="color:#1d4ed8">初始系数</span>'
+                    : ((mv.pcs||mv.styles) ? '<span style="color:#b45309">你改过</span>' : (anyK?'按实测记录算':'—'));
       h+='<tr><td class="k">'+escHtml(s[1])+'</td>'+cell('pcs','样品件数系数')+cell('styles','大货款式系数')
-        +'<td class="sub">'+(mv.pcs||mv.styles ? '<span style="color:#b45309">手工改过</span>' : (anyK?'自动':'—'))+'</td></tr>';
+        +'<td class="sub">'+srcTag+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="fc-note"><b>这四个数可以直接改</b>（改完立即生效，预测马上跟着变）：留空 = 用按实测值自动算出来的；填数 = 用手填的。<br>'
-      +'自动算法：<b>该店所有实测月的实测值合计 ÷ 对应单数合计</b>。比如朗格斯 7–9 月共 144 个样品单、实际寄出 217 件样品 → 系数 1.51。<br>'
-      +'改错了想回到自动值：把格子清空，或点下面的「恢复自动系数」。</div>';
-    if(anyMan) h+='<div class="fc-note" style="margin-top:6px"><button class="btn btn-sm" onclick="fcCalAutoAll()">恢复自动系数</button></div>';
+    h+='<div class="fc-note"><b>这四个数直接改就行</b>（改完立即生效，预测马上跟着变）。它们是固定值，不会自己变；改乱了点上面的「<b>恢复初始系数</b>」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
+      +'留空的算法（一般不用管）：<b>该店实测记录里的实测值合计 ÷ 单数合计</b>。朗格斯 7–9 月共 144 个样品单、实际寄出 217 件样品 → 1.51。</div>';
   }
   if(calRows.length){
+    h+='<div class="fc-note" style="margin-top:10px"><b>系数的依据：实测记录</b>（2026 年 7~9 月 · 来自「样品单跟进表」）—— 只作留档，<b>改这里不会自动改上面的系数</b>。</div>';
     h+='<div style="overflow-x:auto"><table class="fc-3col" id="fcCalTable" style="min-width:720px"><thead><tr>'
       +'<th style="text-align:left">店铺</th><th style="text-align:left">月份</th>'
       +'<th>实测样品件数</th><th>该月样品单数</th>'
       +'<th>实测大货款式数</th><th>该月大货单数</th><th></th></tr></thead><tbody>';
     calRows.forEach((r,i)=>{
-      const b=fcCalOrders(r.shop, r.month, autoBy[r.shop], fc.months||{});
+      const b=fcCalRowCounts(r, autoBy[r.shop]);
       const mOpts=fcMonthOptions().map(mm=>'<option value="'+mm+'"'+(mm===r.month?' selected':'')+'>'+mm+'</option>').join('');
       const sOpts=FC_SHOPS.map(s=>'<option value="'+s[0]+'"'+(s[0]===r.shop?' selected':'')+'>'+escHtml(s[1])+'</option>').join('');
+      const numCell=(key,val,ph,ti)=>'<td><input type="number" min="0" step="1" style="width:88px;text-align:right" value="'+((val===null||val===undefined||val==='')?'':val)+'" placeholder="'+ph+'" title="'+ti+'" onchange="fcCalSet('+i+',\''+key+'\',this.value)"></td>';
       h+='<tr>'
         +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'shop\',this.value)">'+sOpts+'</select></td>'
         +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'month\',this.value)">'+mOpts+'</select></td>'
-        +'<td><input type="number" min="0" step="1" style="width:96px;text-align:right" value="'+(r.pcs===null?'':r.pcs)+'" placeholder="如 120" onchange="fcCalSet('+i+',\'pcs\',this.value)"></td>'
-        +'<td class="sub">'+b.sample+' 单</td>'
-        +'<td><input type="number" min="0" step="1" style="width:96px;text-align:right" value="'+(r.styles===null?'':r.styles)+'" placeholder="如 30" onchange="fcCalSet('+i+',\'styles\',this.value)"></td>'
-        +'<td class="sub">'+b.bulk+' 单</td>'
+        +numCell('pcs', r.pcs, '如 120', '这个月实际寄出的样品件数')
+        +numCell('ord', r.ord, String(b.sampleAuto), '这个月的样品单数。留空 = 用经营分析里这月的样品单数（'+b.sampleAuto+' 单）')
+        +numCell('styles', r.styles, '如 30', '这个月实际做的大货款式数')
+        +numCell('ordB', r.ordB, String(b.bulkAuto), '这个月的大货单数。留空 = 用经营分析里这月的大货单数（'+b.bulkAuto+' 单）')
         +'<td><button class="btn btn-sm" onclick="fcCalDel('+i+')">删</button></td>'
         +'</tr>';
     });
     h+='</tbody></table></div>';
+    h+='<div class="fc-note">「该月样品单数 / 大货单数」也能改：<b>留空</b>就用你经营分析里这个月的数（格子里的灰字就是它），<b>填数</b>就用你填的。'
+      +'这 6 行已经把单数填好了，所以你就算还没导入经营分析数据，系数也照样准。'
+      +'想按这几个月的数<b>更新系数</b>：先把上面的系数格子清空（留空 = 按记录重算），或直接点「恢复初始系数」。</div>';
     let hasK=false, miss=[];
     FC_SHOPS.forEach(s=>{
       const kk=KK[s[0]];
@@ -13775,8 +13851,10 @@ function renderFc(){
       const desc=(o,unit)=>{
         if(!o) return null;
         const v=(Math.round(o.k*100)/100);
+        const sd=FC_CAL_K_SEED[s[0]]||{};
+        const isSeed=(Math.abs(Number(o.k)-Number(unit==='件'?(sd.pcs||0):(sd.styles||0)))<1e-6);
         if(o.manual){
-          const a=(o.auto!==null&&o.auto!==undefined)?('（自动算是 '+(Math.round(o.auto*100)/100)+'，已手工覆盖）'):'（手工设定）';
+          const a=isSeed ? '（初始系数）' : ((o.auto!==null&&o.auto!==undefined)?('（你改的；按实测记录算是 '+(Math.round(o.auto*100)/100)+'）'):'（你设的）');
           return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+a;
         }
         return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+'（'+o.n+' 个月合计 '+Math.round(o.act)+' '+unit+' ÷ '+o.ord+' 单）';
@@ -13837,7 +13915,7 @@ function renderFc(){
   if(!af.length){
     h+='<div class="fc-chatbox"><b>备选来源（v2.35 起已降级）。</b>这里是从<b>订单产品明细</b>里数出来的 quantity 合计。<br>'
       +'<span style="color:#b45309">⚠️ 实测发现这个数偏大：平台记的是「下单数量」，一个样品单可能记几百件，跟实际发出去的样品件数不是一回事。</span>'
-      +'现在默认走上面的<b>实测校准系数</b>；只有某店没配系数时，才退回用这里的数。<br>'
+      +'现在默认走上面的<b>件数 / 款式数系数</b>；只有某店系数没设时，才退回用这里的数。<br>'
       +'要用就：左边选店铺 → 点「导入订单明细 CSV」→ 选 <code>Accio取数-订单款式与件数.js</code> 导出的 CSV（一次只能导一个店）。</div>';
   } else {
     h+='<div class="fc-note">已导入 <b>'+af.length+'</b> 个文件，共覆盖 <b>'+Object.keys(fc.chat.months||{}).length+'</b> 个月'+(fc.chat.accio.updated?('（更新于 '+escHtml(fc.chat.accio.updated)+'）'):'')
@@ -14040,7 +14118,7 @@ function fcPrevMonth(m){
   mm--; if(mm<1){ mm=12; y--; }
   return y+'-'+String(mm).padStart(2,'0');
 }
-// 可选月份：最近 24 个月（含当月），供实测校准下拉用
+// 可选月份：最近 24 个月（含当月），供实测记录下拉用
 function fcMonthOptions(){
   const out=[], cur=fcCurMonth(); let m=cur;
   for(let i=0;i<24;i++){ out.push(m); m=fcPrevMonth(m); }
@@ -14266,14 +14344,14 @@ function fcSummaryText(ctx){
     +(c.seas.ok?('② 淡旺季按自家历史算：'+mm+' 月系数 '+f.toFixed(2)+(f>=1.08?'（偏旺）':(f<=0.92?'（偏淡）':'（接近平常）'))+'，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量':'半量')+'套用；')
              :('② 历史不足 12 个月，本次<b>未套用淡旺季</b>；'))
     +'③ '+(c.hasCal
-        ? ('样品件数 / 大货款式数按<b>实测系数</b>折算：'+FC_SHOPS.map(s=>{
+        ? ('样品件数 / 大货款式数按<b>固定系数</b>折算：'+FC_SHOPS.map(s=>{
              const k=c.calK[s[0]]||{};
              const a=k.pcs?('样品单 ×'+fcR2(k.pcs.k)):'';
              const b=k.styles?('大货单 ×'+fcR2(k.styles.k)):'';
              const t=[a,b].filter(Boolean).join('、');
              return escHtml(s[1])+'（'+t+'）';
-           }).filter(x=>!/（）/.test(x)).join('；')+'，系数来自你录入的 '+c.calRows+' 个月实测值；')
-        : ('样品件数 / 大货款式数来自订单产品明细 / 聊天解析（覆盖 '+c.chatMonths+' 个月，'+(c.chatMonths?('抓不到的月份留空、不参与该指标预测'):'目前还没有数据，建议去上面做「实测校准」')+'）；'))
+           }).filter(x=>!/（）/.test(x)).join('；')+'；系数是初始值，按 '+(c.calRows||0)+' 个月（2026 年 7~9 月）实测值定下来后固定使用，不随数据自动变，可在面板直接改；')
+        : ('样品件数 / 大货款式数来自订单产品明细 / 聊天解析（覆盖 '+c.chatMonths+' 个月，'+(c.chatMonths?('抓不到的月份留空、不参与该指标预测'):'目前还没有数据，建议去上面设「件数 / 款式数系数」')+'）；'))
     +'④ 季节节奏参考了平时整理的行业规律（见第三节），只用于解释，不直接改数字。');
   return L.join('');
 }
@@ -14332,14 +14410,14 @@ function fcReportHtml(){
   }
   // 二、依据
   H+='<h2>二、预测依据与算法说明</h2><ul>';
-  H+='<li><b>数据来源</b>：全部来自你自己的数据 —— 订单表 / 收款表（「经营分析」导入）+ 你录入的实测值（件数 / 款式数）。没有用任何外部推测的数字。</li>';
+  H+='<li><b>数据来源</b>：订单数 / 样品单数 / 大货单数 / 金额 / 客户数来自你自己的订单表、收款表（「经营分析」导入）；样品件数 / 大货款式数按「单数 × 固定系数」折算。没有用任何外部推测的数字。</li>';
   H+='<li><b>归月口径</b>：'+(cfg.src==='pays'?'收款口径，按放款月份统计，同一订单多笔收款只算一单':'下单口径，按订单创建时间统计')+'。</li>';
   H+='<li><b>样品 / 大货划分</b>：单笔金额 ≤ $'+fcNum(cfg.line)+' 记样品单，&gt; $'+fcNum(cfg.line)+' 记大货单（与经营分析、提成规则同一条线）。</li>';
   H+='<li><b>预测方法</b>：'+fcEsc(c.methodName)+'。'+(cfg.method==='avg3'?'取最近 3 个月平均值，稳但不看趋势。':(cfg.method==='trend'?'对历史做最小二乘直线拟合再外推，越远的月份趋势衰减越多（避免越推越离谱）。':'把「趋势外推」和「近 3 月平均」各取一半，兼顾走势和稳定。'))+'</li>';
   H+='<li><b>淡旺季处理</b>：'+(c.seas.ok?('用自家历史算每个月的季节系数（12 个月平均=1.00）：先算「该月 ÷ 该年均值」的相对比抹掉年份间基数差异，再对多年取中位数（满 3 年时去掉最高最低），然后先把历史去掉季节再拟合、最后乘回目标月系数。'+fcEsc(String(Number(String(t).split('-')[1])))+' 月系数 <b>'+c.seas.idx[Number(String(t).split('-')[1])].toFixed(2)+'</b>，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量套用':'半量套用（样本不足 24 个月）')+'。'):('淡旺季采用<b>年内相对比 + 多年中位数</b>（该月 ÷ 该年均值，再多年取中位数），但当前历史只有 '+c.nAct+' 个月、不足 12 个月，月份还没走满一轮，<b>本次未套用</b> —— 硬套会把偶发波动当规律。<b>只用自己的历史算，不套行业预设值。</b>'))+'</li>';
   H+='<li><b>波动区间</b>：按历史对趋势线的偏离程度 + 相邻月份最大波动估算，<b>不是保证能落在这个范围里</b>。</li>';
   if(c.last && c.last.partial) H+='<li><b>当月折算</b>：'+fcEsc(fcMonthLabel(c.last.month))+' 还没过完，已按已过天数折算成整月（约 ×'+c.last.scale.toFixed(2)+'），否则会低估。</li>';
-  H+='<li><b>样品件数 / 大货款式数</b>：'+(c.hasCal?('按<b>实测系数</b>折算 —— 系数 = 你录入的实测值合计 ÷ 对应单数合计（共 '+(c.calRows||0)+' 个月的实测值）。一个样品单不等于一件样品、一个订单也可能多个款式，所以按「平均一个样品单几件样品 / 平均一个大货单几个款式」折算。系数在「<b>实测校准</b>」面板录入，可随时改。'):('目前来自订单产品明细解析（覆盖 '+(c.chatMonths||0)+' 个月），建议改用「<b>实测校准</b>」的实测系数（明细里的数量是下单量，会虚高）。'))+'</li>';
+  H+='<li><b>样品件数 / 大货款式数</b>：'+(c.hasCal?('按<b>固定系数</b>折算 —— <b>预测样品件数 = 预测样品单数 × 系数</b>，<b>预测大货款式数 = 预测大货单数 × 系数</b>。一个样品单不等于一件样品、一个订单也可能多个款式，所以用「平均一个样品单几件样品 / 平均一个大货单几个款式」折算。系数是初始值（按 2026 年 7~9 月 '+(c.calRows||0)+' 个月的实测值定下来后<b>固定使用</b>，不随数据自动变），在当前页「<b>件数 / 款式数系数</b>」面板可直接改，改完预测立即跟着变。'):('目前来自订单产品明细解析（覆盖 '+(c.chatMonths||0)+' 个月），建议到上面「<b>件数 / 款式数系数</b>」面板设系数（明细里的数量是下单量，会虚高）。'))+'</li>';
   H+='</ul>';
   // 三、行业节奏参考
   H+='<h2>三、行业淡旺季参考（外部规律，仅用于解释与校验）</h2>';
@@ -14395,7 +14473,7 @@ function fcReportHtml(){
   if(c.nAct<6) H+='<li><b>样本偏少</b>：只有 '+c.nAct+' 个月历史，预测误差会明显偏大，建议至少攒到 6 个月再看。</li>';
   if(!c.seas.ok) H+='<li><b>未含淡旺季</b>：历史不足 12 个月，季节性没进入模型，旺季/淡季月份的偏差可能较大。</li>';
   else if(c.seas.w<1) H+='<li><b>淡旺季系数半量套用</b>：样本 '+c.seas.n+' 条（不足 24 个月），系数本身也有噪声。</li>';
-  if(!c.hasCal) H+='<li><b>样品件数 / 大货款式数还没配系数</b>：这两个指标目前没有可靠来源，建议到上面「实测校准」填 2~3 个月的实测件数 / 款式数。</li>';
+  if(!c.hasCal) H+='<li><b>样品件数 / 大货款式数还没配系数</b>：这两个指标目前没有可靠来源，建议到上面「件数 / 款式数系数」把系数设上（初始值已经填好了）。</li>';
   else if((c.calRows||0)<2) H+='<li><b>实测样本偏少</b>：只填了 '+(c.calRows||0)+' 个月，系数容易被单个月的偶然情况带偏，建议补到 3 个月左右。</li>';
   H+='<li><b>规则变化</b>：提成规则、样品线（$'+fcNum(cfg.line)+'）、店铺运营策略一旦调整，历史规律会失效，需要重新观察。</li>';
   H+='<li><b>大环境</b>：平台流量、类目政策、汇率、客户自身库存都会影响实际下单，模型只能反映"惯性和季节"，反映不了突发事件。</li>';
@@ -14410,7 +14488,7 @@ function fcReportHtml(){
     const g=FC_INDUSTRY[k];
     H+='<li>【'+fcEsc(g.name)+'】针对旺季驱动（'+fcEsc(g.drive.join('、'))+'）提前触达历史大货客户。</li>';
   });
-  if(!c.hasCal) H+='<li>打开上面的「实测校准」，把最近 2~3 个月两个店的<b>实际样品件数</b>和<b>实际大货款式数</b>填进去，这两个指标才算有据可依。</li>';
+  if(!c.hasCal) H+='<li>到上面「件数 / 款式数系数」面板把两个店的系数填上（初始值 1.51 / 0.88、1.36 / 1.44 已经预置），这两个指标才算有据可依。</li>';
   H+='</ul>';
   // 八、口径
   H+='<h2>八、口径与可复现</h2><ul>'
