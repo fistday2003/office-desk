@@ -426,6 +426,104 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .date-group-header.done{color:var(--success);border-bottom-color:var(--success-light)}
 .todo-detail{padding:14px 16px}
 .todo-detail .card-meta{margin-bottom:10px}
+/* ============================================================
+   面料库（v2.42）：面料主数据 + 供应商台账 + 合库收敛（61 → 20~30）
+   ============================================================ */
+.fab-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:10px;margin-bottom:12px}
+.fab-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px}
+.fab-card .k{font-size:11.5px;color:var(--text-muted);line-height:1.5}
+.fab-card .v{font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.35}
+.fab-card .s{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:2px}
+.fab-card.warn{border-color:#fecaca;background:var(--danger-light)}
+.fab-card.warn .v{color:#b91c1c}
+.fab-card.ok{border-color:#a7f3d0;background:var(--success-light)}
+.fab-card.ok .v{color:#047857}
+.fab-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fab-tab{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;background:var(--card-bg);color:var(--text-secondary);cursor:pointer}
+.fab-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.fab-tag{font-size:11px;font-weight:600;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,.08);margin-left:4px}
+.fab-tab.active .fab-tag{background:rgba(255,255,255,.28)}
+.fab-hint{margin-left:auto;font-size:12px;font-weight:400;color:var(--text-muted)}
+.fab-goal{margin-left:auto;font-size:12px;font-weight:400;color:var(--text-muted);display:flex;align-items:center;gap:5px}
+.fab-goal input{width:66px;font-size:13px;padding:4px 7px}
+.fab-bar{height:9px;border-radius:5px;background:var(--border);overflow:hidden;margin:2px 0 6px}
+.fab-bar span{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .25s ease}
+.fab-bar-txt{font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.fab-conv-hint{font-size:12.5px;color:var(--text-secondary);line-height:1.75;background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:9px 12px;margin:10px 0}
+.fab-okbox{font-size:13px;color:#047857;background:var(--success-light);border:1px solid #a7f3d0;border-radius:8px;padding:12px 14px;margin-top:10px}
+.fab-igbox{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px;color:var(--text-secondary);margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)}
+.fab-iglist{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.fab-igrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;padding:7px 10px;background:#f8fafc;border:1px solid var(--border);border-radius:8px}
+.fab-ignm{font-weight:600;color:var(--text)}
+.fab-igact{margin-left:auto}
+.fab-grp{border:1px solid var(--border);border-left:3px solid #f59e0b;border-radius:10px;padding:11px 13px;margin-bottom:10px;background:var(--card-bg)}
+.fab-grp.strong{border-left-color:var(--danger)}
+.fab-grp-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px;margin-bottom:8px}
+.fab-score{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:8px;background:#fef3c7;color:#b45309;font-variant-numeric:tabular-nums}
+.fab-score.s-strong{background:#fee2e2;color:#b91c1c}
+.fab-mtag{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:8px;background:#f1f5f9;color:#64748b}
+.fab-mtag.s-strong{background:#fee2e2;color:#b91c1c}
+.fab-grp-n{font-size:11.5px;color:var(--text-muted)}
+.fab-grp-act{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.fab-grp-body{border-top:1px dashed var(--border);padding-top:7px}
+.fab-gi{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px;padding:6px 9px;border-radius:8px}
+.fab-gi.keep{background:var(--success-light)}
+.fab-gi-badge{font-size:10.5px;font-weight:700;color:#047857;background:#d1fae5;padding:1px 7px;border-radius:7px;min-width:54px;text-align:center;display:inline-block}
+.fab-gi-badge:empty{background:transparent}
+.fab-gi-nm{color:var(--text)}
+.fab-gi-code{font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.fab-gi-spec{font-size:11.5px;color:var(--text-secondary)}
+.fab-gi-price{font-size:12px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.fab-gi-sup{font-size:11.5px;color:var(--text-muted)}
+.fab-gi-use{font-size:11.5px;color:var(--text-muted)}
+.fab-grp-hint{font-size:11.5px;color:var(--text-secondary);line-height:1.7;margin-top:6px}
+.fab-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.fab-sel{width:auto;min-width:104px;font-size:13px;padding:7px 8px}
+.fab-kw{width:auto;flex:1 1 190px;min-width:140px;font-size:13px;padding:7px 10px}
+.fab-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.fab-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.fab-tbl th{text-align:left;padding:9px 8px;background:#f8fafc;color:var(--text-secondary);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.fab-th{cursor:pointer;user-select:none}
+.fab-th:hover{color:var(--primary)}
+.fab-tbl td{padding:9px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.fab-tbl tbody tr:hover{background:#f8fafc}
+.fab-tbl .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fab-tr.merged td{background:var(--bg);color:var(--text-muted)}
+.fab-tr.open td{background:var(--primary-light)}
+.fab-code{font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:12px;white-space:nowrap}
+.fab-nm{font-weight:600;color:var(--text);cursor:pointer}
+.fab-nm:hover{color:var(--primary);text-decoration:underline}
+.fab-alias{font-size:10.5px;padding:1px 6px;border-radius:7px;background:#e0e7ff;color:#4338ca;font-weight:600;margin-left:5px;white-space:nowrap}
+.fab-spec{font-size:12px;color:var(--text-secondary);white-space:nowrap}
+.fab-sup-cell{font-size:12px;color:var(--text-secondary)}
+.fab-st{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.fab-st.s-active{background:#dcfce7;color:#15803d}
+.fab-st.s-watch{background:#fef3c7;color:#b45309}
+.fab-st.s-cut{background:#f1f5f9;color:#94a3b8}
+.fab-st.s-merged{background:#e0e7ff;color:#4338ca}
+.fab-acts{white-space:nowrap;text-align:right}
+.fab-acts .btn{margin-left:4px}
+.fab-merged-to{font-size:11.5px;color:var(--text-muted);margin-right:4px}
+.fab-empty{text-align:center;color:var(--text-muted);font-size:13px;padding:26px 12px;line-height:1.9}
+.fab-det-row td{background:#f8fafc;border-bottom:2px solid var(--border)}
+.fab-det{padding:4px 2px}
+.fab-det-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 14px;margin-bottom:8px}
+.fab-kv{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--border)}
+.fab-kv .k{color:var(--text-muted);white-space:nowrap}
+.fab-kv .v{color:var(--text);font-weight:600;text-align:right;word-break:break-word}
+.fab-det-line{font-size:12.5px;color:var(--text);line-height:1.75;margin-top:4px;word-break:break-word}
+.fab-det-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fab-mg-hint{font-size:12.5px;color:var(--text-secondary);line-height:1.75;margin-bottom:10px}
+.fab-mg-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow-y:auto}
+.fab-mg-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px;padding:8px 11px;border:1px solid var(--border);border-radius:8px;cursor:pointer}
+.fab-mg-row.keep{background:var(--success-light);border-color:#a7f3d0}
+.fab-mg-row input{width:auto;margin:0}
+.fab-mg-nm{font-weight:600;color:var(--text)}
+.fab-mg-prev{font-size:12.5px;color:var(--text-secondary);line-height:1.75;margin-top:12px;padding:9px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px}
+.fab-chk{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;margin:0 12px 7px 0;cursor:pointer}
+.fab-chk input{width:auto;margin:0}
+.fab-sup-box{display:flex;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#f8fafc}
+/* ---------- 面料库 CSS 结束 ---------- */
 .project-archive .card-title{color:var(--text-secondary)}
 /* 跟进时间线 */
 .proj-log-region{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px}
@@ -1312,13 +1410,18 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-5 3.5 3.5L20 7"/><polyline points="15 7 20 7 20 12"/><line x1="20" y1="14" x2="20" y2="19" stroke-dasharray="2.5 2.5"/></svg>
         订单预测
       </button>
+      <button class="nav-item" data-tab="fabric">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+        面料库
+        <span class="nav-badge" id="fabBadge" style="display:none">0</span>
+      </button>
     </nav>
     <div class="sidebar-footer">
       <button class="nav-item" id="btnClearAll" style="color:var(--text-muted);font-size:12px">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.41 · 2026-10-16</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.42 · 2026-10-16</div>
     </div>
   </aside>
 
@@ -1485,6 +1588,16 @@ tr:hover .fr-fwd-acts{opacity:1}
       <p class="section-subtitle">把 <b>询盘 → 建客户 → 报价 → 打样 → 成交</b> 这段过程也管起来。已成交客户<b>自动</b>从「经营分析」已导入的收款流水生成（<b>零录入</b>），你只管补<b>跟进记录、阶段、下次跟进日</b>；该跟进的客户自动置顶标红，并出现在最上面「今天要处理」里。</p>
       <div id="crmContent"></div>
     </div>
+
+    <!-- TAB: 面料库（v2.42） -->
+    <div class="tab-panel" id="tab-fabric">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+        面料库
+      </div>
+      <p class="section-subtitle">面料主数据 + 供应商台账。核心是<b>合库收敛</b>：按「成分 + 克重 + 门幅 + 工艺」自动比出规格重复的面料，一组一组并掉，把在用的种类收到 <b>20~30 种</b>。<b>合并不是删除</b> —— 被合并的会留着、随时可撤销，旧名字记成别名以后照样搜得到。</p>
+      <div id="fabContent"></div>
+    </div>
   </main>
 </div>
 
@@ -1533,6 +1646,10 @@ tr:hover .fr-fwd-acts{opacity:1}
   <button class="mnav-item" data-mtab="freight">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
     运费
+  </button>
+  <button class="mnav-item" data-mtab="fabric">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+    面料
   </button>
 </nav>
 
@@ -2034,6 +2151,79 @@ tr:hover .fr-fwd-acts{opacity:1}
   </div>
 </div>
 
+<!-- ====== 面料库：新增 / 编辑面料（v2.42） ====== -->
+<div class="modal-overlay" id="modalFab" style="display:none">
+  <div class="modal" style="width:min(640px,95vw)">
+    <h3 id="modalFabTitle">新增面料</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 110px"><label>编号</label><input type="text" id="fabCode" placeholder="F-001"></div>
+      <div class="form-group" style="flex:3 1 240px"><label>常用名 *</label><input type="text" id="fabName" placeholder="如 75D 四面弹"></div>
+    </div>
+    <div class="form-group"><label>成分</label><input type="text" id="fabComp" placeholder="如 涤纶 88% + 氨纶 12%（涤纶/聚酯纤维、锦纶/尼龙、氨纶/莱卡 都认）"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 110px"><label>克重 g/m²</label><input type="number" id="fabGsm" min="0" step="1" placeholder="180"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>门幅 cm</label><input type="number" id="fabWidth" min="0" step="1" placeholder="160"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>工艺</label><select id="fabCraft"></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>用途</label><select id="fabUsage"></select></div>
+      <div class="form-group" style="flex:1 1 110px"><label>常做色</label><input type="text" id="fabColor" placeholder="如 常规黑 / 藏青"></div>
+      <div class="form-group" style="flex:1 1 100px"><label>状态</label><select id="fabStatus"></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 110px"><label>单价 CNY/m</label><input type="number" id="fabPrice" min="0" step="0.1" placeholder="14.2"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>起订量 m</label><input type="number" id="fabMoq" min="0" step="1" placeholder="500"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>用量（次）</label><input type="number" id="fabUse" min="0" step="1" placeholder="近 12 个月下过几单"></div>
+    </div>
+    <div class="form-group"><label>供应商（可多选）</label><div class="fab-sup-box" id="fabSupBox"></div></div>
+    <div class="form-group"><label>备注</label><textarea id="fabMemo" rows="2" placeholder="如 耐撕测试通过 / 客户对透气性有顾虑 / 打样结论"></textarea></div>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 6px">「在用种数」不是在这里数的 —— 用上面的「合并」把同规格的并掉，数量自己就下来了。</p>
+    <div class="modal-actions">
+      <button class="btn" id="fabDelBtn" style="margin-right:auto;display:none" onclick="fabDelCur()">删除这条</button>
+      <button class="btn" onclick="closeModal('modalFab')">取消</button>
+      <button class="btn btn-primary" onclick="fabSave()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 面料库：新增 / 编辑供应商（v2.42） ====== -->
+<div class="modal-overlay" id="modalFabSup" style="display:none">
+  <div class="modal" style="width:min(560px,95vw)">
+    <h3 id="modalFabSupTitle">新增供应商</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 200px"><label>名称 *</label><input type="text" id="fabSupName" placeholder="如 华南纺织"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>评级</label><select id="fabSupRating"></select></div>
+    </div>
+    <div class="form-group"><label>主营</label><input type="text" id="fabSupMain" placeholder="如 涤纶 / 锦纶 经编泳装布"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>地区</label><input type="text" id="fabSupRegion" placeholder="如 广东·佛山"></div>
+      <div class="form-group" style="flex:1 1 110px"><label>联系人</label><input type="text" id="fabSupContact" placeholder="如 陈经理"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 160px"><label>电话</label><input type="text" id="fabSupPhone" placeholder="如 138-0000-1001"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>账期</label><input type="text" id="fabSupTerm" placeholder="如 月结 30 天"></div>
+    </div>
+    <div class="form-group"><label>备注</label><textarea id="fabSupMemo" rows="2" placeholder="如 交期稳但价格偏高 / 小单也接"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" id="fabSupDelBtn" style="margin-right:auto;display:none" onclick="fabSupDelCur()">删除这家</button>
+      <button class="btn" onclick="closeModal('modalFabSup')">取消</button>
+      <button class="btn btn-primary" onclick="fabSupSave()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 面料库：合并这一组（v2.42） ====== -->
+<div class="modal-overlay" id="modalFabMerge" style="display:none">
+  <div class="modal" style="width:min(680px,95vw)">
+    <h3 id="modalFabMergeTitle">合并这一组</h3>
+    <div id="fabMergeBody"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalFabMerge')">取消</button>
+      <button class="btn btn-primary" onclick="fabDoMerge()">确认合并</button>
+    </div>
+  </div>
+</div>
+
 <!-- ====== SYNC SETUP MODAL (首次设置同步名称) ====== -->
 <div class="modal-overlay" id="modalPlan" style="display:none">
   <div class="modal">
@@ -2165,7 +2355,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.41';
+const APP_VERSION = 'v2.42';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -2250,6 +2440,11 @@ function loadData(){
   if(_crmr && typeof _crmr==='object' && !Array.isArray(_crmr)) crm = Object.assign(crmBlank(), _crmr);
   else crm = crmBlank();
   crmHeal();
+  // 面料库
+  const _fb = rdStore('fabric', null);
+  if(_fb && typeof _fb==='object' && !Array.isArray(_fb)) fab = Object.assign(fabBlank(), _fb);
+  else fab = fabBlank();
+  fabHeal();
   const _bz = rdStore('biz', null);
   if(_bz && typeof _bz==='object') biz = Object.assign(bizBlank(), _bz);
   if(!biz || typeof biz!=='object') biz = bizBlank();
@@ -2440,6 +2635,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
       localStorage.setItem(STORAGE_PREFIX+'forecast',JSON.stringify(fc));
       localStorage.setItem(STORAGE_PREFIX+'crm',JSON.stringify(crm));
+      localStorage.setItem(STORAGE_PREFIX+'fabric',JSON.stringify(fab));
     }catch(e){
       // 即使剥离附件元数据仍写不下：再退一步，连 files 也清空，保证文字记录绝不丢
       try{
@@ -2457,6 +2653,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
         localStorage.setItem(STORAGE_PREFIX+'forecast',JSON.stringify(fc));
         localStorage.setItem(STORAGE_PREFIX+'crm',JSON.stringify(crm));
+        localStorage.setItem(STORAGE_PREFIX+'fabric',JSON.stringify(fab));
         showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
       }catch(e2){ showToast('⚠️ 本地存储写入失败，请导出备份到百度盘', 'warning'); }
     }
@@ -2502,11 +2699,11 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + claims.length + hr.staff.length + hr.talent.length + biz.orders.length + biz.pays.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + claims.length + hr.staff.length + hr.talent.length + biz.orders.length + biz.pays.length + fab.fabrics.length + fab.suppliers.length}
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample();
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample() || fabHasSample();
 }
 
 // Clear sample data
@@ -2519,6 +2716,8 @@ function clearSampleData(){
   expenses = expenses.filter(e=>!e._sample);
   claims = claims.filter(c=>!c._sample);
   crmClearSample();
+  // 面料库的示例是给李主任当底稿改的：改过的（_touched）不清，只清没动过的
+  fabClearSample();
   saveAll();
 }
 
@@ -5283,7 +5482,7 @@ async function bkFileDataUrl(fid, mem){
   return (g && g.dataUrl) ? g.dataUrl : '';
 }
 function bkSnapshotData(){
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,forecast:fc,crm,
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,forecast:fc,crm,fabric:fab,
                 _app:'办公工作台', _version:APP_VERSION, exportedAt:new Date().toISOString()};
   try{
     const corrupt={};
@@ -6224,6 +6423,30 @@ function applyIncoming(data, label){
     if(ib.ana && typeof ib.ana === 'object') biz.ana = Object.assign({}, ib.ana, lb.ana || {});
     stat.bizAdded = u1.added + u2.added;
   }
+  // 面料库：面料 / 供应商各自按 id 只增不减；目标、已忽略组、合并史按并集合并（本机已有为准）
+  if(data && data.fabric && typeof data.fabric === 'object'){
+    const lf = (fab && typeof fab==='object' && !Array.isArray(fab)) ? fab : fabBlank();
+    const r1 = syncMergeById(lf.fabrics||[], data.fabric.fabrics||[], 'fabric');
+    const r2 = syncMergeById(lf.suppliers||[], data.fabric.suppliers||[], 'fabsup');
+    lf.fabrics = r1.list; lf.suppliers = r2.list;
+    stat.kept += r1.keepLocal + r2.keepLocal;
+    stat.newFromIncoming += r1.incomingNew + r2.incomingNew;
+    if(data.fabric.cfg && typeof data.fabric.cfg==='object'){
+      if(!lf.cfg || typeof lf.cfg!=='object') lf.cfg={};
+      const tg = Number(data.fabric.cfg.target);
+      if(!lf.cfg.target && tg>0) lf.cfg.target = Math.round(tg);
+      const ig = {};
+      (lf.cfg.ignored||[]).forEach(k=>{ if(k) ig[k]=1; });
+      (data.fabric.cfg.ignored||[]).forEach(k=>{ if(k) ig[k]=1; });
+      lf.cfg.ignored = Object.keys(ig);
+      const im = {};
+      (lf.cfg.merged||[]).forEach(r=>{ if(r && r.fromId) im[r.fromId]=r; });
+      (data.fabric.cfg.merged||[]).forEach(r=>{ if(r && r.fromId && !im[r.fromId]) im[r.fromId]=r; });
+      lf.cfg.merged = Object.keys(im).map(k=>im[k]);
+    }
+    lf.seeded = !!(lf.seeded || data.fabric.seeded);
+    fab = lf; fabHeal();
+  }
   saveAll();
   return stat;
 }
@@ -6265,12 +6488,13 @@ function asSnapshot(){
             hrStaff:hr.staff.length, hrTalent:hr.talent.length,
             bizOrders:biz.orders.length, bizPays:biz.pays.length,
             crmRecs:Object.keys(crm.recs||{}).length, crmFollows:(crm.follows||[]).length,
+            fabFabrics:((fab&&fab.fabrics)||[]).length, fabSuppliers:((fab&&fab.suppliers)||[]).length,
             attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
     dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims), hr:hr, freight:frSyncLight(),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded},
-    forecast:fc, crm:crm
+    forecast:fc, crm:crm, fabric:fab
   };
   try{
     const seen={n:0};
@@ -14712,6 +14936,7 @@ function renderCurrentTab(){
   else if(currentTab==='freight') renderFreight();
   else if(currentTab==='crm') renderCrm();
   else if(currentTab==='forecast') renderFc();
+  else if(currentTab==='fabric') renderFab();
 }
 
 function refreshAll(){
@@ -14724,6 +14949,7 @@ function refreshAll(){
   hrBadge();
   frBadge();
   crmBadge();
+  fabBadge();
 }
 
 function updateClearDemoBtn(){
@@ -15524,6 +15750,1098 @@ document.addEventListener('click', function(e){
 });
 
 // ============================================================
+//  面料库（v2.42）：面料主数据 + 供应商台账 + 合库收敛（61 → 20~30）
+//  数据键 fabric：read / write / export / import / sync 五链路全部接入
+//
+//  ⚠️ 改这个模块前必读的三条设计约定
+//  1) 「合并」不是删除 —— 被合并那条 status='merged' + mergedInto=主面料 id，记录仍在本地：
+//     名字进主面料的 aliases（以后搜老名字还搜得到）、供应商并集、用量【转移到】主面料
+//     （被合并那条的 useCount 归零，原值记在 cfg.merged[].fromUse 里），随时可「撤销合并」。
+//     🔑 不变式：合并前后——① 全库用量总和不变；② 在用种数减少 = 被并入的条数。e2e 就按这两条验。
+//  2) 「在用种数」只算 status==='active'。watch（观察）/ cut（淘汰）/ merged（已合并）都不计入收敛目标。
+//  3) 示例数据带 _sample；一旦你编辑过就再打 _touched ——「清空示例数据」只清「_sample 且没被改过」的，
+//     绝不会把你改过的样板一起删掉（这批示例本来就是给你当底稿改的）。
+// ============================================================
+const FAB_TARGET_DEFAULT = 25;
+const FAB_CRAFTS = ['经编','纬编','梭织','针织','其他'];
+const FAB_USAGES = ['布基尼','泳装','沙滩裤','BJJ 服','MMA / 训练','压缩衣','里布','网布','辅料','其他'];
+const FAB_STATUS = [['active','在用'],['watch','观察'],['cut','淘汰']];
+const FAB_RATINGS = [['A','A 主供'],['B','B 备选'],['C','C 临时']];
+const FAB_SIM_STRONG = 82;   // 相似度 ≥ 这个分 → 「很可能重复」（红）
+const FAB_SIM_WEAK   = 68;   // 相似度 ≥ 这个分 → 「可能重复」（橙）
+
+function fabBlank(){
+  return {fabrics:[], suppliers:[], cfg:{target:FAB_TARGET_DEFAULT, ignored:[], merged:[]}, seeded:false};
+}
+let fab = fabBlank();
+let fabTab = 'lib';                                    // lib=面料台账 / sup=供应商台账
+let fabFilter = {status:'', sup:'', usage:'', kw:''};
+let fabOpenId = '';                                    // 展开详情的面料 id
+let fabMergedOpen = false;                             // 「已合并」折叠区
+let fabShowIgnored = false;                             // 是否显示「已判定不用合并」的组
+let fabSort = {key:'code', dir:1};
+let fabMergeIds = [];                                  // 打开合并弹窗时那一组的 id 列表
+
+function fabHeal(){
+  if(!fab || typeof fab!=='object' || Array.isArray(fab)) fab = fabBlank();
+  if(!Array.isArray(fab.fabrics)) fab.fabrics=[];
+  if(!Array.isArray(fab.suppliers)) fab.suppliers=[];
+  if(!fab.cfg || typeof fab.cfg!=='object' || Array.isArray(fab.cfg)) fab.cfg={};
+  if(!Array.isArray(fab.cfg.ignored)) fab.cfg.ignored=[];
+  if(!Array.isArray(fab.cfg.merged)) fab.cfg.merged=[];
+  const t = Number(fab.cfg.target);
+  fab.cfg.target = (t>0) ? Math.round(t) : FAB_TARGET_DEFAULT;
+  const supIds = {};
+  fab.suppliers.forEach(s=>{ if(s && s.id) supIds[s.id]=1; });
+  fab.fabrics.forEach(f=>{
+    if(!f || typeof f!=='object') return;
+    if(!f.id) f.id = 'fb_'+uid();
+    if(!f.code) f.code = fabNextCode();
+    if(!Array.isArray(f.aliases)) f.aliases=[];
+    if(!Array.isArray(f.supplierIds)) f.supplierIds=[];
+    // 供应商被删掉就把引用摘掉，不留下悬空 id
+    f.supplierIds = f.supplierIds.filter(sid=>supIds[sid]);
+    if(f.status!=='active' && f.status!=='watch' && f.status!=='cut' && f.status!=='merged') f.status='active';
+    // mergedInto 指向的记录不存在了 → 这条不该再算「已合并」，退回在用（数据自愈）
+    if(f.status==='merged' && (!f.mergedInto || !fab.fabrics.some(x=>x && x.id===f.mergedInto))){
+      f.status='active'; f.mergedInto='';
+    }
+    f.useCount = Number(f.useCount)||0;
+    f.gsm = Number(f.gsm)||0;
+    f.width = Number(f.width)||0;
+    if(f.price===''||f.price==null) f.price=''; else f.price = Number(f.price)||0;
+  });
+  // cfg.merged 里指向已不存在的面料 → 清掉（避免「已合并」列表挂空记录）
+  fab.cfg.merged = fab.cfg.merged.filter(r=>r && r.fromId && fab.fabrics.some(x=>x && x.id===r.fromId));
+  fab.seeded = !!fab.seeded;
+}
+
+// ---------- 供应商 ----------
+function fabSup(id){ return (fab.suppliers||[]).find(s=>s && s.id===id) || null; }
+function fabSupLabel(f){
+  const ns = (f.supplierIds||[]).map(id=>{ const s=fabSup(id); return s ? s.name : ''; }).filter(Boolean);
+  return ns.length ? ns.join(' / ') : '未指定';
+}
+function fabSupUsedCount(id){
+  return fab.fabrics.filter(f=>f && f.status!=='merged' && (f.supplierIds||[]).indexOf(id)>=0).length;
+}
+function fabActiveSupCount(){
+  const seen={};
+  fab.fabrics.forEach(f=>{ if(f && f.status!=='merged') (f.supplierIds||[]).forEach(id=>{ if(fabSup(id)) seen[id]=1; }); });
+  return Object.keys(seen).length;
+}
+
+// ---------- 编号 ----------
+function fabNextCode(){
+  let max=0;
+  (fab.fabrics||[]).forEach(f=>{ const m=/^F-(\d+)$/.exec(String((f&&f.code)||'')); if(m) max=Math.max(max, parseInt(m[1],10)); });
+  return 'F-'+String(max+1).padStart(3,'0');
+}
+
+// ---------- 成分归一：涤纶/聚酯纤维/polyester → 涤纶；锦纶/尼龙/nylon → 锦纶；氨纶/莱卡/spandex → 氨纶 ----------
+const FAB_COMP_ALIAS = [
+  ['涤纶', ['涤纶','聚酯纤维','聚酯','polyester','pet']],
+  ['锦纶', ['锦纶','尼龙','nylon','pa66','pa6','pa']],
+  ['氨纶', ['氨纶','莱卡','spandex','elastane','lycra']],
+  ['棉',   ['棉','纯棉','cotton']],
+  ['粘胶', ['粘胶','人造丝','viscose','rayon']],
+  ['腈纶', ['腈纶','acrylic']],
+  ['真丝', ['真丝','桑蚕丝','silk']]
+];
+function fabCompKey(w){
+  const s=String(w||'').toLowerCase().replace(/\s+/g,'');
+  if(!s) return '';
+  for(const pair of FAB_COMP_ALIAS){
+    if(pair[1].some(a=>s===a || s.indexOf(a)===0)) return pair[0];
+  }
+  return '';
+}
+// 解析 "涤纶 88% + 氨纶 12%" → [{k:'涤纶',p:88},{k:'氨纶',p:12}]，按占比降序
+function fabComp(txt){
+  const out=[];
+  String(txt||'').split(/[+＋,，\/、\s]+/).forEach(tok=>{
+    const t=tok.trim(); if(!t) return;
+    const m=/([^\d%]+?)\s*(\d+(?:\.\d+)?)?\s*%?$/.exec(t);
+    if(!m) return;
+    const k=fabCompKey(m[1]);
+    if(!k) return;
+    const p = (m[2]!=null) ? parseFloat(m[2]) : 0;
+    if(out.some(o=>o.k===k)) return;
+    out.push({k:k, p:isNaN(p)?0:p});
+  });
+  out.sort((a,b)=>b.p-a.p);
+  return out;
+}
+const FAB_FAMILY = {'涤纶':'poly','锦纶':'polyamide','氨纶':'elastane','棉':'cellulose','粘胶':'cellulose','腈纶':'poly','真丝':'protein'};
+function fabFamilyOf(k){ return FAB_FAMILY[k] || 'other'; }
+
+// 名称相似度：去掉空格/括号/连字符后按【字符集合】算 Jaccard
+function fabNameSim(a,b){
+  const set=s=>{
+    const o={}, t=String(s||'').toLowerCase().replace(/[\s()（）·\-—\/、"']/g,'');
+    for(let i=0;i<t.length;i++) o[t.charAt(i)]=1;
+    return o;
+  };
+  const A=set(a), B=set(b);
+  const ka=Object.keys(A), kb=Object.keys(B);
+  if(!ka.length || !kb.length) return 0;
+  let inter=0; ka.forEach(c=>{ if(B[c]) inter++; });
+  const uni = ka.length + kb.length - inter;
+  return uni ? (inter/uni) : 0;
+}
+
+// 两条面料的规格相似度（0~100）。权重合计正好 100：成分 35 / 克重 25 / 门幅 15 / 工艺 10 / 名称 15
+function fabSim(a,b){
+  let s=0;
+  const ca=fabComp(a.comp), cb=fabComp(b.comp);
+  if(ca.length && cb.length){
+    if(ca[0].k===cb[0].k){
+      const s1=ca[1], s2=cb[1];
+      let secSame;
+      if(s1 && s2) secSame = (s1.k===s2.k && Math.abs(s1.p-s2.p)<=3);
+      else secSame = (!s1 && !s2);
+      s += secSame ? 35 : 20;
+    }else if(fabFamilyOf(ca[0].k)===fabFamilyOf(cb[0].k)) s += 10;
+  }
+  const ga=Number(a.gsm)||0, gb=Number(b.gsm)||0;
+  if(ga>0 && gb>0){
+    const d=Math.abs(ga-gb)/Math.max(ga,gb);
+    if(d<=0.03) s+=25; else if(d<=0.08) s+=15; else if(d<=0.15) s+=6;
+  }
+  const wa=Number(a.width)||0, wb=Number(b.width)||0;
+  if(wa>0 && wb>0){
+    const dw=Math.abs(wa-wb);
+    if(dw<=2) s+=15; else if(dw<=5) s+=8;
+  }
+  if(a.craft && b.craft && a.craft===b.craft) s+=10;
+  const j=fabNameSim(a.name,b.name);
+  if(j>=1) s+=15; else if(j>=0.5) s+=10;
+  return Math.min(100, Math.round(s));
+}
+
+// 并查集：把「相似度 ≥ 弱阈值」的面料连成组，返回 [{key, ids, items, score, strong, use}]
+function fabGroups(){
+  const list = fab.fabrics.filter(f=>f && f.status!=='merged');
+  const n=list.length;
+  const p=[]; for(let i=0;i<n;i++) p[i]=i;
+  const find=i=>{ while(p[i]!==i){ p[i]=p[p[i]]; i=p[i]; } return i; };
+  const uni=(i,j)=>{ const a=find(i), b=find(j); if(a!==b) p[b]=a; };
+  const cache={};
+  // 🔑 用途不同的两条不并组。
+  //   否则会出现「A~B 勉强像、B~C 勉强像，但 A~C 完全不像」的串联假重复：
+  //   实测 F-006 抗氯泳装布 就是桥 —— 它跟 75D 四面弹 各 68 分、跟 MMA 短裤弹力布 75 分，
+  //   结果把「布基尼 / 泳装 / MMA」三种用途的面料串成了一大组。
+  //   并查集本身没有「方向」，只能在这里把跨用途的边掐掉。
+  const useClash=(a,b)=> !!(a.usage && b.usage && a.usage!==b.usage);
+  for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){
+    const sc=fabSim(list[i], list[j]);
+    cache[i+'_'+j]=sc;
+    if(sc>=FAB_SIM_WEAK && !useClash(list[i], list[j])) uni(i,j);
+  }
+  const bucket={};
+  for(let i=0;i<n;i++){ const r=find(i); if(!bucket[r]) bucket[r]=[]; bucket[r].push(i); }
+  const out=[];
+  Object.keys(bucket).forEach(r=>{
+    const idxs=bucket[r];
+    if(idxs.length<2) return;
+    const items=idxs.map(i=>list[i]);
+    let hi=0;
+    for(let a=0;a<idxs.length;a++) for(let b=a+1;b<idxs.length;b++){
+      const sc=fabSim(items[a],items[b]);
+      if(sc>hi) hi=sc;
+    }
+    const ids=items.map(f=>f.id).slice().sort();
+    out.push({key:ids.join(','), ids:ids, items:items, score:hi,
+              strong:(hi>=FAB_SIM_STRONG),
+              use:items.reduce((t,f)=>t+(Number(f.useCount)||0),0)});
+  });
+  out.sort((a,b)=> (b.strong-a.strong) || (b.items.length-a.items.length) || (b.score-a.score) || (b.use-a.use));
+  return out;
+}
+// 一组里建议保留哪一条：用量最多的（并列时按编号靠前）
+function fabSuggestKeep(items){
+  const arr=items.slice();
+  arr.sort((a,b)=> ((Number(b.useCount)||0)-(Number(a.useCount)||0)) || String(a.code||'').localeCompare(String(b.code||'')));
+  return arr[0];
+}
+function fabIgnoredKeySet(){
+  const o={}; (fab.cfg.ignored||[]).forEach(k=>{ o[k]=1; });
+  return o;
+}
+function fabPendGroups(){
+  const ig=fabIgnoredKeySet();
+  return fabGroups().filter(g=>!ig[g.key]);
+}
+function fabLiveFabrics(){ return fab.fabrics.filter(f=>f && f.status==='active'); }
+
+// ---------- 小工具 ----------
+function fabNum(v){ const n=Number(v); if(!isFinite(n)) return '0'; return (Math.round(n*100)/100).toString(); }
+function fabSpec(f){
+  const p=[];
+  if(f.comp) p.push(f.comp);
+  if(f.gsm) p.push(f.gsm+'g');
+  if(f.width) p.push(f.width+'cm');
+  if(f.craft) p.push(f.craft);
+  return p.length ? p.join(' · ') : '规格未填';
+}
+function fabNum10(v){ return (Number(v)>0) ? v : 0; }
+
+// ---------- 角标：还有几组可能重复没处理 ----------
+function fabBadge(){
+  const el=document.getElementById('fabBadge');
+  if(!el) return;
+  let n=0;
+  try{ n=fabPendGroups().length; }catch(e){ n=0; }
+  el.textContent=n;
+  el.style.display = n>0 ? '' : 'none';
+}
+
+// 本项目没有通用 openModal，弹窗一律把 overlay 设成 flex
+function fabShowModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
+
+// ============================================================
+//  渲染
+// ============================================================
+function renderFab(){
+  const box=document.getElementById('fabContent');
+  if(!box) return;
+  fabHeal();
+  let h='';
+  h+=fabCardsHtml();
+  h+='<div class="fab-tabs">'
+    +'<button class="fab-tab'+(fabTab==='lib'?' active':'')+'" onclick="fabSetTab(\'lib\')">面料台账 <span class="fab-tag">'+fab.fabrics.filter(f=>f.status!=='merged').length+'</span></button>'
+    +'<button class="fab-tab'+(fabTab==='sup'?' active':'')+'" onclick="fabSetTab(\'sup\')">供应商 <span class="fab-tag">'+fab.suppliers.length+'</span></button>'
+    +'</div>';
+  if(fabTab==='lib'){ h+=fabConvergeHtml(); h+=fabLibHtml(); }
+  else { h+=fabSupHtml(); }
+  box.innerHTML=h;
+}
+
+function fabCard(k,v,sub,warn,ok){
+  return '<div class="fab-card'+(warn?' warn':'')+(ok?' ok':'')+'">'
+    +'<div class="k">'+escHtml(k)+'</div><div class="v">'+escHtml(String(v))+'</div>'
+    +'<div class="s">'+escHtml(sub||'')+'</div></div>';
+}
+function fabCardsHtml(){
+  const live=fabLiveFabrics();
+  const pend=fabPendGroups();
+  const mergedN=fab.fabrics.filter(f=>f.status==='merged').length;
+  const target=fab.cfg.target;
+  const over=Math.max(0, live.length-target);
+  let h='<div class="fab-cards">';
+  h+=fabCard('在用面料', live.length, '目标 ≤ '+target+' 种');
+  h+=fabCard('供应商', fab.suppliers.length, '在供 '+fabActiveSupCount()+' 家');
+  h+=fabCard('可能重复', pend.length+' 组', pend.length? '往下看，逐组处理' : '暂时没发现重复', pend.length>0);
+  h+=fabCard('已合并', mergedN+' 种', mergedN? '可随时撤销' : '还没合并过');
+  if(over>0) h+=fabCard('还要收掉', over+' 种', '再合并 '+over+' 种就达标', true);
+  else h+=fabCard('收敛状态', '已达标', '在用 '+live.length+' ≤ 目标 '+target, false, true);
+  h+='</div>';
+  return h;
+}
+
+// ---------- 🎯 合库收敛面板（本模块最核心的一屏，放最上面） ----------
+function fabConvergeHtml(){
+  const live=fabLiveFabrics();
+  const target=fab.cfg.target;
+  const all=fabGroups();
+  const ig=fabIgnoredKeySet();
+  const pend=all.filter(g=>!ig[g.key]);
+  const done=all.filter(g=>ig[g.key]);
+  const mergedN=fab.fabrics.filter(f=>f.status==='merged').length;
+  const over=Math.max(0, live.length-target);
+  const barPct = (live.length>0) ? Math.min(100, Math.round(target/live.length*100)) : 100;
+  const saveable = pend.reduce((t,g)=>t+(g.items.length-1),0);
+
+  let h='<div class="biz-panel fab-conv"><h4>🎯 合库收敛'
+    +'<span class="tag">在用 '+live.length+' 种 → 目标 '+target+' 种</span>'
+    +'<span class="fab-goal">目标 <input type="number" id="fabTarget" min="1" max="999" value="'+target+'" onchange="fabSetTarget(this.value)"> 种</span>'
+    +'</h4>';
+  h+='<div class="fab-bar"><span style="width:'+barPct+'%"></span></div>';
+  h+='<div class="fab-bar-txt">'
+    +(over>0
+      ? ('还差 <b>'+over+'</b> 种要收掉'+(saveable? ('（下面 '+pend.length+' 组全合并掉正好能收 '+saveable+' 种）') : ''))
+      : ('✓ 已达标：在用 <b>'+live.length+'</b> 种，不超目标 '+target+' 种'))
+    +'　·　已合并 '+mergedN+' 种'
+    +(done.length? ('　·　已判定「不用合并」'+done.length+' 组') : '')
+    +'</div>';
+
+  if(!live.length){
+    h+='<div class="fab-empty">还没有面料。<br>点下面「＋ 新增面料」手工录一条，或先去右侧「供应商」把供货的厂家建好。</div>';
+  }else if(!pend.length){
+    h+='<div class="fab-okbox">✓ 没发现可能重复的面料——规格都拉开距离了。</div>';
+  }else{
+    h+='<div class="fab-conv-hint">下面是按<b>「成分 + 克重 + 门幅 + 工艺」</b>自动比出来的疑似重复组。'
+      +'点「合并这组」挑一条留下，其余的会进最下面「已合并」区（<b>不删除、可撤销</b>，老名字记成别名方便搜）。</div>';
+    pend.forEach((g,i)=>{ h+=fabGroupCardHtml(g,i); });
+  }
+
+  // 已判定「不用合并」的组
+  if(done.length){
+    h+='<div class="fab-igbox">'
+      +'<span>已判定「不用合并」的 <b>'+done.length+'</b> 组</span>'
+      +'<button class="btn btn-sm" onclick="fabToggleIgnored()">'+(fabShowIgnored?'收起':'看一眼')+'</button>'
+      +'<button class="btn btn-sm" onclick="fabUnignoreAll()">全部恢复提示</button>'
+      +'</div>';
+    if(fabShowIgnored){
+      h+='<div class="fab-iglist">';
+      done.forEach(g=>{
+        h+='<div class="fab-igrow">'
+          +g.items.map(f=>'<span class="fab-ignm">'+escHtml(f.name)+'</span>').join('<span style="color:var(--text-muted)">·</span>')
+          +'<span class="fab-igact"><button class="btn btn-sm" onclick="fabUnignore(\''+escAttr(g.key)+'\')">恢复提示</button></span>'
+          +'</div>';
+      });
+      h+='</div>';
+    }
+  }
+
+  // 已合并清单
+  const recs=(fab.cfg.merged||[]).slice().sort((a,b)=>(b.at||0)-(a.at||0));
+  if(recs.length){
+    h+='<div class="fab-igbox">'
+      +'<span>已合并 <b>'+recs.length+'</b> 种</span>'
+      +'<button class="btn btn-sm" onclick="fabToggleMerged()">'+(fabMergedOpen?'收起':'展开')+'</button></div>';
+    if(fabMergedOpen){
+      h+='<div class="fab-iglist">';
+      recs.forEach(r=>{
+        h+='<div class="fab-igrow">'
+          +'<span class="fab-ignm">'+escHtml((r.fromCode?r.fromCode+' ':'')+r.fromName)+'</span>'
+          +'<span style="color:var(--text-muted)">→ 并入</span>'
+          +'<span class="fab-ignm">'+escHtml(r.toName)+'</span>'
+          +'<span style="font-size:11.5px;color:var(--text-muted)">用量 '+fabNum10(r.fromUse)+' 次已转过去</span>'
+          +'<span class="fab-igact"><button class="btn btn-sm" data-fab-unmerge="'+escAttr(r.fromId)+'">撤销合并</button></span>'
+          +'</div>';
+      });
+      h+='</div>';
+    }
+  }
+  h+='</div>';
+  return h;
+}
+
+function fabGroupCardHtml(g, idx){
+  const keep=fabSuggestKeep(g.items);
+  let h='<div class="fab-grp'+(g.strong?' strong':'')+'">';
+  h+='<div class="fab-grp-head"><b>第 '+(idx+1)+' 组</b>'
+    +'<span class="fab-score'+(g.strong?' s-strong':'')+'">相似度 '+g.score+'%</span>'
+    +'<span class="fab-mtag'+(g.strong?' s-strong':'')+'">'+(g.strong?'很可能重复':'可能重复')+'</span>'
+    +'<span class="fab-grp-n">'+g.items.length+' 种 · 合计用量 '+g.use+' 次</span>'
+    +'<span class="fab-grp-act">'
+    +'<button class="btn btn-primary btn-sm" data-fab-merge="'+escAttr(g.key)+'">合并这组</button>'
+    +'<button class="btn btn-sm" data-fab-ignore="'+escAttr(g.key)+'">不用合并</button>'
+    +'</span></div>';
+  h+='<div class="fab-grp-body">';
+  g.items.forEach(f=>{
+    const isKeep=(f.id===keep.id);
+    h+='<div class="fab-gi'+(isKeep?' keep':'')+'">'
+      +'<span class="fab-gi-badge">'+(isKeep?'建议保留':'')+'</span>'
+      +'<b class="fab-gi-nm">'+escHtml(f.name)+'</b>'
+      +(f.code? '<span class="fab-gi-code">'+escHtml(f.code)+'</span>' : '')
+      +'<span class="fab-gi-spec">'+escHtml(fabSpec(f))+'</span>'
+      +'<span class="fab-gi-price">'+((f.price===''||f.price==null)?'单价未填':'¥'+fabNum(f.price)+'/m')+'</span>'
+      +'<span class="fab-gi-sup">'+escHtml(fabSupLabel(f))+'</span>'
+      +'<span class="fab-gi-use">用量 '+fabNum10(f.useCount)+' 次</span>'
+      +'</div>';
+  });
+  const prices=g.items.map(f=>Number(f.price)).filter(v=>v>0);
+  if(prices.length>1){
+    const mn=Math.min.apply(null,prices), mx=Math.max.apply(null,prices);
+    if(mx>mn){
+      h+='<div class="fab-grp-hint">同类报价差 <b>¥'+fabNum(mn)+' ~ ¥'+fabNum(mx)+'/m</b>（差 ¥'+fabNum(mx-mn)+'/m）'
+        +'　·　合并后按最低价那家谈，一年省下来的就是这 '+fabNum(mx-mn)+' 元/m × 用量</div>';
+    }
+  }
+  h+='<div class="fab-grp-hint">合并后：「<b>'+escHtml(keep.name)+'</b>」用量变 <b>'+(g.use)+'</b> 次，'
+    +'其余 '+(g.items.length-1)+' 种进「已合并」区（不删除、可撤销），旧名字记成别名、以后搜得到</div>';
+  h+='</div></div>';
+  return h;
+}
+
+// ---------- 面料台账 ----------
+function fabFiltered(){
+  let list=fab.fabrics.filter(f=>{
+    if(!f) return false;
+    if(fabFilter.status==='__merged'){ if(f.status!=='merged') return false; }
+    else if(fabFilter.status){ if(f.status!==fabFilter.status) return false; }
+    else { if(f.status==='merged') return false; }
+    if(fabFilter.sup && (f.supplierIds||[]).indexOf(fabFilter.sup)<0) return false;
+    if(fabFilter.usage && f.usage!==fabFilter.usage) return false;
+    if(fabFilter.kw){
+      const k=fabFilter.kw.toLowerCase();
+      const hay=[f.name,f.code,f.comp,f.usage,f.color,f.memo,fabSupLabel(f)].concat(f.aliases||[]).join(' ').toLowerCase();
+      if(hay.indexOf(k)<0) return false;
+    }
+    return true;
+  });
+  const k=fabSort.key, dir=fabSort.dir;
+  list.sort((a,b)=>{
+    let va, vb;
+    if(k==='useCount'||k==='price'||k==='gsm'||k==='width'){ va=Number(a[k])||0; vb=Number(b[k])||0; }
+    else { va=String(a[k]||''); vb=String(b[k]||''); }
+    let c = (va<vb) ? -1 : (va>vb ? 1 : 0);
+    if(!c) c = String(a.code||'').localeCompare(String(b.code||''));
+    return c*dir;
+  });
+  return list;
+}
+function fabLibHtml(){
+  const list=fabFiltered();
+  const notMerged=fab.fabrics.filter(f=>f.status!=='merged').length;
+  let h='<div class="biz-panel"><h4>面料台账 <span class="tag" id="fabCount">'+list.length+' / '+notMerged+'</span>'
+    +'<span class="fab-hint">点面料名展开详情 · 点表头可排序 · <b>在用</b>才计入收敛目标</span></h4>';
+  h+='<div class="fab-toolbar">';
+  h+='<select class="fab-sel" onchange="fabSetFilter(\'status\',this.value)">'
+    +'<option value="">全部状态</option>'
+    +FAB_STATUS.map(x=>'<option value="'+x[0]+'"'+(x[0]===fabFilter.status?' selected':'')+'>'+x[1]+'</option>').join('')
+    +'<option value="__merged"'+(fabFilter.status==='__merged'?' selected':'')+'>已合并</option>'
+    +'</select>';
+  h+='<select class="fab-sel" onchange="fabSetFilter(\'sup\',this.value)">'
+    +'<option value="">全部供应商</option>'
+    +fab.suppliers.map(s=>'<option value="'+escAttr(s.id)+'"'+(s.id===fabFilter.sup?' selected':'')+'>'+escHtml(s.name)+'</option>').join('')
+    +'</select>';
+  h+='<select class="fab-sel" onchange="fabSetFilter(\'usage\',this.value)">'
+    +'<option value="">全部用途</option>'
+    +FAB_USAGES.map(u=>'<option value="'+escAttr(u)+'"'+(u===fabFilter.usage?' selected':'')+'>'+escHtml(u)+'</option>').join('')
+    +'</select>';
+  h+='<input class="fab-kw" id="fabKw" type="text" placeholder="搜名称 / 编号 / 成分 / 别名 / 供应商" value="'+escAttr(fabFilter.kw)+'" oninput="fabSetFilter(\'kw\',this.value)">';
+  h+='<button class="btn btn-primary" onclick="fabNew()">＋ 新增面料</button>';
+  h+='<button class="btn btn-ghost" onclick="fabExportCsv()">导出 CSV</button>';
+  h+='</div>';
+  h+='<div id="fabTableWrap">'+fabTableHtml()+'</div>';
+  h+='<div class="fc-note">「<b>用量</b>」= 近 12 个月这面料被下了几次订单，用来决定合并时留哪一种（用量大的留下）。<br>'
+    +'「<b>别名</b>」是合并时自动记下的旧名字 —— 搜老名字照样能搜到这条。</div>';
+  h+='</div>';
+  return h;
+}
+function fabTableHtml(){
+  const list=fabFiltered();
+  if(!list.length){
+    return '<div class="fab-empty">没有符合条件的面料。'
+      +'<div style="margin-top:12px"><button class="btn btn-primary" onclick="fabNew()">＋ 新增面料</button></div></div>';
+  }
+  const arrow=k=> (fabSort.key===k ? (fabSort.dir>0?' ▲':' ▼') : '');
+  let h='<div class="fab-tbl-wrap"><table class="fab-tbl"><thead><tr>';
+  h+='<th class="fab-th" onclick="fabSetSort(\'code\')">编号'+arrow('code')+'</th>';
+  h+='<th class="fab-th" onclick="fabSetSort(\'name\')">名称'+arrow('name')+'</th>';
+  h+='<th>规格</th>';
+  h+='<th class="fab-th" onclick="fabSetSort(\'usage\')">用途'+arrow('usage')+'</th>';
+  h+='<th class="fab-th r" onclick="fabSetSort(\'price\')">单价'+arrow('price')+'</th>';
+  h+='<th>供应商</th>';
+  h+='<th class="fab-th r" onclick="fabSetSort(\'useCount\')">用量'+arrow('useCount')+'</th>';
+  h+='<th>状态</th>';
+  h+='<th class="r">操作</th></tr></thead><tbody>';
+  list.forEach(f=>{
+    const open=(fabOpenId===f.id);
+    h+='<tr class="fab-tr'+(f.status==='merged'?' merged':'')+(open?' open':'')+'">';
+    h+='<td class="fab-code">'+escHtml(f.code||'')+'</td>';
+    h+='<td><span class="fab-nm" data-fab-open="'+escAttr(f.id)+'">'+escHtml(f.name)+'</span>'
+      +((f.aliases&&f.aliases.length)? '<span class="fab-alias" title="'+escAttr(f.aliases.join(' / '))+'">别名 '+f.aliases.length+'</span>' : '')
+      +'</td>';
+    h+='<td class="fab-spec">'+escHtml(fabSpec(f))+'</td>';
+    h+='<td>'+escHtml(f.usage||'—')+'</td>';
+    h+='<td class="r">'+((f.price===''||f.price==null)?'<span style="color:var(--text-muted)">—</span>':('¥'+fabNum(f.price)))+'</td>';
+    h+='<td class="fab-sup-cell">'+escHtml(fabSupLabel(f))+'</td>';
+    h+='<td class="r">'+fabNum10(f.useCount)+'</td>';
+    h+='<td>'+fabStatusTag(f)+'</td>';
+    h+='<td class="fab-acts">';
+    if(f.status==='merged'){
+      h+='<span class="fab-merged-to">已并入 '+escHtml((fab.fabrics.find(x=>x && x.id===f.mergedInto)||{}).name||'—')+'</span>'
+        +'<button class="btn btn-sm" data-fab-unmerge="'+escAttr(f.id)+'">撤销</button>';
+    }else{
+      h+='<button class="btn btn-sm" data-fab-edit="'+escAttr(f.id)+'">编辑</button>'
+        +'<button class="btn btn-sm" data-fab-del="'+escAttr(f.id)+'">删除</button>';
+    }
+    h+='</td></tr>';
+    if(open) h+='<tr class="fab-det-row"><td colspan="9">'+fabDetailHtml(f)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  return h;
+}
+function fabStatusTag(f){
+  if(f.status==='merged') return '<span class="fab-st s-merged">已合并</span>';
+  if(f.status==='watch')  return '<span class="fab-st s-watch">观察</span>';
+  if(f.status==='cut')    return '<span class="fab-st s-cut">淘汰</span>';
+  return '<span class="fab-st s-active">在用</span>';
+}
+function fabDetailHtml(f){
+  let h='<div class="fab-det">';
+  h+='<div class="fab-det-grid">';
+  const kv=(k,v)=>'<div class="fab-kv"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';
+  h+=kv('编号', escHtml(f.code||'—'));
+  h+=kv('常用名', escHtml(f.name||'—'));
+  h+=kv('成分', escHtml(f.comp||'—'));
+  h+=kv('克重', f.gsm? (f.gsm+' g/m²') : '—');
+  h+=kv('门幅', f.width? (f.width+' cm') : '—');
+  h+=kv('工艺', escHtml(f.craft||'—'));
+  h+=kv('用途', escHtml(f.usage||'—'));
+  h+=kv('常做色', escHtml(f.color||'—'));
+  h+=kv('单价', (f.price===''||f.price==null)?'—':('¥'+fabNum(f.price)+' /m'));
+  h+=kv('起订量', f.moq? (fabNum(f.moq)+' m') : '—');
+  h+=kv('用量', fabNum10(f.useCount)+' 次');
+  h+=kv('供应商', escHtml(fabSupLabel(f)));
+  h+='</div>';
+  if(f.aliases && f.aliases.length) h+='<div class="fab-det-line"><b>别名</b>（搜这些名字也能搜到）：'+escHtml(f.aliases.join('  ·  '))+'</div>';
+  if(f.memo) h+='<div class="fab-det-line"><b>备注</b>：'+escHtml(f.memo)+'</div>';
+  if(f.status==='merged'){
+    const to=fab.fabrics.find(x=>x && x.id===f.mergedInto);
+    h+='<div class="fab-det-line"><b>已合并</b>：这条已并入「'+escHtml(to?to.name:'—')+'」，用量也转过去了。点上面「撤销」可以还原。</div>';
+  }
+  h+='<div class="fab-det-act">'
+    +'<button class="btn btn-sm" data-fab-edit="'+escAttr(f.id)+'">编辑</button>'
+    +(f.status==='merged'? '<button class="btn btn-sm" data-fab-unmerge="'+escAttr(f.id)+'">撤销合并</button>' : '')
+    +'<button class="btn btn-sm btn-primary" onclick="fabNewSibling(\''+escAttr(f.id)+'\')">复制一条新增</button>'
+    +'</div>';
+  h+='</div>';
+  return h;
+}
+
+// ---------- 供应商台账 ----------
+function fabSupHtml(){
+  let h='<div class="biz-panel"><h4>供应商台账 <span class="tag">'+fab.suppliers.length+' 家</span>'
+    +'<span class="fab-hint">「在供种类」= 这家现在供几种面料</span></h4>';
+  h+='<div class="fab-toolbar">'
+    +'<button class="btn btn-primary" onclick="fabSupNew()">＋ 新增供应商</button>'
+    +'<button class="btn btn-ghost" onclick="fabExportSupCsv()">导出 CSV</button>'
+    +'</div>';
+  if(!fab.suppliers.length){
+    h+='<div class="fab-empty">还没有供应商。<br>先建几家，回「面料台账」就能给面料选供应商了。</div>';
+  }else{
+    h+='<div class="fab-tbl-wrap"><table class="fab-tbl"><thead><tr>'
+      +'<th>名称</th><th>主营</th><th>地区</th><th>联系人</th><th>电话</th><th>账期</th><th>评级</th>'
+      +'<th class="r">在供种类</th><th class="r">操作</th></tr></thead><tbody>';
+    fab.suppliers.forEach(s=>{
+      h+='<tr>'
+        +'<td><b>'+escHtml(s.name||'')+'</b></td>'
+        +'<td class="fab-spec">'+escHtml(s.main||'—')+'</td>'
+        +'<td>'+escHtml(s.region||'—')+'</td>'
+        +'<td>'+escHtml(s.contact||'—')+'</td>'
+        +'<td>'+escHtml(s.phone||'—')+'</td>'
+        +'<td>'+escHtml(s.payTerm||'—')+'</td>'
+        +'<td>'+fabRatingTag(s.rating)+'</td>'
+        +'<td class="r">'+fabSupUsedCount(s.id)+'</td>'
+        +'<td class="fab-acts">'
+        +'<button class="btn btn-sm" data-fab-sup-edit="'+escAttr(s.id)+'">编辑</button>'
+        +'<button class="btn btn-sm" data-fab-sup-del="'+escAttr(s.id)+'">删除</button>'
+        +'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="fc-note">删供应商不会删面料 —— 只是把面料上的这家引用摘掉（面料会显示成「未指定」）。</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function fabRatingTag(r){
+  if(!r) return '<span class="fab-st s-watch">未评级</span>';
+  const cls = r==='A' ? 's-active' : (r==='B' ? 's-watch' : 's-cut');
+  return '<span class="fab-st '+cls+'">'+escHtml(r)+'</span>';
+}
+
+// ---------- 交互：页签 / 筛选 / 排序 / 折叠 ----------
+function fabSetTab(v){ fabTab=v; fabOpenId=''; renderFab(); }
+function fabSetTarget(v){
+  const n=parseInt(v,10);
+  fab.cfg.target=(isNaN(n)||n<1)?FAB_TARGET_DEFAULT:n;
+  saveAll(); renderFab(); fabBadge();
+  showToast('✓ 收敛目标改成 '+fab.cfg.target+' 种','info');
+}
+function fabSetFilter(k,v){
+  if(fabFilter[k]===v) return;
+  fabFilter[k]=v;
+  // 搜索框是 oninput 触发的：只重画表格，不重画整个面板，否则输入框会失焦
+  if(k==='kw'){
+    const w=document.getElementById('fabTableWrap');
+    if(w){ w.innerHTML=fabTableHtml(); const c=document.getElementById('fabCount');
+      if(c) c.textContent=fabFiltered().length+' / '+fab.fabrics.filter(f=>f.status!=='merged').length; return; }
+  }
+  renderFab();
+}
+function fabSetSort(k){
+  if(fabSort.key===k) fabSort.dir=-fabSort.dir;
+  else { fabSort.key=k; fabSort.dir=1; }
+  const w=document.getElementById('fabTableWrap');
+  if(w) w.innerHTML=fabTableHtml(); else renderFab();
+}
+function fabToggleOpen(id){ fabOpenId = (fabOpenId===id)? '' : id; renderFab(); }
+function fabToggleMerged(){ fabMergedOpen=!fabMergedOpen; renderFab(); }
+function fabToggleIgnored(){ fabShowIgnored=!fabShowIgnored; renderFab(); }
+function fabShowAllMerged(){ fabFilter.status='__merged'; renderFab(); }
+function fabResetFilter(){ fabFilter={status:'',sup:'',usage:'',kw:''}; renderFab(); }
+
+// ============================================================
+//  新增 / 编辑 面料
+// ============================================================
+let fabEditId = null;
+function fabSupCheckboxesHtml(sel){
+  if(!fab.suppliers.length) return '<span style="font-size:12.5px;color:var(--text-muted)">还没有供应商，先去「供应商」页签建一家</span>';
+  return fab.suppliers.map(s=>'<label class="fab-chk"><input type="checkbox" value="'+escAttr(s.id)+'"'+(sel.indexOf(s.id)>=0?' checked':'')+'>'+escHtml(s.name)+'</label>').join('');
+}
+function fabFillSel(id, opts, val, allowEmpty){
+  const el=document.getElementById(id); if(!el) return;
+  let h=allowEmpty? '<option value="">未填</option>' : '';
+  h+=opts.map(o=>'<option value="'+escAttr(o)+'">'+escHtml(o)+'</option>').join('');
+  el.innerHTML=h;
+  if(val && opts.indexOf(val)<0){ const op=document.createElement('option'); op.value=val; op.textContent=val; el.appendChild(op); }
+  el.value=val||'';
+}
+function fabNew(){
+  fabEditId=null;
+  document.getElementById('modalFabTitle').textContent='新增面料';
+  document.getElementById('fabCode').value=fabNextCode();
+  document.getElementById('fabName').value='';
+  document.getElementById('fabComp').value='';
+  document.getElementById('fabGsm').value='';
+  document.getElementById('fabWidth').value='';
+  fabFillSel('fabCraft', FAB_CRAFTS, '经编', false);
+  fabFillSel('fabUsage', FAB_USAGES, '布基尼', false);
+  document.getElementById('fabColor').value='';
+  document.getElementById('fabPrice').value='';
+  document.getElementById('fabMoq').value='';
+  document.getElementById('fabUse').value='';
+  fabFillSel('fabStatus', FAB_STATUS.map(x=>x[1]), '在用', false);
+  document.getElementById('fabMemo').value='';
+  document.getElementById('fabSupBox').innerHTML=fabSupCheckboxesHtml([]);
+  document.getElementById('fabDelBtn').style.display='none';
+  fabShowModal('modalFab');
+}
+function fabNewSibling(id){
+  const f=fab.fabrics.find(x=>x && x.id===id); if(!f) return;
+  fabNew();
+  document.getElementById('modalFabTitle').textContent='复制一条新增（基于「'+f.name+'」）';
+  document.getElementById('fabCode').value=fabNextCode();
+  document.getElementById('fabName').value=f.name+'（改这条）';
+  document.getElementById('fabComp').value=f.comp||'';
+  document.getElementById('fabGsm').value=f.gsm||'';
+  document.getElementById('fabWidth').value=f.width||'';
+  fabFillSel('fabCraft', FAB_CRAFTS, f.craft||'经编', false);
+  fabFillSel('fabUsage', FAB_USAGES, f.usage||'布基尼', false);
+  document.getElementById('fabColor').value=f.color||'';
+  document.getElementById('fabPrice').value=(f.price===''||f.price==null)?'':f.price;
+  document.getElementById('fabMoq').value=f.moq||'';
+  document.getElementById('fabUse').value=f.useCount||'';
+  document.getElementById('fabMemo').value=f.memo||'';
+  fabFillSel('fabStatus', FAB_STATUS.map(x=>x[1]), '在用', false);
+  document.getElementById('fabSupBox').innerHTML=fabSupCheckboxesHtml((f.supplierIds||[]).slice());
+}
+function fabEdit(id){
+  const f=fab.fabrics.find(x=>x && x.id===id); if(!f) return;
+  fabEditId=id;
+  document.getElementById('modalFabTitle').textContent='编辑面料';
+  document.getElementById('fabCode').value=f.code||'';
+  document.getElementById('fabName').value=f.name||'';
+  document.getElementById('fabComp').value=f.comp||'';
+  document.getElementById('fabGsm').value=f.gsm||'';
+  document.getElementById('fabWidth').value=f.width||'';
+  fabFillSel('fabCraft', FAB_CRAFTS, f.craft||'经编', false);
+  fabFillSel('fabUsage', FAB_USAGES, f.usage||'布基尼', false);
+  document.getElementById('fabColor').value=f.color||'';
+  document.getElementById('fabPrice').value=(f.price===''||f.price==null)?'':f.price;
+  document.getElementById('fabMoq').value=f.moq||'';
+  document.getElementById('fabUse').value=f.useCount||'';
+  const label = (f.status==='merged') ? '在用' : (FAB_STATUS.find(x=>x[0]===f.status)||FAB_STATUS[0])[1];
+  fabFillSel('fabStatus', FAB_STATUS.map(x=>x[1]), label, false);
+  document.getElementById('fabMemo').value=f.memo||'';
+  document.getElementById('fabSupBox').innerHTML=fabSupCheckboxesHtml((f.supplierIds||[]).slice());
+  document.getElementById('fabDelBtn').style.display='';
+  fabShowModal('modalFab');
+}
+function fabReadStatus(label){
+  const hit=FAB_STATUS.find(x=>x[1]===label);
+  return hit? hit[0] : 'active';
+}
+function fabSave(){
+  const name=document.getElementById('fabName').value.trim();
+  if(!name){ showToast('请填「常用名」'); return; }
+  const supIds=[];
+  document.querySelectorAll('#fabSupBox input[type=checkbox]').forEach(cb=>{ if(cb.checked) supIds.push(cb.value); });
+  const priceRaw=document.getElementById('fabPrice').value.trim();
+  const payload={
+    code: document.getElementById('fabCode').value.trim() || fabNextCode(),
+    name: name,
+    comp: document.getElementById('fabComp').value.trim(),
+    gsm: Number(document.getElementById('fabGsm').value)||0,
+    width: Number(document.getElementById('fabWidth').value)||0,
+    craft: document.getElementById('fabCraft').value,
+    usage: document.getElementById('fabUsage').value,
+    color: document.getElementById('fabColor').value.trim(),
+    price: priceRaw==='' ? '' : (Number(priceRaw)||0),
+    moq: Number(document.getElementById('fabMoq').value)||0,
+    useCount: Number(document.getElementById('fabUse').value)||0,
+    status: fabReadStatus(document.getElementById('fabStatus').value),
+    memo: document.getElementById('fabMemo').value.trim(),
+    supplierIds: supIds,
+    updatedAt: Date.now()
+  };
+  if(fabEditId){
+    const f=fab.fabrics.find(x=>x && x.id===fabEditId);
+    if(!f){ showToast('这条面料找不到了'); return; }
+    Object.assign(f, payload);
+    // 编辑过就不再算「示例」——「清空示例数据」不会把你改过的样板删掉
+    f._touched=true;
+  }else{
+    fab.fabrics.push(Object.assign({id:'fb_'+uid(), aliases:[], mergedInto:'', mergedAt:0, createdAt:Date.now()}, payload));
+  }
+  saveAll(); closeModal('modalFab'); fabEditId=null;
+  refreshAll();
+  showToast('✓ 已保存「'+name+'」','info');
+}
+function fabDel(id){
+  const f=fab.fabrics.find(x=>x && x.id===id); if(!f) return;
+  const used=(fab.cfg.merged||[]).some(r=>r && r.toId===id);
+  showConfirm('删除面料「'+f.name+'」？\n'+(used? '⚠️ 有面料合并到了这一条上，删掉它那些记录会变成「在用」。\n' : '')+'删除后不可恢复（不想删就先改成「淘汰」状态）。', ()=>{
+    (fab.cfg.merged||[]).slice().forEach(r=>{
+      if(r && r.toId===id){
+        const c=fab.fabrics.find(x=>x && x.id===r.fromId);
+        if(c){ c.status='active'; c.mergedInto=''; c.useCount=Number(r.fromUse)||0; }
+      }
+    });
+    fab.cfg.merged=(fab.cfg.merged||[]).filter(r=>r && r.toId!==id);
+    fab.fabrics=fab.fabrics.filter(x=>x.id!==id);
+    if(fabOpenId===id) fabOpenId='';
+    saveAll(); refreshAll(); fabBadge();
+    showToast('已删除','info');
+  });
+}
+
+// ============================================================
+//  新增 / 编辑 供应商
+// ============================================================
+function fabSupFill(){
+  fabFillSel('fabSupRating', FAB_RATINGS.map(x=>x[1]), 'A 主供', false);
+}
+function fabSupNew(){
+  fabSupEditId=null;
+  document.getElementById('modalFabSupTitle').textContent='新增供应商';
+  ['fabSupName','fabSupMain','fabSupRegion','fabSupContact','fabSupPhone','fabSupTerm','fabSupMemo'].forEach(id=>{ document.getElementById(id).value=''; });
+  fabSupFill();
+  document.getElementById('fabSupDelBtn').style.display='none';
+  fabShowModal('modalFabSup');
+}
+function fabSupEdit(id){
+  const s=fabSup(id); if(!s) return;
+  fabSupEditId=id;
+  document.getElementById('modalFabSupTitle').textContent='编辑供应商';
+  document.getElementById('fabSupName').value=s.name||'';
+  document.getElementById('fabSupMain').value=s.main||'';
+  document.getElementById('fabSupRegion').value=s.region||'';
+  document.getElementById('fabSupContact').value=s.contact||'';
+  document.getElementById('fabSupPhone').value=s.phone||'';
+  document.getElementById('fabSupTerm').value=s.payTerm||'';
+  document.getElementById('fabSupMemo').value=s.memo||'';
+  fabSupFill();
+  const hit=FAB_RATINGS.find(x=>x[0]===s.rating);
+  if(hit) document.getElementById('fabSupRating').value=hit[1];
+  document.getElementById('fabSupDelBtn').style.display='';
+  fabShowModal('modalFabSup');
+}
+function fabSupSave(){
+  const name=document.getElementById('fabSupName').value.trim();
+  if(!name){ showToast('请填供应商名称'); return; }
+  const rl=document.getElementById('fabSupRating').value;
+  const rhit=FAB_RATINGS.find(x=>x[1]===rl);
+  const payload={
+    name:name,
+    main:document.getElementById('fabSupMain').value.trim(),
+    region:document.getElementById('fabSupRegion').value.trim(),
+    contact:document.getElementById('fabSupContact').value.trim(),
+    phone:document.getElementById('fabSupPhone').value.trim(),
+    payTerm:document.getElementById('fabSupTerm').value.trim(),
+    rating: rhit? rhit[0] : '',
+    memo:document.getElementById('fabSupMemo').value.trim()
+  };
+  if(fabSupEditId){
+    const s=fabSup(fabSupEditId);
+    if(!s){ showToast('这家供应商找不到了'); return; }
+    Object.assign(s, payload); s._touched=true;
+  }else{
+    fab.suppliers.push(Object.assign({id:'fb_'+uid(), createdAt:Date.now()}, payload));
+  }
+  saveAll(); closeModal('modalFabSup'); fabSupEditId=null;
+  refreshAll();
+  showToast('✓ 已保存供应商「'+name+'」','info');
+}
+function fabSupDel(id){
+  const s=fabSup(id); if(!s) return;
+  const used=fabSupUsedCount(id);
+  showConfirm('删除供应商「'+s.name+'」？\n'+(used? ('有 '+used+' 种面料在用这家，删掉后它们会显示成「未指定」。\n') : '')+'面料本身不会被删。', ()=>{
+    fab.suppliers=fab.suppliers.filter(x=>x.id!==id);
+    fab.fabrics.forEach(f=>{ f.supplierIds=(f.supplierIds||[]).filter(x=>x!==id); });
+    saveAll(); refreshAll(); fabBadge();
+    showToast('已删除供应商','info');
+  });
+}
+
+// ============================================================
+//  合并 / 撤销 / 忽略
+// ============================================================
+function fabOpenMerge(key){
+  const g=fabGroups().find(x=>x.key===key);
+  if(!g){ showToast('这组已经变了，刷新一下再看'); renderFab(); return; }
+  fabMergeIds=g.ids.slice();
+  const keep=fabSuggestKeep(g.items);
+  document.getElementById('modalFabMergeTitle').textContent='合并第 '+(fabGroups().indexOf(g)+1)+' 组（'+g.items.length+' 种 → 1 种）';
+  let h='<div class="fab-mg-hint">挑一条<b>留下</b>当主面料，其余的会并入它：用量累加到它身上、旧名字记成别名、<b>不删除</b>（在「已合并」区可撤销）。</div>';
+  h+='<div class="fab-mg-list">';
+  g.items.forEach(f=>{
+    h+='<label class="fab-mg-row'+(f.id===keep.id?' keep':'')+'">'
+      +'<input type="radio" name="fabMgKeep" value="'+escAttr(f.id)+'"'+(f.id===keep.id?' checked':'')+'>'
+      +'<span class="fab-mg-nm">'+escHtml(f.name)+'</span>'
+      +(f.code? '<span class="fab-gi-code">'+escHtml(f.code)+'</span>':'')
+      +'<span class="fab-gi-spec">'+escHtml(fabSpec(f))+'</span>'
+      +'<span class="fab-gi-price">'+((f.price===''||f.price==null)?'单价未填':'¥'+fabNum(f.price)+'/m')+'</span>'
+      +'<span class="fab-gi-sup">'+escHtml(fabSupLabel(f))+'</span>'
+      +'<span class="fab-gi-use">用量 '+fabNum10(f.useCount)+' 次</span>'
+      +'</label>';
+  });
+  h+='</div>';
+  h+='<div class="fab-mg-prev" id="fabMergePrev"></div>';
+  document.getElementById('fabMergeBody').innerHTML=h;
+  fabMergePreview();
+  document.querySelectorAll('#fabMergeBody input[name=fabMgKeep]').forEach(r=>r.addEventListener('change',fabMergePreview));
+  fabShowModal('modalFabMerge');
+}
+function fabMergePreview(){
+  const el=document.getElementById('fabMergePrev'); if(!el) return;
+  const sel=document.querySelector('#fabMergeBody input[name=fabMgKeep]:checked');
+  if(!sel){ el.innerHTML=''; return; }
+  const keepId=sel.value;
+  const keep=fab.fabrics.find(x=>x && x.id===keepId);
+  if(!keep){ el.innerHTML=''; return; }
+  const others=fabMergeIds.filter(id=>id!==keepId);
+  const addUse=others.reduce((t,id)=>{ const f=fab.fabrics.find(x=>x && x.id===id); return t+((f&&Number(f.useCount))||0); },0);
+  const names=others.map(id=>{ const f=fab.fabrics.find(x=>x && x.id===id); return f? f.name : ''; }).filter(Boolean);
+  el.innerHTML='合并后：「<b>'+escHtml(keep.name)+'</b>」用量 <b>'+fabNum10(keep.useCount)+' → '+(fabNum10(keep.useCount)+addUse)+'</b> 次；'
+    +'其余 <b>'+others.length+'</b> 种进「已合并」；别名新增：'+escHtml(names.join(' / '));
+}
+function fabDoMerge(){
+  const sel=document.querySelector('#fabMergeBody input[name=fabMgKeep]:checked');
+  if(!sel){ showToast('请先挑一条「留下」'); return; }
+  const keepId=sel.value;
+  const keep=fab.fabrics.find(f=>f && f.id===keepId);
+  if(!keep){ showToast('这条面料找不到了'); return; }
+  const ids=(fabMergeIds||[]).slice();
+  if(ids.indexOf(keepId)<0){ showToast('这一组已经变了，请重新打开'); return; }
+  // 🔑 「打开弹窗」和「按下合并」之间，别处可能已经改过数据（合并了别的组、改了规格、
+  //    撤销过合并）→ 手里这份 id 清单可能已经过期。所以按 key 重新从当前数据算一遍，
+  //    组还在、成员还在用，才允许合并。这就是那句「这一组已经变了」真正该做的事。
+  const key=ids.slice().sort().join(',');
+  if(!fabGroups().some(g=>g.key===key)){
+    closeModal('modalFabMerge'); fabMergeIds=[]; renderFab();
+    showToast('这一组已经变了，请重新打开'); return;
+  }
+  let n=0, addUse=0;
+  ids.forEach(id=>{
+    if(id===keepId) return;
+    const f=fab.fabrics.find(x=>x && x.id===id);
+    if(!f || f.status==='merged') return;
+    const u=Number(f.useCount)||0;
+    addUse+=u; n++;
+    // 别名：被合并那条的名字 + 它自己已有的别名，都挂到主面料上
+    // 🔑 顺手记下「这次到底加了哪几个」—— 撤销时按这份清单精确摘掉。
+    //    原来靠「按名字猜」会把别组留下的别名误删/漏删，脏别名越滚越多。
+    const added=[];
+    [f.name].concat(f.aliases||[]).forEach(nm=>{
+      if(nm && nm!==keep.name && (keep.aliases||[]).indexOf(nm)<0){ keep.aliases.push(nm); added.push(nm); }
+    });
+    // 供应商并集：合并后这几家都算能供这一种
+    (f.supplierIds||[]).forEach(sid=>{ if((keep.supplierIds||[]).indexOf(sid)<0) keep.supplierIds.push(sid); });
+    f.status='merged'; f.mergedInto=keepId; f.mergedAt=Date.now();
+    // 用量转移到主面料；原值留在 cfg.merged 里，撤销时还回来
+    // 🔑 这样「全库用量总和」在合并前后严格不变
+    fab.cfg.merged.push({fromId:f.id, fromName:f.name, fromCode:f.code||'', fromUse:u,
+                         toId:keepId, toName:keep.name, at:Date.now(), added:added});
+    f.useCount=0;
+  });
+  if(!n){ closeModal('modalFabMerge'); fabMergeIds=[]; renderFab();
+    showToast('这一组已经处理过了'); return; }
+  keep.useCount=(Number(keep.useCount)||0)+addUse;
+  keep.updatedAt=Date.now();
+  // 这组已经处理完，把「已忽略」里的残留清掉
+  fab.cfg.ignored=fab.cfg.ignored.filter(k=>k!==key);
+  saveAll(); closeModal('modalFabMerge'); fabMergeIds=[];
+  refreshAll(); fabBadge();
+  showToast('✓ 已把 '+n+' 种并入「'+keep.name+'」，用量累加到 '+keep.useCount+' 次（「已合并」区可撤销）','info');
+}
+function fabIgnoreGroup(key){
+  if((fab.cfg.ignored||[]).indexOf(key)<0) fab.cfg.ignored.push(key);
+  saveAll(); renderFab(); fabBadge();
+  showToast('已标记「不用合并」——想找回点「全部恢复提示」','info');
+}
+function fabUnignore(key){
+  fab.cfg.ignored=(fab.cfg.ignored||[]).filter(k=>k!==key);
+  saveAll(); renderFab(); fabBadge();
+}
+function fabUnignoreAll(){
+  const n=(fab.cfg.ignored||[]).length;
+  if(!n) return;
+  fab.cfg.ignored=[];
+  saveAll(); renderFab(); fabBadge();
+  showToast('✓ 已恢复 '+n+' 组的合并提示','info');
+}
+function fabUnmerge(fromId){
+  const rec=(fab.cfg.merged||[]).find(r=>r && r.fromId===fromId);
+  if(!rec){ showToast('找不到这条合并记录'); return; }
+  const f=fab.fabrics.find(x=>x && x.id===fromId);
+  const keep=fab.fabrics.find(x=>x && x.id===rec.toId);
+  if(!f){  // 记录已不在：清掉这条历史就行
+    fab.cfg.merged=(fab.cfg.merged||[]).filter(r=>r!==rec);
+    saveAll(); refreshAll(); fabBadge(); return;
+  }
+  f.status='active'; f.mergedInto=''; f.mergedAt=0;
+  f.useCount=Number(rec.fromUse)||0;
+  if(keep){
+    keep.useCount=Math.max(0, (Number(keep.useCount)||0)-(Number(rec.fromUse)||0));
+    // 🔑 精确摘别名：只摘「当初这条合并记录加进去的那几个」。
+    //    同一条主面料如果还被别的合并记录引用到同名别名，那个得留着（别的记录还要靠它）。
+    //    老记录没有 added 字段 → 退回只摘它自己的名字。
+    const mine=(rec.added && rec.added.length) ? rec.added : [rec.fromName];
+    const otherAdded={};
+    (fab.cfg.merged||[]).forEach(r=>{
+      if(!r || r===rec || r.toId!==rec.toId) return;
+      ((r.added && r.added.length) ? r.added : [r.fromName]).forEach(a=>{ if(a) otherAdded[a]=1; });
+    });
+    keep.aliases=(keep.aliases||[]).filter(a=> mine.indexOf(a)<0 || otherAdded[a]);
+  }
+  fab.cfg.merged=(fab.cfg.merged||[]).filter(r=>r!==rec);
+  saveAll(); refreshAll(); fabBadge();
+  showToast('✓ 已撤销合并，「'+rec.fromName+'」恢复到在用','info');
+}
+
+// ============================================================
+//  导出 CSV
+// ============================================================
+function fabCsv(rows, filename){
+  const body=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  bkDownloadBlob(new Blob(['\ufeff'+body],{type:'text/csv;charset=utf-8'}), filename);
+}
+function fabExportCsv(){
+  const list=fabFiltered();
+  if(!list.length){ showToast('没有可导出的面料'); return; }
+  const rows=[['编号','常用名','成分','克重g','门幅cm','工艺','用途','常做色','单价CNY/m','起订量m','供应商','用量次数','状态','别名','备注']];
+  list.forEach(f=>{
+    rows.push([f.code||'', f.name||'', f.comp||'', f.gsm||'', f.width||'', f.craft||'', f.usage||'', f.color||'',
+      (f.price===''||f.price==null)?'':f.price, f.moq||'', fabSupLabel(f), fabNum10(f.useCount),
+      (f.status==='merged'?'已合并':((FAB_STATUS.find(x=>x[0]===f.status)||['','在用'])[1])),
+      (f.aliases||[]).join(' / '), f.memo||'']);
+  });
+  fabCsv(rows, '面料库_'+todayStr()+'.csv');
+  showToast('✓ 已导出 '+list.length+' 条面料','info');
+}
+function fabExportSupCsv(){
+  if(!fab.suppliers.length){ showToast('没有可导出的供应商'); return; }
+  const rows=[['名称','主营','地区','联系人','电话','账期','评级','在供种类','备注']];
+  fab.suppliers.forEach(s=>{
+    rows.push([s.name||'', s.main||'', s.region||'', s.contact||'', s.phone||'', s.payTerm||'', s.rating||'',
+      fabSupUsedCount(s.id), s.memo||'']);
+  });
+  fabCsv(rows, '面料库_供应商_'+todayStr()+'.csv');
+  showToast('✓ 已导出 '+fab.suppliers.length+' 家供应商','info');
+}
+
+// ============================================================
+//  示例数据 / 清空示例
+//  这批示例是给李主任当「底稿」用的：32 种里有 4 组共 11 条其实是一种，
+//  合并掉正好 32 → 25，落在「收 20~30 种」的目标区间里。
+// ============================================================
+function fabHasSample(){
+  return fab.fabrics.some(f=>f && f._sample && !f._touched) || fab.suppliers.some(s=>s && s._sample && !s._touched);
+}
+function fabClearSample(){
+  // 只清「还是示例样子、你没动过」的；改过的（_touched）留着
+  fab.fabrics=fab.fabrics.filter(f=>!(f && f._sample && !f._touched));
+  fab.suppliers=fab.suppliers.filter(s=>!(s && s._sample && !s._touched));
+  fabHeal();
+}
+function fabSeedIfEmpty(){
+  if(fab.seeded) return 0;
+  fab.seeded=true;
+  if(fab.fabrics.length || fab.suppliers.length) return 0;
+  const S=(name,main,region,contact,phone,payTerm,rating,memo)=>{
+    const id='fb_'+uid();
+    fab.suppliers.push({id:id, name:name, main:main, region:region, contact:contact, phone:phone,
+      payTerm:payTerm, rating:rating, memo:memo||'', createdAt:Date.now(), _sample:true});
+    return id;
+  };
+  const hn=S('华南纺织','涤纶 / 锦纶 经编泳装布','广东·佛山','陈经理','138-0000-1001','月结 30 天','A','泳装主力供应商，交期稳');
+  const hd=S('宏达针织','经编弹力布','福建·晋江','王主管','138-0000-1002','月结 30 天','B','价格偏高，偶尔救急');
+  const xj=S('新锦源','锦纶泳装布、细旦面料','浙江·绍兴','刘经理','138-0000-1003','月结 45 天','A','锦纶类做得细，报价常最低');
+  const hl=S('恒隆织造','纬编针织、梭织','江苏·苏州','张经理','138-0000-1004','预付 30%','B','纬编强项，梭织一般');
+  const hy=S('华宇氨纶','氨纶 / 弹力面料','广东·东莞','李工','138-0000-1005','月结 30 天','A','氨纶弹性稳定，可做小单');
+  const dy=S('东亚布业','BJJ / 柔术服用料','福建·厦门','吴经理','138-0000-1006','月结 60 天','A','凡适 BJJ 主力，克重足');
+  const ys=S('永盛纺织','里布 / 网布 / 辅料','浙江·义乌','赵老板','138-0000-1007','现结','C','小单灵活，价格低但品质波动');
+  const ld=S('联达新材','功能性后整理','江苏·南通','孙经理','138-0000-1008','月结 45 天','B','吸湿排汗 / 抗氯整理');
+  const sf=S('顺发织造','涤纶网眼布','广东·汕头','周经理','138-0000-1009','月结 30 天','C','网布便宜，起订量高');
+  const F=(code,name,comp,gsm,width,craft,usage,color,price,moq,sups,useCount,memo)=>{
+    const id='fb_'+uid();
+    fab.fabrics.push({id:id, code:code, name:name, comp:comp, gsm:gsm, width:width, craft:craft,
+      usage:usage, color:color, price:price, moq:moq, supplierIds:sups, useCount:useCount,
+      status:'active', aliases:[], mergedInto:'', mergedAt:0, memo:memo||'',
+      createdAt:Date.now(), updatedAt:Date.now(), _sample:true});
+    return id;
+  };
+  // —— 第 1 组（4 条其实是一种）：75D 四面弹 涤纶88%+氨纶12% 180g 160cm 经编
+  F('F-001','75D 四面弹','涤纶 88% + 氨纶 12%',180,160,'经编','布基尼','常规黑 / 藏青',14.2,500,[hn],22,'主力款，一年到头都在用');
+  F('F-007','75D 弹力布','涤纶 88% + 氨纶 12%',180,160,'经编','布基尼','常规黑',16.8,300,[hd],5,'宏达报的价，比华南贵 2.6 元/m');
+  F('F-013','四面弹 180','涤纶 88% + 氨纶 12%',182,158,'经编','布基尼','藏青',13.5,1000,[xj],9,'新锦源试样：克重门幅略有出入，价格最低');
+  F('F-021','75D 四面弹（老款）','涤纶 88% + 氨纶 12%',180,160,'经编','布基尼','黑',15.6,300,[hy],3,'早期华宇供的，现在基本没在订');
+  // —— 第 2 组（3 条其实是一种）：40D 锦纶泳装布 锦纶80%+氨纶20% 200g 150cm 经编
+  F('F-002','40D 锦纶泳布','锦纶 80% + 氨纶 20%',200,150,'经编','布基尼','黑 / 宝蓝',19.5,500,[xj],18,'手感最好的一款，客户认可');
+  F('F-009','尼龙 40D 泳装面料','锦纶 80% + 氨纶 20%',200,150,'经编','布基尼','黑',21.0,300,[hn],6,'华南同规格，价格高一截');
+  F('F-016','40D 高弹锦纶布','锦纶 80% + 氨纶 20%',202,150,'经编','布基尼','宝蓝',18.8,500,[hl],4,'恒隆试的，弹性还行');
+  // —— 第 3 组（2 条其实是一种）：涤纶网眼布 涤纶100% 110g 160cm 经编
+  F('F-005','涤纶网眼布','涤纶 100%',110,160,'经编','里布','白',6.8,1000,[ys],12,'做里布用，量大');
+  F('F-018','网眼布 110g','涤纶 100%',110,160,'经编','里布','白',7.2,800,[sf],3,'顺发同规格，贵 0.4');
+  // —— 第 4 组（2 条其实是一种）：BJJ 耐撕面料 涤纶60%+棉40% 240g 150cm 梭织
+  F('F-003','BJJ 耐撕面料','涤纶 60% + 棉 40%',240,150,'梭织','BJJ 服','黑 / 白',26.0,300,[dy],15,'凡适主推，耐撕测试通过');
+  F('F-011','柔术服专用布','涤纶 60% + 棉 40%',240,150,'梭织','BJJ 服','黑',24.5,300,[hl],7,'恒隆平替，便宜 1.5');
+  // —— 以下 21 条各自独立
+  //    注：F-004 是 50D 高弹（做运动型泳衣），用途标「泳装」，跟上面「布基尼」那组不是一回事 ——
+  //    正好用来说明「用途不同就不建议合并」，也是这句规则在示例数据里的活样板。
+  F('F-004','50D 锦纶高弹布','锦纶 78% + 氨纶 22%',210,150,'经编','泳装','黑 / 玫红',21.5,500,[xj],11,'高弹款，做运动型泳衣（用途跟布基尼那组不同，所以不参与合并建议）');
+  F('F-006','抗氯泳装布','涤纶 85% + 氨纶 15%',195,155,'经编','泳装','深色系',17.6,500,[ld],6,'做过抗氯整理，泳池场景用');
+  F('F-008','泳衣网纱','涤纶 100%',60,150,'经编','泳装','多色',5.5,2000,[ys],7,'做装饰层 / 罩纱');
+  F('F-010','沙滩裤速干布','涤纶 100%',130,150,'梭织','沙滩裤','印花底白',11.2,1000,[sf],8,'速干，做沙滩裤整条');
+  F('F-012','涤纶印花底布（白坯）','涤纶 100%',165,160,'经编','泳装','白坯',12.8,1000,[hn],14,'打底印花用，走量');
+  F('F-014','泳装用弹力网纱','锦纶 90% + 氨纶 10%',95,150,'经编','泳装','裸色 / 黑',16.5,500,[xj],6,'贴肤层用，要求亲肤');
+  F('F-015','泳装拼接网眼布','锦纶 92% + 氨纶 8%',145,150,'经编','泳装','黑',15.2,500,[hy],3,'拼接装饰用');
+  F('F-017','再生涤纶泳装布（环保）','涤纶（再生）86% + 氨纶 14%',220,150,'经编','泳装','黑 / 深蓝',19.8,500,[ld],5,'客户提环保要求时拿出来，有 GRSU 证书');
+  F('F-019','BJJ 服主体布（珍珠格）','涤纶 100%',260,150,'梭织','BJJ 服','白 / 蓝',22.5,300,[dy],13,'珍珠格纹理，凡适主打');
+  F('F-020','BJJ 裤料（加厚）','棉 55% + 涤纶 45%',320,150,'梭织','BJJ 服','黑',29.0,300,[dy],9,'裤子专用，耐磨要求高');
+  F('F-022','MMA 短裤弹力布','涤纶 87% + 氨纶 13%',200,155,'纬编','MMA / 训练','黑 / 灰',15.8,500,[hl],11,'MMA 短裤用，弹性要好');
+  F('F-023','压缩衣面料','锦纶 72% + 氨纶 28%',220,150,'纬编','压缩衣','黑',24.8,300,[hy],7,'压缩衣专用，氨纶含量高');
+  F('F-024','防磨砂感布（patch 用）','涤纶 100%',310,150,'梭织','MMA / 训练','黑',18.5,300,[dy],5,'做补强贴片，砂感耐磨');
+  F('F-025','平纹涤纶里布','涤纶 100%',80,150,'梭织','里布','白 / 黑',5.2,2000,[ys],6,'常规里布，最便宜的一款');
+  F('F-026','吸湿排汗网布','涤纶 100%',120,160,'经编','MMA / 训练','灰 / 白',9.2,1000,[ld],8,'做过吸湿排汗整理，训练服用');
+  F('F-027','双面摇粒绒','涤纶 100%',260,160,'纬编','其他','多色',16.2,500,[hl],3,'秋冬保暖类，季节性');
+  F('F-028','涤纶塔丝隆','涤纶 100%',135,150,'梭织','其他','藏青 / 军绿',10.5,800,[sf],4,'做外套 / 收纳袋');
+  F('F-029','泳装里布（锦纶）','锦纶 100%',90,150,'经编','里布','裸色',9.8,1000,[ys],10,'贴肤里布，比涤纶亲肤');
+  F('F-030','泳装高弹网布','锦纶 90% + 氨纶 10%',175,150,'经编','泳装','黑',16.5,500,[xj],6,'高弹网布，做支撑层');
+  F('F-031','BJJ 腰带专用布','棉 100%',380,150,'梭织','BJJ 服','黑 / 白',19.5,300,[dy],4,'腰带专用，厚实');
+  F('F-032','柔术服内衬布','涤纶 100%',95,150,'梭织','里布','白',7.6,1000,[ys],6,'内衬用，轻薄');
+  return fab.fabrics.length;
+}
+
+// 弹窗里的「删除这条 / 删除这家」：先关弹窗再走确认流程（确认框要单独占一层）
+function fabDelCur(){ const id=fabEditId; if(!id) return; closeModal('modalFab'); fabEditId=null; fabDel(id); }
+function fabSupDelCur(){ const id=fabSupEditId; if(!id) return; closeModal('modalFabSup'); fabSupEditId=null; fabSupDel(id); }
+
+// ============================================================
+//  事件委托：面料库里凡是 id 相关的操作都不拼内联 onclick
+//  （id 由 uid() 生成虽然安全，但统一走委托更稳；e2e 也用真人点击验）
+// ============================================================
+document.addEventListener('click', function(e){
+  const t=e.target;
+  if(!t || !t.closest) return;
+  let a;
+  a=t.closest('[data-fab-open]');      if(a){ fabToggleOpen(a.getAttribute('data-fab-open')); return; }
+  a=t.closest('[data-fab-merge]');     if(a){ fabOpenMerge(a.getAttribute('data-fab-merge')); return; }
+  a=t.closest('[data-fab-ignore]');    if(a){ fabIgnoreGroup(a.getAttribute('data-fab-ignore')); return; }
+  a=t.closest('[data-fab-unmerge]');   if(a){ fabUnmerge(a.getAttribute('data-fab-unmerge')); return; }
+  a=t.closest('[data-fab-edit]');      if(a){ fabEdit(a.getAttribute('data-fab-edit')); return; }
+  a=t.closest('[data-fab-del]');       if(a){ fabDel(a.getAttribute('data-fab-del')); return; }
+  a=t.closest('[data-fab-sup-edit]');  if(a){ fabSupEdit(a.getAttribute('data-fab-sup-edit')); return; }
+  a=t.closest('[data-fab-sup-del]');   if(a){ fabSupDel(a.getAttribute('data-fab-sup-del')); return; }
+});
+
+// ============================================================
 //  INIT
 // ============================================================
 function init(){
@@ -15566,6 +16884,14 @@ function init(){
     localStorage.setItem(STORAGE_PREFIX+'crm_seeded','1');
     saveAll();
     if(_cn) setTimeout(()=>{ try{ showToast('客户跟进台：已载入 3 条示例客户，点「清空示例数据」可移除','info'); }catch(e){} }, 2400);
+  }
+  // 面料库：首次打开若为空，种 32 条示例（9 家供应商 / 4 组共 11 条其实是一种，合并后正好 25 种）
+  // 这批是给李主任当底稿改的 —— 编辑过的记录打 _touched，「清空示例数据」不会误删
+  if(!localStorage.getItem(STORAGE_PREFIX+'fab_seeded')){
+    const _fn = fabSeedIfEmpty();
+    localStorage.setItem(STORAGE_PREFIX+'fab_seeded','1');
+    saveAll();
+    if(_fn) setTimeout(()=>{ try{ showToast('面料库：已载入 '+_fn+' 条示例面料 + 9 家供应商（里面故意留了 4 组重复，试试点「合并这组」）','info'); }catch(e){} }, 3000);
   }
   // 外贸运费：首次打开预置 4 家已知货代公司菜单（顺丰 / 腾信 / 迅驰达 / 深圳燕文），用户可增删
   if(!localStorage.getItem(STORAGE_PREFIX+'fr_fwd_seeded')){
