@@ -519,7 +519,9 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   .form-row>*{min-width:100%}
   .card{padding:14px}
   .modal{padding:20px;width:95%;max-width:95%}
-  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--card-bg);border-top:1px solid var(--border);z-index:900;padding-bottom:env(safe-area-inset-bottom);justify-content:space-around}
+  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--card-bg);border-top:1px solid var(--border);z-index:900;padding-bottom:env(safe-area-inset-bottom);justify-content:space-around;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mobile-nav::-webkit-scrollbar{display:none}
+.mnav-item{flex:0 0 auto}
   .mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;font-size:10px;font-weight:500;color:var(--text-muted);background:none;border:none;cursor:pointer;min-width:50px}
   .mnav-item.active{color:var(--primary)}
   .mnav-item svg{width:20px;height:20px}
@@ -1088,6 +1090,82 @@ tr:hover .fr-fwd-acts{opacity:1}
   .hr-dimrow .nm{flex:0 0 88px;font-size:11.5px}
   .hr-tl li{padding-left:12px}
 }
+
+/* ============================================================
+   客户跟进台（v2.40）：把「询盘 → 建客户 → 报价 → 打样 → 成交」这段过程也管起来
+   ============================================================ */
+.crm-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-bottom:12px}
+.crm-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px}
+.crm-card .k{font-size:11.5px;color:var(--text-muted);line-height:1.5}
+.crm-card .v{font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.35}
+.crm-card.warn{border-color:#fecaca;background:var(--danger-light)}
+.crm-card.warn .v{color:#b91c1c}
+.crm-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.crm-sel{width:auto;min-width:104px;font-size:13px;padding:7px 8px}
+.crm-kw{width:auto;flex:1 1 170px;min-width:130px;font-size:13px;padding:7px 10px}
+.crm-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.crm-tbl th{text-align:left;padding:9px 8px;background:#f8fafc;color:var(--text-secondary);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.crm-tbl td{padding:9px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.crm-tbl tbody tr:hover{background:#f8fafc}
+.crm-tbl .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.crm-tbl .nm{font-weight:600;color:var(--text);cursor:pointer}
+.crm-tbl .nm:hover{color:var(--primary);text-decoration:underline}
+.crm-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.crm-stage{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.crm-s1{background:#f1f5f9;color:#64748b}
+.crm-s2{background:#e0f2fe;color:#0369a1}
+.crm-s3{background:#e0e7ff;color:#4338ca}
+.crm-s4{background:#fef3c7;color:#b45309}
+.crm-s5{background:#fce7f3;color:#be185d}
+.crm-s6{background:#dcfce7;color:#15803d}
+.crm-lv{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:5px;font-size:11.5px;font-weight:700}
+.crm-lvA{background:#fee2e2;color:#b91c1c}
+.crm-lvB{background:#fef3c7;color:#b45309}
+.crm-lvC{background:#e2e8f0;color:#475569}
+.crm-lv0{background:#f1f5f9;color:#94a3b8}
+.crm-idn{font-size:11px;padding:1px 6px;border-radius:7px;font-weight:600;margin-left:5px;white-space:nowrap}
+.crm-new{background:#dcfce7;color:#15803d}
+.crm-old{background:#e2e8f0;color:#475569}
+.crm-silent{background:#fef2f2;color:#b91c1c;font-size:11.5px;padding:1px 7px;border-radius:7px;font-weight:600;white-space:nowrap;display:inline-block}
+.crm-ok{color:var(--text-muted);font-size:12px}
+.crm-src{font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.5}
+.crm-acts{white-space:nowrap;text-align:right}
+.crm-warnbox{background:var(--warning-light);border:1px solid #fde68a;border-radius:var(--radius);padding:12px 14px;margin-bottom:12px}
+.crm-warnbox h4{margin:0 0 9px;font-size:13.5px;font-weight:700;color:#92400e;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.crm-warnlist{display:flex;flex-direction:column;gap:6px}
+.crm-warnrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px;padding:7px 10px;background:var(--card-bg);border:1px solid #fde68a;border-radius:8px}
+.crm-warnrow .nm{font-weight:600;cursor:pointer;color:var(--text)}
+.crm-warnrow .nm:hover{color:var(--primary);text-decoration:underline}
+.crm-empty{text-align:center;color:var(--text-muted);font-size:13px;padding:26px 12px;line-height:1.9}
+.crm-tl{display:flex;flex-direction:column;margin-top:6px}
+.crm-tli{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--border)}
+.crm-tli:last-child{border-bottom:none}
+.crm-tli .dt{flex:0 0 84px;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.crm-tli .bd{flex:1;font-size:13px;line-height:1.65;min-width:0;word-break:break-word}
+.crm-tli .ch{font-size:11px;font-weight:600;color:var(--primary-dark);background:var(--primary-light);padding:1px 6px;border-radius:7px;margin-right:6px}
+.crm-tli .nx{font-size:11.5px;color:#b45309;margin-top:3px}
+.crm-tli .rt{font-size:11.5px;color:var(--text-muted);margin-top:3px}
+.crm-sec{font-size:13px;color:var(--text);margin:14px 0 2px;padding-top:12px;border-top:1px solid var(--border)}
+.crm-frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.crm-fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.crm-fld label{font-size:11.5px;color:var(--text-muted)}
+.crm-fld input,.crm-fld select,.crm-fld textarea{font-size:14px;padding:7px 9px}
+.crm-fld.wide{grid-column:1/-1}
+.crm-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-bottom:12px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border)}
+.crm-fact .k{font-size:11px;color:var(--text-muted)}
+.crm-fact .v{font-size:14px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;margin-top:2px}
+.crm-rep{width:100%;border-collapse:collapse;font-size:13px}
+.crm-rep th{text-align:left;padding:8px;background:#f8fafc;color:var(--text-secondary);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.crm-rep td{padding:8px;border-bottom:1px solid var(--border)}
+.crm-rep .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:768px){
+  .crm-cards{grid-template-columns:repeat(2,1fr);gap:8px}
+  .crm-card .v{font-size:18px}
+  .crm-col-hide{display:none}
+  .crm-toolbar .crm-sel,.crm-toolbar .crm-kw{flex:1 1 auto;min-width:0}
+  .crm-toolbar .btn{flex:1 1 auto;justify-content:center}
+  .crm-frm{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -1206,6 +1284,11 @@ tr:hover .fr-fwd-acts{opacity:1}
         经营分析
         <span class="nav-badge" id="bizBadge" style="display:none">0</span>
       </button>
+      <button class="nav-item" data-tab="crm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        客户跟进
+        <span class="nav-badge" id="crmBadge" style="display:none">0</span>
+      </button>
       <button class="nav-item" data-tab="review">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         每周复盘
@@ -1235,7 +1318,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.39 · 2026-10-15</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.40 · 2026-10-16</div>
     </div>
   </aside>
 
@@ -1410,6 +1493,16 @@ tr:hover .fr-fwd-acts{opacity:1}
       <p class="section-subtitle">按月份统计历史<b>订单笔数 / 样品数 / 大货数 / 金额 / 成交客户数</b>（样品与大货按 <b>$500</b> 划线，和经营分析同一口径），再往后推 <b>1~6 个月</b>。数据直接读「经营分析」里已导入的订单／收款表，某个月不准可以<b>手工修正</b>；还可以给未来月份<b>定目标</b>看达成率。</p>
       <div id="fcContent"></div>
     </div>
+
+    <!-- TAB: 客户跟进（v2.40） -->
+    <div class="tab-panel" id="tab-crm">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        客户跟进台
+      </div>
+      <p class="section-subtitle">把 <b>询盘 → 建客户 → 报价 → 打样 → 成交</b> 这段过程也管起来。已成交客户<b>自动</b>从「经营分析」已导入的收款流水生成（<b>零录入</b>），你只管补<b>跟进记录、阶段、下次跟进日</b>；该跟进的客户自动置顶标红，并出现在最上面「今天要处理」里。</p>
+      <div id="crmContent"></div>
+    </div>
   </main>
 </div>
 
@@ -1442,6 +1535,10 @@ tr:hover .fr-fwd-acts{opacity:1}
   <button class="mnav-item" data-mtab="biz">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
     经营
+  </button>
+  <button class="mnav-item" data-mtab="crm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    客户
   </button>
   <button class="mnav-item" data-mtab="review">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
@@ -2069,6 +2166,14 @@ tr:hover .fr-fwd-acts{opacity:1}
   </div>
 </div>
 
+<!-- ====== 客户跟进弹窗（v2.40）====== -->
+<div class="modal-overlay" id="crmModal" style="display:none">
+  <div class="modal" style="max-width:660px">
+    <h3 id="crmModalTitle">客户</h3>
+    <div id="crmModalBody"></div>
+  </div>
+</div>
+
 <!-- ====== CONFIRM DIALOG ====== -->
 <div class="confirm-overlay" id="confirmDialog" style="display:none">
   <div class="confirm-box">
@@ -2086,7 +2191,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.39';
+const APP_VERSION = 'v2.40';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -2166,6 +2271,11 @@ function loadData(){
   if(_fc && typeof _fc==='object' && !Array.isArray(_fc)) fc = Object.assign(fcBlank(), _fc);
   else fc = fcBlank();
   fcHeal();
+  // 客户跟进台
+  const _crmr = rdStore('crm', null);
+  if(_crmr && typeof _crmr==='object' && !Array.isArray(_crmr)) crm = Object.assign(crmBlank(), _crmr);
+  else crm = crmBlank();
+  crmHeal();
   const _bz = rdStore('biz', null);
   if(_bz && typeof _bz==='object') biz = Object.assign(bizBlank(), _bz);
   if(!biz || typeof biz!=='object') biz = bizBlank();
@@ -2355,6 +2465,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight()));
       localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
       localStorage.setItem(STORAGE_PREFIX+'forecast',JSON.stringify(fc));
+      localStorage.setItem(STORAGE_PREFIX+'crm',JSON.stringify(crm));
     }catch(e){
       // 即使剥离附件元数据仍写不下：再退一步，连 files 也清空，保证文字记录绝不丢
       try{
@@ -2371,6 +2482,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight2()));
         localStorage.setItem(STORAGE_PREFIX+'biz',JSON.stringify(biz));
         localStorage.setItem(STORAGE_PREFIX+'forecast',JSON.stringify(fc));
+        localStorage.setItem(STORAGE_PREFIX+'crm',JSON.stringify(crm));
         showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
       }catch(e2){ showToast('⚠️ 本地存储写入失败，请导出备份到百度盘', 'warning'); }
     }
@@ -2420,7 +2532,7 @@ function totalItems(){return tasks.length + notes.length + projects.length + das
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample);
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample();
 }
 
 // Clear sample data
@@ -2432,6 +2544,7 @@ function clearSampleData(){
   plan = plan.filter(p=>!p._sample);
   expenses = expenses.filter(e=>!e._sample);
   claims = claims.filter(c=>!c._sample);
+  crmClearSample();
   saveAll();
 }
 
@@ -3669,7 +3782,26 @@ function renderBanner(){
   const blockedProjects = projects.filter(p=>p.status==='blocked');
   const postponedTasks = tasks.filter(t=>!t.done && t.postponedCount>0 && t.deadline===today);
   
+  let crmDue=[], crmSilent=[];
+  try{ const _cl=crmList(); crmDue=_cl.filter(c=>c.due); crmSilent=_cl.filter(c=>c.silent); }
+  catch(e){ crmDue=[]; crmSilent=[]; }
+
   let html = '';
+  if(crmDue.length>0){
+    html += '<span class="banner-alert warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'+crmDue.length+' 个客户该跟进</span>';
+    crmDue.slice(0,3).forEach(c=>{
+      // ⚠️ 不能把 cid 拼进内联 onclick 调 crmOpen —— cid 里带买家原名，escAttr 会把撇号转成 &#39;，
+      //    HTML 解析时又还原成撇号，把 JS 字符串截断（买家名带 O'Brien 这种就炸）。
+      //    统一走 data-crm-open，由 document 上的事件委托接管。
+      html += '<span class="banner-item"><a data-crm-open="'+escAttr(c.cid)+'">'+escHtml(c.name)+'</a></span>';
+    });
+  }
+  if(crmSilent.length>0){
+    html += '<span class="banner-alert warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'+crmSilent.length+' 个客户沉默超期</span>';
+    crmSilent.slice(0,3).forEach(c=>{
+      html += '<span class="banner-item"><a data-crm-open="'+escAttr(c.cid)+'">'+escHtml(c.name)+'</a> 已 '+c.gap+' 天没动静</span>';
+    });
+  }
   if(overdueTasks.length>0){
     html += '<span class="banner-alert danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+overdueTasks.length+' 项任务已逾期</span>';
     overdueTasks.forEach(t=>{
@@ -5164,7 +5296,7 @@ async function bkFileDataUrl(fid, mem){
   return (g && g.dataUrl) ? g.dataUrl : '';
 }
 function bkSnapshotData(){
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,forecast:fc,
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,forecast:fc,crm,
                 _app:'办公工作台', _version:APP_VERSION, exportedAt:new Date().toISOString()};
   try{
     const corrupt={};
@@ -6030,6 +6162,18 @@ function applyIncoming(data, label){
     stat.kept += r.keepLocal;
     stat.newFromIncoming += r.incomingNew;
   };
+  if(data && data.crm && typeof data.crm === 'object'){
+    const rf = syncMergeById(crm.follows||[], data.crm.follows||[], 'crmfollow');
+    crm.follows = rf.list;
+    stat.kept += rf.keepLocal; stat.newFromIncoming += rf.incomingNew;
+    crm.recs = syncMergeMap(crm.recs||{}, data.crm.recs||{});
+    const ss={};
+    (crm.sellers||[]).concat(data.crm.sellers||[]).forEach(v=>{ if(v) ss[String(v)]=1; });
+    crm.sellers=Object.keys(ss);
+    if(data.crm.cfg && data.crm.cfg.silentDays) crm.cfg.silentDays = data.crm.cfg.silentDays;
+    if(data.crm.seeded) crm.seeded = true;
+    crmHeal();
+  }
   arr('tasks','task', ()=>tasks, v=>{tasks=v;});
   arr('notes','note', ()=>notes, v=>{notes=v;});
   arr('projects','project', ()=>projects, v=>{projects=v;});
@@ -6132,12 +6276,14 @@ function asSnapshot(){
     counts:{tasks:tasks.length, notes:notes.length, projects:projects.length,
             dashboard:dashboard.length, plan:plan.length, planGoals:Object.keys(planGoals).length, expenses:expenses.length, claims:claims.length,
             hrStaff:hr.staff.length, hrTalent:hr.talent.length,
-            bizOrders:biz.orders.length, bizPays:biz.pays.length, attachments:attCount},
+            bizOrders:biz.orders.length, bizPays:biz.pays.length,
+            crmRecs:Object.keys(crm.recs||{}).length, crmFollows:(crm.follows||[]).length,
+            attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
     dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims), hr:hr, freight:frSyncLight(),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded},
-    forecast:fc
+    forecast:fc, crm:crm
   };
   try{
     const seen={n:0};
@@ -14577,6 +14723,7 @@ function renderCurrentTab(){
   else if(currentTab==='biz') renderBiz();
   else if(currentTab==='hr') renderHr();
   else if(currentTab==='freight') renderFreight();
+  else if(currentTab==='crm') renderCrm();
   else if(currentTab==='forecast') renderFc();
 }
 
@@ -14590,6 +14737,7 @@ function refreshAll(){
   bizBadge();
   hrBadge();
   frBadge();
+  crmBadge();
 }
 
 function updateClearDemoBtn(){
@@ -14652,6 +14800,744 @@ document.addEventListener('keydown',function(e){
 });
 
 // ============================================================
+//  客户跟进台（v2.40）：把「询盘 → 建客户 → 报价 → 打样 → 成交」这段过程也管起来
+//  数据键 crm：read / write / export / import / sync 五链路全部接入
+//
+//  ⚠️ 改这个模块前必读的三条设计约定
+//  1) 已成交客户名单【不落库】—— 每次实时从「经营分析」的收款流水聚合（crmAutoMap）。
+//     经营分析里新导一笔收款，客户台立刻多一条，永远不会出现"两边对不上"。
+//  2) 只把【跟踪状态】（阶段/等级/备注/下次跟进日）和【跟进记录】存进 crm。
+//     自动客户的 cid = 'a:' + 买家小写 + '|||' + 业务员英文小写，跟经营分析的客户键同源；
+//     手工建档的 cid = 'm:' + uid()。两者共用 crm.recs / crm.follows，统计逻辑只写一份。
+//  3) cid 里带着买家原名（可能含引号），所以列表里一律用 data-crm-open / data-crm-follow
+//     加事件委托，绝不把 cid 拼进内联 onclick —— 引号会在 HTML 解析阶段被还原，把 JS 字符串截断。
+// ============================================================
+const CRM_STAGES = [
+  {key:'inquiry', name:'询盘'},
+  {key:'replied', name:'已回复'},
+  {key:'created', name:'已建客户'},
+  {key:'quoted',  name:'已报价'},
+  {key:'sampled', name:'已打样'},
+  {key:'dealt',   name:'已成交'}
+];
+const CRM_STAGE_KEYS = CRM_STAGES.map(x=>x.key);
+const CRM_LEVELS = [['','未评级'],['A','A 重点'],['B','B 跟进'],['C','C 一般']];
+const CRM_CHANNELS = ['TM','阿里询盘','邮件','微信','电话','其他'];
+const CRM_SOURCES  = ['TM','阿里询盘','老客介绍','展会','社媒','其他'];
+const CRM_SILENT_DEFAULT = 7;
+
+function crmBlank(){
+  return {follows:[], recs:{}, sellers:[], cfg:{silentDays:CRM_SILENT_DEFAULT}, seeded:false};
+}
+let crm = crmBlank();
+let crmFilter = {seller:'', stage:'', level:'', kw:''};
+let crmOpenCid = '';
+
+function crmHeal(){
+  if(!crm || typeof crm!=='object' || Array.isArray(crm)) crm = crmBlank();
+  if(!Array.isArray(crm.follows)) crm.follows=[];
+  if(!crm.recs || typeof crm.recs!=='object' || Array.isArray(crm.recs)) crm.recs={};
+  if(!Array.isArray(crm.sellers)) crm.sellers=[];
+  if(!crm.cfg || typeof crm.cfg!=='object' || Array.isArray(crm.cfg)) crm.cfg={};
+  const sd=parseInt(crm.cfg.silentDays,10);
+  crm.cfg.silentDays = (isNaN(sd)||sd<1) ? CRM_SILENT_DEFAULT : sd;
+  // 跟进记录：补齐字段、剔掉坏行（坏行只丢它自己，不连累其他记录）
+  const fl=[];
+  crm.follows.forEach(f=>{
+    if(!f || typeof f!=='object' || !f.id || !f.cid) return;
+    fl.push({id:String(f.id), cid:String(f.cid),
+             date:String(f.date||'').slice(0,10) || todayStr(),
+             ch:CRM_CHANNELS.indexOf(f.ch)>=0 ? f.ch : 'TM',
+             text:String(f.text||''),
+             next:String(f.next||'').slice(0,10),
+             inAt:String(f.inAt||''), reAt:String(f.reAt||''),
+             by:String(f.by||'')});
+  });
+  crm.follows=fl;
+  const rc={};
+  Object.keys(crm.recs).forEach(k=>{
+    const r=crm.recs[k];
+    if(r && typeof r==='object' && !Array.isArray(r)) rc[k]=r;
+  });
+  crm.recs=rc;
+}
+
+function crmRec(cid){ return (crm.recs||{})[cid] || {}; }
+function crmSetRec(cid, patch){
+  if(!crm.recs) crm.recs={};
+  crm.recs[cid] = Object.assign({}, crm.recs[cid]||{}, patch||{}, {at:Date.now()});
+}
+function crmStageIdx(k){ const i=CRM_STAGE_KEYS.indexOf(k); return i<0?0:i; }
+function crmStageName(k){ return CRM_STAGES[crmStageIdx(k)].name; }
+function crmStageTag(k){
+  return '<span class="crm-stage crm-s'+(crmStageIdx(k)+1)+'">'+CRM_STAGES[crmStageIdx(k)].name+'</span>';
+}
+function crmLevelTag(lv){
+  const v=String(lv||'').toUpperCase();
+  if(v!=='A'&&v!=='B'&&v!=='C') return '<span class="crm-lv crm-lv0" title="未评级">—</span>';
+  return '<span class="crm-lv crm-lv'+v+'">'+v+'</span>';
+}
+function crmShopName(x){ return x==='langges'?'朗格斯':(x==='fansi'?'凡适':String(x||'')); }
+function crmMoney(v){
+  const n=Number(v)||0;
+  return n ? ('$'+fcNum(n)) : '<span class="crm-ok">—</span>';
+}
+// 两个 'YYYY-MM-DD' 相差的天数（d2 - d1）
+function crmDays(d1, d2){
+  if(!d1||!d2) return null;
+  const a=Date.parse(String(d1).slice(0,10)+'T00:00:00');
+  const b=Date.parse(String(d2).slice(0,10)+'T00:00:00');
+  if(isNaN(a)||isNaN(b)) return null;
+  return Math.round((b-a)/86400000);
+}
+function crmShiftDate(n){
+  const x=new Date(); x.setDate(x.getDate()+n);
+  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+}
+function crmParseTs(v){
+  const t=String(v||'').trim().replace('T',' ');
+  if(!t) return null;
+  const m=/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ ](\d{1,2}):(\d{2}))?/.exec(t);
+  if(!m) return null;
+  const d=new Date(+m[1], +m[2]-1, +m[3], +(m[4]||0), +(m[5]||0), 0, 0);
+  return isNaN(d.getTime()) ? null : d.getTime();
+}
+function crmFollowHours(f){
+  const a=crmParseTs(f.inAt), b=crmParseTs(f.reAt);
+  if(a===null||b===null||b<a) return null;
+  return (b-a)/3600000;
+}
+function crmFmtHours(h){
+  if(h===null||h===undefined||isNaN(h)) return '—';
+  if(h<24) return (Math.round(h*10)/10)+' 小时';
+  return (Math.round(h/24*10)/10)+' 天';
+}
+
+// ---------- 自动客户：实时从经营分析收款流水聚合 ----------
+let _crmAutoCache=null, _crmAutoKey='';
+function crmAutoMap(){
+  const pays=(biz && biz.pays) || [];
+  const key=pays.length+'|'+Object.keys((biz&&biz.firstPay)||{}).length+'|'+((pays.length&&pays[pays.length-1])?String(pays[pays.length-1].ts||''):'');
+  if(_crmAutoCache && _crmAutoKey===key) return _crmAutoCache;
+  const m={};
+  pays.forEach(p=>{
+    const buyer=String(p.buyer||'').trim();
+    if(!buyer) return;
+    const sRaw=String(p.sellerRaw||'').trim();
+    const seller=String(p.sellerCn||'').trim() || (sRaw ? bizSellerCn(sRaw) : '') || '未注明业务员';
+    const gk=(buyer.toLowerCase()+'|||'+sRaw.toLowerCase());
+    const cid='a:'+gk;
+    const day=String(p.ts||'').slice(0,10);
+    let o=m[cid];
+    if(!o){
+      o=m[cid]={cid:cid, name:buyer, seller:seller, gk:gk, auto:true, country:'',
+                amount:0, orderN:0, payN:0, first:day, last:day,
+                shops:{}, orders:{}, countryN:{}, stage0:'dealt'};
+    }
+    o.payN++;
+    o.amount += bizNum(p.amount);
+    if(day){ if(!o.first||day<o.first) o.first=day; if(!o.last||day>o.last) o.last=day; }
+    if(p.shop) o.shops[p.shop]=1;
+    if(p.orderNo) o.orders[p.orderNo]=1;
+    const cn=bizCountryCn(bizCountryOf(p));   // 归一成中文（AE → 阿联酋），搜索「日本」也能命中
+    if(cn && cn!=='未知国家') o.countryN[cn]=(o.countryN[cn]||0)+1;
+  });
+  Object.keys(m).forEach(k=>{
+    const o=m[k];
+    o.orderN=Object.keys(o.orders).length;
+    o.shopList=Object.keys(o.shops).filter(Boolean);
+    o.shop=o.shopList.map(crmShopName).join(' / ');
+    // 国家取出现次数最多的那个（同一个买家偶尔夹几条脏数据）
+    let best='', bn=0;
+    Object.keys(o.countryN).forEach(c=>{ if(o.countryN[c]>bn){ bn=o.countryN[c]; best=c; } });
+    o.country=best;
+    // 首次成交日以经营分析的「首单 / 首款库」为准（可能早于当前导入范围）
+    const fp=(biz.firstPay||{})[o.gk], fo=(biz.firstOrder||{})[o.gk];
+    o.firstAll=(fo&&fp)?(fo<fp?fo:fp):(fo||fp||o.first);
+  });
+  _crmAutoCache=m; _crmAutoKey=key;
+  return m;
+}
+
+// ---------- 全量客户列表：自动 + 手工，套上跟踪状态 ----------
+function crmList(){
+  const today=todayStr();
+  const recs=crm.recs||{};
+  const silentDays=crm.cfg.silentDays;
+  const out=[];
+  const mk=(base, rec)=>{
+    const r=rec||{};
+    const fl=(crm.follows||[]).filter(f=>f.cid===base.cid);
+    fl.sort((a,b)=> a.date<b.date?1:(a.date>b.date?-1:0));
+    const lastFollow = fl.length ? fl[0].date : '';
+    const next = String(r.next||'');
+    // 最近一次「有动静」= max(最近跟进, 最近收款, 首次成交, 首次接触)
+    let touch='';
+    [lastFollow, base.last, base.firstAll, base.first].forEach(d=>{ if(d && (!touch || d>touch)) touch=d; });
+    const gap = touch ? crmDays(touch, today) : null;
+    const overdue = !!(next && next<today);
+    const dueToday = !!(next && next===today);
+    let identity=null;
+    if(base.firstAll){
+      identity = (bizMonthDiff(base.firstAll, today) < 12) ? {t:'新客户', cls:'crm-new'} : {t:'老客户', cls:'crm-old'};
+    }
+    return Object.assign({}, base, {
+      stage: r.stage || base.stage0 || 'inquiry',
+      level: String(r.level||'').toUpperCase(),
+      source: r.source || base.source0 || '',
+      seller: r.seller || base.seller || '',
+      name: r.name || base.name || '',
+      country: r.country || base.country || '',
+      remark: String(r.remark||''),
+      next: next, lastFollow: lastFollow, followN: fl.length, follows: fl,
+      touch: touch, gap: gap, overdue: overdue, dueToday: dueToday, due: (overdue||dueToday),
+      silent: (gap!==null && gap>silentDays && !next),
+      identity: identity, sample: !!r._sample,
+      firstContact: r.contact || base.first || ''
+    });
+  };
+  const auto=crmAutoMap();
+  Object.keys(auto).forEach(cid=>{
+    const r=recs[cid];
+    if(r && r.hidden) return;
+    out.push(mk(auto[cid], r));
+  });
+  Object.keys(recs).forEach(cid=>{
+    if(cid.indexOf('m:')!==0) return;
+    const r=recs[cid]||{};
+    if(r.hidden) return;
+    out.push(mk({cid:cid, name:r.name||'（未填客户名）', seller:r.seller||'', country:r.country||'',
+                 gk:'', amount:0, orderN:0, payN:0, first:String(r.contact||''), last:'',
+                 firstAll:'', shop:'', shopList:[], auto:false, stage0:'inquiry', source0:r.source||''}, r));
+  });
+  out.sort((a,b)=>{
+    const w=x=> x.overdue?0 : (x.dueToday?1 : (x.silent?2 : 3));
+    const d=w(a)-w(b); if(d) return d;
+    const ta=a.touch||'', tb=b.touch||'';
+    if(ta!==tb) return ta<tb?1:-1;
+    return String(a.name).localeCompare(String(b.name));
+  });
+  return out;
+}
+function crmFiltered(all){
+  const f=crmFilter;
+  return (all||[]).filter(c=>{
+    if(f.seller && c.seller!==f.seller) return false;
+    if(f.stage && c.stage!==f.stage) return false;
+    if(f.level){
+      // 筛「未评级」时传进来的是 __none__ 哨兵值，这里翻回空串跟 c.level 比
+      const want = (f.level==='__none__') ? '' : f.level;
+      if(String(c.level||'')!==want) return false;
+    }
+    if(f.kw){
+      const k=f.kw.toLowerCase();
+      const hay=(c.name+' '+c.country+' '+c.seller+' '+c.shop+' '+c.remark).toLowerCase();
+      if(hay.indexOf(k)<0) return false;
+    }
+    return true;
+  });
+}
+function crmStats(all){
+  const today=todayStr(), monthStart=today.slice(0,7)+'-01';
+  const st={total:all.length, open:0, dealt:0, silent:0, due:0, newThisMonth:0, amount:0};
+  all.forEach(c=>{
+    if(c.stage==='dealt') st.dealt++; else st.open++;
+    if(c.silent) st.silent++;
+    if(c.due) st.due++;
+    if(c.firstAll && c.firstAll>=monthStart) st.newThisMonth++;
+    st.amount += Number(c.amount)||0;
+  });
+  return st;
+}
+// 业务员 → 平均响应（只统计同时填了「来询时间」和「首次回复时间」的跟进）
+function crmRespMap(){
+  const m={};
+  (crm.follows||[]).forEach(f=>{
+    const h=crmFollowHours(f);
+    if(h===null) return;
+    const seller=f.by || crmRec(f.cid).seller || '未指定';
+    const o=m[seller]||(m[seller]={sum:0,n:0});
+    o.sum+=h; o.n++;
+  });
+  return m;
+}
+function crmSellerOptions(all){
+  const m={};
+  (crm.sellers||[]).forEach(v=>{ if(v) m[String(v)]=1; });
+  Object.keys(BIZ_SELLERS||{}).forEach(k=>{ const v=BIZ_SELLERS[k]; if(v && v.indexOf('店铺')<0) m[v]=1; });
+  (all||[]).forEach(c=>{ if(c.seller) m[c.seller]=1; });
+  return Object.keys(m).sort((a,b)=>a.localeCompare(b));
+}
+function crmBadge(){
+  const b=document.getElementById('crmBadge');
+  if(!b) return;
+  let n=0;
+  // 角标 = 「需要我动手的客户」= 约好到期 + 沉默超期，跟页面里的提醒盒口径一致
+  try{ n=crmList().filter(c=>c.due||c.silent).length; }catch(e){ n=0; }
+  if(n>0){ b.textContent=n; b.style.display=''; } else { b.textContent='0'; b.style.display='none'; }
+}
+
+// ---------- 小片段渲染 ----------
+function crmCard(k,v,sub,warn){
+  return '<div class="crm-card'+(warn?' warn':'')+'"><div class="k">'+escHtml(k)+'</div>'
+    +'<div class="v">'+escHtml(String(v))+'</div>'
+    +'<div class="k" style="margin:3px 0 0">'+escHtml(sub||'')+'</div></div>';
+}
+function crmTouchHtml(c){
+  if(!c.touch) return '<span class="crm-ok">—</span>';
+  const d=crmDays(c.touch, todayStr());
+  const cls=(d!==null && d>crm.cfg.silentDays && c.stage!=='dealt') ? 'crm-silent' : 'crm-ok';
+  return '<span class="'+cls+'">'+escHtml(String(c.touch).slice(5))+(d!==null?(' · '+d+' 天前'):'')+'</span>';
+}
+function crmNextHtml(c){
+  if(!c.next) return '<span class="crm-ok">未安排</span>';
+  const d=crmDays(todayStr(), c.next);
+  if(d===null) return '<span>'+escHtml(c.next)+'</span>';
+  if(d<0) return '<span class="crm-silent">'+escHtml(c.next.slice(5))+' · 已过 '+Math.abs(d)+' 天</span>';
+  if(d===0) return '<span style="color:#b45309;font-weight:600">今天</span>';
+  return '<span>'+escHtml(c.next.slice(5))+' · 还有 '+d+' 天</span>';
+}
+function crmRowHtml(c){
+  let h='<tr>';
+  h+='<td><div class="nm" data-crm-open="'+escAttr(c.cid)+'">'+escHtml(c.name)
+    +(c.identity?'<span class="crm-idn '+c.identity.cls+'">'+c.identity.t+'</span>':'')
+    +(c.sample?'<span class="crm-idn" style="background:#fef3c7;color:#b45309">示例</span>':'')+'</div>'
+    +'<div class="crm-src">'+escHtml(c.country||'—')+' · '+(c.auto?'自动':'手工')+'</div></td>';
+  h+='<td>'+escHtml(c.seller||'—')+(c.shop?'<div class="crm-src">'+escHtml(c.shop)+'</div>':'')+'</td>';
+  h+='<td>'+crmStageTag(c.stage)+'</td>';
+  h+='<td class="crm-col-hide">'+crmLevelTag(c.level)+'</td>';
+  h+='<td class="crm-col-hide">'+crmTouchHtml(c)+'</td>';
+  h+='<td>'+crmNextHtml(c)+'</td>';
+  h+='<td class="r crm-col-hide">'+crmMoney(c.amount)+'</td>';
+  h+='<td class="r crm-col-hide">'+c.followN+'</td>';
+  h+='<td class="crm-acts"><button class="btn btn-sm" data-crm-follow="'+escAttr(c.cid)+'">记跟进</button></td>';
+  return h+'</tr>';
+}
+function crmTableHtml(list){
+  if(!list.length) return '<div class="crm-empty">没有符合条件的客户</div>';
+  let h='<table class="crm-tbl"><thead><tr>'
+    +'<th>客户</th><th>业务员</th><th>阶段</th>'
+    +'<th class="crm-col-hide">等级</th><th class="crm-col-hide">最近动静</th>'
+    +'<th>下次跟进</th><th class="r crm-col-hide">累计实收</th>'
+    +'<th class="r crm-col-hide">跟进</th><th class="crm-acts">操作</th>'
+    +'</tr></thead><tbody>';
+  list.forEach(c=>{ h+=crmRowHtml(c); });
+  return h+'</tbody></table>';
+}
+function crmSellerReport(all, resp){
+  const m={};
+  all.forEach(c=>{
+    const nm=c.seller||'未指定';
+    const o=m[nm]||(m[nm]={name:nm, n:0, dealt:0, open:0, due:0, silent:0, amount:0, followN:0});
+    o.n++;
+    if(c.stage==='dealt') o.dealt++; else o.open++;
+    if(c.due) o.due++;
+    if(c.silent) o.silent++;
+    o.amount += Number(c.amount)||0;
+    o.followN += c.followN;
+  });
+  Object.keys(m).forEach(k=>{
+    const r=resp[k];
+    m[k].resp = (r&&r.n) ? (r.sum/r.n) : null;
+    m[k].respN = r ? r.n : 0;
+  });
+  return Object.values(m).sort((a,b)=> b.n-a.n || a.name.localeCompare(b.name));
+}
+
+// ---------- 主渲染 ----------
+function renderCrm(){
+  const box=document.getElementById('crmContent');
+  if(!box) return;
+  crmHeal();
+  const all=crmList();
+  const list=crmFiltered(all);
+  const st=crmStats(all);
+  const resp=crmRespMap();
+  let rSum=0, rN=0;
+  Object.keys(resp).forEach(k=>{ rSum+=resp[k].sum; rN+=resp[k].n; });
+  let h='';
+
+  h+='<div class="crm-cards">';
+  h+=crmCard('客户总数', st.total, '自动 + 手工');
+  h+=crmCard('在跟（未成交）', st.open, '询盘 → 打样');
+  h+=crmCard('该跟进', st.due, '今天到期 / 已过期', st.due>0);
+  h+=crmCard('沉默超期', st.silent, '超过 '+crm.cfg.silentDays+' 天没动静', st.silent>0);
+  h+=crmCard('本月新增客户', st.newThisMonth, '按首次成交日算');
+  h+=crmCard('平均响应', (rN ? crmFmtHours(rSum/rN) : '—'), rN ? ('已记录 '+rN+' 次') : '还没录过响应时间');
+  h+='</div>';
+
+  // 该跟进提醒
+  const warn=all.filter(c=>c.due||c.silent);
+  if(warn.length){
+    h+='<div class="crm-warnbox"><h4><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+      +'该跟进了：'+warn.length+' 个客户'
+      +'<span style="font-weight:400;color:#b45309;margin-left:auto">这些也会出现在最上面「今天要处理」里</span></h4>';
+    h+='<div class="crm-warnlist">';
+    warn.slice(0,10).forEach(c=>{
+      const why = c.overdue
+        ? ('约好 '+c.next.slice(5)+' 跟进，已过 '+Math.abs(crmDays(todayStr(), c.next)||0)+' 天')
+        : (c.dueToday ? '今天约好跟进' : ('已经 '+c.gap+' 天没动静'));
+      h+='<div class="crm-warnrow">'
+        +'<span class="nm" data-crm-open="'+escAttr(c.cid)+'">'+escHtml(c.name)+'</span>'
+        +'<span class="crm-src" style="margin:0">'+escHtml(c.seller||'未指定')+'</span>'
+        +crmStageTag(c.stage)
+        +crmLevelTag(c.level)
+        +'<span class="crm-silent">'+escHtml(why)+'</span>'
+        +'<span style="margin-left:auto"><button class="btn btn-sm" data-crm-follow="'+escAttr(c.cid)+'">记一次跟进</button></span>'
+        +'</div>';
+    });
+    if(warn.length>10) h+='<div class="crm-src" style="text-align:center;margin-top:4px">还有 '+(warn.length-10)+' 个，看下面的台账</div>';
+    h+='</div></div>';
+  }
+
+  // 工具栏
+  h+='<div class="crm-toolbar">';
+  h+='<select class="crm-sel" onchange="crmSetFilter(\'seller\',this.value)">'
+    +'<option value="">全部业务员</option>'
+    +crmSellerOptions(all).map(v=>'<option value="'+escAttr(v)+'"'+(v===crmFilter.seller?' selected':'')+'>'+escHtml(v)+'</option>').join('')
+    +'</select>';
+  h+='<select class="crm-sel" onchange="crmSetFilter(\'stage\',this.value)">'
+    +'<option value="">全部阶段</option>'
+    +CRM_STAGES.map(x=>'<option value="'+x.key+'"'+(x.key===crmFilter.stage?' selected':'')+'>'+x.name+'</option>').join('')
+    +'</select>';
+  h+='<select class="crm-sel" onchange="crmSetFilter(\'level\',this.value)">'
+    +'<option value="">全部等级</option>'
+    // ⚠️ 「未评级」的 level 本身就是空串，跟「全部等级」的 option value 撞了 ——
+    //    撞了浏览器会把**最后一个同值 option** 当成选中项，下拉会错误地显示成「未评级」。
+    //    所以「未评级」在筛选器里用 __none__ 哨兵值，crmFiltered 再翻译回空串比对。
+    +CRM_LEVELS.map(x=>{const v=x[0]||'__none__'; return '<option value="'+escAttr(v)+'"'+(v===String(crmFilter.level||'')?' selected':'')+'>'+escHtml(x[1])+'</option>';}).join('')
+    +'</select>';
+  h+='<input class="crm-kw" id="crmKw" type="text" placeholder="搜客户名 / 国家 / 业务员 / 备注" value="'+escAttr(crmFilter.kw)+'" oninput="crmSetFilter(\'kw\',this.value)">';
+  h+='<button class="btn btn-primary" onclick="crmNewCustomer()">＋ 新建客户</button>';
+  h+='<button class="btn btn-ghost" onclick="crmExportCsv()">导出 CSV</button>';
+  h+='</div>';
+
+  // 台账
+  h+='<div class="biz-panel"><h4>客户台账 <span class="tag" id="crmCount">'+list.length+' / '+all.length+'</span>'
+    +'<span style="margin-left:auto;font-size:12px;font-weight:400;color:var(--text-muted)">点客户名看全过程 · 点「记跟进」直接补一条</span></h4>';
+  if(!all.length){
+    h+='<div class="crm-empty">'
+      +'<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">还没有客户</div>'
+      +'成交客户会<b>自动</b>从「经营分析」已导入的收款流水里生成 —— 去「经营分析」把订单 / 收款表导进来，这里立刻就有。<br>'
+      +'还没成交的潜在客户，点上面的「<b>＋ 新建客户</b>」手工建档。'
+      +'<div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
+      +'<button class="btn btn-primary" onclick="switchTab(\'biz\')">去经营分析导数据</button>'
+      +'<button class="btn btn-ghost" onclick="crmNewCustomer()">＋ 新建客户</button>'
+      +'</div></div>';
+  }else{
+    h+='<div class="crm-tbl-wrap" id="crmTableWrap">'+crmTableHtml(list)+'</div>';
+    h+='<div class="fc-note">「<b>自动</b>」= 来自经营分析的收款流水（名单实时生成，删不掉，只能隐藏）；「<b>手工</b>」= 你自己建的潜在客户。<br>'
+      +'「最近动静」取<b>最近一次跟进 / 收款 / 首次成交</b>里最晚的那个；超过 <b>'+crm.cfg.silentDays+'</b> 天没动静就标红。</div>';
+  }
+  h+='</div>';
+
+  // 业务员报表
+  const rep=crmSellerReport(all, resp);
+  if(rep.length){
+    h+='<div class="biz-panel"><h4>业务员客户报表 <span class="tag">按客户数排序</span></h4>';
+    h+='<div class="crm-tbl-wrap"><table class="crm-rep"><thead><tr>'
+      +'<th>业务员</th><th class="r">客户数</th><th class="r">已成交</th><th class="r">在跟</th>'
+      +'<th class="r">该跟进</th><th class="r">沉默</th><th class="r">跟进次数</th>'
+      +'<th class="r">平均响应</th><th class="r">累计实收</th></tr></thead><tbody>';
+    const maxN=rep[0]?rep[0].n:1;
+    rep.forEach(o=>{
+      h+='<tr><td><b>'+escHtml(o.name)+'</b></td>'
+        +'<td class="r">'+o.n+' <span style="display:inline-block;width:'+Math.max(4,Math.round(o.n/maxN*46))+'px;height:7px;border-radius:4px;background:var(--primary);vertical-align:middle"></span></td>'
+        +'<td class="r">'+o.dealt+'</td><td class="r">'+o.open+'</td>'
+        +'<td class="r">'+(o.due?('<span class="crm-silent">'+o.due+'</span>'):'0')+'</td>'
+        +'<td class="r">'+(o.silent?('<span class="crm-silent">'+o.silent+'</span>'):'0')+'</td>'
+        +'<td class="r">'+o.followN+'</td>'
+        +'<td class="r">'+(o.respN ? crmFmtHours(o.resp) : '<span class="crm-ok">未记录</span>')+'</td>'
+        +'<td class="r">'+crmMoney(o.amount)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="fc-note">「平均响应」只统计<b>同时填了「客户来询时间」和「首次回复时间」</b>的跟进记录 —— 不用每条都填，想拿它当考核指标时再填。</div>';
+    h+='</div>';
+  }
+
+  // 设置
+  h+='<div class="biz-panel"><h4>提醒设置</h4>';
+  h+='<div class="crm-toolbar" style="margin:0">'
+    +'<span style="font-size:13px;color:var(--text-secondary)">超过</span>'
+    +'<input class="crm-sel" type="number" min="1" max="180" step="1" style="width:88px;text-align:right" value="'+crm.cfg.silentDays+'" onchange="crmSetSilent(this.value)">'
+    +'<span style="font-size:13px;color:var(--text-secondary)">天没动静就提醒我</span>'
+    +'</div>';
+  h+='<div class="fc-note">「该跟进」的口径：<b>约好的「下次跟进日」已到今天或已过期</b>，或者<b>超过上面这个天数没有任何动静</b>（跟进 / 收款 / 首次成交都算动静）。</div>';
+  h+='</div>';
+
+  box.innerHTML=h;
+  crmBadge();
+}
+function crmRenderTable(){
+  const w=document.getElementById('crmTableWrap');
+  if(!w) return;
+  const all=crmList();
+  const list=crmFiltered(all);
+  w.innerHTML=crmTableHtml(list);
+  const cnt=document.getElementById('crmCount');
+  if(cnt) cnt.textContent=list.length+' / '+all.length;
+}
+function crmSetFilter(k,v){
+  crmFilter[k]=v;
+  if(k==='kw') crmRenderTable(); else renderCrm();
+}
+function crmSetSilent(v){
+  const n=parseInt(v,10);
+  crm.cfg.silentDays=(isNaN(n)||n<1)?CRM_SILENT_DEFAULT:n;
+  saveAll(); renderCrm(); showToast('已改成超过 '+crm.cfg.silentDays+' 天提醒');
+}
+function crmGoto(){ switchTab('crm'); }
+
+// ---------- 弹窗：客户全过程 ----------
+function crmField(label, id, val, type, hint){
+  return '<div class="crm-fld"><label>'+escHtml(label)+(hint?(' <span style="color:#b45309">'+escHtml(hint)+'</span>'):'')+'</label>'
+    +'<input type="'+type+'" id="'+id+'" value="'+escAttr(val||'')+'"></div>';
+}
+function crmSelField(label, id, values, cur, labels){
+  const ls=labels||values;
+  let o='';
+  for(let i=0;i<values.length;i++){
+    o+='<option value="'+escAttr(values[i])+'"'+(String(values[i])===String(cur||'')?' selected':'')+'>'+escHtml(ls[i])+'</option>';
+  }
+  return '<div class="crm-fld"><label>'+escHtml(label)+'</label><select id="'+id+'">'+o+'</select></div>';
+}
+function crmFact(k,v){
+  return '<div class="crm-fact"><div class="k">'+escHtml(k)+'</div><div class="v">'+escHtml(String(v))+'</div></div>';
+}
+function crmOpen(cid){
+  if(!cid) return;
+  crmOpenCid=cid;
+  renderCrmModal();
+  const ov=document.getElementById('crmModal');
+  if(ov) ov.style.display='flex';
+}
+function crmClose(){ crmOpenCid=''; const ov=document.getElementById('crmModal'); if(ov) ov.style.display='none'; }
+function crmQuickFollow(cid){
+  crmOpen(cid);
+  setTimeout(()=>{ const el=document.getElementById('crmAText'); if(el){ try{ el.focus(); }catch(e){} } }, 80);
+}
+function crmNewCustomer(){
+  crmOpenCid='m:'+uid();
+  renderCrmModal();
+  const ov=document.getElementById('crmModal'); if(ov) ov.style.display='flex';
+  setTimeout(()=>{ const el=document.getElementById('crmFName'); if(el){ try{ el.focus(); }catch(e){} } }, 80);
+}
+function renderCrmModal(){
+  const box=document.getElementById('crmModalBody');
+  if(!box) return;
+  const cid=crmOpenCid;
+  const title=document.getElementById('crmModalTitle');
+  if(!cid){ box.innerHTML=''; if(title) title.textContent='客户'; return; }
+  crmHeal();
+  const rec=crmRec(cid);
+  const auto=cid.indexOf('a:')===0;
+  const c=(crmList().filter(x=>x.cid===cid)[0])||null;
+  const name=rec.name||(c?c.name:'');
+  const today=todayStr();
+  if(title) title.textContent=(name||'新客户')+(auto?'（自动 · 来自经营分析收款）':'（手工建档）');
+
+  let h='';
+  if(auto && c){
+    h+='<div class="crm-facts">'
+      +crmFact('累计实收', crmMoney(c.amount).replace(/<[^>]+>/g,''))
+      +crmFact('订单数', c.orderN)
+      +crmFact('首次成交', c.firstAll||'—')
+      +crmFact('最近收款', c.last||'—')
+      +crmFact('涉及店铺', c.shop||'—')
+      +crmFact('身份', c.identity?c.identity.t:'—')
+      +'</div>';
+  }
+  h+='<div class="crm-frm">';
+  h+=crmField('客户名','crmFName',name,'text', auto?'':'');
+  h+=crmField('国家 / 地区','crmFCountry',rec.country||(c?c.country:''),'text','');
+  h+=crmField('归属业务员','crmFSeller',rec.seller||(c?c.seller:''),'text','');
+  h+=crmSelField('来源','crmFSource',CRM_SOURCES,rec.source||'');
+  h+=crmSelField('阶段','crmFStage',CRM_STAGE_KEYS,rec.stage||(auto?'dealt':'inquiry'),CRM_STAGES.map(x=>x.name));
+  h+=crmSelField('等级','crmFLevel',CRM_LEVELS.map(x=>x[0]),rec.level||'',CRM_LEVELS.map(x=>x[1]));
+  h+=crmField('首次接触','crmFContact',String(rec.contact||(c?c.firstContact:'')).slice(0,10),'date','');
+  h+=crmField('下次跟进','crmFNext',String(rec.next||''),'date','到期会提醒');
+  h+='</div>';
+  h+='<div class="crm-fld" style="margin-top:10px"><label>备注</label><textarea id="crmFRemark" rows="2" placeholder="客户偏好、付款习惯、注意事项…">'+escHtml(rec.remark||'')+'</textarea></div>';
+  h+='<div class="modal-actions" style="justify-content:space-between">'
+    +'<button class="btn btn-ghost" onclick="crmDelCustomer(crmOpenCid)">'+(auto?'隐藏此客户':'删除')+'</button>'
+    +'<span style="display:flex;gap:8px">'
+    +'<button class="btn btn-ghost" onclick="crmClose()">关闭</button>'
+    +'<button class="btn btn-primary" onclick="crmSaveCustomer()">保存</button>'
+    +'</span></div>';
+
+  const fl=(c&&c.follows)?c.follows:(crm.follows||[]).filter(f=>f.cid===cid);
+  h+='<div class="crm-sec"><b>跟进记录（'+fl.length+' 条）</b></div>';
+  if(fl.length){
+    h+='<div class="crm-tl">';
+    fl.slice(0,40).forEach(f=>{
+      const hrs=crmFollowHours(f);
+      h+='<div class="crm-tli"><div class="dt">'+escHtml(f.date)+'</div><div class="bd">'
+        +'<span class="ch">'+escHtml(f.ch)+'</span>'+escHtml(f.text)
+        +(f.by?'<div class="rt">跟单人：'+escHtml(f.by)+'</div>':'')
+        +((f.inAt||f.reAt)?('<div class="rt">来询 '+(f.inAt?escHtml(f.inAt):'—')+' → 首次回复 '+(f.reAt?escHtml(f.reAt):'—')+' · 间隔 '+(hrs===null?'—':crmFmtHours(hrs))+'</div>'):'')
+        +(f.next?'<div class="nx">下次跟进：'+escHtml(f.next)+'</div>':'')
+        +'</div>'
+        +'<div style="flex:0 0 auto"><button class="btn btn-sm" style="color:#dc2626" onclick="crmDelFollow(\''+escAttr(f.id)+'\')">删</button></div>'
+        +'</div>';
+    });
+    h+='</div>';
+  }else{
+    h+='<div class="crm-empty" style="padding:14px">还没有跟进记录，底下加一条</div>';
+  }
+
+  h+='<div class="crm-sec"><b>加一条跟进</b></div>';
+  h+='<div class="crm-frm">';
+  h+=crmField('日期','crmADate',today,'date','');
+  h+=crmSelField('渠道','crmACh',CRM_CHANNELS,'TM');
+  h+=crmField('跟单人','crmABy',rec.seller||(c?c.seller:''),'text','');
+  h+=crmSelField('顺便推进到','crmAStageAdv',[''].concat(CRM_STAGE_KEYS),'',
+                 ['（阶段不变）'].concat(CRM_STAGES.map(x=>x.name)));
+  h+=crmField('下次跟进','crmANext','','date','');
+  h+=crmField('客户来询时间','crmAIn','','datetime-local','选填');
+  h+=crmField('首次回复时间','crmARe','','datetime-local','选填');
+  h+='<div class="crm-fld" style="grid-column:1/-1"><label>跟进内容</label>'
+    +'<textarea id="crmAText" rows="3" placeholder="聊了什么、客户什么态度、下一步做什么"></textarea></div>';
+  h+='</div>';
+  h+='<div style="margin-top:10px;display:flex;justify-content:flex-end">'
+    +'<button class="btn btn-primary" onclick="crmAddFollow()">记下这次跟进</button></div>';
+
+  box.innerHTML=h;
+}
+function crmVal(id){ const el=document.getElementById(id); return el?String(el.value||''):''; }
+function crmSaveCustomer(){
+  const cid=crmOpenCid; if(!cid) return;
+  const patch={
+    name: crmVal('crmFName').trim(),
+    country: crmVal('crmFCountry').trim(),
+    seller: crmVal('crmFSeller').trim(),
+    source: crmVal('crmFSource'),
+    stage: crmVal('crmFStage') || 'inquiry',
+    level: crmVal('crmFLevel'),
+    contact: crmVal('crmFContact'),
+    next: crmVal('crmFNext'),
+    remark: crmVal('crmFRemark').trim()
+  };
+  if(!patch.name){ showToast('客户名不能为空'); return; }
+  if(patch.seller && (crm.sellers||[]).indexOf(patch.seller)<0) crm.sellers.push(patch.seller);
+  crmSetRec(cid, patch);
+  saveAll(); renderCrm(); renderCrmModal();
+  showToast('客户资料已保存','success');
+}
+function crmAddFollow(){
+  const cid=crmOpenCid; if(!cid) return;
+  const text=crmVal('crmAText').trim();
+  if(!text){ showToast('先写一句跟进内容吧'); return; }
+  const date=crmVal('crmADate') || todayStr();
+  const next=crmVal('crmANext');
+  const by=crmVal('crmABy').trim();
+  crm.follows.push({id:uid(), cid:cid, date:date, ch:crmVal('crmACh')||'TM',
+                    text:text, next:next,
+                    inAt:crmVal('crmAIn'), reAt:crmVal('crmARe'), by:by});
+  const patch={last:date};
+  if(next) patch.next=next;
+  const adv=crmVal('crmAStageAdv');
+  if(adv && CRM_STAGE_KEYS.indexOf(adv)>=0) patch.stage=adv;
+  if(by && (crm.sellers||[]).indexOf(by)<0) crm.sellers.push(by);
+  crmSetRec(cid, patch);
+  saveAll(); renderCrm(); renderCrmModal();
+  showToast('跟进已记录','success');
+}
+function crmDelFollow(fid){
+  const n=(crm.follows||[]).length;
+  crm.follows=(crm.follows||[]).filter(f=>f.id!==fid);
+  if(n===(crm.follows||[]).length){ showToast('没找到这条记录'); return; }
+  saveAll(); renderCrm(); renderCrmModal(); showToast('已删除这条跟进');
+}
+function crmDelCustomer(cid){
+  if(!cid) return;
+  const rec=crmRec(cid);
+  const auto=cid.indexOf('a:')===0;
+  const nm=rec.name||'这个客户';
+  if(auto){
+    showConfirm('「'+nm+'」是经营分析收款流水里自动带出来的成交客户，删不掉，但可以隐藏。'
+      +'隐藏后客户台不再显示它，收款数据不受任何影响。要隐藏吗？', ()=>{
+      crmSetRec(cid,{hidden:true});
+      saveAll(); crmClose(); renderCrm(); showToast('已隐藏（收款数据不受影响）');
+    });
+  }else{
+    showConfirm('删除手工客户「'+nm+'」以及它的全部跟进记录？删了就找不回来了（自动生成的成交客户不受影响）。', ()=>{
+      delete crm.recs[cid];
+      crm.follows=(crm.follows||[]).filter(f=>f.cid!==cid);
+      saveAll(); crmClose(); renderCrm(); showToast('已删除');
+    });
+  }
+}
+function crmExportCsv(){
+  const list=crmFiltered(crmList());
+  if(!list.length){ showToast('当前筛选下没有客户'); return; }
+  const rows=[['客户','国家','业务员','店铺','阶段','等级','新老客','首次成交','最近动静','距今天数','累计实收(USD)','订单数','跟进次数','下次跟进','来源','备注']];
+  list.forEach(c=>{
+    rows.push([c.name, c.country||'', c.seller||'', c.shop||'', crmStageName(c.stage), c.level||'',
+      c.identity?c.identity.t:'', c.firstAll||'', c.touch||'', (c.gap===null?'':c.gap),
+      Math.round(Number(c.amount)||0), c.orderN||'', c.followN||0,
+      c.next||'', c.source||'', c.remark||'']);
+  });
+  const csv=rows.map(r=>r.map(v=>{
+    const t=String(v===undefined||v===null?'':v);
+    return /[",\r\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t;
+  }).join(',')).join('\r\n');
+  bkDownloadBlob(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}), '客户跟进台_'+todayStr()+'.csv');
+  showToast('已导出 '+list.length+' 个客户','success');
+}
+
+// ---------- 示例数据（只在既没有真实收款、也没有手工客户时种）----------
+function crmSeedIfEmpty(){
+  if(crm.seeded) return 0;
+  crm.seeded=true;
+  if(((biz&&biz.pays)||[]).length) return 0;
+  if(Object.keys(crm.recs||{}).length) return 0;
+  const mk=(name,country,seller,source,stage,level,contact,next,follows)=>{
+    const cid='m:'+uid();
+    crm.recs[cid]={name:name, country:country, seller:seller, source:source, stage:stage,
+                   level:level, contact:contact, next:next, remark:'', _sample:true};
+    (follows||[]).forEach(f=>{
+      crm.follows.push({id:uid(), cid:cid, date:f[0], ch:f[1], text:f[2], next:f[3]||'',
+                        inAt:f[4]||'', reAt:f[5]||'', by:seller});
+    });
+    return cid;
+  };
+  mk('示例 · Al Noor Trading（示例）','阿联酋','孟伊','TM','quoted','A', crmShiftDate(-20), crmShiftDate(-4), [
+    [crmShiftDate(-20),'TM','客户要 BJJ 套装，发了两款版型图 + 报价单',
+      '', crmShiftDate(-20)+' 09:10', crmShiftDate(-20)+' 09:35'],
+    [crmShiftDate(-4),'邮件','说这周给答复，到现在没动静 —— 要主动追一下','', '', '']
+  ]);
+  mk('示例 · Kimura Sports（示例）','日本','李雪洋','阿里询盘','sampled','B', crmShiftDate(-9), todayStr(), [
+    [crmShiftDate(-9),'阿里询盘','收到询盘，要 75D 四面弹打样','', crmShiftDate(-9)+' 14:02', crmShiftDate(-9)+' 14:48'],
+    [crmShiftDate(-2),'微信','样品昨天寄出，顺丰单号已发','', '', '']
+  ]);
+  mk('示例 · Sunrise Beachwear（示例）','澳大利亚','陈曦','老客介绍','dealt','A', crmShiftDate(-45), crmShiftDate(7), [
+    [crmShiftDate(-45),'邮件','老客户介绍来的，第一次下单走样品单','', crmShiftDate(-45)+' 10:20', crmShiftDate(-45)+' 11:05'],
+    [crmShiftDate(-6),'TM','大货已出货，约好下周回访问返单','', '', '']
+  ]);
+  return 3;
+}
+function crmHasSample(){
+  const r=crm.recs||{};
+  return Object.keys(r).some(k=>r[k] && r[k]._sample);
+}
+function crmClearSample(){
+  const r=crm.recs||{};
+  const del=Object.keys(r).filter(k=>r[k] && r[k]._sample);
+  del.forEach(k=>{ delete r[k]; });
+  crm.follows=(crm.follows||[]).filter(f=>del.indexOf(f.cid)<0);
+}
+
+// cid 里带买家原名（可能含引号），一律走事件委托，不拼内联 onclick
+document.addEventListener('click', function(e){
+  const t=e.target;
+  if(!t || !t.closest) return;
+  const a=t.closest('[data-crm-open]');
+  if(a){ crmOpen(a.getAttribute('data-crm-open')); return; }
+  const b=t.closest('[data-crm-follow]');
+  if(b){ crmQuickFollow(b.getAttribute('data-crm-follow')); }
+});
+
+// ============================================================
 //  INIT
 // ============================================================
 function init(){
@@ -14685,6 +15571,15 @@ function init(){
     seedClmSample();
     localStorage.setItem(STORAGE_PREFIX+'clm_seeded','1');
     saveAll();
+  }
+
+  // 客户跟进台：只在「还没导过经营分析收款、也没建过手工客户」时种 3 条示例
+  // （已经有真实数据的用户不会被塞假客户）；顶部「清空示例数据」可一键清除
+  if(!localStorage.getItem(STORAGE_PREFIX+'crm_seeded')){
+    const _cn = crmSeedIfEmpty();
+    localStorage.setItem(STORAGE_PREFIX+'crm_seeded','1');
+    saveAll();
+    if(_cn) setTimeout(()=>{ try{ showToast('客户跟进台：已载入 3 条示例客户，点「清空示例数据」可移除','info'); }catch(e){} }, 2400);
   }
   // 外贸运费：首次打开预置 4 家已知货代公司菜单（顺丰 / 腾信 / 迅驰达 / 深圳燕文），用户可增删
   if(!localStorage.getItem(STORAGE_PREFIX+'fr_fwd_seeded')){
