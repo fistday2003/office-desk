@@ -417,6 +417,15 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .archive-row .arch-chevron{font-size:11px;color:var(--text-muted);transition:transform .2s ease;flex-shrink:0}
 .archive-row .arch-chevron.open{transform:rotate(90deg);color:var(--success)}
 .archive-detail{margin:-2px 0 12px 0;animation:fadeIn .2s ease}
+/* v2.41 待做事项：事项与项目统一成「一行一条」（沿用项目跟进的索引行样式） */
+.todo-row{padding:11px 14px}
+.todo-row.todo-overdue{border-color:var(--danger-light);background:var(--danger-light)}
+.todo-row.todo-overdue:hover{border-color:var(--danger);background:var(--danger-light)}
+.todo-row.todo-done{background:var(--bg)}
+.todo-name-done{color:var(--text-muted);text-decoration:line-through}
+.date-group-header.done{color:var(--success);border-bottom-color:var(--success-light)}
+.todo-detail{padding:14px 16px}
+.todo-detail .card-meta{margin-bottom:10px}
 .project-archive .card-title{color:var(--text-secondary)}
 /* 跟进时间线 */
 .proj-log-region{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px}
@@ -1254,16 +1263,12 @@ tr:hover .fr-fwd-acts{opacity:1}
     <nav class="sidebar-nav">
       <button class="nav-item active" data-tab="tasks">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        今天待办
+        待做事项
         <span class="nav-badge" id="taskBadge" style="display:none">0</span>
       </button>
       <button class="nav-item" data-tab="notes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
         灵感速记
-      </button>
-      <button class="nav-item" data-tab="projects">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        项目跟进
       </button>
       <button class="nav-item" data-tab="expenses">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
@@ -1293,11 +1298,6 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         每周复盘
       </button>
-      <button class="nav-item" data-tab="archive">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-        已完成项目
-        <span class="nav-badge" id="archiveBadge" style="display:none">0</span>
-      </button>
       <button class="nav-item" data-tab="hr">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         人事管理
@@ -1318,24 +1318,31 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.40 · 2026-10-16</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.41 · 2026-10-16</div>
     </div>
   </aside>
 
   <!-- Main Content -->
   <main class="main-content">
-    <!-- TAB: 今天待办 -->
+    <!-- TAB: 待做事项（v2.41：「今天待办」+「项目跟进」合并，原「已完成项目」并入本页下半部分） -->
     <div class="tab-panel active" id="tab-tasks">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:10px">
         <div class="section-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-          今天待办
+          待做事项
         </div>
-        <button class="btn btn-primary" id="btnAddTask">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          添加任务
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="btnAddTask">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            新建事项
+          </button>
+          <button class="btn btn-ghost" id="btnAddProject">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            新建项目
+          </button>
+        </div>
       </div>
+      <p class="section-subtitle">原来的「今天待办」和「项目跟进」合并到这里，条目统一按项目跟进那种「<b>一行一条、点开看详情</b>」的样式排。<b>简单的一件事</b>用「＋ 新建事项」（可定截止日 / 优先级 / 能顺延）；<b>要跟一阵子的一条线</b>用「＋ 新建项目」（能挂子项目、记跟进记录）。<b>已完成的</b>（勾掉的事项 + 完成的项目）都收在页面最下面的「已完成」里。</p>
       <div id="taskList"></div>
     </div>
 
@@ -1353,21 +1360,6 @@ tr:hover .fr-fwd-acts{opacity:1}
       </div>
       <div class="tag-filter" id="tagFilter"></div>
       <div id="noteList"></div>
-    </div>
-
-    <!-- TAB: 项目跟进 -->
-    <div class="tab-panel" id="tab-projects">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-        <div class="section-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-          项目跟进
-        </div>
-        <button class="btn btn-primary" id="btnAddProject">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          新建项目
-        </button>
-      </div>
-      <div id="projectList"></div>
     </div>
 
     <!-- TAB: 报账整理 -->
@@ -1448,16 +1440,6 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div id="reviewContent"></div>
     </div>
 
-    <!-- TAB: 已完成项目（索引形式，点击名称展开详情） -->
-    <div class="tab-panel" id="tab-archive">
-      <div class="section-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-        已完成项目文件夹
-      </div>
-      <p class="section-subtitle">长期保存 · 索引形式，点击项目名称展开/收起详细内容</p>
-      <div id="archiveList"></div>
-    </div>
-
     <!-- TAB: 人事管理 -->
     <div class="tab-panel" id="tab-hr">
       <div class="hr-head">
@@ -1510,15 +1492,11 @@ tr:hover .fr-fwd-acts{opacity:1}
 <nav class="mobile-nav" id="mobileNav">
   <button class="mnav-item active" data-mtab="tasks">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-    待办
+    事项
   </button>
   <button class="mnav-item" data-mtab="notes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
     灵感
-  </button>
-  <button class="mnav-item" data-mtab="projects">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-    项目
   </button>
   <button class="mnav-item" data-mtab="expenses">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
@@ -1543,10 +1521,6 @@ tr:hover .fr-fwd-acts{opacity:1}
   <button class="mnav-item" data-mtab="review">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
     复盘
-  </button>
-  <button class="mnav-item" data-mtab="archive">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-    归档
   </button>
   <button class="mnav-item" data-mtab="hr">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
@@ -2191,7 +2165,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.40';
+const APP_VERSION = 'v2.41';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -3840,114 +3814,175 @@ function quickPostpone(taskId){
 // ============================================================
 //  TASKS TAB
 // ============================================================
+// ============================================================
+//  待做事项（v2.41）：原「今天待办」+「项目跟进」+「已完成项目」三合一
+//   · 进行中：事项（原待办）与项目混在同一个列表里，条目统一用「项目跟进」的索引行格式
+//   · 已完成：勾掉的事项 + 已完成的项目，统一收在页面最下面（默认折叠，点标题展开）
+//  ⚠️ 数据结构一点没动：事项还在 tasks、项目还在 projects，合并的只是「显示」——
+//     老数据一条都不会丢，导出的备份结构与以前完全一样。
+// ============================================================
+let todoDoneOpen = false;   // 底部「已完成」区是否展开（内存态，不持久化）
+
+function todoToggleDone(){ todoDoneOpen = !todoDoneOpen; renderTasks(); }
+
+// 逾期天数（正数 = 已经过了几天）
+function todoDaysLate(ds){
+  if(!ds) return 0;
+  const p = ds.split('-'), t = todayStr().split('-');
+  return Math.round((Date.UTC(+t[0],t[1]-1,+t[2]) - Date.UTC(+p[0],p[1]-1,+p[2]))/86400000);
+}
+
 function renderTasks(){
+  const el = document.getElementById('taskList');
+  if(!el) return;
   const today = todayStr();
-  const yest = yesterdayStr();
-  const container = document.getElementById('taskList');
-  
-  // Group tasks
-  const overdue = tasks.filter(t=>!t.done && t.deadline && t.deadline < today).sort((a,b)=>a.deadline.localeCompare(b.deadline));
-  const todayTasks = tasks.filter(t=>!t.done && t.deadline===today).sort((a,b)=>priorityOrder(a.priority)-priorityOrder(b.priority));
-  const future = tasks.filter(t=>!t.done && t.deadline && t.deadline > today).sort((a,b)=>a.deadline.localeCompare(b.deadline));
-  const noDate = tasks.filter(t=>!t.done && !t.deadline);
-  const done = tasks.filter(t=>t.done).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0));
-  
+
+  const openT    = tasks.filter(t=>!t.done);
+  const overdue  = openT.filter(t=>t.deadline && t.deadline<today).sort((a,b)=>a.deadline.localeCompare(b.deadline));
+  const dueToday = openT.filter(t=>t.deadline===today).sort((a,b)=>priorityOrder(a.priority)-priorityOrder(b.priority));
+  const future   = openT.filter(t=>t.deadline && t.deadline>today).sort((a,b)=>a.deadline.localeCompare(b.deadline));
+  const noDate   = openT.filter(t=>!t.deadline);
+  const activeP  = projects.filter(p=>p.status!=='completed');
+
   let html = '';
-  
-  // Overdue section
+
   if(overdue.length>0){
     html += '<div class="date-group"><div class="date-group-header overdue">⚠ 已逾期 — 请尽快处理</div>';
-    overdue.forEach(t=>html+=taskCard(t,'overdue'));
+    overdue.forEach(t=>{ html += todoTaskRow(t,'overdue'); });
     html += '</div>';
   }
-  
-  // Today section
-  html += '<div class="date-group"><div class="date-group-header today">📅 今天 · '+fmtDateFull(today)+'</div>';
-  if(todayTasks.length>0){
-    todayTasks.forEach(t=>html+=taskCard(t,'today'));
-  } else {
-    html += '<div class="card" style="text-align:center;color:var(--text-muted);padding:24px">今天还没有任务，点击右上角添加</div>';
+
+  if(dueToday.length>0){
+    html += '<div class="date-group"><div class="date-group-header today">📅 今天 · '+fmtDateFull(today)+'</div>';
+    dueToday.forEach(t=>{ html += todoTaskRow(t,'today'); });
+    html += '</div>';
   }
-  html += '</div>';
-  
-  // Future section - grouped by date
+
+  if(activeP.length>0){
+    html += '<div class="date-group"><div class="date-group-header">📁 进行中的项目（'+activeP.length+'）</div>';
+    html += todoProjectRows(activeP);
+    html += '</div>';
+  }
+
   if(future.length>0){
     const groups = {};
-    future.forEach(t=>{
-      if(!groups[t.deadline]) groups[t.deadline] = [];
-      groups[t.deadline].push(t);
-    });
+    future.forEach(t=>{ if(!groups[t.deadline]) groups[t.deadline]=[]; groups[t.deadline].push(t); });
     Object.keys(groups).sort().forEach(d=>{
       html += '<div class="date-group"><div class="date-group-header">📌 '+fmtDateFull(d)+'</div>';
-      groups[d].forEach(t=>html+=taskCard(t,'future'));
+      groups[d].forEach(t=>{ html += todoTaskRow(t,'future'); });
       html += '</div>';
     });
   }
-  
-  // No date section
+
   if(noDate.length>0){
-    html += '<div class="date-group"><div class="date-group-header">📋 待安排</div>';
-    noDate.forEach(t=>html+=taskCard(t,'nodate'));
+    html += '<div class="date-group"><div class="date-group-header">📋 待安排（没填截止日）</div>';
+    noDate.forEach(t=>{ html += todoTaskRow(t,'nodate'); });
     html += '</div>';
   }
-  
-  // Done section (collapsible)
-  if(done.length>0){
-    html += '<div class="date-group"><div class="date-group-header" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">✅ 已完成（'+done.length+'项）</div>';
-    html += '<div style="display:none">';
-    done.slice(0,10).forEach(t=>html+=taskCard(t,'done'));
-    if(done.length>10) html += '<p style="text-align:center;color:var(--text-muted);font-size:13px;padding:8px">...还有 '+(done.length-10)+' 项已完成</p>';
-    html += '</div></div>';
+
+  if(!html){
+    html = '<div class="card" style="text-align:center;color:var(--text-muted);padding:32px">还没有要处理的事，点右上角「＋ 新建事项」或「＋ 新建项目」开始</div>';
   }
-  
-  // Update badge
-  const activeCount = tasks.filter(t=>!t.done && t.deadline && t.deadline <= today).length;
+
+  // ---------- 已完成区（页面最下面）：勾掉的事项 + 已完成的项目，按完成时间倒序 ----------
+  const doneT = tasks.filter(t=>t.done).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0));
+  const doneP = projects.filter(p=>p.status==='completed').sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
+  const doneAll = doneT.map(t=>({kind:'t', at:t.doneAt||0, o:t}))
+                       .concat(doneP.map(p=>({kind:'p', at:p.completedAt||0, o:p})))
+                       .sort((a,b)=>b.at-a.at);
+  if(doneAll.length>0){
+    html += '<div class="date-group" style="margin-top:22px">';
+    html += '<div class="date-group-header done" style="cursor:pointer" onclick="todoToggleDone()">✅ 已完成（'+doneAll.length+' 项）'
+          + '<span style="font-weight:400;color:var(--text-muted)">'+(todoDoneOpen?'点这里收起':'点这里展开')+'</span></div>';
+    if(todoDoneOpen){
+      doneAll.forEach(x=>{ html += (x.kind==='t') ? todoTaskRow(x.o,'done') : todoProjectRow(x.o,false); });
+    }
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+
+  // 侧栏角标：今天要动手的事项数（逾期 + 今天到期）
+  const activeCount = tasks.filter(t=>!t.done && t.deadline && t.deadline<=today).length;
   const badge = document.getElementById('taskBadge');
-  if(activeCount>0){badge.style.display='inline';badge.textContent=activeCount}else{badge.style.display='none'}
-  
-  container.innerHTML = html || '<div class="card" style="text-align:center;color:var(--text-muted);padding:32px">还没有任务，点击右上角「添加任务」开始</div>';
+  if(badge){
+    if(activeCount>0){ badge.style.display='inline'; badge.textContent=activeCount; }
+    else { badge.style.display='none'; }
+  }
 }
 
 function priorityOrder(p){return p==='P0'?0:p==='P1'?1:2}
 function priorityLabel(p){return p==='P0'?'P0 紧急':p==='P1'?'P1 重要':'P2 一般'}
 function priorityClass(p){return 'badge-'+String(p||'P2').toLowerCase()}   // 兜底：旧数据/外部导入可能没有 priority 字段，缺了就按 P2 渲染，避免整个列表崩
 
-function taskCard(t, section){
-  const isOverdue = section==='overdue';
-  const isToday = section==='today';
+// ---- 事项：一行一条（和项目同一套索引行样式），点标题展开详情 ----
+function todoTaskRow(t, section){
+  const today = todayStr();
   const isDone = section==='done';
-  const postponed = (t.postponedCount||0)>0;
-  
-  let cls = 'card task-card';
-  if(isDone) cls += ' done';
-  if(isOverdue) cls += ' overdue';
-  if(postponed) cls += ' postponed';
-  
+  const open = taskDetailOpen.has(t.id);
   const proj = t.projectId ? projects.find(p=>p.id===t.projectId) : null;
-  const isOpen = taskDetailOpen.has(t.id);
-  
-  let html = '<div class="'+cls+'">';
-  // 标题行：默认只显示复选框 + 标题 + 展开箭头，点击展开详情
-  html += '<div class="task-title-row" onclick="toggleTaskDetail(\''+t.id+'\')">';
-  html += '<div class="task-check'+(isDone?' done':'')+'" onclick="event.stopPropagation();toggleTask(\''+t.id+'\')">';
+
+  let cls = 'archive-row todo-row';
+  if(section==='overdue') cls += ' todo-overdue';
+  if(isDone) cls += ' todo-done';
+
+  let html = '<div class="'+cls+'" onclick="toggleTaskDetail(\''+t.id+'\')">';
+  // 勾选框：点它直接完成 / 取消完成，不展开详情
+  html += '<span class="task-check'+(isDone?' done':'')+'" onclick="event.stopPropagation();toggleTask(\''+t.id+'\')" title="'+(isDone?'取消完成':'标记完成')+'">';
   if(isDone) html += '<svg viewBox="0 0 24 24"><polyline points="4 12 9 17 20 6"/></svg>';
+  html += '</span>';
+  html += '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="'+(isDone?'#16a34a':'#94a3b8')+'" stroke-width="2" style="flex-shrink:0"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+  html += '<div class="arch-name'+(isDone?' todo-name-done':'')+'">'+escHtml(t.title)+'</div>';
+
+  const meta = [];
+  if(!isDone) meta.push(priorityLabel(t.priority));
+  if(t.deadline){
+    if(section==='overdue'){
+      const late = todoDaysLate(t.deadline);
+      meta.push('⚠ 逾期'+(late>0?(' '+late+' 天'):'')+'（原定 '+fmtDate(t.deadline)+'）');
+    } else if(t.deadline===today){
+      meta.push('📅 今天');
+    } else {
+      meta.push('📅 '+fmtDate(t.deadline));
+    }
+  } else if(!isDone){
+    meta.push('待安排');
+  }
+  if((t.postponedCount||0)>0) meta.push('已顺延 '+t.postponedCount+' 次');
+  if(proj) meta.push('📁 '+escHtml(proj.name));
+  if((t.files||[]).length>0) meta.push('📎'+t.files.length);
+  if(isDone && t.doneAt) meta.push(fmtDate(tsToDateStr(t.doneAt))+'完成');
+  if(meta.length) html += '<div class="arch-meta">'+meta.join(' · ')+'</div>';
+
+  html += '<span class="arch-chevron'+(open?' open':'')+'">▶</span>';
   html += '</div>';
-  html += '<div class="card-title">'+escHtml(t.title)+'</div>';
-  html += '<span class="task-chevron'+(isOpen?' open':'')+'">▶</span>';
+
+  // ⚠️ 详情必须【始终渲染】、只靠 display 藏起来：toggleTaskDetail() 是纯切 display、不重画列表
+  //    （这样在笔记里打字不会因为重画而丢字）。项目那边相反——项目详情是重画时才生成，
+  //    所以项目走 toggleProjectOpen() 重新渲染，两者别搞混。
+  html += '<div class="archive-detail" id="taskDetail_'+t.id+'" data-drop-task="'+t.id+'" style="display:'+(open?'block':'none')+'">';
+  html += todoTaskDetail(t, section);
   html += '</div>';
-  // 详情区：默认折叠，点击标题展开
-  html += '<div class="task-detail" id="taskDetail_'+t.id+'" data-drop-task="'+t.id+'" style="display:'+(isOpen?'block':'none')+'">';
+  return html;
+}
+
+// ---- 事项详情：和项目详情同一套视觉（标签行 + 详情笔记 + 附件 + 操作）----
+function todoTaskDetail(t, section){
+  const proj = t.projectId ? projects.find(p=>p.id===t.projectId) : null;
+
+  let html = '<div class="card todo-detail">';
   html += '<div class="card-meta">';
   html += '<span class="badge '+priorityClass(t.priority)+'">'+priorityLabel(t.priority)+'</span>';
   if(t.deadline) html += '<span class="badge badge-date">📅 '+fmtDate(t.deadline)+'</span>';
-  if(postponed) html += '<span class="badge badge-postpone">已顺延 '+t.postponedCount+' 次</span>';
+  if((t.postponedCount||0)>0) html += '<span class="badge badge-postpone">已顺延 '+t.postponedCount+' 次</span>';
   if(proj) html += '<span class="badge badge-project">📁 '+escHtml(proj.name)+'</span>';
+  html += t.done ? '<span class="badge badge-done">✅ 已完成</span>' : '<span class="badge badge-project">⬜ 未完成</span>';
   html += '</div>';
-  // 笔记区：直接打字，自动保存
+
   html += '<div class="task-note-label">📝 详情笔记</div>';
   html += '<textarea class="task-note-box" id="taskNote_'+t.id+'" placeholder="在这里记录详情、进展、思路..." oninput="scheduleTaskDetailSave(\''+t.id+'\')">'+escHtml(t.detail||'')+'</textarea>';
   html += '<div class="task-note-hint">输入后自动保存</div>';
-  // 附件区
+
   const files = t.files||[];
   if(files.length>0){
     html += '<div class="task-files">';
@@ -3967,15 +4002,12 @@ function taskCard(t, section){
     html += '</div>';
   }
   html += '<div class="task-file-add"><button class="btn btn-sm btn-ghost" onclick="addTaskFiles(\''+t.id+'\')">📎 添加附件</button></div>';
+
   html += '<div class="card-actions">';
-  if(isToday && !isDone){
-    html += '<button class="btn btn-sm btn-ghost" onclick="postponeTask(\''+t.id+'\')" title="顺延到明天">→ 明天</button>';
-  }
+  if(!t.done) html += '<button class="btn btn-sm btn-ghost" onclick="postponeTask(\''+t.id+'\')" title="顺延到明天">→ 明天</button>';
   html += '<button class="btn-icon" onclick="editTask(\''+t.id+'\')" title="编辑"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
   html += '<button class="btn-icon" onclick="deleteTask(\''+t.id+'\')" title="删除" style="color:var(--danger)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
-  html += '</div>';
-  html += '</div>';
-  html += '</div>';
+  html += '</div></div>';
   return html;
 }
 
@@ -4363,6 +4395,7 @@ function toggleTask(id){
   if(!t) return;
   t.done = !t.done;
   t.doneAt = t.done ? Date.now() : null;
+  if(t.done) showToast('✓ 已完成，收到下面「已完成」区了','info');
   saveAll();
   refreshAll();
 }
@@ -4527,103 +4560,57 @@ function getProjectTaskStats(projectId){
 
 // ===== 项目跟进：索引形式（默认只显示项目名称，点击展开全部内容） =====
 const projectOpenIds = new Set();
-function renderProjects(){
-  const container = document.getElementById('projectList');
-  const active = projects.filter(p=>p.status!=='completed');
+// v2.41：「项目跟进」已并入「待做事项」，这里保留同名函数做兼容 ——
+// 各处（记跟进 / 编辑跟进 / 完成项目 / 恢复项目）调用的 renderProjects() 会自动刷新合并列表。
+function renderProjects(){ renderTasks(); }
 
-  if(active.length===0){
-    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">📁</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">还没有进行中的项目</div><div style="font-size:13px">点击右上角「新建项目」开始</div></div>';
-    return;
-  }
-
-  // 排列：父项目在前，紧跟其子项目（子项目缩进标识）
+// ---- 项目：一行一条的索引行（沿用原「项目跟进」的样式），点开才渲染详情 ----
+function todoProjectRows(active){
   const top = active.filter(p=>!p.parentId || !active.find(a=>a.id===p.parentId));
   const ordered = [];
   top.forEach(p=>{
-    ordered.push({p, isChild:false});
+    ordered.push({p:p, isChild:false});
     active.filter(c=>c.parentId===p.id).forEach(c=>ordered.push({p:c, isChild:true}));
   });
   // 兜底：未被归入的（防止循环引用等极端情况）
-  active.forEach(p=>{ if(!ordered.some(o=>o.p.id===p.id)) ordered.push({p, isChild:!!p.parentId}); });
-
-  let html = '';
-  ordered.forEach(({p, isChild})=>{
-    const open = projectOpenIds.has(p.id);
-    const logCount = (p.logs||[]).length;
-    const stats = getProjectTaskStats(p.id);
-    const childrenCount = active.filter(c=>c.parentId===p.id).length;
-    const parentName = isChild ? (projects.find(pp=>pp.id===p.parentId)||{}).name : null;
-    // 索引行
-    html += '<div class="archive-row'+(isChild?' project-child-row':'')+'" onclick="toggleProjectOpen(\''+p.id+'\')"'+(isChild?' style="padding-left:26px"':'')+'>';
-    html += '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><polyline points="9 14 11 16 15 12"/></svg>';
-    html += '<div class="arch-name">'+(isChild?'<span style="font-size:11px;color:var(--text-muted);margin-right:4px">└</span>':'')+escHtml(p.name)+'</div>';
-    // 摘要信息：状态 + 跟进/子项目/待办概览
-    let meta = [];
-    meta.push(p.status==='blocked' ? '🚫 卡住了' : '🔄 进行中');
-    if(parentName) meta.push('子项目 · '+escHtml(parentName));
-    if(childrenCount>0) meta.push(childrenCount+'个子项目');
-    if(logCount>0) meta.push(logCount+'条跟进');
-    if(stats.total>0) meta.push('待办 '+stats.done+'/'+stats.total);
-    if((p.files||[]).length>0) meta.push('📎'+p.files.length);
-    html += '<div class="arch-meta">'+meta.join(' · ')+'</div>';
-    html += '<span class="arch-chevron'+(open?' open':'')+'">▶</span>';
-    html += '</div>';
-    // 详情（点开才渲染）
-    html += '<div class="archive-detail" id="projectDetail_'+p.id+'" style="display:'+(open?'block':'none')+'">';
-    if(open){
-      html += projectCard(p, stats, isChild);
-    }
-    html += '</div>';
-  });
-  container.innerHTML = html;
+  active.forEach(p=>{ if(!ordered.some(o=>o.p.id===p.id)) ordered.push({p:p, isChild:!!p.parentId}); });
+  return ordered.map(o=>todoProjectRow(o.p, o.isChild)).join('');
 }
+
+function todoProjectRow(p, isChild){
+  const isDone = p.status==='completed';
+  const open = projectOpenIds.has(p.id);
+  const logCount = (p.logs||[]).length;
+  const childrenCount = projects.filter(c=>c.parentId===p.id && c.status!=='completed').length;
+  const parentName = isChild ? (projects.find(pp=>pp.id===p.parentId)||{}).name : null;
+  const stats = getProjectTaskStats(p.id);
+
+  let html = '<div class="archive-row'+(isChild?' project-child-row':'')+'" onclick="toggleProjectOpen(\''+p.id+'\')"'+(isChild?' style="padding-left:26px"':'')+'>';
+  html += '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="'+(isDone?'#16a34a':'#2563eb')+'" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><polyline points="9 14 11 16 15 12"/></svg>';
+  html += '<div class="arch-name">'+(isChild?'<span style="font-size:11px;color:var(--text-muted);margin-right:4px">└</span>':'')+escHtml(p.name)+'</div>';
+
+  const meta = [];
+  meta.push(isDone ? '✅ 已完成' : (p.status==='blocked' ? '🚫 卡住了' : '🔄 进行中'));
+  if(parentName) meta.push('子项目 · '+escHtml(parentName));
+  if(childrenCount>0) meta.push(childrenCount+'个子项目');
+  if(logCount>0) meta.push(logCount+'条跟进');
+  if(stats.total>0) meta.push('待办 '+stats.done+'/'+stats.total);
+  if((p.files||[]).length>0) meta.push('📎'+p.files.length);
+  if(isDone && p.completedAt) meta.push(fmtDate(tsToDateStr(p.completedAt))+'完成');
+  html += '<div class="arch-meta">'+meta.join(' · ')+'</div>';
+  html += '<span class="arch-chevron'+(open?' open':'')+'">▶</span>';
+  html += '</div>';
+
+  html += '<div class="archive-detail" id="projectDetail_'+p.id+'" style="display:'+(open?'block':'none')+'">';
+  if(open) html += projectCard(p, stats, isChild);
+  html += '</div>';
+  return html;
+}
+
 function toggleProjectOpen(id){
   if(projectOpenIds.has(id)) projectOpenIds.delete(id);
   else projectOpenIds.add(id);
   renderProjects();
-}
-
-// ===== 已完成项目：独立 Tab，索引形式（只显示名称，点击展开详情） =====
-const archiveOpenIds = new Set();
-function renderArchive(){
-  const el = document.getElementById('archiveList');
-  if(!el) return;
-  const completed = projects.filter(p=>p.status==='completed');
-  // 侧边栏/手机导航角标
-  const badge = document.getElementById('archiveBadge');
-  if(badge){
-    badge.textContent = completed.length;
-    badge.style.display = completed.length>0 ? '' : 'none';
-  }
-  if(completed.length===0){
-    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">🗂</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">文件夹是空的</div><div style="font-size:13px">在「项目跟进」里点「完成项目，移入已完成文件夹」，项目就会自动存到这里</div></div>';
-    return;
-  }
-  // 按归档时间倒序
-  const sorted = completed.slice().sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
-  let html = '';
-  sorted.forEach(p=>{
-    const open = archiveOpenIds.has(p.id);
-    const logCount = (p.logs||[]).length;
-    html += '<div class="archive-row" onclick="toggleArchiveProject(\''+p.id+'\')">';
-    html += '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#16a34a" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><polyline points="9 14 11 16 15 12"/></svg>';
-    html += '<div class="arch-name">'+escHtml(p.name)+'</div>';
-    html += '<div class="arch-meta">'+(logCount>0?logCount+'条跟进 · ':'')+(p.completedAt?fmtDate(tsToDateStr(p.completedAt))+'归档':'')+'</div>';
-    html += '<span class="arch-chevron'+(open?' open':'')+'">▶</span>';
-    html += '</div>';
-    html += '<div class="archive-detail" id="archiveDetail_'+p.id+'" style="display:'+(open?'block':'none')+'">';
-    if(open){
-      const stats = getProjectTaskStats(p.id);
-      html += projectCard(p, stats, false);
-    }
-    html += '</div>';
-  });
-  el.innerHTML = html;
-}
-function toggleArchiveProject(id){
-  if(archiveOpenIds.has(id)) archiveOpenIds.delete(id);
-  else archiveOpenIds.add(id);
-  renderArchive();
 }
 
 function projectCard(p, stats, isChild){
@@ -4745,7 +4732,7 @@ function projectCard(p, stats, isChild){
 
   // 完成归档按钮（进行中/卡住的项目）
   if(!isDone){
-    html += '<button class="proj-done-btn" onclick="completeProject(\''+p.id+'\')"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 完成项目，移入已完成文件夹</button>';
+    html += '<button class="proj-done-btn" onclick="completeProject(\''+p.id+'\')"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 完成这个项目（落到最下面「已完成」）</button>';
   }
 
   html += '</div>';
@@ -4879,7 +4866,7 @@ function completeProject(id){
   const desc = getDescendantIds(id);
   const toArchive = projects.filter(x=>x.id===id || (desc.has(x.id) && x.status!=='completed'));
   const extra = toArchive.length - 1;
-  showConfirm('将「'+p.name+'」移入「已完成项目」文件夹'+(extra>0?'，并连同其 '+extra+' 个子项目一起归档':'')+'？\n归档后长期保存在文件夹里，可随时恢复查看。', ()=>{
+  showConfirm('把「'+p.name+'」标记为已完成'+(extra>0?'，并连同其 '+extra+' 个子项目一起完成':'')+'？\n完成后会落到「待做事项」页面最下面的「已完成」区，随时可以「恢复为进行中」。', ()=>{
     const now = Date.now();
     toArchive.forEach(x=>{x.status='completed'; x.completedAt=now;});
     saveAll();
@@ -11748,6 +11735,8 @@ function showToast(msg, type='warning'){
 //  TAB SWITCHING
 // ============================================================
 function switchTab(tab){
+  // v2.41：「项目跟进」「已完成项目」已并入「待做事项」，老书签 / 老链接自动落到新页面
+  if(tab==='projects' || tab==='archive') tab = 'tasks';
   currentTab = tab;
   document.querySelectorAll('.nav-item[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
   document.querySelectorAll('.mnav-item[data-mtab]').forEach(el=>el.classList.toggle('active',el.dataset.mtab===tab));
@@ -14714,9 +14703,7 @@ function fcExportCsv(){
 function renderCurrentTab(){
   if(currentTab==='tasks') renderTasks();
   else if(currentTab==='notes'){renderNotes();renderTagFilter();}
-  else if(currentTab==='projects') renderProjects();
   else if(currentTab==='review') renderReview();
-  else if(currentTab==='archive') renderArchive();
   else if(currentTab==='data') renderDash();
   else if(currentTab==='expenses') renderExpenses();
   else if(currentTab==='claims') renderClaims();
@@ -14730,7 +14717,6 @@ function renderCurrentTab(){
 function refreshAll(){
   renderBanner();
   renderCurrentTab();
-  renderArchive();
   updateClearDemoBtn();
   expRenderBadge();
   clmRenderBadge();
