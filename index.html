@@ -428,6 +428,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .todo-detail .card-meta{margin-bottom:10px}
 /* ============================================================
    面料库（v2.42）：面料主数据 + 供应商台账 + 合库收敛（61 → 20~30）
+   报账整理（v2.43）：日常报账 + 专项报账（一个项目多笔、多人垫付、结束后统一报账）
    ============================================================ */
 .fab-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:10px;margin-bottom:12px}
 .fab-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px}
@@ -718,6 +719,97 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:inherit}
 .exp-drop{border:1px dashed var(--border);border-radius:8px;padding:14px;text-align:center;font-size:12.5px;color:var(--text-muted);cursor:pointer;background:#f8fafc;transition:var(--transition)}
 .exp-drop:hover{border-color:var(--primary);color:var(--primary-dark)}
+/* ---------- 专项报账（v2.43）---------- */
+/* 子视图切换条：日常 / 专项 */
+.exp-subtabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.exp-subtab{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:9px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-secondary);font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.exp-subtab:hover{border-color:var(--primary);color:var(--primary-dark)}
+.exp-subtab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.exp-subtab.active:hover{color:#fff}
+.exp-subtab i{font-style:normal;font-size:11px;font-weight:700;padding:1px 6px;border-radius:9px;background:#eef2f7;color:var(--text-secondary);min-width:18px;text-align:center}
+.exp-subtab.active i{background:rgba(255,255,255,.26);color:#fff}
+.exp-subtab-hint{font-size:12px;color:var(--text-muted);line-height:1.6;flex:1 1 260px;min-width:0}
+
+/* 项目卡片 */
+.exp-proj{border:1px solid var(--border);border-radius:var(--radius);background:var(--card-bg);margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow);transition:var(--transition)}
+.exp-proj.done{opacity:.82}
+.exp-proj-head{display:flex;align-items:center;gap:10px;padding:12px 15px;cursor:pointer;user-select:none;background:#f8fafc;flex-wrap:wrap}
+.exp-proj-head:hover{background:#eef2f7}
+.exp-proj-name{font-size:14.5px;font-weight:700;color:var(--text);word-break:break-word}
+.exp-proj-range{font-size:12px;color:var(--text-muted);white-space:nowrap}
+.exp-proj-stat{margin-left:auto;font-size:12.5px;color:var(--text-secondary);font-variant-numeric:tabular-nums;white-space:nowrap}
+.exp-proj-stat b{font-size:14px;color:var(--text);font-weight:700}
+.exp-proj-tag{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap}
+.exp-proj-tag.open{background:#fef3c7;color:#b45309}
+.exp-proj-tag.done{background:#d1fae5;color:#047857}
+.exp-proj-body{padding:12px 15px 14px;border-top:1px solid var(--border)}
+
+/* 参与人垫付条 */
+.exp-ppl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.exp-ppl-chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:#f8fafc;color:var(--text-secondary);font-variant-numeric:tabular-nums;white-space:nowrap}
+.exp-ppl-chip b{color:var(--text);font-weight:700}
+.exp-ppl-chip.warn{background:var(--warning-light);border-color:#fde68a;color:#92400e}
+
+/* 条目行 */
+.exp-pitem{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px dashed var(--border);flex-wrap:wrap}
+.exp-pitem:last-child{border-bottom:none}
+.exp-pitem-d{font-size:12px;color:var(--text-muted);white-space:nowrap;font-variant-numeric:tabular-nums;flex:0 0 74px}
+.exp-pitem-m{flex:1 1 180px;min-width:0}
+.exp-pitem-t{font-size:13.5px;color:var(--text);word-break:break-word}
+.exp-pitem-s{font-size:11.5px;color:var(--text-muted);margin-top:2px;display:flex;gap:7px;flex-wrap:wrap}
+.exp-pitem-h{font-size:12px;color:var(--text-secondary);white-space:nowrap;flex:0 0 auto;padding:2px 8px;border-radius:5px;background:#eef2f7}
+.exp-pitem-a{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums;flex:0 0 auto;min-width:82px;text-align:right}
+.exp-pitem-a.inc{color:#15803d}
+.exp-pitem-act{display:flex;gap:2px;flex:0 0 auto}
+
+/* 分摊结算表 */
+.exp-set-tbl{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:12.5px;margin-top:4px}
+.exp-set-tbl th{background:#f1f5f9;color:var(--text-secondary);font-weight:700;font-size:11.5px;padding:7px 9px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border)}
+.exp-set-tbl th:first-child{text-align:left}
+.exp-set-tbl td{padding:7px 9px;text-align:right;border-bottom:1px solid #f1f5f9;font-variant-numeric:tabular-nums;white-space:nowrap}
+.exp-set-tbl td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.exp-set-tbl tr:last-child td{border-bottom:none}
+.exp-set-tbl tr.me td{background:#f0f9ff}
+.exp-set-tbl .pos{color:#047857;font-weight:700}
+.exp-set-tbl .neg{color:var(--danger);font-weight:700}
+.exp-set-tbl .zero{color:var(--text-muted)}
+.exp-set-tbl tfoot td{background:#f8fafc;font-weight:700}
+
+/* 转账建议 */
+.exp-xfer{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding:9px 12px;background:var(--info-light);border:1px solid #bae6fd;border-radius:8px;font-size:12.5px;color:#0c4a6e}
+.exp-xfer-t{font-weight:700;flex-shrink:0}
+.exp-xfer-i{padding:2px 9px;background:#fff;border:1px solid #bae6fd;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.exp-xfer-i b{color:var(--text)}
+
+/* 项目底部按钮 */
+.exp-proj-foot{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px;padding-top:12px;border-top:1px solid var(--border)}
+.exp-proj-foot .btn svg{width:14px;height:14px}
+.exp-proj-foot .sp{margin-left:auto}
+
+/* 弹窗里的专项横幅 */
+.exp-projbanner{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:8px 12px;margin-bottom:12px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;font-size:12.5px;color:#3730a3}
+.exp-projbanner b{color:#312e81}
+.exp-projbanner .btn{margin-left:auto;padding:4px 10px;font-size:12px;min-height:0}
+
+/* 手机端：项目卡片收窄 */
+@media (max-width:768px){
+  .exp-subtab-hint{flex:1 1 100%;order:9}
+  .exp-proj-head{padding:11px 12px}
+  .exp-proj-name{flex:1 1 100%;order:1}
+  .exp-proj-range{order:2}
+  .exp-proj-stat{order:3;margin-left:0}
+  .exp-proj-tag{order:4;margin-left:auto}
+  .exp-proj-body{padding:10px 12px 12px}
+  .exp-pitem-d{flex:0 0 62px;font-size:11.5px}
+  .exp-pitem-m{flex:1 1 100%}
+  .exp-pitem-h{order:5}
+  .exp-pitem-a{order:6;margin-left:auto;min-width:0}
+  .exp-pitem-act{order:7}
+  .exp-set-tbl th,.exp-set-tbl td{padding:6px 6px;font-size:12px}
+  .exp-proj-foot .btn{flex:1 1 auto;justify-content:center}
+}
+/* ---------- 专项报账 CSS 结束 ---------- */
+
 /* ===== 货损 / 客诉登记 ===== */
 .clm-tag{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap}
 .clm-tag-ct{background:#fee2e2;color:#b91c1c}
@@ -1421,7 +1513,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.42 · 2026-10-16</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.43 · 2026-10-26</div>
     </div>
   </aside>
 
@@ -1473,7 +1565,7 @@ tr:hover .fr-fwd-acts{opacity:1}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2h14v19l-2.5-1.7L14 21l-2-1.7L10 21l-2.5-1.7L5 21V2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
             报账整理
           </div>
-          <p class="section-subtitle">随手记下每一笔垫付/支出，发票拍照传上来；勾选后一键打包（明细表 + 全部凭证）发给财务</p>
+          <p class="section-subtitle">随手记下每一笔垫付/支出，发票拍照传上来；勾选后一键打包（明细表 + 全部凭证）发给财务。<b>出差 / 展会这种一个项目、好几个人分开垫钱的，走「专项报账」——项目结束后统一报一次，跟日常单笔分开</b></p>
         </div>
         <div class="exp-filterwrap" id="expFilterBar"></div>
       </div>
@@ -1724,6 +1816,10 @@ tr:hover .fr-fwd-acts{opacity:1}
 <div class="modal-overlay" id="modalExp" style="display:none">
   <div class="modal" data-drop-exp-modal="1">
     <h3 id="modalExpTitle">记一笔</h3>
+    <div id="expProjBanner" class="exp-projbanner" style="display:none">
+      <span id="expProjBannerTxt"></span>
+      <button type="button" class="btn" onclick="expModalDetach()">改为日常报账</button>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 130px"><label>日期</label><input type="date" id="expDate"></div>
       <div class="form-group" style="flex:1 1 130px"><label>金额（元）</label><input type="number" id="expAmount" step="0.01" placeholder="0.00" inputmode="decimal" oninput="expAmountVisual()"></div>
@@ -1741,8 +1837,9 @@ tr:hover .fr-fwd-acts{opacity:1}
     <div class="form-group"><label>事由 / 摘要</label><input type="text" id="expDesc" placeholder="这笔钱花在哪了"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 130px"><label>收款方（可留空）</label><input type="text" id="expPayee" placeholder="付给了谁，如 顺丰 / 某供应商"></div>
-      <div class="form-group" style="flex:1 1 130px"><label>经手人（可留空）</label><input type="text" id="expHandler" placeholder="谁经手这笔钱，如 孟伊"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>经手人（谁付的这笔钱）</label><input type="text" id="expHandler" placeholder="谁经手这笔钱，如 孟伊"></div>
     </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 12px" id="expHandlerChips"></div>
     <div class="form-group"><label>备注（可留空）</label><textarea id="expNote" rows="2" placeholder="发票号、补充说明"></textarea></div>
     <div class="form-group">
       <label>发票 / 收据照片（可多张，最多 9 张，也可把文件直接拖进来）</label>
@@ -1752,6 +1849,33 @@ tr:hover .fr-fwd-acts{opacity:1}
     <div class="modal-actions">
       <button class="btn" id="btnExpCancel">取消</button>
       <button class="btn btn-primary" id="btnExpSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 专项报账项目（v2.43） ====== -->
+<div class="modal-overlay" id="modalExpProj" style="display:none">
+  <div class="modal">
+    <h3 id="modalExpProjTitle">新建专项</h3>
+    <div style="font-size:12.5px;color:var(--text-muted);line-height:1.75;margin:-6px 0 13px">
+      「专项」= 一个项目周期里的多笔支出（比如 <b>3 个人去北京出差 5 天</b>）：
+      <b>过程中谁碰上谁付、经手人可以好几个人</b>，项目结束后点「统一报账」一次性打包，
+      跟日常那些零散单笔分开算、分开放的。
+    </div>
+    <div class="form-group"><label>项目名称（必填）</label><input type="text" id="expProjName" placeholder="如：3 人北京出差 / 秋季广交会展位搭建"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 140px"><label>开始日期</label><input type="date" id="expProjFrom"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>结束日期</label><input type="date" id="expProjTo"></div>
+    </div>
+    <div class="form-group">
+      <label>参与人（谁可能垫钱；多人用顿号或逗号隔开）</label>
+      <input type="text" id="expProjMembers" placeholder="孟伊、李雪洋、陈曦">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px" id="expProjMemberChips"></div>
+    </div>
+    <div class="form-group"><label>备注（可留空）</label><textarea id="expProjNote" rows="2" placeholder="事由、同行人、报销注意事项"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" id="btnExpProjCancel" onclick="closeModal('modalExpProj')">取消</button>
+      <button class="btn btn-primary" id="btnExpProjSave" onclick="saveExpProj()">保存</button>
     </div>
   </div>
 </div>
@@ -2355,11 +2479,12 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.42';
+const APP_VERSION = 'v2.43';
 let tasks = [];
 let notes = [];
 let projects = [];
 let expenses = [];
+let expProjects = [];   // 专项报账：项目台账（条目仍在 expenses 里，靠 projId 归属）
 let claims = [];   // 货损 / 客诉登记
 let plan = [];     // 数据看板：月度销售计划 / 实际完成（项目×业务员×月份）
 let planGoals = {};     // 数据看板：手填「总计划」（月/季/年 × 项目），与个人计划分开存
@@ -2411,6 +2536,7 @@ function loadData(){
   planGoals = rdStore('plan_goals', {}, false); // 新版数据看板：手填总计划（月/季/年/项目）
   if(!planGoals || typeof planGoals!=='object' || Array.isArray(planGoals)) planGoals={};
   expenses  = rdStore('expenses', [], true);
+  expProjects = rdStore('exp_projects', [], true);
   claims    = rdStore('claims', [], true);
   dashOrphans = rdStore('dash_orphan', [], true);
   planOrphans = rdStore('plan_orphan', [], true);
@@ -2471,6 +2597,7 @@ function loadData(){
   healDashboard();
   healPlan();
   expHeal();
+  expProjHeal();
   clmHeal();
   if(dataHealNotes.length || dashOrphans.length){
     const tips=[];
@@ -2629,6 +2756,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
       localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
       localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser(expenses)));
+      localStorage.setItem(STORAGE_PREFIX+'exp_projects',JSON.stringify(expProjects));
       localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser(claims)));
       localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(stripHrFiles(hr)));
       localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight()));
@@ -2647,6 +2775,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'plan',JSON.stringify(plan));
         localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
         localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser2(expenses)));
+        localStorage.setItem(STORAGE_PREFIX+'exp_projects',JSON.stringify(expProjects));
         localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser2(claims)));
         localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(stripHrFiles(hr)));
         localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight2()));
@@ -2699,11 +2828,11 @@ function autoPostpone(){
 }
 
 // Count total items for backup reminder
-function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + claims.length + hr.staff.length + hr.talent.length + biz.orders.length + biz.pays.length + fab.fabrics.length + fab.suppliers.length}
+function totalItems(){return tasks.length + notes.length + projects.length + dashboard.length + plan.length + Object.keys(planGoals||{}).length + expenses.length + (expProjects||[]).length + claims.length + hr.staff.length + hr.talent.length + biz.orders.length + biz.pays.length + fab.fabrics.length + fab.suppliers.length}
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample() || fabHasSample();
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample() || fabHasSample() || expProjHasSample();
 }
 
 // Clear sample data
@@ -2716,6 +2845,8 @@ function clearSampleData(){
   expenses = expenses.filter(e=>!e._sample);
   claims = claims.filter(c=>!c._sample);
   crmClearSample();
+  // 专项报账：示例专项 + 它下面的示例条目一起清（条目带 _sample，上面那行已经过滤过一遍）
+  expProjClearSample();
   // 面料库的示例是给李主任当底稿改的：改过的（_touched）不清，只清没动过的
   fabClearSample();
   saveAll();
@@ -5418,7 +5549,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 // ============================================================
 document.getElementById('btnExportFull').addEventListener('click',()=>{ bkExportFull(); });
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,claims,hr,freight,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
   try{
     const corrupt = {};
@@ -5482,7 +5613,7 @@ async function bkFileDataUrl(fid, mem){
   return (g && g.dataUrl) ? g.dataUrl : '';
 }
 function bkSnapshotData(){
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,claims,hr,freight,biz,forecast:fc,crm,fabric:fab,
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,claims,hr,freight,biz,forecast:fc,crm,fabric:fab,
                 _app:'办公工作台', _version:APP_VERSION, exportedAt:new Date().toISOString()};
   try{
     const corrupt={};
@@ -6366,6 +6497,13 @@ function applyIncoming(data, label){
   arr('dashboard','dash', ()=>dashboard, v=>{dashboard=v;});
   arr('plan','plan', ()=>plan, v=>{plan=v;});
   arr('expenses','expense', ()=>expenses, v=>{expenses=v;});
+  // 专项报账：项目按 id 只增不减（条目本身走上面的 expenses 合并，不会重复）
+  if(data && Array.isArray(data.expProjects)){
+    const _rp = syncMergeById(expProjects||[], data.expProjects, 'expproj');
+    expProjects = _rp.list;
+    stat.kept += _rp.keepLocal;
+    stat.newFromIncoming += _rp.incomingNew;
+  }
   arr('claims','claim', ()=>claims, v=>{claims=v;});
   // 人事：员工 / 候选人 各自按 id 合并（只增不减）；面试人员名单与评价维度按 map 合并
   if(data && data.hr && typeof data.hr === 'object'){
@@ -6489,9 +6627,10 @@ function asSnapshot(){
             bizOrders:biz.orders.length, bizPays:biz.pays.length,
             crmRecs:Object.keys(crm.recs||{}).length, crmFollows:(crm.follows||[]).length,
             fabFabrics:((fab&&fab.fabrics)||[]).length, fabSuppliers:((fab&&fab.suppliers)||[]).length,
+            expProjects:(expProjects||[]).length,
             attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), claims:light(claims), hr:hr, freight:frSyncLight(),
+    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), expProjects:expProjects, claims:light(claims), hr:hr, freight:frSyncLight(),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded},
     forecast:fc, crm:crm, fabric:fab
@@ -6828,11 +6967,14 @@ function expHeal(){
   if(changed) saveAll();
 }
 function expMonths(){
-  return [...new Set(expenses.map(r=>String(r.date||'').slice(0,7)).filter(Boolean))].sort();
+  // v2.43：专项条目归专项视图，不进日常的月份列表
+  return [...new Set(expenses.filter(r=>r && !r.projId).map(r=>String(r.date||'').slice(0,7)).filter(Boolean))].sort();
 }
 // 只按「月份 + 报账状态」筛（账户小计用这个，不受账户筛选影响）
 function expBaseList(){
   return expenses.filter(r=>{
+    // v2.43：带 projId 的是专项条目，只在「专项报账」里出现，绝不混进日常汇总
+    if(r.projId) return false;
     if(expSelMonth!=='all' && String(r.date||'').slice(0,7)!==expSelMonth) return false;
     if(expSelStatus==='wait' && r.filed) return false;
     if(expSelStatus==='done' && !r.filed) return false;
@@ -6867,7 +7009,9 @@ function expScopeLabel(){
 function expRenderBadge(){
   const b=document.getElementById('expBadge');
   if(!b) return;
-  const n=expenses.filter(r=>!r.filed).length;
+  // 日常待报账笔数 + 还没统一报账的专项个数
+  const n=expenses.filter(r=>r && !r.projId && !r.filed).length
+        + (expProjects||[]).filter(p=>p && p.status!=='done').length;
   if(n>0){ b.textContent=n; b.style.display=''; } else { b.style.display='none'; }
 }
 function expPickMonth(m){ expSelMonth=m; renderExpenses(); }
@@ -6878,12 +7022,21 @@ function renderExpenses(){
   const box=document.getElementById('expContent');
   if(!box) return;
   expRenderBadge();
-  if(expenses.length===0){
+  // v2.43：报账页内两个子视图 —— 日常报账 / 专项报账
+  if(expView==='proj'){
+    const fbP=document.getElementById('expFilterBar');
+    if(fbP) fbP.innerHTML='';
+    box.innerHTML = expSubTabsHtml() + expProjBodyHtml();
+    return;
+  }
+  if(!expenses.some(r=>r && !r.projId)){
     const fb0=document.getElementById('expFilterBar');
     if(fb0) fb0.innerHTML='';
-    box.innerHTML='<div class="exp-empty"><b style="color:var(--text);font-size:15px">还没有报账记录</b><br>'
+    box.innerHTML = expSubTabsHtml()
+      +'<div class="exp-empty"><b style="color:var(--text);font-size:15px">还没有日常报账记录</b><br>'
       +'点「记一笔」，把垫付的钱先记下来<br>'
-      +'发票拍张照传上去，月底勾选后点「导出所选项目文件包」，明细表带全部凭证一起打包</div>';
+      +'发票拍张照传上去，月底勾选后点「导出所选项目文件包」，明细表带全部凭证一起打包<br>'
+      +'<span style="font-size:12.5px">出差 / 展会这种一整摊的支出，走上面的「<b>专项报账</b>」，别混在这儿一条条记</span></div>';
     return;
   }
   const months=expMonths();
@@ -6893,7 +7046,7 @@ function renderExpenses(){
   const base=expBaseList();
   const bs=expSum(base);
 
-  let html='';
+  let html=expSubTabsHtml();
 
   // ---- 筛选条：月份 + 报账状态 + 记账账户（一行，渲染到标题行右侧的 expFilterBar，v1.6.5）----
   let fhtml='';
@@ -7167,15 +7320,22 @@ function viewExpModalFile(i){
 }
 
 // ---------------- 录入 / 编辑弹窗 ----------------
-function openExpModal(id){
+function openExpModal(id, projId){
   editingExpId = id || null;
   const rec = id ? expenses.find(r=>r.id===id) : null;
+  // v2.43：这条记在哪个专项下 —— 编辑时跟着记录走，新建时由调用方指定
+  expModalProjId = rec ? (rec.projId||null) : (projId||null);
   const sel=document.getElementById('expAccount');
   sel.innerHTML = EXP_ACCOUNTS.map(a=>'<option value="'+a.key+'">'+escHtml(a.name)+'</option>').join('');
   const chips=document.getElementById('expCatChips');
   chips.innerHTML = EXP_CATS.map(c=>'<button type="button" class="exp-chip" onclick="expPickCat(\''+c+'\')">'+c+'</button>').join('');
   document.getElementById('modalExpTitle').textContent = rec ? '编辑报账记录' : '记一笔';
-  document.getElementById('expDate').value = rec ? (rec.date||todayStr()) : todayStr();
+  document.getElementById('expDate').value = rec ? (rec.date||todayStr()) : (function(){
+    // 在专项里补记：默认落到项目结束日（还没到结束日就用今天）
+    const pp = expModalProjId ? expProjById(expModalProjId) : null;
+    if(pp && pp.to && todayStr() > pp.to) return pp.to;
+    return todayStr();
+  })();
   document.getElementById('expAmount').value = rec ? eNum(rec.amount) : '';
   sel.value = rec ? (normExpAccount(rec.account)||'langges') : 'langges';
   document.getElementById('expCategory').value = rec ? (rec.category||'') : '';
@@ -7187,6 +7347,7 @@ function openExpModal(id){
   expModalPending = 0;
   renderExpModalFiles();
   expAmountVisual();
+  expRenderProjBanner();
   document.getElementById('modalExp').style.display='flex';
   if(!rec) setTimeout(()=>{ try{ document.getElementById('expAmount').focus(); }catch(e){} }, 120);
 }
@@ -7243,6 +7404,7 @@ function saveExpRecord(){
     files: expModalFiles.slice(),
     createdAt: Date.now()
   };
+  if(expModalProjId) rec.projId = expModalProjId;   // v2.43：归属专项
   const wasEdit = !!editingExpId;
   if(wasEdit){
     const i=expenses.findIndex(r=>r.id===editingExpId);
@@ -7257,6 +7419,7 @@ function saveExpRecord(){
     expenses.push(rec);
   }
   editingExpId=null;
+  expModalProjId=null;
   saveAll();
   closeModal('modalExp');
   refreshAll();
@@ -16842,6 +17005,756 @@ document.addEventListener('click', function(e){
 });
 
 // ============================================================
+//  专项报账（v2.43）
+//  场景：一个项目周期内的多笔支出（比如 3 个人去北京出差 5 天），
+//        过程中谁碰上谁付钱、经手人好几个人，项目结束后统一打包报账。
+//  与日常报账的分界（三条，改这个模块前先看）：
+//    ① 专项条目就存在 expenses 数组里，带 projId 标记 —— 这样附件、备份、
+//       云快照、导入合并这些链路全都不用改，一条也不会漏。
+//    ② 日常视图（月份筛选 / 汇总 / 勾选打包 / 打印）一律排除带 projId 的记录；
+//       专项视图只认带 projId 的。
+//    ③ 项目本身单独存 exp_projects（只有名字/周期/参与人，没有附件）。
+//  两条硬不变式（回归测试的判定标准）：
+//    · 应摊合计 ≡ 支出合计（分币误差由参与人最后一位吃掉）
+//    · 差额合计 ≡ 0（只要每笔都填了经手人）
+// ============================================================
+let expView = 'daily';        // 报账页内的子视图：daily 日常 / proj 专项
+let expProjFilter = 'all';    // 专项视图筛选：all | open | done
+let expProjOpen = {};         // 项目卡片展开状态：id -> true
+let editingExpProjId = null;
+let expModalProjId = null;    // 当前弹窗这条记在哪个专项下（null = 日常）
+
+function expProjById(id){ return (expProjects||[]).find(p=>p && p.id===id) || null; }
+function expProjItems(pid){
+  return (expenses||[]).filter(r=> r && r.projId===pid)
+    .sort((a,b)=>{ if(a.date!==b.date) return String(a.date)<String(b.date)?-1:1; return (a.createdAt||0)-(b.createdAt||0); });
+}
+function expProjDays(p){
+  if(!p || !p.from || !p.to) return 0;
+  const a=new Date(String(p.from).replace(/-/g,'/')), b=new Date(String(p.to).replace(/-/g,'/'));
+  if(isNaN(a)||isNaN(b)) return 0;
+  return Math.max(1, Math.round((b-a)/86400000)+1);
+}
+function expProjParseMembers(s){
+  // 只按中文分隔符切，不按空格切 —— 团队里有 "Shirley Li" 这种带空格的英文名
+  return String(s==null?'':s).split(/[、,，;；\/|\n]+/)
+    .map(x=>x.trim()).filter(Boolean)
+    .filter((v,i,a)=>a.indexOf(v)===i);
+}
+
+// 数据自愈：项目缺 id/日期/参与人补齐；projId 指向已不存在的项目 → 退回日常（记录绝不凭空消失）
+function expProjHeal(){
+  let changed=false;
+  if(!Array.isArray(expProjects)){ expProjects=[]; changed=true; }
+  expProjects = expProjects.filter(p=>{
+    if(!p || typeof p!=='object'){ changed=true; return false; }
+    return true;
+  });
+  const live={};
+  expProjects.forEach(p=>{
+    if(!p.id){ p.id=uid(); changed=true; }
+    live[p.id]=1;
+    const nm=String(p.name||'').trim();
+    if(!nm){ p.name='未命名专项'; changed=true; }
+    if(!p.from){ p.from=p.to||todayStr(); changed=true; }
+    if(!p.to){ p.to=p.from||todayStr(); changed=true; }
+    if(String(p.to)<String(p.from)){ const t=p.from; p.from=p.to; p.to=t; changed=true; }
+    if(!Array.isArray(p.members)){ p.members=[]; changed=true; }
+    const ms=p.members.map(m=>String(m==null?'':m).trim()).filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i);
+    if(ms.length!==p.members.length || ms.join('|')!==p.members.join('|')){ p.members=ms; changed=true; }
+    if(p.status!=='done'){ if(p.status!=='open'){ p.status='open'; changed=true; } }
+    const wantFiled = (p.status==='done');
+    if(!!p.filed!==wantFiled){ p.filed=wantFiled; changed=true; }
+    if(p.status==='done' && !p.filedAt){ p.filedAt=p.to||todayStr(); changed=true; }
+    if(p.status!=='done' && p.filedAt){ delete p.filedAt; changed=true; }
+    if(!Array.isArray(p.files)) { /* 专项本身不带附件，这里只防有人手工塞脏数据 */ }
+  });
+  (expenses||[]).forEach(r=>{
+    if(!r || !r.projId) return;
+    if(!live[r.projId]){ delete r.projId; changed=true; }
+  });
+  if(changed) saveAll();
+}
+
+// ---------------- 分摊结算（本模块的核心算法） ----------------
+// 口径：支出按参与人「均摊」；垫付按每笔的经手人归属；差额 = 垫付 - 应摊。
+// 分币处理：先把总额换算成分，前 N-1 人拿整数分，最后一人吃掉余数 → 应摊合计严格等于支出合计。
+function expProjSettle(p){
+  const items = expProjItems(p.id);
+  const members = (p.members||[]).slice();
+  let total=0;
+  items.forEach(r=>{ total += eNum(r.amount); });
+  const cents = Math.round(total*100);
+  const N = members.length;
+  const shares = {};
+  if(N>0){
+    const base = Math.floor(cents/N);
+    members.forEach((nm,i)=>{ shares[nm] = (i===N-1 ? (cents - base*(N-1)) : base)/100; });
+  }
+  const paid = {};
+  members.forEach(nm=>{ paid[nm]=0; });
+  const strays = [];
+  let noHCount=0, noHAmount=0;
+  items.forEach(r=>{
+    const a = eNum(r.amount);
+    const h = String(r.handler||'').trim();
+    if(!h){ noHCount++; noHAmount += a; return; }
+    if(paid[h]===undefined){ paid[h]=0; strays.push(h); }
+    paid[h] += a;
+  });
+  const names = members.concat(strays);
+  const rows = names.map(nm=>{
+    const pd = Math.round((paid[nm]||0)*100)/100;
+    const sh = Math.round((shares[nm]||0)*100)/100;
+    const diff = Math.round((pd-sh)*100)/100;
+    return {name:nm, paid:pd, share:sh, diff:diff, member:members.indexOf(nm)>=0};
+  });
+  let sumPaid=0, sumShare=0, sumDiff=0;
+  rows.forEach(r=>{ sumPaid+=r.paid; sumShare+=r.share; sumDiff+=r.diff; });
+  return {
+    total: Math.round(total*100)/100,
+    share: N? Math.round(cents/N)/100 : 0,
+    members: members,
+    rows: rows,
+    strays: strays,
+    noHandler: {count:noHCount, amount:Math.round(noHAmount*100)/100},
+    sumPaid: Math.round(sumPaid*100)/100,
+    sumShare: Math.round(sumShare*100)/100,
+    sumDiff: Math.round(sumDiff*100)/100,
+    balanced: (N>0 && noHCount===0 && Math.abs(sumDiff)<0.005),
+    transfers: expProjTransfers(rows),
+    count: items.length
+  };
+}
+// 最少笔数转账：垫多了的排前面，垫少的一笔笔补给他
+function expProjTransfers(rows){
+  const cr = (rows||[]).filter(r=>r.diff>0.005).map(r=>({n:r.name, v:Math.round(r.diff*100)})).sort((a,b)=>b.v-a.v);
+  const db = (rows||[]).filter(r=>r.diff<-0.005).map(r=>({n:r.name, v:-Math.round(r.diff*100)})).sort((a,b)=>b.v-a.v);
+  const out=[]; let i=0, j=0;
+  while(i<cr.length && j<db.length){
+    const m = Math.min(cr[i].v, db[j].v);
+    if(m>0) out.push({from:db[j].n, to:cr[i].n, amount:m/100});
+    cr[i].v -= m; db[j].v -= m;
+    if(cr[i].v<=0) i++;
+    if(db[j].v<=0) j++;
+  }
+  return out;
+}
+
+// ---------------- 子视图切换 ----------------
+function expSetView(v){ expView = (v==='proj'?'proj':'daily'); renderExpenses(); }
+function expSetProjFilter(f){ expProjFilter = (f==='open'||f==='done')?f:'all'; renderExpenses(); }
+function expProjToggle(id){
+  if(id) expProjOpen[id] = !expProjOpen[id];
+  renderExpenses();
+}
+function expSubTabsHtml(){
+  const nDaily = (expenses||[]).filter(r=>r && !r.projId && !r.filed).length;
+  const nProj  = (expProjects||[]).filter(p=>p && p.status!=='done').length;
+  return '<div class="exp-subtabs">'
+    + '<button class="exp-subtab'+(expView==='daily'?' active':'')+'" onclick="expSetView(\'daily\')">日常报账'
+    + (nDaily?('<i>'+nDaily+'</i>'):'')+'</button>'
+    + '<button class="exp-subtab'+(expView==='proj'?' active':'')+'" onclick="expSetView(\'proj\')">专项报账'
+    + (nProj?('<i>'+nProj+'</i>'):'')+'</button>'
+    + '<span class="exp-subtab-hint">'+(expView==='daily'
+        ? '随手记的单笔支出（快递、样品、打车…），按月份勾选后打包发给财务'
+        : '按项目打包：出差 / 展会 / 客户拜访这种跨几天、几个人分开垫钱的事，项目结束后一次性统一报账')
+    + '</span>'
+    + '</div>';
+}
+
+// ---------------- 专项视图 ----------------
+function expProjBodyHtml(){
+  const all = (expProjects||[]).slice();
+  const cmpFrom = (a,b)=>String(b.from||'').localeCompare(String(a.from||''));
+  const openP = all.filter(p=>p.status!=='done').sort(cmpFrom);
+  const doneP = all.filter(p=>p.status==='done')
+    .sort((a,b)=>String(b.filedAt||b.to||'').localeCompare(String(a.filedAt||a.to||'')));
+  const showOpen = expProjFilter==='all' || expProjFilter==='open';
+  const showDone = expProjFilter==='all' || expProjFilter==='done';
+
+  let openAmt=0, openCnt=0, noH=0;
+  openP.forEach(p=>{
+    const it=expProjItems(p.id);
+    openAmt += expSum(it).total; openCnt += it.length;
+    it.forEach(r=>{ if(!String(r.handler||'').trim()) noH++; });
+  });
+  let doneAmt=0, doneCnt=0;
+  doneP.forEach(p=>{ const it=expProjItems(p.id); doneAmt+=expSum(it).total; doneCnt+=it.length; });
+
+  let html='<div class="exp-sums">';
+  html+='<div class="exp-sum"><div class="es-label">进行中专项</div><div class="es-value">'+openP.length+' 个</div><div class="es-foot">共 '+openCnt+' 笔 · 还没统一报账</div></div>';
+  html+='<div class="exp-sum unpaid"><div class="es-label">待报账金额</div><div class="es-value">'+fmtCNY(openAmt)+'</div><div class="es-foot">进行中专项的支出合计</div></div>';
+  html+='<div class="exp-sum"><div class="es-label">待指定经手人</div><div class="es-value">'+noH+' 笔</div><div class="es-foot">'+(noH?'补齐后分摊表才对得上':'都填了，分摊能对上')+'</div></div>';
+  html+='<div class="exp-sum paid"><div class="es-label">已报账专项</div><div class="es-value">'+doneP.length+' 个</div><div class="es-foot">'+doneCnt+' 笔 · '+fmtCNY(doneAmt)+' · 已归档</div></div>';
+  html+='</div>';
+
+  html+='<div class="dash-panel"><div class="exp-toolbar" style="margin-bottom:0">';
+  html+='<button class="btn btn-sm btn-primary" onclick="openExpProjModal()">＋ 新建专项</button>';
+  html+='<span class="exp-chip'+(expProjFilter==='all'?' active':'')+'" onclick="expSetProjFilter(\'all\')">全部</span>';
+  html+='<span class="exp-chip'+(expProjFilter==='open'?' active':'')+'" onclick="expSetProjFilter(\'open\')">进行中 '+openP.length+'</span>';
+  html+='<span class="exp-chip'+(expProjFilter==='done'?' active':'')+'" onclick="expSetProjFilter(\'done\')">已报账 '+doneP.length+'</span>';
+  html+='<button class="btn btn-sm" style="margin-left:auto" onclick="expProjExportListCsv()">导出专项列表 CSV</button>';
+  html+='</div></div>';
+
+  if(showOpen && openP.length){ openP.forEach(p=>{ html+=expProjCardHtml(p); }); }
+  if(showDone && doneP.length){
+    if(showOpen && openP.length){
+      html+='<div style="font-size:12.5px;font-weight:600;color:var(--text-secondary);margin:16px 0 8px">已统一报账归档（点标题展开看明细与结算）</div>';
+    }
+    doneP.forEach(p=>{ html+=expProjCardHtml(p); });
+  }
+  if(!(showOpen&&openP.length) && !(showDone&&doneP.length)){
+    html+='<div class="exp-empty"><b style="color:var(--text);font-size:15px">'+(expProjFilter==='all'?'还没有专项报账':'这个筛选下没有专项')+'</b><br>'
+      +'「专项」适合出差 / 展会 / 客户拜访这种<b>跨几天、好几个人分开垫钱</b>的事：<br>'
+      +'开一个项目 → 把过程中每一笔都记进去（谁付的都行，经手人填付款的那个人）→ 结束后点「统一报账」一次性打包<br>'
+      +'<button class="btn btn-sm btn-primary" style="margin-top:12px" onclick="openExpProjModal()">＋ 新建第一个专项</button></div>';
+  }
+  return html;
+}
+
+function expProjCardHtml(p){
+  const items=expProjItems(p.id);
+  const s=expSum(items);
+  const st=expProjSettle(p);
+  const open=!!expProjOpen[p.id];
+  const isDone=p.status==='done';
+  const days=expProjDays(p);
+  let h='<div class="exp-proj'+(isDone?' done':'')+'">';
+  h+='<div class="exp-proj-head" onclick="expProjToggle(\''+p.id+'\')">';
+  h+='<span class="exp-caret">'+(open?'▾':'▸')+'</span>';
+  h+='<span class="exp-proj-name">'+escHtml(p.name)+'</span>';
+  h+='<span class="exp-proj-range">'+escHtml(String(p.from||'')+' ~ '+String(p.to||''))+(days?(' · '+days+' 天'):'')+'</span>';
+  h+='<span class="exp-proj-stat"><b>'+fmtCNY(s.total)+'</b> · '+items.length+' 笔 · '+(p.members||[]).length+' 人</span>';
+  h+='<span class="exp-proj-tag '+(isDone?'done':'open')+'">'+(isDone?'已报账':'进行中')+'</span>';
+  h+='</div>';
+  if(!open) return h+'</div>';
+  h+='<div class="exp-proj-body">';
+
+  // 参与人垫付一览
+  h+='<div class="exp-ppl">';
+  if(st.rows.length){
+    st.rows.forEach(r=>{
+      h+='<span class="exp-ppl-chip'+(r.member?'':' warn')+'" title="'+(r.member?'参与人':'经手人不在参与人名单里')+'"><b>'+escHtml(r.name)+'</b> 垫 '+fmtCNY(r.paid)+'</span>';
+    });
+  }
+  if(st.noHandler.count){
+    h+='<span class="exp-ppl-chip warn">未填经手人 '+st.noHandler.count+' 笔（'+fmtCNY(st.noHandler.amount)+'）</span>';
+  }
+  if(!st.rows.length) h+='<span class="exp-ppl-chip warn">还没填参与人</span>';
+  if(p.note) h+='<span style="font-size:12px;color:var(--text-muted)">备注：'+escHtml(p.note)+'</span>';
+  h+='</div>';
+
+  // 条目
+  if(items.length){
+    items.forEach(r=>{ h+=expProjItemRow(r); });
+  } else {
+    h+='<div style="text-align:center;padding:16px 8px;color:var(--text-muted);font-size:13px">这个专项还没记条目 —— 点下面「＋ 记一笔」开始记</div>';
+  }
+
+  // 分摊结算
+  if(st.rows.length && items.length){
+    h+='<div style="font-size:12.5px;font-weight:700;color:var(--text-secondary);margin:16px 0 7px">分摊结算 · 均摊 '+fmtCNY(st.share)+' / 人</div>';
+    h+='<table class="exp-set-tbl"><thead><tr><th>姓名</th><th>垫付</th><th>应摊</th><th>差额</th><th>结论</th></tr></thead><tbody>';
+    st.rows.forEach(r=>{
+      const cls = r.diff>0.005?'pos':(r.diff<-0.005?'neg':'zero');
+      const concl = r.diff>0.005?('收 '+fmtCNY(r.diff)):(r.diff<-0.005?('补 '+fmtCNY(-r.diff)):'持平');
+      h+='<tr><td>'+escHtml(r.name)+(r.member?'':' <span style="font-size:11px;color:var(--text-muted)">（名单外）</span>')+'</td>'
+        +'<td>'+fmtCNY(r.paid)+'</td>'
+        +'<td>'+fmtCNY(r.share)+'</td>'
+        +'<td class="'+cls+'">'+(r.diff>0.005?'+':'')+fmtCNY(r.diff)+'</td>'
+        +'<td class="'+cls+'">'+concl+'</td></tr>';
+    });
+    h+='</tbody><tfoot><tr><td>合计</td><td>'+fmtCNY(st.sumPaid)+'</td><td>'+fmtCNY(st.sumShare)+'</td>'
+      +'<td class="'+(Math.abs(st.sumDiff)<0.005?'zero':'neg')+'">'+fmtCNY(st.sumDiff)+'</td>'
+      +'<td>'+(Math.abs(st.sumDiff)<0.005?'✓ 平衡':'⚠ 对不上')+'</td></tr></tfoot></table>';
+    if(st.noHandler.count){
+      h+='<div class="dash-panel" style="background:var(--warning-light);border-color:#fde68a;margin-top:10px">'
+        +'<div style="font-size:12.5px;color:#92400e;line-height:1.75">还有 <b>'+st.noHandler.count+' 笔</b>（'+fmtCNY(st.noHandler.amount)+'）<b>没填经手人</b>，'
+        +'这部分钱分摊表里没人认领，所以差额合计不是 0。点条目的「编辑」补上经手人，分摊就自动对上了。</div></div>';
+    }
+    if(st.transfers.length){
+      h+='<div class="exp-xfer"><span class="exp-xfer-t">转账建议</span>';
+      st.transfers.forEach(t=>{ h+='<span class="exp-xfer-i">'+escHtml(t.from)+' → <b>'+escHtml(t.to)+'</b> '+fmtCNY(t.amount)+'</span>'; });
+      h+='</div>';
+    } else if(st.balanced){
+      h+='<div class="exp-xfer"><span class="exp-xfer-t">转账建议</span><span class="exp-xfer-i">大家都持平，不用互相转账</span></div>';
+    }
+  }
+
+  // 操作
+  h+='<div class="exp-proj-foot">';
+  if(!isDone){
+    h+='<button class="btn btn-sm btn-primary" onclick="expProjNewItem(\''+p.id+'\')">＋ 记一笔</button>';
+    h+='<button class="btn btn-sm" onclick="expProjFile(\''+p.id+'\')">统一报账（导出报账包）</button>';
+  } else {
+    h+='<button class="btn btn-sm" onclick="expProjUnfile(\''+p.id+'\')">撤销报账</button>';
+  }
+  h+='<button class="btn btn-sm" onclick="expProjPrint(\''+p.id+'\')">打印专项明细单</button>';
+  h+='<button class="btn btn-sm" onclick="openExpProjModal(\''+p.id+'\')">编辑项目</button>';
+  if(isDone && p.filedAt) h+='<span style="font-size:12px;color:var(--text-muted);align-self:center">报账于 '+escHtml(p.filedAt)+'</span>';
+  h+='<button class="btn btn-sm sp" style="color:var(--danger)" onclick="delExpProj(\''+p.id+'\')">删除专项</button>';
+  h+='</div>';
+
+  h+='</div></div>';
+  return h;
+}
+
+function expProjItemRow(r){
+  const a=expAcct(r.account);
+  const nf=(r.files||[]).length;
+  const inc=eNum(r.amount)<0;
+  const hd=String(r.handler||'').trim();
+  let h='<div class="exp-pitem">';
+  h+='<span class="exp-pitem-d">'+escHtml(r.date||'')+'</span>';
+  h+='<div class="exp-pitem-m">';
+  h+='<div class="exp-pitem-t">'+escHtml(r.desc||'（未填事由）')+(inc?' <span class="exp-tag-income">收入</span>':'')+'</div>';
+  h+='<div class="exp-pitem-s">';
+  h+='<span class="exp-acct-tag '+a.cls+'">'+escHtml(a.name)+'</span>';
+  if(r.category) h+='<span>'+escHtml(r.category)+'</span>';
+  if(r.payee)    h+='<span>付给 '+escHtml(r.payee)+'</span>';
+  if(nf)         h+='<span>凭证 '+nf+' 张</span>';
+  if(r.filed && r.filedAt) h+='<span>报账于 '+escHtml(r.filedAt)+'</span>';
+  h+='</div></div>';
+  h+='<span class="exp-pitem-h"'+(hd?' title="这笔谁付的钱"':' title="还没填付款人，分摊表里没人认领" style="background:var(--warning-light);color:#92400e"')+'>'+(hd?('经手 '+escHtml(hd)):'未填经手人')+'</span>';
+  h+='<span class="exp-pitem-a'+(inc?' inc':'')+'">'+fmtCNY(r.amount)+'</span>';
+  h+='<span class="exp-pitem-act">';
+  h+='<button class="btn-icon" onclick="openExpModal(\''+r.id+'\')" title="编辑">'+ICON_EDIT+'</button>';
+  h+='<button class="btn-icon" onclick="deleteExpRecord(\''+r.id+'\')" title="删除" style="color:var(--danger)">'+ICON_DEL+'</button>';
+  h+='</span></div>';
+  return h;
+}
+
+// ---------------- 项目增删改 ----------------
+function expProjAddMember(nm){
+  nm=String(nm||'').trim(); if(!nm) return;
+  const el=document.getElementById('expProjMembers'); if(!el) return;
+  const cur=expProjParseMembers(el.value);
+  if(cur.indexOf(nm)<0) cur.push(nm);
+  el.value=cur.join('、');
+}
+function expProjAddMemberIdx(i){
+  const s=(hr&&hr.staff)?hr.staff[i]:null;
+  if(s && s.name) expProjAddMember(String(s.name));
+}
+function openExpProjModal(id){
+  editingExpProjId = id||null;
+  const p = id ? expProjById(id) : null;
+  document.getElementById('modalExpProjTitle').textContent = p ? ('编辑专项：'+p.name) : '新建专项';
+  document.getElementById('expProjName').value = p ? (p.name||'') : '';
+  document.getElementById('expProjFrom').value = p ? (p.from||todayStr()) : todayStr();
+  document.getElementById('expProjTo').value   = p ? (p.to||todayStr()) : todayStr();
+  document.getElementById('expProjMembers').value = p ? (p.members||[]).join('、') : '';
+  document.getElementById('expProjNote').value = p ? (p.note||'') : '';
+  const box=document.getElementById('expProjMemberChips');
+  if(box){
+    const staff=(hr&&hr.staff)||[];
+    const btns=[];
+    staff.forEach((s,i)=>{
+      const nm=String((s&&s.name)||'').trim();
+      if(nm) btns.push('<button type="button" class="exp-chip" onclick="expProjAddMemberIdx('+i+')">'+escHtml(nm)+'</button>');
+    });
+    box.innerHTML = btns.length
+      ? ('<span style="font-size:11.5px;color:var(--text-muted);align-self:center">从人事名单快捷加入：</span>'+btns.join(''))
+      : '<span style="font-size:11.5px;color:var(--text-muted)">直接在上面手填名字就行（多个人用顿号或逗号隔开）</span>';
+  }
+  document.getElementById('modalExpProj').style.display='flex';
+  if(!p) setTimeout(()=>{ try{ document.getElementById('expProjName').focus(); }catch(e){} }, 120);
+}
+function saveExpProj(){
+  const name=String(document.getElementById('expProjName').value||'').trim();
+  const from=document.getElementById('expProjFrom').value||todayStr();
+  const to=document.getElementById('expProjTo').value||from;
+  const members=expProjParseMembers(document.getElementById('expProjMembers').value);
+  const note=String(document.getElementById('expProjNote').value||'').trim();
+  if(!name){ showToast('请填项目名称，比如「3 人北京出差」'); try{document.getElementById('expProjName').focus()}catch(e){} return; }
+  if(String(to)<String(from)){ showToast('结束日期不能早于开始日期'); return; }
+  if(!members.length){ showToast('请至少填一个参与人（谁可能垫钱）'); try{document.getElementById('expProjMembers').focus()}catch(e){} return; }
+  const wasEdit=!!editingExpProjId;
+  let pid=editingExpProjId;
+  if(wasEdit){
+    const p=expProjById(editingExpProjId);
+    if(p){ p.name=name; p.from=from; p.to=to; p.members=members; p.note=note; p.updatedAt=Date.now(); }
+  } else {
+    pid=uid();
+    expProjects.push({id:pid, name:name, from:from, to:to, members:members, note:note,
+                      status:'open', filed:false, createdAt:Date.now(), updatedAt:Date.now()});
+  }
+  editingExpProjId=null;
+  expView='proj';
+  if(!wasEdit) expProjOpen[pid]=true;
+  saveAll();
+  closeModal('modalExpProj');
+  refreshAll();
+  showToast(wasEdit?'✓ 项目已更新':'✓ 专项已建好，接下来把每一笔记进去','info');
+}
+function delExpProj(id){
+  const p=expProjById(id); if(!p) return;
+  const items=expProjItems(id);
+  const tail = items.length
+    ? ('\n\n⚠️ 下面 '+items.length+' 笔不会被删除，会退回「日常报账」继续保留。')
+    : '';
+  showConfirm('删除专项《'+p.name+'》？'+tail, ()=>{
+    expProjects = expProjects.filter(x=>x.id!==id);
+    items.forEach(r=>{ const x=expenses.find(y=>y.id===r.id); if(x) delete x.projId; });
+    delete expProjOpen[id];
+    saveAll(); renderExpenses();
+    showToast(items.length?('已删除专项，'+items.length+' 笔已退回日常报账'):'已删除专项','info');
+  });
+}
+function expProjNewItem(pid){
+  const p=expProjById(pid); if(!p) return;
+  if(p.status==='done'){ showToast('这个专项已经报账归档了，要加请先点「撤销报账」'); return; }
+  openExpModal(null, pid);
+}
+
+// ---------------- 弹窗里的专项横幅 + 经手人快捷选择 ----------------
+function expRenderProjBanner(){
+  const p = expModalProjId ? expProjById(expModalProjId) : null;
+  const bar=document.getElementById('expProjBanner');
+  if(bar){
+    if(p){
+      bar.style.display='flex';
+      const t=document.getElementById('expProjBannerTxt');
+      if(t) t.innerHTML='这笔记在专项 <b>《'+escHtml(p.name)+'》</b> 下（'+escHtml(String(p.from||''))+' ~ '+escHtml(String(p.to||''))+'）';
+    } else {
+      bar.style.display='none';
+    }
+  }
+  const chips=document.getElementById('expHandlerChips');
+  if(chips){
+    const members = p ? (p.members||[]) : [];
+    chips.innerHTML = members.length
+      ? ('<span style="font-size:11.5px;color:var(--text-muted);align-self:center">谁付的钱？点一下：</span>'
+         + members.map((nm,i)=>'<button type="button" class="exp-chip" onclick="expPickHandlerIdx('+i+')">'+escHtml(nm)+'</button>').join(''))
+      : '';
+  }
+}
+function expPickHandlerIdx(i){
+  const p = expModalProjId ? expProjById(expModalProjId) : null;
+  if(!p) return;
+  const nm=(p.members||[])[i]; if(!nm) return;
+  const el=document.getElementById('expHandler'); if(!el) return;
+  el.value = (el.value===nm) ? '' : nm;
+}
+function expModalDetach(){
+  expModalProjId=null;
+  expRenderProjBanner();
+  showToast('这笔改成「日常报账」了，保存后生效','info');
+}
+
+// ---------------- 统一报账（整个项目一次性打包归档） ----------------
+function expProjMarkFiled(p, filed){
+  if(!p) return;
+  const items=expProjItems(p.id);
+  const stamp=todayStr();
+  items.forEach(r=>{
+    const x=expenses.find(y=>y.id===r.id);
+    if(!x) return;
+    x.filed=!!filed;
+    if(filed) x.filedAt=stamp; else delete x.filedAt;
+  });
+  p.status = filed ? 'done' : 'open';
+  p.filed = !!filed;
+  if(filed) p.filedAt=stamp; else delete p.filedAt;
+  p.updatedAt=Date.now();
+  expProjOpen[p.id]=true;
+  saveAll(); renderExpenses();
+  showToast(filed ? ('✓ 《'+p.name+'》已统一报账，'+items.length+' 笔一起归档') : ('《'+p.name+'》已改回进行中'), 'info');
+}
+function expProjFile(pid){
+  const p=expProjById(pid); if(!p) return;
+  const items=expProjItems(pid);
+  if(!items.length){ showToast('这个专项还没记条目'); return; }
+  if(p.status==='done'){ showToast('这个专项已经报账归档了'); return; }
+  const st=expProjSettle(p);
+  const warn = st.noHandler.count
+    ? ('\n\n⚠️ 还有 '+st.noHandler.count+' 笔没填经手人（'+fmtCNY(st.noHandler.amount)+'），分摊表会对不上，建议先补上再报。')
+    : '';
+  showConfirm('把《'+p.name+'》的 '+items.length+' 笔（'+fmtCNY(st.total)+'）打包成专项报账包？'+warn, ()=>{
+    if(!expProjPackage(p)) return;
+    showConfirm('已导出。\n要把《'+p.name+'》标记成「已报账」吗？\n（'+items.length+' 笔会一起归档到 '+todayStr()+'，以后不再进日常报账）', ()=>{
+      expProjMarkFiled(p, true);
+    });
+  });
+}
+function expProjUnfile(pid){
+  const p=expProjById(pid); if(!p) return;
+  const items=expProjItems(pid);
+  showConfirm('把《'+p.name+'》改回「进行中」？\n'+items.length+' 笔会一起变回「待报账」，可以继续记新的。', ()=>{
+    expProjMarkFiled(p, false);
+  });
+}
+
+// ---------------- 导出：CSV / 打印页 / 打包 ----------------
+function expProjCsv(p, names){
+  const q=v=>{
+    const s=String(v==null?'':v);
+    return /[",\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  };
+  const items=expProjItems(p.id);
+  let out='专项：'+q(p.name)+'\n';
+  out+='周期：'+q(String(p.from||'')+' ~ '+String(p.to||''))+'（'+expProjDays(p)+' 天）  参与人：'+q((p.members||[]).join('、'))+'\n';
+  out+='\n序号,日期,费用类别,事由,收款方,经手人,金额(元),备注,凭证文件,记账账户\n';
+  let i=0, total=0;
+  items.forEach((r,k)=>{
+    i++; total+=eNum(r.amount);
+    out+=[i, r.date||'', r.category||'', r.desc||'', r.payee||'', r.handler||'',
+          eNum(r.amount).toFixed(2), r.note||'', ((names&&names[k])||[]).join(' '), expAcctName(r.account)].map(q).join(',')+'\n';
+  });
+  out+=['','','','','合计','',total.toFixed(2),'','',''].map(q).join(',')+'\n';
+  return out;
+}
+function expProjSettleCsv(p){
+  const st=expProjSettle(p);
+  const q=v=>{
+    const s=String(v==null?'':v);
+    return /[",\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  };
+  let out='专项：'+q(p.name)+'\n周期：'+q(String(p.from||'')+' ~ '+String(p.to||''))+'  参与人：'+q((p.members||[]).join('、'))+'\n';
+  out+='分摊口径：支出合计 '+st.total.toFixed(2)+' 元，按 '+st.members.length+' 人均摊，每人 '+st.share.toFixed(2)+' 元；差额 = 垫付 - 应摊（正数=该收回，负数=该补钱）\n\n';
+  out+='姓名,是否参与人,垫付金额,应摊金额,差额,结论\n';
+  st.rows.forEach(r=>{
+    const concl = r.diff>0.005?'应收 '+r.diff.toFixed(2):(r.diff<-0.005?'应补 '+(-r.diff).toFixed(2):'持平');
+    out+=[r.name, r.member?'是':'否（名单外经手人）', r.paid.toFixed(2), r.share.toFixed(2), r.diff.toFixed(2), concl].map(q).join(',')+'\n';
+  });
+  out+=['合计','', st.sumPaid.toFixed(2), st.sumShare.toFixed(2), st.sumDiff.toFixed(2), (Math.abs(st.sumDiff)<0.005?'平衡':'⚠ 有 '+st.noHandler.count+' 笔未填经手人，对不上')].map(q).join(',')+'\n';
+  if(st.transfers.length){
+    out+='\n转账建议\n付款人,收款人,金额\n';
+    st.transfers.forEach(t=>{ out+=[t.from,t.to,t.amount.toFixed(2)].map(q).join(',')+'\n'; });
+  } else if(st.balanced){
+    out+='\n转账建议：大家都持平，不用互相转账\n';
+  }
+  return out;
+}
+function expProjReadme(p){
+  const st=expProjSettle(p);
+  return '专项报账文件包\r\n'
+   +'========================================\r\n'
+   +'项目名称：'+String(p.name||'')+'\r\n'
+   +'项目周期：'+String(p.from||'')+' ~ '+String(p.to||'')+'（'+expProjDays(p)+' 天）\r\n'
+   +'参与人：'+((p.members||[]).join('、')||'未填')+'\r\n'
+   +'记录笔数：'+st.count+' 笔\r\n'
+   +'金额合计：'+fmtCNY(st.total)+'\r\n'
+   +'分摊口径：按 '+st.members.length+' 人均摊，每人 '+fmtCNY(st.share)+'\r\n'
+   +(st.noHandler.count
+      ? '⚠️ 有 '+st.noHandler.count+' 笔（'+fmtCNY(st.noHandler.amount)+'）没填经手人，分摊表差额合计不是 0\r\n'
+      : '✓ 每笔都填了经手人，分摊表已平衡（差额合计 0）\r\n')
+   +'打包时间：'+new Date().toLocaleString('zh-CN')+'\r\n'
+   +'\r\n'
+   +'包里有什么\r\n'
+   +'----------------------------------------\r\n'
+   +'专项明细.csv     —— 项目里每一笔支出（Excel 打开，已带 BOM，中文不乱码）\r\n'
+   +'分摊结算表.csv   —— 每个人垫了多少、该摊多少、谁该转给谁多少\r\n'
+   +'专项明细单.html  —— 双击用浏览器打开，可直接打印或存 PDF（带签字栏）\r\n'
+   +'凭证\\            —— 全部发票 / 收据照片，文件名序号与明细表一一对应\r\n'
+   +'\r\n'
+   +'凭证文件命名规则：序号_日期_金额.扩展名\r\n';
+}
+function expProjPrintHtml(p, autoPrint){
+  const st=expProjSettle(p);
+  const items=expProjItems(p.id);
+  const now=new Date();
+  const two=n=>String(n).padStart(2,'0');
+  const when=now.getFullYear()+'-'+two(now.getMonth()+1)+'-'+two(now.getDate())+' '+two(now.getHours())+':'+two(now.getMinutes());
+  let rows='', i=0, invN=0;
+  items.forEach(r=>{
+    i++;
+    const a=expAcct(r.account);
+    const nf=(r.files||[]).length; invN+=nf;
+    rows+='<tr>'
+      +'<td class="c idx">'+i+'</td>'
+      +'<td class="c nowrap">'+escHtml(r.date||'')+'</td>'
+      +'<td class="c">'+(r.category?escHtml(r.category):'<span class="none">—</span>')+'</td>'
+      +'<td class="desc">'+escHtml(r.desc||'')+'</td>'
+      +'<td class="c">'+(r.payee?escHtml(r.payee):'<span class="none">—</span>')+'</td>'
+      +'<td class="c">'+(String(r.handler||'').trim()?escHtml(String(r.handler).trim()):'<span class="none">未填</span>')+'</td>'
+      +'<td class="r amt'+(eNum(r.amount)<0?' inc':'')+'">'+eNum(r.amount).toFixed(2)+'</td>'
+      +'<td class="c">'+(nf?('<span class="vch">'+nf+'</span>'):'<span class="none">—</span>')+'</td>'
+      +'<td class="note">'+escHtml(r.note||'')+'</td>'
+      +'<td class="c"><span class="acct '+a.cls+'">'+escHtml(a.name)+'</span></td>'
+      +'</tr>';
+  });
+  let setRows='';
+  st.rows.forEach(r=>{
+    const cls = r.diff>0.005?'pos':(r.diff<-0.005?'neg':'');
+    const concl = r.diff>0.005?('应收 '+fmtCNY(r.diff)):(r.diff<-0.005?('应补 '+fmtCNY(-r.diff)):'持平');
+    setRows+='<tr><td>'+escHtml(r.name)+(r.member?'':'<span class="none">（名单外）</span>')+'</td>'
+      +'<td class="r">'+fmtCNY(r.paid)+'</td><td class="r">'+fmtCNY(r.share)+'</td>'
+      +'<td class="r '+cls+'">'+(r.diff>0.005?'+':'')+fmtCNY(r.diff)+'</td>'
+      +'<td class="c '+cls+'">'+concl+'</td></tr>';
+  });
+  let xfer='';
+  if(st.transfers.length){
+    xfer='<div class="xfer"><b>互相转账建议：</b>'
+      + st.transfers.map(t=>escHtml(t.from)+' → '+escHtml(t.to)+' '+fmtCNY(t.amount)).join('　｜　')
+      +'</div>';
+  } else if(st.balanced){
+    xfer='<div class="xfer"><b>互相转账建议：</b>大家都持平，不用互相转账</div>';
+  }
+  const css='*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+   +'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:#0f172a;padding:26px 28px;font-size:13px;margin:0;background:#fff}'
+   +'.head{border-bottom:3px solid #0f766e;padding-bottom:12px;margin-bottom:16px}'
+   +'h1{font-size:21px;margin:0 0 6px;letter-spacing:2px;color:#0f766e}'
+   +'.meta{font-size:12px;color:#64748b;line-height:1.8}.meta b{color:#0f172a}'
+   +'.cards{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}'
+   +'.card{flex:1 1 120px;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;background:#f8fafc}'
+   +'.card .k{font-size:11px;color:#64748b;margin-bottom:4px}'
+   +'.card .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}'
+   +'table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:16px}'
+   +'thead th{background:#0f766e;color:#fff;font-weight:600;font-size:12px;padding:9px 7px;text-align:left;white-space:nowrap;border:none}'
+   +'tbody td{padding:7px;font-size:12px;border-bottom:1px solid #eef2f6;vertical-align:middle;word-break:break-word}'
+   +'tbody tr:nth-child(even) td{background:#f8fafc}'
+   +'tfoot td{padding:9px 7px;font-size:12.5px;font-weight:700;background:#eef7f5;border-top:2px solid #0f766e}'
+   +'td.c{text-align:center}td.r{text-align:right;font-variant-numeric:tabular-nums}td.nowrap{white-space:nowrap}'
+   +'td.note{font-size:11.5px;color:#64748b}'
+   +'td.amt{font-weight:700;font-variant-numeric:tabular-nums}td.amt.inc{color:#047857}'
+   +'.st{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600}'
+   +'.st.wait{background:#fef3c7;color:#b45309}.st.done{background:#d1fae5;color:#047857}'
+   +'.vch{display:inline-block;min-width:18px;text-align:center;font-size:11px;font-weight:700;color:#0369a1;background:#e0f2fe;border-radius:4px;padding:1px 5px}'
+   +'.acct{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600;background:#eef2f7;color:#475569}'
+   +'.acct.lg{background:#e0f2fe;color:#0369a1}.acct.fs{background:#fef3c7;color:#b45309}.acct.zz{background:#e0e7ff;color:#4338ca}'
+   +'.none{color:#cbd5e1}'
+   +'h2{font-size:15px;margin:18px 0 9px;color:#0f172a;padding-left:9px;border-left:4px solid #0f766e}'
+   +'.pos{color:#047857;font-weight:700}.neg{color:#b91c1c;font-weight:700}'
+   +'.xfer{margin-top:10px;padding:10px 13px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:12.5px;color:#0c4a6e;line-height:1.8}'
+   +'.sign{display:flex;gap:30px;margin-top:34px;font-size:12.5px;color:#334155}'
+   +'.sign div{flex:1;border-top:1px solid #94a3b8;padding-top:6px}'
+   +'@media print{body{padding:10px 12px}.noprint{display:none}}'
+   +'@page{size:A4 landscape;margin:10mm}';
+  return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>专项报账明细单 - '+escHtml(p.name||'')+'</title><style>'+css+'</style></head><body>'
+   +'<div class="head"><h1>专项报账明细单</h1><div class="meta">'
+   +'项目：<b>'+escHtml(p.name||'')+'</b>　｜　周期：<b>'+escHtml(String(p.from||'')+' ~ '+String(p.to||''))+'</b>（'+expProjDays(p)+' 天）<br>'
+   +'参与人：<b>'+escHtml((p.members||[]).join('、')||'未填')+'</b>　｜　共 <b>'+st.count+'</b> 笔　｜　凭证 <b>'+invN+'</b> 张'
+   +(p.note?('　｜　备注：'+escHtml(p.note)):'')
+   +'<br>打印时间：'+when+'</div></div>'
+   +'<div class="cards">'
+   +'<div class="card"><div class="k">支出合计</div><div class="v">'+fmtCNY(st.total)+'</div></div>'
+   +'<div class="card"><div class="k">参与人数</div><div class="v">'+st.members.length+' 人</div></div>'
+   +'<div class="card"><div class="k">人均应摊</div><div class="v">'+fmtCNY(st.share)+'</div></div>'
+   +'<div class="card"><div class="k">状态</div><div class="v">'+(p.status==='done'?'已报账':'进行中')+'</div></div>'
+   +'</div>'
+   +'<table><thead><tr><th style="width:34px">序号</th><th style="width:86px">日期</th><th style="width:66px">类别</th>'
+   +'<th>事由</th><th style="width:86px">收款方</th><th style="width:66px">经手人</th><th style="width:82px;text-align:right">金额</th>'
+   +'<th style="width:44px">凭证</th><th style="width:110px">备注</th><th style="width:64px">账户</th></tr></thead><tbody>'
+   +(rows||'<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:18px">这个专项还没有条目</td></tr>')
+   +'</tbody><tfoot><tr><td colspan="6">合计</td><td class="r">'+eNum(st.total).toFixed(2)
+   +'</td><td colspan="3"></td></tr></tfoot></table>'
+   +'<h2>分摊结算（均摊 '+fmtCNY(st.share)+' / 人）</h2>'
+   +'<table><thead><tr><th style="width:140px">姓名</th><th style="text-align:right">垫付金额</th><th style="text-align:right">应摊金额</th>'
+   +'<th style="text-align:right">差额</th><th style="width:120px;text-align:center">结论</th></tr></thead><tbody>'
+   +(setRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:18px">还没填参与人</td></tr>')
+   +'</tbody><tfoot><tr><td>合计</td><td class="r">'+eNum(st.sumPaid).toFixed(2)+'</td><td class="r">'+eNum(st.sumShare).toFixed(2)
+   +'</td><td class="r '+(Math.abs(st.sumDiff)<0.005?'pos':'neg')+'">'+eNum(st.sumDiff).toFixed(2)+'</td>'
+   +'<td class="c">'+(Math.abs(st.sumDiff)<0.005?'平衡':'对不上')+'</td></tr></tfoot></table>'
+   +xfer
+   +'<div class="sign"><div>经办人（垫付人）签字</div><div>部门负责人签字</div><div>财务审核</div><div>日期</div></div>'
+   +(autoPrint?'<script>window.onload=function(){setTimeout(function(){window.print()},260)}<\/script>':'')
+   +'</body></html>';
+}
+function expProjPrint(pid){
+  const p=expProjById(pid); if(!p) return;
+  const html=expProjPrintHtml(p, true);
+  const w=window.open('','_blank');
+  if(!w){ showToast('浏览器拦住了新窗口，请允许弹出窗口后重试'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+}
+function expProjPackage(p){
+  try{
+    if(typeof TextEncoder==='undefined'){ showToast('当前浏览器不支持打包，请用电脑上的 Chrome / Edge'); return false; }
+    const items=expProjItems(p.id);
+    const invFiles=[], names=[];
+    let idx=0;
+    items.forEach(r=>{
+      const arr=[];
+      (r.files||[]).forEach(f=>{
+        if(!f || !f.dataUrl) return;
+        idx++;
+        const m=String(f.name||'').match(/\.([A-Za-z0-9]{1,5})$/);
+        const ext=m?m[1].toLowerCase():'jpg';
+        const nm=String(idx).padStart(2,'0')+'_'+String(r.date||'').replace(/-/g,'')+'_'+eNum(r.amount).toFixed(2)+'.'+ext;
+        arr.push(nm);
+        invFiles.push({name:'凭证/'+nm, data:dataUrlToU8(f.dataUrl)});
+      });
+      names.push(arr);
+    });
+    const enc=new TextEncoder();
+    const zipFiles=[
+      {name:'专项明细.csv',   data:enc.encode('\ufeff'+expProjCsv(p, names))},
+      {name:'分摊结算表.csv', data:enc.encode('\ufeff'+expProjSettleCsv(p))},
+      {name:'专项明细单.html',data:enc.encode(expProjPrintHtml(p, false))},
+      {name:'说明.txt',       data:enc.encode(expProjReadme(p))},
+      {name:'凭证/',          data:new Uint8Array(0)}
+    ].concat(invFiles);
+    const base=String(p.name||'专项').replace(/[\\/:*?"<>|\r\n]/g,'_').slice(0,40);
+    bkDownloadBlob(zipStore(zipFiles), '专项报账_'+base+'_'+todayStr().replace(/-/g,'')+'.zip');
+    showToast('✓ 已打包 '+items.length+' 笔、'+idx+' 张凭证', 'info');
+    return true;
+  }catch(e){
+    showToast('打包失败：'+((e&&e.message)||e));
+    return false;
+  }
+}
+function expProjExportListCsv(){
+  if(!(expProjects||[]).length){ showToast('还没有专项'); return; }
+  const q=v=>{
+    const s=String(v==null?'':v);
+    return /[",\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  };
+  let out='项目名称,开始日期,结束日期,天数,参与人,笔数,金额合计,已报账金额,状态,报账日期\n';
+  expProjects.slice()
+    .sort((a,b)=>String(b.from||'').localeCompare(String(a.from||'')))
+    .forEach(p=>{
+      const it=expProjItems(p.id);
+      const s=expSum(it);
+      out+=[p.name, p.from||'', p.to||'', expProjDays(p), (p.members||[]).join(' '), it.length,
+            s.total.toFixed(2), s.paid.toFixed(2), (p.status==='done'?'已报账':'进行中'), p.filedAt||''].map(q).join(',')+'\n';
+    });
+  bkDownloadBlob(new Blob(['\ufeff'+out],{type:'text/csv;charset=utf-8'}), '专项报账列表_'+todayStr()+'.csv');
+  showToast('✓ 专项列表已导出','info');
+}
+
+// ---------------- 示例数据 / 清空 ----------------
+function expProjHasSample(){ return (expProjects||[]).some(p=>p && p._sample); }
+// 🔑 示例专项的条目也带 _sample，所以清空时会被两处各自过滤掉，不会留下孤儿账
+function expProjClearSample(){
+  const ids={};
+  (expProjects||[]).forEach(p=>{ if(p && p._sample) ids[p.id]=1; });
+  if(!Object.keys(ids).length) return;
+  expProjects = expProjects.filter(p=>!p || !p._sample);
+  expenses = (expenses||[]).filter(r=> !(r && r.projId && ids[r.projId] && r._sample) );
+}
+function seedExpProjSample(){
+  const d=new Date();
+  const day=n=>{ const dt=new Date(d); dt.setDate(dt.getDate()+n); return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); };
+  const mk=(pid,date,account,amount,category,desc,payee,handler,note)=>({
+    id:uid(), projId:pid, date:date, amount:amount, account:account, category:category,
+    desc:desc, payee:payee||'', handler:handler||'', note:note||'', files:[],
+    filed:false, createdAt:Date.now(), _sample:true
+  });
+  const p1={id:uid(), name:'3 人北京出差（面辅料市场 + 客户拜访）', from:day(-16), to:day(-12),
+            members:['孟伊','李雪洋','陈曦'], note:'去大红门看样，顺路拜访 2 个老客户',
+            status:'open', filed:false, createdAt:Date.now(), updatedAt:Date.now(), _sample:true};
+  const p2={id:uid(), name:'秋季广交会展位搭建', from:day(-40), to:day(-36),
+            members:['孟伊','Phoebe'], note:'展位搭建 + 展期接待',
+            status:'done', filed:true, filedAt:day(-35), createdAt:Date.now(), updatedAt:Date.now(), _sample:true};
+  expProjects.push(p1, p2);
+  expenses.push(
+    mk(p1.id, day(-16),'langges',2340,'差旅','3 人往返机票（郑州—北京）','南方航空','孟伊',''),
+    mk(p1.id, day(-16),'langges', 186,'交通','高铁补票 + 机场大巴','12306','陈曦',''),
+    mk(p1.id, day(-15),'langges',1760,'差旅','酒店 4 晚（3 间）','如家','孟伊',''),
+    mk(p1.id, day(-14),'langges', 268,'交通','市场来回打车','滴滴','李雪洋',''),
+    mk(p1.id, day(-14),'langges', 520,'差旅','三天工作餐','市场附近','陈曦',''),
+    mk(p1.id, day(-13),'langges', 680,'招待','请老客户吃饭','全聚德','孟伊',''),
+    mk(p2.id, day(-40),'fansi',  3200,'其他','展位搭建 + 喷绘','展览公司','孟伊',''),
+    mk(p2.id, day(-39),'fansi',   460,'快递费','展品物料顺丰寄广州','顺丰','Phoebe',''),
+    mk(p2.id, day(-38),'fansi',   380,'差旅','展期工作餐','展馆内','孟伊','')
+  );
+  expenses.forEach(r=>{ if(r.projId===p2.id){ r.filed=true; r.filedAt=p2.filedAt; } });
+  return 2;
+}
+
+// ============================================================
 //  INIT
 // ============================================================
 function init(){
@@ -16868,6 +17781,15 @@ function init(){
     seedExpSample();
     localStorage.setItem(STORAGE_PREFIX+'exp_seeded','1');
     saveAll();
+  }
+
+  // 专项报账（v2.43）：首次打开种 2 个示例专项（1 个进行中 + 1 个已报账）；顶部「清空示例数据」可清
+  if(!localStorage.getItem(STORAGE_PREFIX+'exp_prj_seeded')){
+    let _pjp=0;
+    if(!(expProjects||[]).length) _pjp=seedExpProjSample();
+    localStorage.setItem(STORAGE_PREFIX+'exp_prj_seeded','1');
+    saveAll();
+    if(_pjp) setTimeout(()=>{ try{ showToast('报账整理：已预置 '+_pjp+' 个示例专项（3 人北京出差 / 广交会展位），点「专项报账」看统一报账怎么算','info'); }catch(e){} }, 2600);
   }
 
   // 货损/客诉：首次打开若为空，载入 3 条示例（2 未汇报 + 1 已汇报折叠示例）
