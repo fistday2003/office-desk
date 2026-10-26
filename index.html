@@ -1137,6 +1137,16 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .hr-table tbody tr:hover{background:var(--primary-light)}
 .hr-table tbody tr:nth-child(4n+1){background:rgba(0,0,0,0.012)}
 .hr-table .num{text-align:right;font-variant-numeric:tabular-nums}
+/* 表头列宽可拖（v2.46）：鼠标移到表头右边缘就变成左右箭头，按住拖即可 */
+.hr-tablewrap thead th{position:relative}
+.hr-tablewrap thead th::after{content:'';position:absolute;right:-4px;top:0;bottom:0;width:9px;cursor:col-resize;z-index:4}
+.hr-tablewrap thead th:last-child::after{display:none}
+.hr-tablewrap thead th.hr-th-sort::after{z-index:5}
+body.hr-col-dragging,body.hr-col-dragging *{cursor:col-resize!important;user-select:none!important}
+.hr-table-fixed{table-layout:fixed}
+.hr-table-fixed th,.hr-table-fixed td{overflow:hidden;text-overflow:ellipsis}
+.hr-colw-tip{font-size:11.5px;color:var(--text-muted);margin:-4px 0 10px}
+.hr-colw-tip b{color:var(--text-secondary);font-weight:600}
 
 /* ===== 外贸运费管理 ===== */
 .fr-summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
@@ -1272,6 +1282,20 @@ tr:hover .fr-fwd-acts{opacity:1}
 .hr-inline-sel.pri-b{border-color:var(--accent);background:#ecfdf5;color:#065f46;font-weight:700}
 .hr-inline-sel.pri-c{border-color:#94a3b8;background:#f1f5f9;color:#475569;font-weight:700}
 .hr-col-paynote{white-space:normal;min-width:130px;max-width:210px;word-break:break-word;line-height:1.5;font-size:12px}
+/* 岗位选项可手动添加（v2.46） */
+.hr-post-mgr{float:right;font-weight:400;font-size:11.5px;color:var(--primary);cursor:pointer;user-select:none;line-height:1.5}
+.hr-post-mgr:hover{text-decoration:underline}
+.hr-post-grp{margin:0 0 14px}
+.hr-post-grp h4{font-size:12.5px;font-weight:700;color:var(--text-secondary);margin:0 0 7px}
+.hr-post-grp h4 small{font-weight:400;color:var(--text-muted);margin-left:6px;font-size:11.5px}
+.hr-post-chips{display:flex;flex-wrap:wrap;gap:7px}
+.hr-post-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--card-bg);border-radius:999px;padding:4px 10px;font-size:12.5px;line-height:1.4;max-width:100%}
+.hr-post-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hr-post-chip.mine{border-color:#bfdbfe;background:var(--primary-light);color:var(--primary-dark)}
+.hr-post-chip.auto{border-style:dashed;color:var(--text-muted)}
+.hr-post-chip b{flex:0 0 auto;cursor:pointer;font-weight:700;font-size:14px;line-height:1;color:var(--text-muted);padding:0 1px}
+.hr-post-chip b:hover{color:var(--danger)}
+.hr-post-chips .hr-post-none{font-size:12.5px;color:var(--text-muted)}
 /* 简历自动识别结果提示条（v2.23） */
 .hr-auto-box{margin:0 0 12px;border:1px solid #a7f3d0;background:#ecfdf5;color:#065f46;border-radius:8px;padding:8px 11px;font-size:12.5px;line-height:1.75}
 .hr-auto-box.warn{border-color:#fed7aa;background:#fff7ed;color:#b45309}
@@ -1516,7 +1540,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.45 · 2026-10-26</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.46 · 2026-10-26</div>
     </div>
   </aside>
 
@@ -2032,7 +2056,7 @@ tr:hover .fr-fwd-acts{opacity:1}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 140px"><label>项目归属 *</label><select id="hsProject"></select></div>
-      <div class="form-group" style="flex:1 1 140px"><label>岗位</label><input type="text" id="hsPost" placeholder="如 外贸业务员" list="hrPostList"></div>
+      <div class="form-group" style="flex:1 1 140px"><label>岗位<span class="hr-post-mgr" onclick="openHrPostMgr()" title="手动添加 / 删除岗位选项">＋ 选项</span></label><input type="text" id="hsPost" placeholder="如 外贸业务员" list="hrPostList"></div>
       <div class="form-group" style="flex:1 1 140px"><label>子账号 / 工号</label><input type="text" id="hsSubAccount" placeholder="如 Nancy Lignes"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -2076,14 +2100,25 @@ tr:hover .fr-fwd-acts{opacity:1}
       <button class="btn btn-primary" id="btnHrStaffSave">保存</button>
     </div>
   </div>
-  <datalist id="hrPostList">
-    <option value="外贸业务员"></option>
-    <option value="外贸业务员（助理型）"></option>
-    <option value="跟单 / 面料支持"></option>
-    <option value="国际站运营"></option>
-    <option value="翻译 / 口语辅助"></option>
-    <option value="业务助理"></option>
-  </datalist>
+</div>
+<!-- 岗位下拉选项（v2.46）：放在弹窗外面，任何弹窗打开时都能引用到 -->
+<datalist id="hrPostList"></datalist>
+
+<!-- ====== MODAL: 岗位选项管理（v2.46） ====== -->
+<div class="modal-overlay" id="modalHrPostMgr" style="display:none;z-index:1200">
+  <div class="modal" style="width:min(540px,95vw)">
+    <h3 id="hrOptMgrTitle">岗位选项管理</h3>
+    <div class="hr-tabs" id="hrOptMgrTabs" style="margin:-4px 0 10px"></div>
+    <p id="hrOptMgrDesc" style="font-size:12.5px;color:var(--text-secondary);margin:-2px 0 14px;line-height:1.7">这里的选项会出现在「新增员工 / 新增候选人 / 调岗」的岗位下拉里，点输入框就能选。手动添加的随时能删，<b>删选项不会动已填好的档案</b>（档案里原来的岗位照样保留）。</p>
+    <div id="hrPostMgrBody"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <input type="text" id="hrPostNew" placeholder="输入新岗位，如 面料开发 / 采购" maxlength="40" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter'){event.preventDefault();hrOptAdd();}">
+      <button class="btn btn-primary" style="flex:0 0 auto;min-width:76px;justify-content:center" onclick="hrOptAdd()">添加</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalHrPostMgr')">关闭</button>
+    </div>
+  </div>
 </div>
 
 <!-- ====== MODAL: 调薪登记 ====== -->
@@ -2117,7 +2152,7 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group" style="flex:1 1 130px"><label>姓名 *</label><input type="text" id="htName"></div>
       <div class="form-group" style="flex:0 1 100px"><label>性别</label><select id="htGender"><option value="">未填</option><option>女</option><option>男</option></select></div>
       <div class="form-group" style="flex:1 1 120px"><label>出生年月</label><input type="month" id="htBirth"></div>
-      <div class="form-group" style="flex:1 1 130px"><label>应聘岗位</label><input type="text" id="htPost" placeholder="如 外贸业务员" list="hrPostList"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>应聘岗位<span class="hr-post-mgr" onclick="openHrPostMgr()" title="手动添加 / 删除岗位选项">＋ 选项</span></label><input type="text" id="htPost" placeholder="如 外贸业务员" list="hrPostList"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:0 1 110px"><label>学历</label><select id="htEdu"></select></div>
@@ -2132,7 +2167,7 @@ tr:hover .fr-fwd-acts{opacity:1}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:0 1 140px"><label>面试时间</label><input type="date" id="htDate"></div>
-      <div class="form-group" style="flex:0 1 140px"><label>批次 / 来源</label><input type="text" id="htSource" placeholder="如 第一批 · 悦婷推送" list="hrSourceList"></div>
+      <div class="form-group" style="flex:0 1 140px"><label>批次 / 来源<span class="hr-post-mgr" onclick="openHrOptMgr('source')" title="手动添加 / 删除来源选项">＋ 选项</span></label><input type="text" id="htSource" placeholder="如 第一批 · 悦婷推送" list="hrSourceList"></div>
       <div class="form-group" style="flex:0 1 110px"><label>优先级</label><select id="htPriority"><option value="">未评级</option><option value="A">A 重点推进</option><option value="B">B 培养 / 定向</option><option value="C">C 兜底备选</option></select></div>
       <div class="form-group" style="flex:0 1 130px"><label>状态</label><select id="htStatus"></select></div>
     </div>
@@ -2175,15 +2210,9 @@ tr:hover .fr-fwd-acts{opacity:1}
       <button class="btn btn-primary" id="btnHrTalentSave">保存</button>
     </div>
   </div>
-  <datalist id="hrSourceList">
-    <option value="第一批 · 悦婷推送"></option>
-    <option value="李总推送"></option>
-    <option value="推荐"></option>
-    <option value="校招"></option>
-    <option value="社招"></option>
-    <option value="内部推荐"></option>
-  </datalist>
 </div>
+<!-- 批次/来源下拉选项（v2.46）：同样放在弹窗外面，由 JS 灌值 -->
+<datalist id="hrSourceList"></datalist>
 
 <!-- HR 资料上传：全局隐藏 file input（人才 / 在职弹窗与明细内联共用） -->
 <input type="file" id="hrDocInput" multiple style="display:none" onchange="hrDocInputChange()">
@@ -2258,7 +2287,7 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group" style="flex:1 1 140px"><label>调岗生效日期</label><input type="date" id="hrTransferDate"></div>
       <div class="form-group" style="flex:1 1 150px"><label>调往项目</label><select id="hrTransferProject"></select></div>
     </div>
-    <div class="form-group"><label>调往岗位</label><input type="text" id="hrTransferPost" placeholder="如 外贸业务员 / 国际站运营" list="hrPostList"></div>
+    <div class="form-group"><label>调往岗位<span class="hr-post-mgr" onclick="openHrPostMgr()" title="手动添加 / 删除岗位选项">＋ 选项</span></label><input type="text" id="hrTransferPost" placeholder="如 外贸业务员 / 国际站运营" list="hrPostList"></div>
     <div class="form-group"><label>调岗原因 / 说明</label><textarea id="hrTransferReason" rows="3" placeholder="如 业务需要 / 个人申请；客户与账号交接情况"></textarea></div>
     <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 6px">确认后该员工的项目与岗位立即更新，并在「调岗记录」里留一条历史（点姓名展开可见），原项目 / 原岗位不会被抹掉。</p>
     <div class="modal-actions">
@@ -2503,7 +2532,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.45';
+const APP_VERSION = 'v2.46';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -12517,6 +12546,159 @@ const HR_STAFF_STATUS_KEYS = HR_STAFF_STATUS.map(x=>x.key);
 const HR_EDU_OPTIONS = ['','大专','本科','硕士','博士','其他'];
 const HR_POST_OPTIONS = ['外贸业务员','外贸业务员（助理型）','跟单 / 面料支持','国际站运营','翻译 / 口语辅助','业务助理'];
 const HR_SOURCE_OPTIONS = ['第一批 · 悦婷推送','李总推送','推荐','校招','社招','内部推荐'];
+// ---- 选项表（v2.46）：岗位 / 批次·来源 两类共用同一套逻辑 ----
+// 手动添加的存 hr.meta.posts / hr.meta.sources —— 复用已有 hr 键，不进新存储键、五链路零改动
+const HR_OPT_CFG = {
+  post:   { label:'岗位',        metaKey:'posts',   builtin:HR_POST_OPTIONS,   dl:'hrPostList',   field:'post'   },
+  source: { label:'批次/来源',   metaKey:'sources', builtin:HR_SOURCE_OPTIONS, dl:'hrSourceList', field:'source' }
+};
+function hrOptCfg(kind){ return HR_OPT_CFG[kind==='source'?'source':'post']; }
+// 手动添加的那一份（存在 meta 里，跟着备份/同步/导出走）
+function hrOptCustom(kind){
+  const c=hrOptCfg(kind);
+  if(!hr || typeof hr!=='object') return [];
+  if(!hr.meta || typeof hr.meta!=='object' || Array.isArray(hr.meta)) hr.meta = {};
+  if(!Array.isArray(hr.meta[c.metaKey])) hr.meta[c.metaKey] = [];
+  return hr.meta[c.metaKey];
+}
+// 档案里正在用的（只读、不落库）：老数据里的自定义值自动回到下拉，不用手工补
+function hrOptUsed(kind){
+  const c=hrOptCfg(kind), out=[];
+  const push=v=>{ v=String(v==null?'':v).trim(); if(v && out.indexOf(v)<0) out.push(v); };
+  (Array.isArray(hr.staff)?hr.staff:[]).forEach(s=>{ if(s) push(s[c.field]); });
+  (Array.isArray(hr.talent)?hr.talent:[]).forEach(t=>{ if(t && !t.deleted) push(t[c.field]); });
+  return out;
+}
+// 全部可选：内置 → 手动添加 → 在用；extra 传当前值，保证编辑时不丢老值
+function hrOptOptions(kind, extra){
+  const c=hrOptCfg(kind), out=[];
+  const push=v=>{ v=String(v==null?'':v).trim(); if(v && out.indexOf(v)<0) out.push(v); };
+  c.builtin.forEach(push);
+  hrOptCustom(kind).forEach(push);
+  hrOptUsed(kind).forEach(push);
+  if(extra) push(extra);
+  return out;
+}
+function renderHrOptDatalist(kind){
+  const c=hrOptCfg(kind);
+  const dl=document.getElementById(c.dl);
+  if(!dl) return;
+  dl.innerHTML = hrOptOptions(kind).map(p=>'<option value="'+escAttr(p)+'"></option>').join('');
+}
+// —— 岗位专用薄包装（v2.46 前半版就用的这些名字，其它地方和测试都在调）——
+function hrPostsCustom(){ return hrOptCustom('post'); }
+function hrPostUsed(){ return hrOptUsed('post'); }
+function hrPostOptions(extra){ return hrOptOptions('post', extra); }
+// 一次把两张 datalist 都灌好：岗位 + 批次/来源
+function renderHrPostDatalist(){ renderHrOptDatalist('post'); renderHrOptDatalist('source'); }
+// —— 批次/来源专用薄包装 ——
+function hrSourcesCustom(){ return hrOptCustom('source'); }
+function hrSourceUsed(){ return hrOptUsed('source'); }
+function hrSourceOptions(extra){ return hrOptOptions('source', extra); }
+function renderHrSourceDatalist(){ renderHrOptDatalist('source'); }
+// —— 选项管理弹窗：一个弹窗管两类，上面两个标签切换 ——
+let hrOptKind='post';
+function openHrPostMgr(){ openHrOptMgr('post'); }
+function openHrOptMgr(kind){
+  hrOptKind = (kind==='source') ? 'source' : 'post';
+  renderHrOptMgr();
+  document.getElementById('modalHrPostMgr').style.display='flex';
+  const inp=document.getElementById('hrPostNew');
+  if(inp){
+    inp.value='';
+    setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 60);
+  }
+}
+function hrOptSetKind(k){
+  hrOptKind = (k==='source') ? 'source' : 'post';
+  const inp=document.getElementById('hrPostNew');
+  if(inp) inp.value='';
+  renderHrOptMgr();
+  if(inp){ try{ inp.focus(); }catch(e){} }
+}
+function renderHrPostMgr(){ renderHrOptMgr(); }
+function renderHrOptMgr(){
+  const kind=hrOptKind, c=hrOptCfg(kind);
+  const tt=document.getElementById('hrOptMgrTitle');
+  if(tt) tt.textContent = c.label + '选项管理';
+  const tabs=document.getElementById('hrOptMgrTabs');
+  if(tabs) tabs.innerHTML=''
+    +'<button class="hr-tab'+(kind==='post'?' on':'')+'" onclick="hrOptSetKind(\'post\')">岗位 <span class="hr-tab-cnt">'+hrOptOptions('post').length+'</span></button>'
+    +'<button class="hr-tab'+(kind==='source'?' on':'')+'" onclick="hrOptSetKind(\'source\')">批次/来源 <span class="hr-tab-cnt">'+hrOptOptions('source').length+'</span></button>';
+  const desc=document.getElementById('hrOptMgrDesc');
+  if(desc) desc.innerHTML = (kind==='post')
+    ? '这里的选项会出现在「新增员工 / 新增候选人 / 调岗」的岗位下拉里，点输入框就能选。手动添加的随时能删，<b>删选项不会动已填好的档案</b>。'
+    : '这里的选项会出现在「新增候选人」的批次 / 来源下拉里，点输入框就能选。手动添加的随时能删，<b>删选项不会动已填好的档案</b>。';
+  const inp=document.getElementById('hrPostNew');
+  if(inp) inp.placeholder = (kind==='post') ? '输入新岗位，如 面料开发 / 采购' : '输入新来源，如 第三批 · 猎头推送';
+  const box=document.getElementById('hrPostMgrBody');
+  if(!box) return;
+  const mine=hrOptCustom(kind);
+  const used=hrOptUsed(kind).filter(p=>c.builtin.indexOf(p)<0 && mine.indexOf(p)<0);
+  let h='';
+  h+='<div class="hr-post-grp"><h4>我添加的<small>'+(mine.length?('共 '+mine.length+' 个，点 × 移除'):'还没有，下面输入框加一个')+'</small></h4><div class="hr-post-chips">';
+  if(!mine.length) h+='<span class="hr-post-none">— 无 —</span>';
+  else mine.forEach(p=>{
+    h+='<span class="hr-post-chip mine"><span>'+escHtml(p)+'</span><b title="从下拉选项里移除" onclick="hrOptDel(this)" data-opt="'+escAttr(p)+'" data-kind="'+kind+'">×</b></span>';
+  });
+  h+='</div></div>';
+  h+='<div class="hr-post-grp"><h4>内置常用<small>系统自带，不可删</small></h4><div class="hr-post-chips">';
+  c.builtin.forEach(p=>{ h+='<span class="hr-post-chip"><span>'+escHtml(p)+'</span></span>'; });
+  h+='</div></div>';
+  h+='<div class="hr-post-grp"><h4>档案里正在用<small>自动出现，不用手工加</small></h4><div class="hr-post-chips">';
+  if(!used.length) h+='<span class="hr-post-none">— 无 —</span>';
+  else used.forEach(p=>{ h+='<span class="hr-post-chip auto" title="来自现有员工 / 候选人档案"><span>'+escHtml(p)+'</span></span>'; });
+  h+='</div></div>';
+  box.innerHTML=h;
+}
+function hrOptAdd(){ hrOptAddFor(hrOptKind); }
+function hrPostAdd(){ hrOptAddFor('post'); }
+function hrOptAddFor(kind){
+  const c=hrOptCfg(kind);
+  const inp=document.getElementById('hrPostNew');
+  const v=String((inp&&inp.value)||'').replace(/\s+/g,' ').trim();
+  if(!v){ showToast('先输入'+c.label+'名称'); return; }
+  if(hrOptOptions(kind).indexOf(v)>=0){ showToast('「'+v+'」已经在选项里了','info'); return; }
+  hrOptCustom(kind).push(v);
+  if(inp) inp.value='';
+  saveAll(); renderHrOptMgr(); renderHrOptDatalist(kind);
+  showToast('✓ 已添加'+c.label+'「'+v+'」，下拉开着就能选到','info');
+  if(inp){ try{ inp.focus(); }catch(e){} }
+}
+// 某个值还有几条档案在用（删除选项时给个准数，别让用户以为「删不掉」）
+function hrOptUseCount(kind, v){
+  v=String(v==null?'':v).trim();
+  if(!v) return 0;
+  const c=hrOptCfg(kind);
+  let n=0;
+  (Array.isArray(hr.staff)?hr.staff:[]).forEach(s=>{ if(s && String(s[c.field]||'').trim()===v) n++; });
+  (Array.isArray(hr.talent)?hr.talent:[]).forEach(t=>{ if(t && !t.deleted && String(t[c.field]||'').trim()===v) n++; });
+  return n;
+}
+function hrPostUseCount(v){ return hrOptUseCount('post', v); }
+function hrOptDel(el){
+  const v=String((el&&el.dataset&&(el.dataset.opt||el.dataset.post))||'');
+  const kind=String((el&&el.dataset&&el.dataset.kind)||hrOptKind);
+  hrOptDelFor(kind, v);
+}
+function hrPostDel(el){
+  hrOptDelFor('post', String((el&&el.dataset&&(el.dataset.post||el.dataset.opt))||''));
+}
+function hrOptDelFor(kind, v){
+  const c=hrOptCfg(kind);
+  const arr=hrOptCustom(kind);
+  const i=arr.indexOf(v);
+  if(i<0){ renderHrOptMgr(); return; }
+  arr.splice(i,1);
+  saveAll(); renderHrOptMgr(); renderHrOptDatalist(kind);
+  const n=hrOptUseCount(kind, v);
+  if(n>0){
+    // 档案里还有人在用 → 它会被「档案里正在用」那一组自动捡回来，不是没删掉
+    showToast('已从「我添加的」移除「'+v+'」；但还有 '+n+' 条档案是这个'+c.label+'，所以下拉里仍会显示','info');
+  }else{
+    showToast('已从选项里移除「'+v+'」（已填档案不受影响）','info');
+  }
+}
 const HR_DIMS_DEFAULT = [
   {key:'major', name:'专业/经历对口度'},
   {key:'image', name:'个人形象'},
@@ -12545,6 +12727,16 @@ function hrMetaNormalize(meta){
   meta = meta || {};
   if(!meta.interviewers || typeof meta.interviewers!=='object') meta.interviewers={};
   if(!Array.isArray(meta.dims)) meta.dims = HR_DIMS_DEFAULT.slice();
+  // v2.46：手动添加的选项表（岗位 / 批次·来源），去空、去重、限长
+  ['posts','sources'].forEach(function(k){
+    if(!Array.isArray(meta[k])) meta[k]=[];
+    const _ps=[];
+    meta[k].forEach(x=>{
+      const v=String(x==null?'':x).replace(/\s+/g,' ').trim().slice(0,40);
+      if(v && _ps.indexOf(v)<0) _ps.push(v);
+    });
+    meta[k]=_ps;
+  });
   HR_INTERVIEWERS_DEFAULT.forEach(n=>{ if(!(n in meta.interviewers)) meta.interviewers[n]=1; });
   return meta;
 }
@@ -12556,6 +12748,7 @@ function hrFillSelect(sel, opts, val){
 }
 function hrHeal(){
   let changed=false;
+  if(!hr.meta || typeof hr.meta!=='object' || Array.isArray(hr.meta) || !Array.isArray(hr.meta.posts) || !Array.isArray(hr.meta.sources)) changed=true;
   hr.meta = hrMetaNormalize(hr.meta);
   hr.staff.forEach(s=>{
     if(!s) return;
@@ -12627,6 +12820,7 @@ function hrStaffLeaveToggle(){
 function openHrStaffModal(id){
   editingHrStaffId = id || null;
   hrAutoBoxReset('hsAutoBox');
+  renderHrPostDatalist();
   const rec = id ? hr.staff.find(s=>s.id===id) : null;
   const projSel=document.getElementById('hsProject');
   projSel.innerHTML = HR_PROJECTS.map(p=>'<option value="'+p+'">'+(p||'')+'</option>').join('');
@@ -12758,6 +12952,7 @@ function saveHrSalary(){
 function openHrTalentModal(id){
   editingHrTalentId = id || null;
   hrAutoBoxReset('htAutoBox');
+  renderHrPostDatalist();
   const rec = id? hr.talent.find(t=>t.id===id): null;
   const statusSel=document.getElementById('htStatus');
   statusSel.innerHTML = HR_TALENT_STATUS.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
@@ -12925,15 +13120,163 @@ function hrDelTalentConfirm(){
 function renderHr(){
   const tools=document.getElementById('hrTools');
   if(tools) tools.innerHTML='<button class="btn btn-primary" onclick="openHrStaffModal()">＋ 新增员工</button>'
-    +'<button class="btn" onclick="openHrTalentModal()">＋ 新增候选人</button>';
+    +'<button class="btn" onclick="openHrTalentModal()">＋ 新增候选人</button>'
+    +'<button class="btn" onclick="openHrPostMgr()" title="岗位选项可手动添加">⚙ 岗位选项</button>';
+  renderHrPostDatalist();
   const tabs=document.getElementById('hrTabs');
   if(tabs) tabs.innerHTML=''
     +'<button class="hr-tab'+(hrTab==='staff'?' on':'')+'" onclick="hrSetTab(\'staff\')">在职员工 <span class="hr-tab-cnt">'+hr.staff.filter(s=>s.status!=='leave').length+'</span></button>'
     +'<button class="hr-tab'+(hrTab==='talent'?' on':'')+'" onclick="hrSetTab(\'talent\')">人才储备库 <span class="hr-tab-cnt">'+hr.talent.filter(t=>!t.deleted).length+'</span></button>';
   const box=document.getElementById('hrContent');
   if(box) box.innerHTML = hrTab==='staff'? hrStaffHtml() : hrTalentHtml();
+  hrColwApply();
 }
 function hrSetTab(t){ hrTab=t; renderHr(); }
+
+// ===== 表头列宽拖动（v2.46）=====
+// 鼠标移到表头右边缘（9px 内）变成左右箭头，按住拖即可；双击该处恢复这张表的默认列宽。
+// 宽度按表格分开存在 wb_office_hr_colw —— 纯界面偏好，不进备份 / 同步 / 导出。
+const HR_COLW_KEY = STORAGE_PREFIX + 'hr_colw';
+let hrColDrag = null, hrColSuppressClick = false;
+function hrColwAll(){
+  try{
+    const o = JSON.parse(localStorage.getItem(HR_COLW_KEY) || '{}');
+    return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+  }catch(e){ return {}; }
+}
+function hrColwSave(kind, arr){
+  try{
+    const all = hrColwAll();
+    all[kind] = arr;
+    localStorage.setItem(HR_COLW_KEY, JSON.stringify(all));
+  }catch(e){}
+}
+function hrColwClear(kind){
+  try{
+    const all = hrColwAll();
+    delete all[kind];
+    localStorage.setItem(HR_COLW_KEY, JSON.stringify(all));
+  }catch(e){}
+}
+function hrColwThs(tb){ return [].slice.call(tb.querySelectorAll('thead > tr:first-child > th')); }
+function hrColwSum(cols){
+  let t = 0;
+  cols.forEach(function(c){ const v = parseInt(c.style.width, 10); if(!isNaN(v)) t += v; });
+  return t;
+}
+// 按给定宽度铺 colgroup 并切 fixed 布局（只在真要拖时才切，没碰过的表保持原样，排版零变化）
+function hrColwMake(tb, widths){
+  const ths = hrColwThs(tb);
+  if(!ths.length) return [];
+  const old = tb.querySelector('colgroup.hr-colgroup');
+  if(old && old.parentNode) old.parentNode.removeChild(old);
+  const cg = document.createElement('colgroup');
+  cg.className = 'hr-colgroup';
+  const cols = [];
+  ths.forEach(function(th, i){
+    const c = document.createElement('col');
+    if(widths[i] > 0) c.style.width = widths[i] + 'px';
+    cg.appendChild(c);
+    cols.push(c);
+  });
+  tb.insertBefore(cg, tb.firstChild);
+  tb.classList.add('hr-table-fixed');
+  // ⚠️ 必须同时把 table 自己的宽度钉成列宽总和：
+  // 只加 table-layout:fixed 而 table 还是 width:100% 的话，浏览器会把超宽的列
+  // 按比例压回容器宽度，原来能横向滚动的大表就被压扁、每列都截字了。
+  const sum = hrColwSum(cols);
+  if(sum > 0) tb.style.width = sum + 'px';
+  return cols;
+}
+// 重渲染后把存过的宽度贴回去（renderHr 每次都重建 tbody，必须重新贴）
+function hrColwApply(){
+  const all = hrColwAll();
+  [].slice.call(document.querySelectorAll('table.hr-table[data-hrcol]')).forEach(function(tb){
+    const w = all[tb.dataset.hrcol];
+    if(Array.isArray(w) && w.length) hrColwMake(tb, w);
+  });
+}
+function hrColwEdge(e, th){
+  const r = th.getBoundingClientRect();
+  return (e.clientX >= r.right - 9 && e.clientX <= r.right + 2);
+}
+// 恢复这张表的默认列宽
+function hrColwReset(tb){
+  if(!tb) return false;
+  hrColwClear(tb.dataset.hrcol);
+  const cg = tb.querySelector('colgroup.hr-colgroup');
+  if(cg && cg.parentNode) cg.parentNode.removeChild(cg);
+  tb.classList.remove('hr-table-fixed');
+  tb.style.width = '';   // 去掉钉死的宽度，回到 CSS 的 width:100%
+  showToast('已恢复默认列宽','info');
+  return true;
+}
+let hrColLastHit = { t:0, tb:null, x:0, y:0 };
+document.addEventListener('mousedown', function(e){
+  if(e.button !== 0) return;
+  const th = (e.target && e.target.closest) ? e.target.closest('.hr-tablewrap thead th') : null;
+  if(!th || !hrColwEdge(e, th)){ hrColLastHit = { t:0, tb:null, x:0, y:0 }; return; }
+  const tb = th.closest('table.hr-table[data-hrcol]');
+  if(!tb) return;
+  // 双击表头右边缘 = 恢复默认。自己判两次快速按下（450ms 内、同一张表、几乎同一位置），
+  // 不依赖浏览器的 dblclick 合成 —— 无头 / 某些环境根本不派发 dblclick。
+  const now = Date.now();
+  if(hrColLastHit.tb === tb && hrColLastHit.t > 0 && now - hrColLastHit.t < 450
+     && Math.abs(hrColLastHit.x - e.clientX) <= 4 && Math.abs(hrColLastHit.y - e.clientY) <= 4){
+    hrColLastHit = { t:0, tb:null, x:0, y:0 };
+    e.stopPropagation();
+    hrColwReset(tb);
+    return;
+  }
+  hrColLastHit = { t:now, tb:tb, x:e.clientX, y:e.clientY };
+  const ths = hrColwThs(tb);
+  const idx = ths.indexOf(th);
+  if(idx < 0 || idx >= ths.length - 1) return;   // 最后一列右边没有邻列，不给拖
+  // 注意：这里千万不能 preventDefault —— 一 preventDefault 浏览器就不再合成 dblclick。
+  // 改用清掉选区（配合 body.hr-col-dragging 的 user-select:none）。
+  e.stopPropagation();
+  try{ const sel=window.getSelection(); if(sel && sel.removeAllRanges) sel.removeAllRanges(); }catch(err){}
+  const widths = ths.map(function(x){ return Math.round(x.getBoundingClientRect().width); });
+  const cols = hrColwMake(tb, widths);
+  hrColDrag = { tb:tb, idx:idx, cols:cols, x:e.clientX, w:widths[idx], moved:false };
+  document.body.classList.add('hr-col-dragging');
+}, true);
+document.addEventListener('mousemove', function(e){
+  if(!hrColDrag) return;
+  const dx = e.clientX - hrColDrag.x;
+  if(Math.abs(dx) > 1) hrColDrag.moved = true;
+  const w = Math.max(44, Math.round(hrColDrag.w + dx));
+  hrColDrag.cols[hrColDrag.idx].style.width = w + 'px';
+  const sum = hrColwSum(hrColDrag.cols);
+  if(sum > 0) hrColDrag.tb.style.width = sum + 'px';
+}, true);
+document.addEventListener('mouseup', function(e){
+  if(!hrColDrag) return;
+  const d = hrColDrag; hrColDrag = null;
+  document.body.classList.remove('hr-col-dragging');
+  const arr = d.cols.map(function(c){ const v = parseInt(c.style.width, 10); return isNaN(v) ? 0 : v; });
+  hrColwSave(d.tb.dataset.hrcol, arr);
+  // 不管有没有真拖动，都要吃掉紧跟的这一次 click ——
+  // 否则点表头边缘会先触发排序（整张表重渲染），「双击恢复」永远等不到第二下。
+  hrColSuppressClick = true;
+  setTimeout(function(){ hrColSuppressClick = false; }, 120);
+}, true);
+// 拖完那一下别顺手把表头排序也触发了
+document.addEventListener('click', function(e){
+  if(!hrColSuppressClick) return;
+  if(e.target && e.target.closest && e.target.closest('.hr-tablewrap thead th')){
+    e.stopPropagation(); e.preventDefault();
+  }
+}, true);
+// 双击表头右边缘 = 恢复这张表的默认列宽（原生 dblclick 兜底，正常浏览器走这条）
+document.addEventListener('dblclick', function(e){
+  const th = (e.target && e.target.closest) ? e.target.closest('.hr-tablewrap thead th') : null;
+  if(!th || !hrColwEdge(e, th)) return;
+  const tb = th.closest('table.hr-table[data-hrcol]');
+  if(!tb) return;
+  e.preventDefault(); e.stopPropagation();
+  hrColwReset(tb);
+}, true);
 function hrBadge(){ const b=document.getElementById('hrBadge'); if(b) b.style.display='none'; }
 
 function hrStaffHtml(){
@@ -12952,7 +13295,7 @@ function hrStaffHtml(){
   if(!total){ h+='<div class="hr-empty-box">还没有员工档案，点上方「＋ 新增员工」登记；第一版初始数据已自动导入，刷新即可见。</div>'; return h; }
   if(!active.length){ h+='<div class="hr-empty-box">当前没有在职或试用期员工，已离职员工见下方「已离职员工」。</div>'; }
   else {
-    h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+    h+='<div class="hr-tablewrap"><table class="hr-table" data-hrcol="staff"><thead><tr>'
       +'<th>姓名</th><th>项目</th><th>岗位</th><th class="num hr-col-base">基本工资</th><th class="hr-col-comm">提成 / 奖金</th><th>状态</th><th>入职时间</th><th>试用至</th><th>转正时间</th><th>资料</th><th>操作</th>'
       +'</tr></thead><tbody>';
     active.forEach(s=>{
@@ -12980,12 +13323,12 @@ function hrStaffHtml(){
       h+='<tr class="hr-detail-row" id="hrDs_'+s.id+'" style="display:none"><td colspan="11">'+hrStaffDetail(s)+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="hr-tip">提示：点姓名可展开「薪资明细 / 调薪记录 / 备注」</div>';
+    h+='<div class="hr-tip">提示：点姓名可展开「薪资明细 / 调薪记录 / 备注」；<b>表头右边缘可拖动调列宽</b>（双击该处恢复默认）</div>';
   }
   if(leave.length){
     h+='<div class="hr-collapsible">';
     h+='<div class="hr-collapsible-h" onclick="hrToggleBox(\'hrLeaveBox\')"><span class="hr-caret" id="hrLeaveBoxCare">▸</span>已离职员工 <span class="hr-cnt">'+leave.length+'</span></div>';
-    h+='<div class="hr-collapsible-b" id="hrLeaveBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+    h+='<div class="hr-collapsible-b" id="hrLeaveBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table" data-hrcol="staffLeave"><thead><tr>'
       +'<th>姓名</th><th>项目</th><th>岗位</th><th>入职时间</th><th>离职日期</th><th>离职原因 / 交接</th><th>资料</th><th>操作</th>'
       +'</tr></thead><tbody>';
     leave.forEach(s=>{
@@ -13047,6 +13390,7 @@ function hrStaffTransfer(id){
   document.getElementById('hrTransferNow').innerHTML='<b>当前：</b>'+escHtml(s.project||'—')+'　·　'+escHtml(s.post||'—');
   document.getElementById('hrTransferDate').value=todayStr();
   hrFillProjectSel('hrTransferProject', s.project||'');
+  renderHrPostDatalist();
   document.getElementById('hrTransferPost').value=s.post||'';
   document.getElementById('hrTransferReason').value='';
   document.getElementById('modalHrTransfer').style.display='flex';
@@ -13159,8 +13503,7 @@ function hrTalentCmp(a,b,key){
 // ---- 列表内联下拉：应聘岗位 / 优先级 / 状态 直接在列表改（v2.23） ----
 function hrTalentPostSel(t){
   const val=String(t.post||'');
-  const all=HR_POST_OPTIONS.slice();
-  if(val && all.indexOf(val)<0) all.push(val);
+  const all=hrPostOptions(val);
   let h='<select class="hr-inline-sel" title="点开直接改应聘岗位" onchange="hrTalentInline(\''+t.id+'\',\'post\',this.value)">';
   h+='<option value=""'+(!val?' selected':'')+'>— 未填 —</option>';
   all.forEach(o=>{ h+='<option value="'+escAttr(o)+'"'+(o===val?' selected':'')+'>'+escHtml(o)+'</option>'; });
@@ -13184,17 +13527,21 @@ function hrTalentStatusSel(t){
 }
 function hrTalentInline(id, key, val){
   const t=hr.talent.find(x=>x.id===id); if(!t) return;
+  let addedPost='';
   if(val==='__other__'){
     let cur=null;
     try{ cur=window.prompt('输入应聘岗位（留空则不改）', t.post||''); }catch(e){ cur=null; }
     if(cur===null){ renderHr(); return; }
-    val=String(cur).trim();
+    val=String(cur).replace(/\s+/g,' ').trim();
     if(!val){ renderHr(); return; }
+    // v2.46：手输的新岗位顺手存进选项表，下回直接选
+    const v40=val.slice(0,40);
+    if(key==='post' && hrPostOptions().indexOf(v40)<0){ hrPostsCustom().push(v40); addedPost=v40; }
   }
   t[key]=val;
   saveAll(); renderHr();
   const lbl={post:'应聘岗位',priority:'优先级',status:'状态'}[key]||key;
-  showToast('✓ 已更新'+lbl+'：'+(val||'—'), 'info');
+  showToast('✓ 已更新'+lbl+'：'+(val||'—')+(addedPost?'（已加进岗位选项）':''), 'info');
 }
 function hrTalentHtml(){
   const all=hr.talent;
@@ -13209,7 +13556,7 @@ function hrTalentHtml(){
   if(!activeT.length){ h+='<div class="hr-empty-box">当前没有在库候选人，已删除资源见下方「已删除资源」。</div>'; }
   else {
     const th=(key,label,sortable)=>{ if(!sortable) return '<th>'+label+'</th>'; const on=hrTalentSort.key===key; return '<th class="hr-th-sort'+(on?' on':'')+'" onclick="hrTalentSortBy(\''+key+'\')">'+label+(on?(' '+(hrTalentSort.dir>0?'▲':'▼')):'')+'</th>'; };
-    h+='<div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+    h+='<div class="hr-tablewrap"><table class="hr-table" data-hrcol="talent"><thead><tr>'
       +th('name','姓名',true)
       +th('post','应聘岗位',true)
       +th('priority','优先级',true)
@@ -13250,12 +13597,12 @@ function hrTalentHtml(){
       h+='<tr class="hr-detail-row" id="hrDt_'+t.id+'" style="display:none"><td colspan="13">'+hrTalentDetail(t)+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="hr-tip">提示：点表头字段（姓名 / 岗位 / 优先级 / 状态 / 面试时间 / 联系方法 / 期望薪资 / 承诺薪资 / 薪资说明）可升、降序排序（再点一次切换方向）；<b>应聘岗位 · 优先级 · 状态可直接在列表里点下拉改</b>；「资料」列每条都能点开预览、点 ⬇ 下载；点姓名展开明细；「转试用」转入在职；「删」移入「已删除资源」</div>';
+    h+='<div class="hr-tip">提示：点表头字段（姓名 / 岗位 / 优先级 / 状态 / 面试时间 / 联系方法 / 期望薪资 / 承诺薪资 / 薪资说明）可升、降序排序（再点一次切换方向）；<b>应聘岗位 · 优先级 · 状态可直接在列表里点下拉改</b>；「资料」列每条都能点开预览、点 ⬇ 下载；点姓名展开明细；「转试用」转入在职；「删」移入「已删除资源」；<b>表头右边缘可拖动调列宽</b>（双击该处恢复默认）</div>';
   }
   if(delT.length){
     h+='<div class="hr-collapsible">';
     h+='<div class="hr-collapsible-h" onclick="hrToggleBox(\'hrDelBox\')"><span class="hr-caret" id="hrDelBoxCare">▸</span>已删除资源 <span class="hr-cnt">'+delT.length+'</span></div>';
-    h+='<div class="hr-collapsible-b" id="hrDelBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table"><thead><tr>'
+    h+='<div class="hr-collapsible-b" id="hrDelBox" style="display:none"><div class="hr-tablewrap"><table class="hr-table" data-hrcol="talentDel"><thead><tr>'
       +'<th>姓名</th><th>应聘岗位</th><th>状态</th><th>删除原因</th><th>删除日期</th><th>资料</th><th>操作</th>'
       +'</tr></thead><tbody>';
     delT.forEach(t=>{
