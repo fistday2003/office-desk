@@ -1513,7 +1513,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.44 · 2026-10-26</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.45 · 2026-10-26</div>
     </div>
   </aside>
 
@@ -1537,7 +1537,7 @@ tr:hover .fr-fwd-acts{opacity:1}
           </button>
         </div>
       </div>
-      <p class="section-subtitle">原来的「今天待办」和「项目跟进」合并到这里，条目统一按项目跟进那种「<b>一行一条、点开看详情</b>」的样式排。<b>简单的一件事</b>用「＋ 新建事项」（可定截止日 / 优先级 / 能顺延）；<b>要跟一阵子的一条线</b>用「＋ 新建项目」（能挂子项目、记跟进记录）。<b>已完成的</b>（勾掉的事项 + 完成的项目）都收在页面最下面的「已完成」里。</p>
+      <p class="section-subtitle">原来的「今天待办」和「项目跟进」合并到这里，条目统一按项目跟进那种「<b>一行一条、点开看详情</b>」的样式排。<b>简单的一件事</b>用「＋ 新建事项」（可定截止日 / 优先级 / 能顺延）；<b>要跟一阵子的一条线</b>用「＋ 新建项目」（能挂子项目、记跟进记录）。<b>已完成的</b>（勾掉的事项 + 完成的项目）都收在页面最下面的「已完成」里。事项和项目都能<b>挂附件</b>：新建或编辑时点「📎 添加附件」，或者把文件<b>直接拖进弹窗</b>，图片、PDF、文本都能<b>点开直接看</b>。</p>
       <div id="taskList"></div>
     </div>
 
@@ -1756,7 +1756,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 
 <!-- ====== MODAL: Task ====== -->
 <div class="modal-overlay" id="modalTask" style="display:none">
-  <div class="modal">
+  <div class="modal" data-drop-task-modal="1">
     <h3 id="modalTaskTitle">添加任务</h3>
     <div class="form-group"><label>任务名称</label><input type="text" id="taskTitle" placeholder="输入任务名称"></div>
     <div class="form-row">
@@ -1766,6 +1766,10 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group"><label>截止日期</label><input type="date" id="taskDeadline"></div>
     </div>
     <div class="form-group"><label>关联项目（可选）</label><select id="taskProject"><option value="">不关联</option></select></div>
+    <div class="form-group"><label>附件（选填）</label>
+      <div id="taskModalFiles" class="task-files" style="margin-top:0"></div>
+      <div class="task-file-add"><button type="button" class="btn btn-sm btn-ghost" onclick="pickTaskModalFiles()">📎 添加附件</button><span id="taskModalFilesHint" style="font-size:11px;color:var(--text-muted);margin-left:8px">图片自动压缩，单个文件最大 3MB；也可以把文件直接拖进这个窗口，点缩略图就能看</span></div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnModalCancel">取消</button>
       <button class="btn btn-primary" id="btnModalSave">保存</button>
@@ -1891,6 +1895,23 @@ tr:hover .fr-fwd-acts{opacity:1}
       </div>
     </div>
     <div id="expViewBody" style="min-height:120px"></div>
+  </div>
+</div>
+
+<!-- ====== 附件预览弹窗（v2.45：待做事项的事项/项目附件） ====== -->
+<div class="modal-overlay" id="modalFileView" style="display:none">
+  <div class="modal" style="width:min(900px,94vw)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <h3 id="fileViewTitle" style="margin:0;font-size:15px;word-break:break-all">附件预览</h3>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span id="fileViewNav" style="font-size:12px;color:var(--text-muted)"></span>
+        <button class="btn" id="btnFilePrev" onclick="fileViewStep(-1)" style="display:none">‹ 上一个</button>
+        <button class="btn" id="btnFileNext" onclick="fileViewStep(1)" style="display:none">下一个 ›</button>
+        <a class="btn" id="fileViewDl" download style="cursor:pointer;text-decoration:none">下载</a>
+        <button class="btn" onclick="closeFileView()">关闭</button>
+      </div>
+    </div>
+    <div id="fileViewBody" style="min-height:120px"></div>
   </div>
 </div>
 
@@ -2479,7 +2500,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.44';
+const APP_VERSION = 'v2.45';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -4324,7 +4345,8 @@ function todoTaskDetail(t, section){
       } else {
         html += '<span class="file-ic">📄</span>';
       }
-      html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+      // v2.45：非图片附件也点名字就能预览（以前只有下载）
+      html += '<div class="file-info"><span class="file-name" style="cursor:pointer" onclick="viewTaskFile(\''+t.id+'\','+idx+')" title="点击预览">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
       if(!isImg) html += '<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">下载</a>';
       html += '<button class="task-file-del" onclick="removeTaskFile(\''+t.id+'\','+idx+')" title="删除附件">×</button>';
       html += '</div>';
@@ -4379,19 +4401,29 @@ function saveTaskDetailNow(id){
 }
 
 // 附件：选择 → 处理 → 保存
+// v2.45：同一个 input 服务两条入口 —— 列表卡片上的「添加附件」(mode=事项id)
+//        和新建/编辑弹窗里的「添加附件」(mode='modal')，靠 dataset.mode 分流。
 function addTaskFiles(id){
   const input = document.getElementById('taskFileInput');
+  input.dataset.mode = id;
   input.dataset.taskId = id;
+  input.value = '';
+  input.click();
+}
+function pickTaskModalFiles(){
+  const input = document.getElementById('taskFileInput');
+  input.dataset.mode = 'modal';
   input.value = '';
   input.click();
 }
 function handleTaskFiles(){
   const input = document.getElementById('taskFileInput');
-  const taskId = input.dataset.taskId;
+  const mode = input.dataset.mode || input.dataset.taskId || '';
   const files = Array.from(input.files||[]);
   input.value = '';
   if(files.length===0) return;
-  addTaskFilesFromList(taskId, files);
+  if(mode==='modal') addTaskModalFilesFromList(files);
+  else addTaskFilesFromList(mode, files);
 }
 function addTaskFilesFromList(taskId, files){
   const t = tasks.find(t=>t.id===taskId);
@@ -4471,7 +4503,177 @@ function removeTaskFile(taskId, idx){
 function viewTaskFile(taskId, idx){
   const t = tasks.find(t=>t.id===taskId);
   if(!t || !t.files || !t.files[idx]) return;
-  window.open(t.files[idx].dataUrl, '_blank');
+  // v2.45：改成应用内预览（以前是 window.open 开新标签，会被拦截、也看不清）
+  showFileView(t.files[idx], t.files, idx);
+}
+
+// ===== 事项弹窗里的附件（v2.45）=====
+// 新建/编辑事项时先暂存在 taskModalFiles，点「保存」才写进事项。
+// 没保存就取消 → 原事项一个字节都不动。
+let taskModalFiles = [];
+let taskModalPending = 0;   // 还在压缩/读取中的文件数
+
+function addTaskModalFilesFromList(files){
+  if(!files || files.length===0) return;
+  if(taskModalFiles.length + taskModalPending + files.length > 9){
+    showToast('每个事项最多 9 个附件（已有 ' + taskModalFiles.length + ' 个）');
+    return;
+  }
+  // ⚠️ 必须【串行】处理：图片压缩是异步的，并发 push 会让附件顺序跟用户选的不一样
+  //    （选 1、2、3，压完可能变成 3、1、2 —— 一次拖 9 张发票时特别难受）
+  let chain = Promise.resolve();
+  files.forEach(function(f){
+    taskModalPending++;
+    chain = chain.then(function(){
+      return processTaskFile(f).then(function(r){
+        taskModalFiles.push(r);
+      }).catch(function(e){
+        showToast((e && e.message) || (f.name + ' 添加失败'));
+      }).finally(function(){
+        taskModalPending--;
+        renderTaskModalFiles();
+      });
+    });
+  });
+  renderTaskModalFiles();
+}
+function renderTaskModalFiles(){
+  const box = document.getElementById('taskModalFiles');
+  if(!box) return;
+  let html = '';
+  taskModalFiles.forEach(function(f, idx){
+    const isImg = f.type && f.type.indexOf('image/') === 0;
+    html += '<div class="task-file-item">';
+    if(isImg) html += '<img src="' + f.dataUrl + '" onclick="viewTaskModalFile(' + idx + ')" title="点击预览">';
+    else html += '<span class="file-ic" style="cursor:pointer" onclick="viewTaskModalFile(' + idx + ')" title="点击预览">📄</span>';
+    html += '<div class="file-info"><span class="file-name" style="cursor:pointer" onclick="viewTaskModalFile(' + idx + ')" title="点击预览">' + escHtml(f.name) + '</span><span class="file-size">' + fmtSize(f.size) + '</span></div>';
+    html += '<button type="button" class="task-file-del" onclick="removeTaskModalFile(' + idx + ')" title="移除">×</button>';
+    html += '</div>';
+  });
+  if(taskModalPending > 0){
+    html += '<div class="task-file-item" style="opacity:.65"><span class="file-ic">⏳</span><div class="file-info"><span class="file-name">正在处理 ' + taskModalPending + ' 个…</span></div></div>';
+  }
+  box.innerHTML = html;
+  const hint = document.getElementById('taskModalFilesHint');
+  if(hint) hint.textContent = taskModalPending > 0
+    ? '正在处理附件，请稍候...'
+    : '图片自动压缩，单个文件最大 3MB；也可以把文件直接拖进这个窗口，点缩略图就能看';
+}
+function removeTaskModalFile(idx){
+  if(idx < 0 || idx >= taskModalFiles.length) return;
+  taskModalFiles.splice(idx, 1);
+  renderTaskModalFiles();
+}
+function viewTaskModalFile(idx){
+  if(taskModalFiles[idx]) showFileView(taskModalFiles[idx], taskModalFiles, idx);
+}
+
+// ===== 通用附件预览查看器（v2.45）=====
+// 为什么不直接复用报账的 expShowPreview：那个绑死在 #modalExpView 上，而报账的凭证预览
+// 已经稳定且有 e2e 覆盖，动它只会引入回归。这里另起一个查看器，四分支口径对齐
+// （图片 / PDF / 文本 / 其它），另外多支持多附件「上一个 / 下一个」。
+let fileViewList = [];
+let fileViewIdx = 0;
+let fileViewBlob = null;    // PDF 用的 blob URL，关弹窗要 revoke，不然内存泄漏
+
+function dataUrlToBlobUrl(dataUrl){
+  try{
+    const str = String(dataUrl || '');
+    const m = /^data:([^;,]*)(;base64)?,/i.exec(str);
+    if(!m) return '';
+    const mime = m[1] || 'application/octet-stream';
+    const body = str.slice(m[0].length);
+    let bytes;
+    if(m[2]){
+      const bin = atob(body);
+      const n = bin.length;
+      bytes = new Uint8Array(n);
+      for(let i = 0; i < n; i++) bytes[i] = bin.charCodeAt(i);
+    } else {
+      bytes = new TextEncoder().encode(decodeURIComponent(body));
+    }
+    return URL.createObjectURL(new Blob([bytes], {type: mime}));
+  }catch(e){ return ''; }
+}
+function showFileView(f, list, idx){
+  if(!f) return;
+  if(!f.dataUrl){
+    showToast('这个附件已经没有内容了（可能存储被清理过），请重新上传一份');
+    return;
+  }
+  fileViewList = (Array.isArray(list) && list.length) ? list : [f];
+  fileViewIdx = (typeof idx === 'number' && idx >= 0 && idx < fileViewList.length) ? idx : 0;
+  fileViewRender();
+  const el = document.getElementById('modalFileView');
+  if(el) el.style.display = 'flex';
+}
+function fileViewStep(d){
+  if(fileViewList.length < 2) return;
+  fileViewIdx = (fileViewIdx + d + fileViewList.length) % fileViewList.length;
+  fileViewRender();
+}
+function closeFileView(){
+  const el = document.getElementById('modalFileView');
+  if(el) el.style.display = 'none';
+  const body = document.getElementById('fileViewBody');
+  if(body) body.innerHTML = '';
+  if(fileViewBlob){ try{ URL.revokeObjectURL(fileViewBlob); }catch(e){} fileViewBlob = null; }
+  fileViewList = [];
+  fileViewIdx = 0;
+}
+function fileViewRender(){
+  const f = fileViewList[fileViewIdx] || {};
+  const body = document.getElementById('fileViewBody');
+  if(!body) return;
+  const title = document.getElementById('fileViewTitle');
+  if(title) title.textContent = f.name || '附件预览';
+  const dl = document.getElementById('fileViewDl');
+  if(dl){ dl.href = f.dataUrl || ''; dl.setAttribute('download', f.name || '附件'); }
+
+  if(fileViewBlob){ try{ URL.revokeObjectURL(fileViewBlob); }catch(e){} fileViewBlob = null; }
+
+  const total = fileViewList.length;
+  const nav = document.getElementById('fileViewNav');
+  if(nav) nav.textContent = total > 1 ? ((fileViewIdx + 1) + ' / ' + total) : '';
+  const bp = document.getElementById('btnFilePrev'), bn = document.getElementById('btnFileNext');
+  if(bp) bp.style.display = total > 1 ? '' : 'none';
+  if(bn) bn.style.display = total > 1 ? '' : 'none';
+
+  const t = String(f.type || '');
+  const nm = String(f.name || '');
+  const isImg = t.indexOf('image/') === 0 || /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(nm);
+  const isPdf = t === 'application/pdf' || /\.pdf$/i.test(nm);
+  const isTxt = t.indexOf('text/') === 0 || t === 'application/json' || /\.(txt|csv|md|log|json|xml|html?)$/i.test(nm);
+
+  if(isImg){
+    body.innerHTML = '<img src="' + f.dataUrl + '" alt="" style="max-width:100%;max-height:66vh;display:block;margin:0 auto;border-radius:8px">';
+  } else if(isPdf){
+    // ⚠️ Chrome 里 iframe 直接吃 data:application/pdf 会白屏，必须先转 blob URL
+    fileViewBlob = dataUrlToBlobUrl(f.dataUrl);
+    if(fileViewBlob){
+      body.innerHTML = '<iframe src="' + fileViewBlob + '" style="width:100%;height:66vh;border:1px solid var(--border);border-radius:8px;background:#fff" title="PDF 预览"></iframe>';
+    } else {
+      body.innerHTML = '<div class="exp-empty"><b>这个 PDF 没法在页面里直接显示</b><br>' + escHtml(nm) + '<br>点右上角「下载」后用 PDF 阅读器打开</div>';
+    }
+  } else if(isTxt){
+    let txt = '';
+    try{
+      const str = String(f.dataUrl || '');
+      const comma = str.indexOf(',');
+      const head = str.slice(0, comma);
+      const bodyStr = str.slice(comma + 1);
+      if(head.indexOf(';base64') >= 0){
+        const bin = atob(bodyStr);
+        try{ txt = decodeURIComponent(escape(bin)); }catch(e2){ txt = bin; }
+      } else {
+        txt = decodeURIComponent(bodyStr);
+      }
+    }catch(e){ txt = '（内容无法解码）'; }
+    body.innerHTML = '<pre style="white-space:pre-wrap;word-break:break-all;font-size:13px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:66vh;overflow:auto;margin:0">' + escHtml(txt.slice(0, 20000)) + '</pre>';
+  } else {
+    const kb = f.size ? (' · ' + fmtSize(f.size)) : '';
+    body.innerHTML = '<div class="exp-empty"><b>这种格式不能在页面里直接看</b><br>' + escHtml(nm) + kb + '<br>点右上角「下载」，用电脑上对应的软件（Excel / Word / 压缩包等）打开</div>';
+  }
 }
 function fmtSize(b){
   if(b<1024) return b+'B';
@@ -4575,7 +4777,8 @@ function removeProjectFile(pid, idx){
 function viewProjectFile(pid, idx){
   const p = projects.find(pp=>pp.id===pid);
   if(!p || !p.files || !p.files[idx]) return;
-  window.open(p.files[idx].dataUrl, '_blank');
+  // v2.45：和事项附件统一走应用内预览
+  showFileView(p.files[idx], p.files, idx);
 }
 
 // ===== 灵感速记附件 =====
@@ -4678,7 +4881,7 @@ function viewNoteFile(nid, idx){
 
 // ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 速记卡片 / 新建编辑弹窗）=====
 function dropZoneFromEvent(e){
-  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal],[data-drop-clm-modal],[data-drop-fr-cat],[data-drop-fr-action],[data-drop-to]') : null;
+  return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-task-modal],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal],[data-drop-clm-modal],[data-drop-fr-cat],[data-drop-fr-action],[data-drop-to]') : null;
 }
 document.addEventListener('dragover', e=>{
   const zone = dropZoneFromEvent(e);
@@ -4703,6 +4906,7 @@ document.addEventListener('drop', e=>{
   else if(zone.dataset.dropClmModal) addClmModalFilesFromList(files);
   else if(zone.dataset.dropNoteModal) addNoteModalFilesFromList(files);
   else if(zone.dataset.dropNote) addNoteFilesFromList(zone.dataset.dropNote, files);
+  else if(zone.dataset.dropTaskModal) addTaskModalFilesFromList(files);
   else if(zone.dataset.dropModal) addProjectModalFilesFromList(files);
   else if(zone.dataset.dropTask) addTaskFilesFromList(zone.dataset.dropTask, files);
   else if(zone.dataset.projectId) addProjectFilesFromList(zone.dataset.projectId, files);
@@ -4744,6 +4948,10 @@ function editTask(id){
   editingId = id;
   const t = tasks.find(t=>t.id===id);
   if(!t) return;
+  // v2.45：把已有附件带进弹窗（拷一份 —— 取消编辑时原事项不受影响）
+  taskModalFiles = (t.files||[]).map(function(f){ return Object.assign({}, f); });
+  taskModalPending = 0;
+  renderTaskModalFiles();
   document.getElementById('modalTaskTitle').textContent = '编辑任务';
   document.getElementById('taskTitle').value = t.title;
   document.getElementById('taskPriority').value = t.priority;
@@ -4763,6 +4971,8 @@ function deleteTask(id){
 
 function openTaskModal(){
   editingId = null;
+  taskModalFiles = []; taskModalPending = 0;
+  renderTaskModalFiles();
   document.getElementById('modalTaskTitle').textContent = '添加任务';
   document.getElementById('taskTitle').value = '';
   document.getElementById('taskPriority').value = 'P1';
@@ -5458,13 +5668,21 @@ document.getElementById('btnModalSave').addEventListener('click',()=>{
   const priority = document.getElementById('taskPriority').value;
   const deadline = document.getElementById('taskDeadline').value;
   const projectId = document.getElementById('taskProject').value||null;
+  // v2.45：附件还在压缩就别急着存，否则会存成半截
+  if(taskModalPending>0){showToast('附件还在处理中，请稍等 1~2 秒再保存');return}
   
   if(editingId){
     const t = tasks.find(t=>t.id===editingId);
-    if(t){t.title=title;t.priority=priority;t.deadline=deadline;t.projectId=projectId;}
+    if(t){t.title=title;t.priority=priority;t.deadline=deadline;t.projectId=projectId;
+      if(taskModalFiles.length) t.files = taskModalFiles.slice();
+      else if(t.files) delete t.files;
+    }
   } else {
-    tasks.push({id:uid(),title,priority,deadline,done:false,postponedCount:0,projectId,createdAt:Date.now()});
+    const nt = {id:uid(),title,priority,deadline,done:false,postponedCount:0,projectId,createdAt:Date.now()};
+    if(taskModalFiles.length) nt.files = taskModalFiles.slice();
+    tasks.push(nt);
   }
+  taskModalFiles = []; taskModalPending = 0;
   saveAll();
   closeModal('modalTask');
   refreshAll();
