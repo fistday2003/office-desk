@@ -1401,7 +1401,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         导出文件
       </button>
-      <button class="btn-header" id="btnExportFull" title="把填写的内容和所有上传的附件（照片/PDF）一起打包成 ZIP，一份就能完整备份">
+      <button class="btn-header" id="btnExportFull" title="把填写的内容和所有上传的附件（照片/PDF）一起打包成 ZIP，一份就能完整备份。首次点会请你选一次存放文件夹（引导到 D:\BaiduSyncdisk\工作文件\自研软件\办公平台\07-数据备份），之后直接存进去；换文件夹请按住 Shift 点">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M4 20h16"/></svg>
         完整备份（含附件）
       </button>
@@ -1513,7 +1513,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.43 · 2026-10-26</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.44 · 2026-10-26</div>
     </div>
   </aside>
 
@@ -2479,7 +2479,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.43';
+const APP_VERSION = 'v2.44';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -5547,7 +5547,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 // ============================================================
 //  EXPORT / IMPORT
 // ============================================================
-document.getElementById('btnExportFull').addEventListener('click',()=>{ bkExportFull(); });
+document.getElementById('btnExportFull').addEventListener('click',(ev)=>{ bkExportFull(!!(ev && ev.shiftKey)); });
 document.getElementById('btnExport').addEventListener('click',()=>{
   const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,claims,hr,freight,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
@@ -5633,7 +5633,153 @@ function bkDownloadBlob(blob, filename){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
-async function bkExportFull(){
+// ============================================================
+//  完整备份的存放目录（v2.44）
+//  —— 用户要求：点「完整备份（含附件）」直接存到
+//     D:\BaiduSyncdisk\工作文件\自研软件\办公平台\07-数据备份
+//
+//  ⚠️ 先说清一件事：网页**没有权限**决定浏览器的「下载目录」。
+//     普通下载永远只能落到浏览器默认的下载文件夹（一般是「下载」）。
+//     想固定存到指定文件夹，只有 File System Access API 这条路：
+//     用户亲手授权一次目录 → 句柄存进 IndexedDB → 以后同一个入口再点
+//     就直接写进去，不再弹框、不再进「下载」。
+//
+//  四条规矩（改这段之前先看）：
+//    ① 只有 Chrome / Edge 支持。不支持、拒授权、写失败 → 一律退回普通下载，
+//       **绝不静默丢文件**（真的失败也要让用户拿到 ZIP）。
+//    ② 授权是按「入口（origin）」记的：本地 file:// 那份和 github.io 那份
+//       要各授权一次，两边 IndexedDB 不互通（数据本来也是分开的）。
+//    ③ 句柄失效（清过站点数据 / 文件夹被改名或删除）→ 重新弹框，不报错。
+//    ④ 同名文件直接覆盖：一天只留一个备份文件，不堆一堆 _1 _2 _3。
+//    ⑤ 换文件夹：按住 Shift 点按钮。
+// ============================================================
+const BK_DIR_KEY    = 'bkLandingDir';
+const BK_TARGET_TIP = 'D:\\BaiduSyncdisk\\工作文件\\自研软件\\办公平台\\07-数据备份';
+let bkDirMem = null, bkDirReady = false;
+
+function bkFsSupported(){ try{ return typeof window.showDirectoryPicker === 'function'; }catch(e){ return false; } }
+
+// 从 IndexedDB 取回上次授权的目录句柄（只取一次，之后用内存缓存）
+async function bkDirRecall(){
+  if(bkDirReady) return bkDirMem;
+  bkDirReady = true;
+  try{
+    const db = await frDirIdbOpen();
+    bkDirMem = await new Promise(res=>{
+      const tx=db.transaction(FR_DIR_STORE,'readonly');
+      const rq=tx.objectStore(FR_DIR_STORE).get(BK_DIR_KEY);
+      rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>res(null);
+    });
+  }catch(e){ bkDirMem=null; }
+  return bkDirMem;
+}
+async function bkDirRemember(h){
+  try{
+    const db = await frDirIdbOpen();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction(FR_DIR_STORE,'readwrite');
+      tx.objectStore(FR_DIR_STORE).put(h, BK_DIR_KEY);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+  }catch(e){}
+}
+
+// 开选择框。startIn 传句柄就定位到上次那个文件夹，否则落在「文档」。
+// id 参数老浏览器可能不认 → 降级重试一次，别让整个备份挂掉。
+function bkOpenPicker(startIn){
+  const first={ id:'bkLanding', mode:'readwrite', startIn:(startIn||'documents') };
+  try{ return window.showDirectoryPicker(first); }
+  catch(e){
+    try{ return window.showDirectoryPicker(startIn?{mode:'readwrite',startIn:startIn}:{mode:'readwrite'}); }
+    catch(e2){ throw e2; }
+  }
+}
+
+// 有句柄且权限还在 → 直接返回；要重新授权就返回 null（交回上层走用户手势那条路）
+async function bkDirUsable(){
+  if(!bkFsSupported()) return null;
+  let h=null; try{ h=await bkDirRecall(); }catch(e){ return null; }
+  if(!h) return null;
+  let perm='prompt';
+  try{ perm=await h.queryPermission({mode:'readwrite'}); }catch(e){ perm='prompt'; }
+  return perm==='granted' ? h : null;
+}
+
+// 写文件，返回 {name, existed}
+async function bkWriteToDir(dir, blob, filename){
+  let existed=false;
+  try{ await dir.getFileHandle(filename); existed=true; }catch(e){ existed=false; }
+  const fh = await dir.getFileHandle(filename, {create:true});
+  const w  = await fh.createWritable();
+  await w.write(blob);
+  await w.close();
+  return { name:filename, existed:existed };
+}
+
+// 用户在确认框里点了「确定」→ 这一下就是合法的手势，必须**同步**开选择框
+function bkAskDirThenSave(zip, filename, okN, missN){
+  let p;
+  try{
+    p = bkOpenPicker(bkDirMem || null);
+  }catch(e){
+    bkDownloadBlob(zip, filename);
+    showToast('这个浏览器不支持直接选文件夹，已改为普通下载','warning');
+    return;
+  }
+  p.then(async dir=>{
+    bkDirMem=dir; bkDirReady=true;
+    bkDirRemember(dir);
+    try{
+      const r = await bkWriteToDir(dir, zip, filename);
+      showToast('✓ 完整备份已存到「'+(dir.name||'所选文件夹')+'」：'+filename
+        +(r.existed?'（覆盖了今天的同名备份）':'')
+        +'　以后点这个按钮就直接存这里，不再弹框 · 换文件夹按住 Shift 点', 'info');
+    }catch(e){
+      bkDownloadBlob(zip, filename);
+      showToast('写不进这个文件夹（'+((e&&(e.message||e.name))||'没有写入权限')+'），已改为普通下载','warning');
+    }
+  }).catch(err=>{
+    // AbortError = 用户自己点了取消，这是正常操作，不当错误处理
+    bkDownloadBlob(zip, filename);
+    showToast('没选文件夹，已改为普通下载（存到浏览器默认的下载目录）','info');
+  });
+}
+
+// 完整备份的统一落地口：能直写就直写，否则下载。绝不静默失败。
+async function bkDeliverFull(zip, filename, okN, missN, forcePick){
+  const missTail = missN ? ('，'+missN+' 个找不到原文件（清单里已标出）') : '';
+
+  const dir = forcePick ? null : await bkDirUsable();
+  if(dir){
+    try{
+      const r = await bkWriteToDir(dir, zip, filename);
+      showToast('✓ 完整备份已存到「'+(dir.name||'所选文件夹')+'」：'+filename
+        +'（'+okN+' 个附件'+missTail+'）'+(r.existed?' · 覆盖了今天的同名备份':'')
+        +'　换文件夹：按住 Shift 点按钮', missN?'warning':'info');
+      return;
+    }catch(e){
+      // 句柄坏了（文件夹被改名/删除/权限被收回）→ 清掉，走下面重新授权
+      bkDirMem=null;
+    }
+  }
+
+  if(!bkFsSupported()){
+    bkDownloadBlob(zip, filename);
+    showToast('✓ 完整备份已下载：'+okN+' 个附件'+missTail
+      +'　（这个浏览器不能直接写文件夹，请手动挪到 07-数据备份）', missN?'warning':'info');
+    return;
+  }
+
+  // 第一次用 / 权限没了：先讲清楚要选哪个文件夹，再开选择框
+  // ⚠️ showConfirm 用的是 textContent 写进 <p>，换行会被浏览器塌成空格，
+  //    所以这里只能写成一整段、不能靠 \n 排版，也不能用 ** 加粗。
+  showConfirm('一劳永逸地把完整备份存到 '
+    + BK_TARGET_TIP
+    + ' 吗？　点「确定」后，请在弹出的框里选到上面这个文件夹——只需选一次，以后点「完整备份」就直接存进去，不再弹框（今天已有同名备份会直接覆盖，一天只留一个）。　点「取消」＝ 还是普通下载，存到浏览器默认的下载文件夹。',
+    ()=>{ bkAskDirThenSave(zip, filename, okN, missN); });
+}
+
+async function bkExportFull(forcePick){
   const enc=new TextEncoder();
   const all=bkCollectAll(), mem=bkMemoryMap();
   showToast('正在打包完整备份（'+all.length+' 个附件）…','info');
@@ -5668,13 +5814,15 @@ async function bkExportFull(){
     '已打包附件：'+okN+' 个      缺失：'+missN+' 个',
     (missN? '（缺失的多半是很早以前上传、浏览器缓存已被清理的文件，数据记录本身还在，只是文件打不开）' : ''),
     '',
-    '建议：把这个 ZIP 存进百度同步盘的 07-数据备份 目录，和其他备份放一起。'
+    '存放位置：v2.44 起，第一次点「完整备份」时选一次存放文件夹',
+    '          （推荐 D:\\BaiduSyncdisk\\工作文件\\自研软件\\办公平台\\07-数据备份），',
+    '          以后就自动存到这里，不再弹框；想换文件夹按住 Shift 点按钮。'
   ].join('\n');
   entries.push({name:'README-恢复说明.txt', bytes: enc.encode('\ufeff'+readme)});
   const zip=frBuildZip(entries);
-  bkDownloadBlob(zip, '办公工作台完整备份_'+todayStr()+'.zip');
-  if(missN) showToast('✓ 完整备份已下载：'+okN+' 个附件已打包，'+missN+' 个找不到原文件（清单里已标出）','warning');
-  else showToast('✓ 完整备份已下载：'+okN+' 个附件全部打包在内','info');
+  // v2.44：优先存进「记住的备份目录」（默认引导到百度同步盘的 07-数据备份）
+  // 不支持 / 没授权 / 用户取消 / 写失败 → 退回普通下载，绝不静默丢文件
+  await bkDeliverFull(zip, '办公工作台完整备份_'+todayStr()+'.zip', okN, missN, !!forcePick);
 }
 
 document.getElementById('btnImport').addEventListener('click',()=>{
