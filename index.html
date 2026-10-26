@@ -330,6 +330,9 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .task-file-add{margin-top:8px}
 /* 拖拽文件悬停高亮 */
 .drop-hover{outline:2px dashed var(--primary);outline-offset:-4px;background:rgba(37,99,235,.04)!important}
+/* v2.45：弹窗当拖放区时【只描边，别刷那层半透明底】——
+   泛用规则会把 .modal 的白底刷成 4% 蓝 → 整窗变透明、字全看不清（老 bug，项目/速记/报账弹窗都中招过） */
+.modal.drop-hover{background:var(--card-bg)!important}
 
 /* Badges */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
