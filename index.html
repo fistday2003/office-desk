@@ -10582,6 +10582,8 @@ function bizEmbShowDown(){
   const tt   = document.getElementById('bizDownTitle');
   if(!down) return;
   const https = String(location.protocol || '').toLowerCase() === 'https:';
+  // 状态点必须跟着变红 —— 不然兜底页出来了、右上角还挂着「正在连接…」，看着像卡住
+  bizEmbPaint('down', https ? '线上不能内嵌 · 请用本机文件打开' : '连不上分析系统 · 看下面的处理办法');
   if(tt) tt.textContent = https ? '线上打不开：浏览器不许 https 页面里嵌 http' : '分析系统的后台服务没启动';
   if(msg){
     msg.innerHTML = https
