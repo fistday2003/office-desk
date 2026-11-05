@@ -92,11 +92,6 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .nav-item:hover{background:var(--primary-light);color:var(--primary-dark)}
 .nav-item.active{background:var(--primary-light);color:var(--primary);border-left-color:var(--primary);font-weight:600}
 .nav-item svg{width:20px;height:20px;flex-shrink:0}
-/* v2.48 经营分析改成外链入口（a 标签当导航用，样式跟 button 一致 + 右侧一个小箭头） */
-a.nav-item,a.mnav-item{text-decoration:none;box-sizing:border-box}
-.nav-ext-item{width:100%}
-.nav-ext{margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:400;opacity:.7}
-.nav-ext-item:hover .nav-ext{color:var(--primary);opacity:1}
 .nav-badge{font-size:11px;background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;margin-left:auto}
 .sidebar-footer{padding:12px 24px;border-top:1px solid var(--border)}
 .sidebar-footer .nav-item{border-left:none;padding:10px 0}
@@ -285,6 +280,30 @@ a.nav-item,a.mnav-item{text-decoration:none;box-sizing:border-box}
 .tab-panel{display:none}
 .tab-panel.active{display:block;animation:fadeIn .25s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---- v2.49 经营分析内嵌模块（iframe 挂本机分析系统 127.0.0.1:5010）----
+   面板撑满主区高度、自己内部滚，主区改成 overflow:hidden，避免两条滚动条打架 */
+#tab-biz.active{display:flex;flex-direction:column;gap:10px;height:calc(100vh - var(--header-h) - 40px);min-height:420px}
+.biz-embed-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex:0 0 auto}
+.biz-embed-acts{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-secondary);flex-wrap:wrap}
+.biz-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#94a3b8;flex:0 0 auto}
+.biz-dot.ok{background:#34d399}
+.biz-dot.err{background:#f87171}
+.biz-dot.wait{background:#fbbf24;animation:aspulse 1s ease-in-out infinite}
+.biz-embed-body{position:relative;flex:1 1 auto;min-height:0;display:flex}
+.biz-frame{flex:1 1 auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px;background:#fff;box-shadow:var(--shadow)}
+.biz-down{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:20px}
+.biz-down-box{max-width:560px}
+.biz-down-ico{font-size:26px;line-height:1;margin-bottom:10px}
+.biz-down-box h3{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--text)}
+.biz-down-box p{font-size:13px;color:var(--text-secondary);line-height:1.85;margin-bottom:14px}
+.biz-down-acts{display:flex;gap:8px;flex-wrap:wrap}
+.main-content.biz-mode{overflow:hidden}
+@media (max-width:768px){
+  #tab-biz.active{height:calc(100vh - var(--header-h) - 94px);min-height:340px}
+  .main-content.biz-mode{padding-bottom:14px}
+  .biz-embed-head .section-title{font-size:15px}
+}
 
 /* Section Title */
 .section-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
@@ -1508,12 +1527,11 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
         数据看板
       </button>
-      <!-- v2.48：经营分析改为独立程序（Python 服务 127.0.0.1:5010），这里只留外链入口 -->
-      <a class="nav-item nav-ext-item" href="http://127.0.0.1:5010" target="_blank" rel="noopener noreferrer" title="打开「国际站多店铺经营分析与提成计算系统」（独立程序，需后台服务在运行）">
+      <!-- v2.49：经营分析改回平台内嵌模块（iframe 挂本机 127.0.0.1:5010 的分析系统） -->
+      <button class="nav-item" data-tab="biz" title="「国际站多店铺经营分析与提成计算系统」（嵌在平台里用，需本机服务在运行）">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
         经营分析
-        <span class="nav-ext">↗</span>
-      </a>
+      </button>
       <button class="nav-item" data-tab="crm">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         客户跟进
@@ -1548,7 +1566,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.48 · 2026-11-04</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.49 · 2026-11-05</div>
     </div>
   </aside>
 
@@ -1701,6 +1719,35 @@ tr:hover .fr-fwd-acts{opacity:1}
       <p class="section-subtitle">面料主数据 + 供应商台账。核心是<b>合库收敛</b>：按「成分 + 克重 + 门幅 + 工艺」自动比出规格重复的面料，一组一组并掉，把在用的种类收到 <b>20~30 种</b>。<b>合并不是删除</b> —— 被合并的会留着、随时可撤销，旧名字记成别名以后照样搜得到。</p>
       <div id="fabContent"></div>
     </div>
+    <!-- TAB: 经营分析（v2.49：从外链跳转改回平台内嵌，iframe 直接挂本机分析系统） -->
+    <div class="tab-panel" id="tab-biz">
+      <div class="biz-embed-head">
+        <div class="section-title" style="margin:0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
+          经营分析
+        </div>
+        <div class="biz-embed-acts">
+          <span class="biz-dot" id="bizEmbedDot"></span>
+          <span id="bizEmbedState">尚未连接</span>
+          <button class="btn btn-ghost btn-sm" onclick="bizEmbedReload()">重新连接</button>
+          <button class="btn btn-ghost btn-sm" onclick="openBizSystem()">新窗口打开</button>
+        </div>
+      </div>
+      <div class="biz-embed-body">
+        <iframe id="bizFrame" class="biz-frame" title="国际站多店铺经营分析与提成计算系统" src="about:blank" referrerpolicy="no-referrer"></iframe>
+        <div class="biz-down" id="bizDown" style="display:none">
+          <div class="biz-down-box">
+            <div class="biz-down-ico">⚠️</div>
+            <h3 id="bizDownTitle">分析系统的后台服务没启动</h3>
+            <p id="bizDownMsg">正在检查…</p>
+            <div class="biz-down-acts">
+              <button class="btn btn-primary btn-sm" onclick="bizEmbedReload()">重新连接</button>
+              <button class="btn btn-ghost btn-sm" onclick="openBizSystem()">新窗口打开</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -1726,10 +1773,10 @@ tr:hover .fr-fwd-acts{opacity:1}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
     数据
   </button>
-  <a class="mnav-item" href="http://127.0.0.1:5010" target="_blank" rel="noopener noreferrer" title="打开经营分析系统">
+  <button class="mnav-item" data-mtab="biz" title="经营分析（需本机 5010 服务在运行）">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></svg>
     经营
-  </a>
+  </button>
   <button class="mnav-item" data-mtab="crm">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     客户
@@ -2516,7 +2563,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.48';
+const APP_VERSION = 'v2.49';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -10489,13 +10536,101 @@ function bizBands(list){
   });
   return b;
 }
-// v2.48：经营分析独立程序的入口地址集中在这里，以后换端口 / 换机器只改这一处
+// v2.49：经营分析从「外链跳转」改回「平台内嵌模块」
+//  - 分析系统是本机的 Python Flask 服务（app.py，监听 127.0.0.1:5010），有磁盘数据、要出 Excel，
+//    装不进一个单文件 HTML，所以用 iframe 内嵌；地址集中在这里，换端口 / 换机器只改这一处。
+//  - ⚠️ 线上 https 页面嵌不了本地 http（浏览器拦混合内容），本地双击 HTML 打开则正常。
 const BIZ_SYS_URL = 'http://127.0.0.1:5010';
+const BIZ_FRAME_SRC = BIZ_SYS_URL + '/?embed=1';
+let bizEmbState = 'idle';    // idle / loading / ok / down
+let bizEmbBound = false;
+let bizEmbLoaded = false;    // iframe 里的系统页面是否已经真的加载完（白屏还是出来了）
+
 function openBizSystem(){
   try{ window.open(BIZ_SYS_URL, '_blank', 'noopener'); }
   catch(e){ location.href = BIZ_SYS_URL; }
-  showToast('正在打开经营分析系统…（没反应说明后台服务没启动）', 'info');
+  showToast('正在新窗口打开经营分析系统…（没反应说明后台服务没启动）', 'info');
 }
+
+function bizEmbPaint(st, msg){
+  bizEmbState = st;
+  const dot = document.getElementById('bizEmbedDot');
+  const tx  = document.getElementById('bizEmbedState');
+  if(dot) dot.className = 'biz-dot' + (st==='ok' ? ' ok' : st==='down' ? ' err' : st==='loading' ? ' wait' : '');
+  if(tx) tx.textContent = msg || (st==='ok' ? '已连接 · 分析系统运行中'
+                            : st==='down' ? '连不上分析系统'
+                            : st==='loading' ? '正在连接分析系统…' : '尚未连接');
+}
+
+// 探活：no-cors 读不到响应体，但「根本连不上」会直接失败，判服务在不在足够用了
+function bizEmbPing(ms){
+  return new Promise(resolve=>{
+    let done = false;
+    const fin = v => { if(!done){ done = true; clearTimeout(t); resolve(v); } };
+    const t = setTimeout(()=>fin(false), ms || 2500);
+    try{
+      fetch(BIZ_SYS_URL + '/api/health?t=' + Date.now(), {mode:'no-cors', cache:'no-store'})
+        .then(()=>fin(true), ()=>fin(false));
+    }catch(e){ fin(false); }
+  });
+}
+
+function bizEmbShowDown(){
+  const down = document.getElementById('bizDown');
+  const f    = document.getElementById('bizFrame');
+  const msg  = document.getElementById('bizDownMsg');
+  const tt   = document.getElementById('bizDownTitle');
+  if(!down) return;
+  const https = String(location.protocol || '').toLowerCase() === 'https:';
+  if(tt) tt.textContent = https ? '线上打不开：浏览器不许 https 页面里嵌 http' : '分析系统的后台服务没启动';
+  if(msg){
+    msg.innerHTML = https
+      ? '你现在用的是<b>线上地址</b>（https），浏览器按安全规则不允许 https 页面里嵌 <b>http://127.0.0.1:5010</b>，这是硬限制，改代码也绕不过去。两个办法：① 用<b>本机那份 HTML 文件</b>打开办公工作台（双击桌面上的），里面就能正常内嵌；② 直接点下面的「新窗口打开」。'
+      : '本机 <b>127.0.0.1:5010</b> 没有响应。经营分析是独立的 Python 程序，不跟着这个网页跑，得它自己活着才行。<br>① 双击 <b>启动经营分析.bat</b>（或命令行跑 <b>python app.py</b>）把服务起起来；② 起好以后点「重新连接」。';
+  }
+  down.style.display = '';
+  if(f) f.style.visibility = 'hidden';
+}
+
+function bizEmbShowFrame(){
+  const down = document.getElementById('bizDown');
+  const f    = document.getElementById('bizFrame');
+  if(down) down.style.display = 'none';
+  if(f) f.style.visibility = '';
+}
+
+function bizEmbBind(){
+  if(bizEmbBound) return;
+  const f = document.getElementById('bizFrame');
+  if(!f) return;
+  bizEmbBound = true;
+  f.addEventListener('load', ()=>{
+    // 跨域拿不到 iframe 里的内容，但 load 真触发了就说明页面已经下来了（不是白屏）
+    const src = f.getAttribute('src');
+    if(!src || src === 'about:blank') return;
+    bizEmbLoaded = true;
+    if(bizEmbState !== 'down') bizEmbPaint('ok');
+  });
+}
+
+async function bizEmbEnter(force){
+  const f = document.getElementById('bizFrame');
+  if(!f) return;
+  // 已经连上就别重载（切回来保持 iframe 里的原状态，别把用户填了一半的表单冲掉）
+  if(bizEmbState === 'ok' && !force) return;
+  bizEmbBind();
+  bizEmbPaint('loading', '正在连接分析系统（127.0.0.1:5010）…');
+  const up = await bizEmbPing();
+  if(!up){ bizEmbShowDown(); return; }
+  bizEmbShowFrame();
+  if(force) bizEmbLoaded = false;
+  if(force) f.src = BIZ_FRAME_SRC;
+  else if(!f.getAttribute('src') || f.getAttribute('src') === 'about:blank') f.src = BIZ_FRAME_SRC;
+  // 探活已经过了 = 服务确实活着，状态点立刻点亮，别让用户干等首屏解析（第一次要几秒）
+  bizEmbPaint('ok', '已连接 · 正在加载界面…');
+}
+
+function bizEmbedReload(){ bizEmbEnter(true); }
 function bizBadge(){
   const el=document.getElementById('bizBadge');
   if(!el) return;
@@ -12516,9 +12651,10 @@ function showToast(msg, type='warning'){
 function switchTab(tab){
   // v2.41：「项目跟进」「已完成项目」已并入「待做事项」，老书签 / 老链接自动落到新页面
   if(tab==='projects' || tab==='archive') tab = 'tasks';
-  // v2.48：经营分析已改成独立程序，老书签 / 老按钮落到这里直接开新窗口
-  if(tab==='biz'){ openBizSystem(); return; }
   currentTab = tab;
+  // v2.49：经营分析改回内嵌模块 —— 面板自己撑满高度、内部滚，主区这时候不能再自己滚（否则两条滚动条打架）
+  const _mc = document.querySelector('.main-content');
+  if(_mc) _mc.classList.toggle('biz-mode', tab==='biz');
   document.querySelectorAll('.nav-item[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
   document.querySelectorAll('.mnav-item[data-mtab]').forEach(el=>el.classList.toggle('active',el.dataset.mtab===tab));
   document.querySelectorAll('.tab-panel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+tab));
@@ -15811,6 +15947,7 @@ function renderCurrentTab(){
   else if(currentTab==='crm') renderCrm();
   else if(currentTab==='forecast') renderFc();
   else if(currentTab==='fabric') renderFab();
+  else if(currentTab==='biz') bizEmbEnter();   // v2.49：内嵌面板懒加载 + 探活
 }
 
 function refreshAll(){
