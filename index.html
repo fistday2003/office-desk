@@ -979,6 +979,25 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fc-badge.man{background:#dbeafe;color:#1d4ed8}
 .fc-note{font-size:11.5px;color:var(--text-muted);line-height:1.85;margin-top:8px}
 .fc-warn{border:1px solid #fcd34d;background:#fffbeb;border-radius:8px;padding:10px 13px;font-size:12.5px;color:#92400e;line-height:1.8;margin-bottom:12px}
+/* v2.50：实测数据状态条 / 折叠区 / 久远月份 */
+.fc-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--border);background:var(--card-bg);border-radius:9px;padding:9px 13px;font-size:12.5px;line-height:1.75;margin-bottom:10px}
+.fc-act.warn{border-color:#fcd34d;background:#fffbeb;color:#92400e}
+.fc-act.bad{border-color:#fca5a5;background:#fef2f2;color:#b91c1c}
+.fc-act-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:#94a3b8}
+.fc-act-dot.ok{background:#16a34a}
+.fc-act-dot.wait{background:#f59e0b}
+.fc-act-dot.bad{background:#dc2626}
+.fc-act-acts{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.fc-act-line{font-size:11px;color:var(--text-muted);margin:-4px 0 12px 4px;line-height:1.7}
+.fc-fold{border:1px solid var(--border);border-radius:9px;margin-top:12px;background:var(--card-bg)}
+.fc-fold>summary{cursor:pointer;padding:11px 14px;font-size:13.5px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px}
+.fc-fold>summary::-webkit-details-marker{display:none}
+.fc-fold>summary:before{content:'\25B8';color:var(--text-muted);display:inline-block;transition:transform .15s}
+.fc-fold[open]>summary:before{transform:rotate(90deg)}
+.fc-fold-hint{font-weight:400;font-size:11.5px;color:var(--text-muted)}
+.fc-fold-body{padding:0 12px 12px}
+.fc-fold-body .biz-panel{margin-top:0}
+.fc-row-old{display:none}
 .fc-warn b{color:#b45309}
 .fc-ok{display:inline-block;color:#15803d;font-weight:600}
 .fc-miss{display:inline-block;color:#b91c1c;font-weight:600}
@@ -1566,7 +1585,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.49 · 2026-11-05</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.50 · 2026-11-05</div>
     </div>
   </aside>
 
@@ -1696,7 +1715,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-5 3.5 3.5L20 7"/><polyline points="15 7 20 7 20 12"/><line x1="20" y1="14" x2="20" y2="19" stroke-dasharray="2.5 2.5"/></svg>
         订单与样品数量预测
       </div>
-      <p class="section-subtitle">按月份统计历史<b>订单笔数 / 样品数 / 大货数 / 金额 / 成交客户数</b>（样品与大货按 <b>$500</b> 划线，和经营分析同一口径），再往后推 <b>1~6 个月</b>。数据直接读「经营分析」里已导入的订单／收款表，某个月不准可以<b>手工修正</b>；还可以给未来月份<b>定目标</b>看达成率。</p>
+      <p class="section-subtitle">按月份统计<b>订单笔数 / 样品数 / 大货数 / 金额 / 成交客户数</b>（样品与大货按 <b>$500</b> 划线，和经营分析同一口径），再往后推 <b>1~6 个月</b>。<b>每月过完，后台自动去 Accio 拉那个月的实数并填进来</b>，不用你导 Excel；还没取到的月份就退回旧数据，页面上会写清楚是哪个月、差哪个店。<b>取不到的月份可以手工修正，未来月份可以定目标看达成率。</b></p>
       <div id="fcContent"></div>
     </div>
 
@@ -2563,7 +2582,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.49';
+const APP_VERSION = 'v2.50';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -14502,6 +14521,22 @@ function fcAutoMap(scope){
     const o=map[k]; o.buyers=Object.keys(o.buyers).length; delete o._k;
     o.amount=Math.round(o.amount*100)/100;
   });
+  // v2.50：Accio 实拉的月份覆盖旧导入。要求「这个范围内的每个店都取到」才覆盖 ——
+  // 只取到一家就覆盖会让「合计」凭空少一半，那种假数比旧数更坏。
+  const act=(fcAct && fcAct.months) || {};
+  const want=(!scope||scope==='all') ? FC_SHOPS.map(x=>x[0]) : [scope];
+  Object.keys(act).forEach(m=>{
+    const mm=act[m]||{};
+    if(!want.length || !want.every(sh=>mm[sh])) return;
+    const o={orders:0, sample:0, bulk:0, amount:0, buyers:0, act:1};
+    want.forEach(sh=>{
+      const a=mm[sh]||{};
+      o.orders+=Number(a.orders)||0; o.sample+=Number(a.sample)||0; o.bulk+=Number(a.bulk)||0;
+      o.amount+=Number(a.amount)||0; o.buyers+=Number(a.buyers)||0;
+    });
+    o.amount=Math.round(o.amount*100)/100;
+    map[m]=o;
+  });
   return map;
 }
 // 聊天解析值：样品件数 / 大货款式数（没有就是 null，绝不猜数）
@@ -14692,6 +14727,7 @@ function fcSeries(scope){
                  pcs:(pcs===null?null:pcs*scale), styles:(styles===null?null:styles*scale)};
     const manN = Object.keys(man).filter(k=>k!=='note' && has(man[k])).length;
     return {month:m, orders:orders, sample:sample, bulk:bulk, amount:amount, buyers:buyers,
+            act:(!!a.act && manN===0),
             pcs:pcs, styles:styles,
             partial:partial, scale:scale, est:est,
             man:manN>0 || !!man.note, note:man.note||''};
@@ -14984,6 +15020,127 @@ function fcSet(key, val){
   else fc.cfg[key]=val;
   saveAll(); renderFc();
 }
+// ---------- v2.50：Accio 实拉月度数据（每月过完自动取，比旧导入准） ----------
+// 为什么加：v2.48 之后经营分析不再导 Excel，biz.pays/orders 停在 9 月，
+// 「订单预测」里的 10 月就成了半截假数。分析系统那边每月过完会自动去 Accio 拉真实
+// 订单（笔数/样品/大货/金额/客户数）+ 聊天（样品件数/款式数），写到 data/fc_actual.json。
+// 这里读那份结果：该范围内**每个店都取到了**才覆盖，否则宁可保留旧数，不出「只有凡适的合计」这种假数。
+const FC_SYS = 'http://127.0.0.1:5010';
+let fcAct = {ok:false, online:false, months:{}, pending:{}, bound:'', lastRun:'', msg:'', tried:false, loading:false, fetching:false};
+let fcShowOld = false;        // 月度明细：久远月份是否展开
+let fcFoldOpen = false;       // 折叠区开关状态（重渲染后保持）
+const FC_MONTH_SHOW = 6;      // 月度明细默认只显示最近 6 个月
+
+function fcShopName(k){ const s=FC_SHOPS.filter(x=>x[0]===k)[0]; return s?s[1]:String(k||''); }
+function fcActNeed(){
+  const p=(fcAct&&fcAct.pending)||{};
+  return Object.keys(p).filter(m=>(p[m]||[]).length).sort().reverse();
+}
+function fcActReload(){
+  if(fcAct.loading) return;
+  fcAct.loading = true;
+  renderFc();
+  fetch(FC_SYS+'/api/fc/actual', {cache:'no-store'}).then(r=>r.json()).then(j=>{
+    fcAct.loading = false; fcAct.tried = true;
+    if(j && j.success){
+      fcAct.ok = true;
+      fcAct.online = !!j.accOnline;
+      fcAct.months = j.months || {};
+      fcAct.pending = j.pending || {};
+      fcAct.bound = j.bound || '';
+      fcAct.lastRun = j.lastRun || '';
+      fcAct.msg = '';
+    }else{
+      fcAct.ok = false; fcAct.msg = (j && j.msg) || '分析系统回了异常';
+    }
+    renderFc();
+  }).catch(e=>{
+    fcAct.loading = false; fcAct.tried = true; fcAct.ok = false;
+    fcAct.msg = '连不上分析系统（127.0.0.1:5010 没开）';
+    renderFc();
+  });
+}
+function fcActFetch(month){
+  if(fcAct.fetching) return;
+  const m = month || (fcActNeed()[0] || '');
+  if(!m){ alert('近三个月都取全了，没有要取的月份。'); return; }
+  fcAct.fetching = true; fcAct.msg = '正在取 ' + m + ' 的数…'; renderFc();
+  fetch(FC_SYS+'/api/fc/fetch', {method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({month:m, chat:true})}).then(r=>r.json()).then(j=>{
+    if(!j || !j.success){ fcAct.fetching=false; fcAct.msg=(j&&j.msg)||'取数没能启动'; renderFc(); return; }
+    fcActPoll(0, m);
+  }).catch(e=>{ fcAct.fetching=false; fcAct.msg='取数请求失败：'+e.message; renderFc(); });
+}
+function fcActPoll(n, m){
+  fetch(FC_SYS+'/api/fc/status', {cache:'no-store'}).then(r=>r.json()).then(j=>{
+    const job=(j&&j.job)||{};
+    if(job.running){
+      if(n<180){
+        fcAct.msg='正在取 '+m+' 的数…（约 '+(n*2)+' 秒，聊天记录多的月份要一会儿）';
+        if(n%4===0) renderFc();
+        setTimeout(()=>fcActPoll(n+1, m), 2000);
+        return;
+      }
+      fcAct.fetching=false; fcAct.msg='取得有点久，先停在这儿，过会儿点「刷新」看结果'; renderFc(); return;
+    }
+    fcAct.fetching=false;
+    fcAct.msg = (job.ok===false) ? ('取数失败：'+(job.msg||'')) : ('已取到 '+m+' 的数');
+    fcActReload();
+  }).catch(e=>{ fcAct.fetching=false; fcAct.msg='查取数状态失败'; renderFc(); });
+}
+function fcActHtml(){
+  const a=fcAct||{};
+  const btn=(t,fn,cls)=>'<button class="btn btn-sm '+(cls||'')+'" onclick="'+fn+'">'+t+'</button>';
+  if(!a.ok && (!a.tried || a.loading)){
+    return '<div class="fc-act"><span class="fc-act-dot wait"></span><b>实测数据</b>　正在读取 Accio 取数结果…</div>';
+  }
+  if(!a.ok){
+    return '<div class="fc-act bad"><span class="fc-act-dot bad"></span><b>实测数据</b>　'+escHtml(a.msg||'读不到')
+      +'。下面的数字仍是旧导入数据（可能不准）。<span class="fc-act-acts">'+btn('重试','fcActReload()')+'</span></div>';
+  }
+  const need=fcActNeed();
+  const got=Object.keys(a.months||{}).sort().reverse();
+  const boundTxt = a.bound ? ('Accio 当前绑定 <b>'+escHtml(fcShopName(a.bound))+'</b>') : 'Accio 里还没绑定店铺';
+  let cls='', txt='';
+  if(!need.length){
+    txt='<b>实测数据</b>　近 3 个月都取全了，下表用的就是后台实数（每月过完自动取，不用你管）。';
+  }else{
+    const m0=need[0], shops=(a.pending[m0]||[]).map(x=>escHtml(x.label)).join('、');
+    cls=' warn';
+    txt='<b>实测数据</b>　<span style="color:#b45309">⚠️ <b>要切店铺</b>：'+boundTxt+'，'
+      +escHtml(fcMonthLabel(m0))+' 还差 <b>'+shops+'</b> 没取。'
+      +'请到 Accio 里把店铺切到【'+shops+'】，回来点「取这个月的数」。</span>';
+  }
+  let out='<div class="fc-act'+cls+'"><span class="fc-act-dot '+(need.length?'wait':'ok')+'"></span>'+txt;
+  if(a.msg) out+='<span style="color:var(--text-muted)">'+escHtml(a.msg)+'</span>';
+  out+='<span class="fc-act-acts">'
+     + btn(a.fetching?'取数中…':'取这个月的数', 'fcActFetch()', 'btn-primary')
+     + btn('刷新','fcActReload()')
+     + '</span></div>';
+  out+='<div class="fc-act-line">'
+     +(got.length ? ('已取到：'+got.slice(0,6).map(m=>escHtml(fcMonthLabel(m))+'（'+Object.keys(a.months[m]||{}).map(x=>escHtml(fcShopName(x))).join(' + ')+'）').join('　·　')) : '还没取到任何月份')
+     +(need.length ? ('　|　<b>'+escHtml(fcMonthLabel(need[0]))+'现在显示的仍是旧导入数据（可能不准），取到就自动换掉</b>') : '')
+     +(a.lastRun?('　|　最近取数 '+escHtml(a.lastRun)):'')
+     +'</div>';
+  return out;
+}
+function fcFoldSink(el){ fcFoldOpen = !!(el && el.open); }
+function fcFoldHtml(inner){
+  return '<details class="fc-fold"'+(fcFoldOpen?' open':'')+' ontoggle="fcFoldSink(this)">'
+    +'<summary>数据来源 · 系数 · 算法说明<span class="fc-fold-hint">（平时不用管，收着就行）</span></summary>'
+    +'<div class="fc-fold-body">'+inner+'</div></details>';
+}
+function fcToggleOld(){
+  fcShowOld = !fcShowOld;
+  const box=document.getElementById('fcContent');
+  if(box){
+    // ⚠️ 必须写 table-row，不能写空串 —— 空串会退回 .fc-row-old{display:none}，等于没展开
+    [].slice.call(box.querySelectorAll('.fc-row-old')).forEach(tr=>{ tr.style.display = fcShowOld?'table-row':'none'; });
+    const b=document.getElementById('fcOldBtn');
+    if(b) b.textContent = fcShowOld ? '收起更早的月份' : b.getAttribute('data-more');
+  }
+}
+
 function renderFc(){
   const box=document.getElementById('fcContent');
   if(!box) return;
@@ -14999,12 +15156,13 @@ function renderFc(){
   h+='<span class="fc-sep"></span><span class="fc-lab">范围</span><select class="fc-sel" onchange="fcSet(\'scope\',this.value)">'+sel(FC_SCOPES,cfg.scope)+'</select>';
   h+='<span class="fc-sep"></span><span class="fc-lab">方法</span><select class="fc-sel" onchange="fcSet(\'method\',this.value)">'+sel(FC_METHODS,cfg.method)+'</select>';
   h+='<span class="fc-sep"></span><span class="fc-lab">预测</span><select class="fc-sel" onchange="fcSet(\'horizon\',this.value)">'+FC_HORIZONS.map(v=>'<option value="'+v+'"'+(v===cfg.horizon?' selected':'')+'>未来 '+v+' 个月</option>').join('')+'</select>';
-  h+='<span class="fc-sep"></span><button class="btn btn-sm btn-primary" onclick="document.getElementById(\'fcChatFile\').click()">导入聊天 CSV（取样品件数 / 款式数）</button>';
   h+='<span class="fc-sep"></span><button class="btn btn-sm" onclick="fcExportCsv()">导出 CSV</button>';
   h+='<input type="file" id="fcChatFile" multiple accept=".csv,.txt" style="display:none" onchange="fcImportChat()">';
   h+='</div>';
+  // 第一行永远是「这份数字是哪来的」—— 服务在不在、哪个月还没取、要不要切店铺
+  h+=fcActHtml();
   if(!nAct){
-    h+='<div class="fc-warn"><b>还没有历史数据。</b>请先到「经营分析」导入订单表 / 收款表，本模块会自动按月份统计；如果暂时不想导入，也可以直接点下面「手工补录一个月」自己填。</div>';
+    h+='<div class="fc-warn"><b>还没有历史数据。</b>到「经营分析」上传订单表 / 收款表；或者点上面「取这个月的数」直接从 Accio 拉，也可以手工补录。</div>';
   } else if(nAct<3){
     h+='<div class="fc-warn">历史只有 <b>'+nAct+'</b> 个月，样本偏少，预测仅供参考（一般要有 6 个月以上才稳）。</div>';
   }
@@ -15018,13 +15176,14 @@ function renderFc(){
   const KK={}; FC_SHOPS.forEach(s=>{ KK[s[0]]=fcCalK(s[0]); });
   const anyK = FC_SHOPS.some(s=>{ const k=KK[s[0]]; return k && (k.pcs||k.styles); });
   const anyMan = FC_SHOPS.some(s=>{ const m=(fc.cal.manual||{})[s[0]]||{}; return m.pcs||m.styles; });
-  h+='<div class="biz-panel"><h4>件数 / 款式数系数<span class="tag tag-ok">'+(anyMan?'已设好':'未设')+'</span>'
+  let g='';   // 折叠区（数据来源 / 系数 / 算法说明）
+  g+='<div class="biz-panel"><h4>件数 / 款式数系数<span class="tag tag-ok">'+(anyMan?'已设好':'未设')+'</span>'
     +'<span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">'
     +'<button class="btn btn-sm" onclick="fcCalAutoAll()">恢复初始系数</button>'
     +'<button class="btn btn-sm" onclick="fcCalAdd()">＋ 加一行实测记录</button>'
     +(calRows.length?'<button class="btn btn-sm" onclick="fcCalClear()">清空记录</button>':'')
     +'</span></h4>';
-  h+='<div class="fc-chatbox"><b style="color:#1d4ed8">这一块是下面预测表的「输入」</b> —— 系数一改，下面表里的样品件数 / 大货款式数立刻跟着变。<br>'
+  g+='<div class="fc-chatbox"><b style="color:#1d4ed8">这一块是下面预测表的「输入」</b> —— 系数一改，下面表里的样品件数 / 大货款式数立刻跟着变。<br>'
     +'<b>样品件数 = 样品单数 × 系数；大货款式数 = 大货单数 × 系数。</b>'
     +'<b style="color:#1d4ed8">系数已经填好了 —— 朗格斯 1.51 / 0.88，凡适 1.36 / 1.44</b>（按 2026 年 7~9 月三个月的实测值算的：217 件÷144 单、43 款÷49 单、83 件÷61 单、26 款÷18 单）。<br>'
     +'<b>这个系数是个固定值，不会跟着数据自己变</b> —— 预测本来就是估个大概，不用天天重算。要调就直接改下面格子里的数，改完预测立刻跟着变；改乱了点「恢复初始系数」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
@@ -15032,7 +15191,7 @@ function renderFc(){
     +'</div>';
   // 系数（直接改）—— 初始值就是按 7~9 月实测值算好的那四个数；改了就存下来，不跟数据实时算
   if(anyK || anyMan || calRows.length){
-    h+='<div style="overflow-x:auto;margin-top:10px"><table class="fc-3col" id="fcCalKTable" style="min-width:560px"><thead><tr>'
+    g+='<div style="overflow-x:auto;margin-top:10px"><table class="fc-3col" id="fcCalKTable" style="min-width:560px"><thead><tr>'
       +'<th style="text-align:left">店铺</th><th>样品件数系数<br><span class="sub">样品件数 ÷ 样品单数</span></th>'
       +'<th>大货款式系数<br><span class="sub">大货款式数 ÷ 大货单数</span></th><th>来源</th></tr></thead><tbody>';
     FC_SHOPS.forEach(s=>{
@@ -15048,16 +15207,16 @@ function renderFc(){
                     && Math.abs(Number(mv.pcs)-Number(sd.pcs||0))<1e-6 && Math.abs(Number(mv.styles)-Number(sd.styles||0))<1e-6);
       const srcTag = isSeed ? '<span style="color:#1d4ed8">初始系数</span>'
                     : ((mv.pcs||mv.styles) ? '<span style="color:#b45309">你改过</span>' : (anyK?'按实测记录算':'—'));
-      h+='<tr><td class="k">'+escHtml(s[1])+'</td>'+cell('pcs','样品件数系数')+cell('styles','大货款式系数')
+      g+='<tr><td class="k">'+escHtml(s[1])+'</td>'+cell('pcs','样品件数系数')+cell('styles','大货款式系数')
         +'<td class="sub">'+srcTag+'</td></tr>';
     });
-    h+='</tbody></table></div>';
-    h+='<div class="fc-note"><b>这四个数直接改就行</b>（改完立即生效，预测马上跟着变）。它们是固定值，不会自己变；改乱了点上面的「<b>恢复初始系数</b>」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
+    g+='</tbody></table></div>';
+    g+='<div class="fc-note"><b>这四个数直接改就行</b>（改完立即生效，预测马上跟着变）。它们是固定值，不会自己变；改乱了点上面的「<b>恢复初始系数</b>」回到 1.51 / 0.88 / 1.36 / 1.44。<br>'
       +'留空的算法（一般不用管）：<b>该店实测记录里的实测值合计 ÷ 单数合计</b>。朗格斯 7–9 月共 144 个样品单、实际寄出 217 件样品 → 1.51。</div>';
   }
   if(calRows.length){
-    h+='<div class="fc-note" style="margin-top:10px"><b>系数的依据：实测记录</b>（2026 年 7~9 月 · 来自「样品单跟进表」）—— 只作留档，<b>改这里不会自动改上面的系数</b>。</div>';
-    h+='<div style="overflow-x:auto"><table class="fc-3col" id="fcCalTable" style="min-width:720px"><thead><tr>'
+    g+='<div class="fc-note" style="margin-top:10px"><b>系数的依据：实测记录</b>（2026 年 7~9 月 · 来自「样品单跟进表」）—— 只作留档，<b>改这里不会自动改上面的系数</b>。</div>';
+    g+='<div style="overflow-x:auto"><table class="fc-3col" id="fcCalTable" style="min-width:720px"><thead><tr>'
       +'<th style="text-align:left">店铺</th><th style="text-align:left">月份</th>'
       +'<th>实测样品件数</th><th>该月样品单数</th>'
       +'<th>实测大货款式数</th><th>该月大货单数</th><th></th></tr></thead><tbody>';
@@ -15066,7 +15225,7 @@ function renderFc(){
       const mOpts=fcMonthOptions().map(mm=>'<option value="'+mm+'"'+(mm===r.month?' selected':'')+'>'+mm+'</option>').join('');
       const sOpts=FC_SHOPS.map(s=>'<option value="'+s[0]+'"'+(s[0]===r.shop?' selected':'')+'>'+escHtml(s[1])+'</option>').join('');
       const numCell=(key,val,ph,ti)=>'<td><input type="number" min="0" step="1" style="width:88px;text-align:right" value="'+((val===null||val===undefined||val==='')?'':val)+'" placeholder="'+ph+'" title="'+ti+'" onchange="fcCalSet('+i+',\''+key+'\',this.value)"></td>';
-      h+='<tr>'
+      g+='<tr>'
         +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'shop\',this.value)">'+sOpts+'</select></td>'
         +'<td style="text-align:left"><select class="fc-sel" onchange="fcCalSet('+i+',\'month\',this.value)">'+mOpts+'</select></td>'
         +numCell('pcs', r.pcs, '如 120', '这个月实际寄出的样品件数')
@@ -15076,8 +15235,8 @@ function renderFc(){
         +'<td><button class="btn btn-sm" onclick="fcCalDel('+i+')">删</button></td>'
         +'</tr>';
     });
-    h+='</tbody></table></div>';
-    h+='<div class="fc-note">「该月样品单数 / 大货单数」也能改：<b>留空</b>就用你经营分析里这个月的数（格子里的灰字就是它），<b>填数</b>就用你填的。'
+    g+='</tbody></table></div>';
+    g+='<div class="fc-note">「该月样品单数 / 大货单数」也能改：<b>留空</b>就用你经营分析里这个月的数（格子里的灰字就是它），<b>填数</b>就用你填的。'
       +'这 6 行已经把单数填好了，所以你就算还没导入经营分析数据，系数也照样准。'
       +'想按这几个月的数<b>更新系数</b>：先把上面的系数格子清空（留空 = 按记录重算），或直接点「恢复初始系数」。</div>';
     let hasK=false, miss=[];
@@ -15096,14 +15255,14 @@ function renderFc(){
         }
         return '1 个'+(unit==='件'?'样品单':'大货单')+' ≈ <b>'+v+'</b> '+unit+'（'+o.n+' 个月合计 '+Math.round(o.act)+' '+unit+' ÷ '+o.ord+' 单）';
       };
-      h+='<div class="fc-note"><b>'+escHtml(s[1])+'：</b>'
+      g+='<div class="fc-note"><b>'+escHtml(s[1])+'：</b>'
         +((desc(kk.pcs,'件')||'样品件数还没填'))
         +'　·　'
         +((desc(kk.styles,'款')||'大货款式数还没填'))
         +'</div>';
     });
-    if(!hasK) h+='<div class="fc-note">还没算出系数 —— 在上面填至少一行的实测件数或款式数。</div>';
-    if(miss.length) h+='<div class="fc-note" style="color:#b45309">⚠️ '+miss.join('、')+'<b>还没配系数</b>：该店这两项在「合计」里<b>不计入</b>（宁可少算，也不拿虚高的数凑），所以合计会偏低。补上实测值就齐了。</div>';
+    if(!hasK) g+='<div class="fc-note">还没算出系数 —— 在上面填至少一行的实测件数或款式数。</div>';
+    if(miss.length) g+='<div class="fc-note" style="color:#b45309">⚠️ '+miss.join('、')+'<b>还没配系数</b>：该店这两项在「合计」里<b>不计入</b>（宁可少算，也不拿虚高的数凑），所以合计会偏低。补上实测值就齐了。</div>';
     // 两店综合系数：把两个店的实际值和单数各自加总后相除，等于两店合并以后的平均水平
     if(FC_SHOPS.length>1){
       // 两店综合：优先按「单数加权」= Σ(系数×单数) ÷ Σ单数（自动算的时候它等价于 实测合计÷单数合计）
@@ -15125,19 +15284,19 @@ function renderFc(){
         return head+tail;
       };
       if(cp || cs){
-        h+='<div class="fc-note" style="background:#f0fdf4;border-left:3px solid #16a34a"><b>两店综合（合计口径）：</b>'
+        g+='<div class="fc-note" style="background:#f0fdf4;border-left:3px solid #16a34a"><b>两店综合（合计口径）：</b>'
           +(cp ? howTxt(cp,'件') : '样品件数还不够算综合')
           +'　·　'
           +(cs ? howTxt(cs,'款') : '大货款式数还不够算综合')
           +'</div>';
       }
     }
-    h+='<div class="fc-note">提醒：当月还没过完的话，<b>实测值和单数要取同一时段</b>（比如都取到当月 14 日），否则系数会偏。<br>'
+    g+='<div class="fc-note">提醒：当月还没过完的话，<b>实测值和单数要取同一时段</b>（比如都取到当月 14 日），否则系数会偏。<br>'
       +'系数小于 1 不代表算错 —— 说明「按金额划出来的大货单」里有一部分其实没产生大货款式（或那部分算样品了）。只要<b>预测时用的是同一套单数口径</b>，折算照样成立。<br>'
       +'但如果系数小得离谱（比如 0.2），或者两个店差出好几倍，就说明分母口径跟实测表对不上，这时候要改用自己系统里的单数重新算。</div>';
-    if(fc.cal.updated) h+='<div class="fc-fileline">更新于 '+escHtml(fc.cal.updated)+'</div>';
+    if(fc.cal.updated) g+='<div class="fc-fileline">更新于 '+escHtml(fc.cal.updated)+'</div>';
   }
-  h+='</div>';
+  g+='</div>';
   // ---------- 两店分开 + 合计（核心诉求） ----------
   const pL=fcForecastScope('langges', cfg.horizon, cfg.method);
   const pF=fcForecastScope('fansi',   cfg.horizon, cfg.method);
@@ -15230,14 +15389,20 @@ function renderFc(){
   if(!rowsAll.length){
     h+='<tr><td colspan="14" style="text-align:center;color:var(--text-secondary);padding:24px">还没有数据 —— 去「经营分析」导入订单 / 收款表，或用上面的按钮手工补录</td></tr>';
   }
+  // v2.50：新月份排在上面（倒序），久远的先折起来，页面才清爽
+  rowsAll.reverse();
+  const _oldN = Math.max(0, rowsAll.length - FC_MONTH_SHOW);
+  let _ri = -1;
   rowsAll.forEach(r=>{
+    _ri++;
+    const hid = _ri >= FC_MONTH_SHOW;
     const goal = (fc.goals||{})[r.s?r.s.month:(r.p?r.p.month:'')] || {};
     if(r.s){
       const s=r.s;
       const badge = s.partial ? '<span class="fc-badge man">进行中</span>' : '<span class="fc-badge act">实际</span>';
-      const manTag = s.man ? ' <span class="fc-badge man">手工</span>' : '';
+      const manTag = s.man ? ' <span class="fc-badge man">手工</span>' : (s.act ? ' <span class="fc-badge" style="background:#dcfce7;color:#15803d">实测</span>' : '');
       const partialTip = s.partial ? ('<div style="font-size:10.5px;color:var(--text-muted)">折算整月 ≈ '+fcNum(s.est.orders)+' 单</div>') : '';
-      h+='<tr'+(s.man?' class="fc-row-man"':'')+'>';
+      h+='<tr class="'+(s.man?'fc-row-man ':'')+(hid?'fc-row-old':'')+'">';
       h+='<td>'+escHtml(fcMonthLabel(s.month))+partialTip+'</td>';
       h+='<td>'+badge+manTag+'</td>';
       h+='<td class="r">'+fcNum(s.orders)+'</td>';
@@ -15255,7 +15420,7 @@ function renderFc(){
       h+='</tr>';
     } else {
       const p=r.p;
-      h+='<tr class="fc-row-pred">';
+      h+='<tr class="fc-row-pred'+(hid?' fc-row-old':'')+'">';
       h+='<td>'+escHtml(fcMonthLabel(p.month))+'</td>';
       h+='<td><span class="fc-badge pre">预测</span></td>';
       h+='<td class="r"><b>'+fcNum(p.orders)+'</b>'+fcRangeCell(p.lo.orders,p.hi.orders)+'</td>';
@@ -15274,34 +15439,37 @@ function renderFc(){
     }
   });
   h+='</tbody></table></div>';
+  if(_oldN>0){
+    h+='<div style="text-align:center;margin-top:10px"><button class="btn btn-sm" id="fcOldBtn" data-more="展开更早的 '+_oldN+' 个月" onclick="fcToggleOld()">'+(fcShowOld?'收起更早的月份':'展开更早的 '+_oldN+' 个月')+'</button></div>';
+  }
   h+='<div class="fc-note">「修正」只影响本模块的预测输入，<b>不会改动经营分析里的原始订单 / 收款数据</b>；留空的字段仍然用自动统计值。「样品件」「大货款」两列只来自聊天解析，不能在弹窗里手填。</div>';
   h+='</div>';
   // ---------- 淡旺季（只用自己的历史算） ----------
   const seas=fcSeasonIdx(series, cfg.metric);
-  h+='<div class="biz-panel"><h4>淡旺季系数 <span class="tag">只用你自己 '+nAct+' 个月的历史算</span>'
+  g+='<div class="biz-panel"><h4>淡旺季系数 <span class="tag">只用你自己 '+nAct+' 个月的历史算</span>'
     +'<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">看的是「'+escHtml((FC_METRICS.filter(x=>x.key===cfg.metric)[0]||{}).name||'订单数')+'」</span></h4>';
   if(!nAct){
-    h+='<div class="fc-note">还没有历史数据，暂时算不出淡旺季。</div>';
+    g+='<div class="fc-note">还没有历史数据，暂时算不出淡旺季。</div>';
   } else if(!seas.ok){
-    h+='<div class="fc-warn">历史只有 <b>'+nAct+'</b> 个月，<b>暂不套用淡旺季</b> —— 月份还没走满一轮，硬套会把偶发波动当成规律。攒够 12 个月（最好 24 个月）会自动启用。</div>';
+    g+='<div class="fc-warn">历史只有 <b>'+nAct+'</b> 个月，<b>暂不套用淡旺季</b> —— 月份还没走满一轮，硬套会把偶发波动当成规律。攒够 12 个月（最好 24 个月）会自动启用。</div>';
   } else {
     const idx=seas.idx; let mx=0; for(let i=1;i<=12;i++) mx=Math.max(mx, idx[i]);
-    h+='<div class="fc-sbar">';
+    g+='<div class="fc-sbar">';
     for(let i=1;i<=12;i++){
       const f=idx[i], hpx=Math.max(4, Math.round(f/(mx||1)*58));
       const cls = f>=1.08 ? 'up' : (f<=0.92 ? 'dn' : '');
-      h+='<div class="b"><span class="vv">'+f.toFixed(2)+'</span><span class="bar '+cls+'" style="height:'+hpx+'px"></span><span class="lb">'+i+'月</span></div>';
+      g+='<div class="b"><span class="vv">'+f.toFixed(2)+'</span><span class="bar '+cls+'" style="height:'+hpx+'px"></span><span class="lb">'+i+'月</span></div>';
     }
-    h+='</div>';
-    h+='<div class="fc-slegend">系数 = 该月历史平均 ÷ 总平均（已归一化，12 个月平均正好 1.00）。<b>橙色 ≥1.08 偏旺、灰色 ≤0.92 偏淡</b>。预测时先按这个系数把历史「去掉季节」再拟合，最后乘回目标月的系数，所以淡旺季会体现在预测值里。'
+    g+='</div>';
+    g+='<div class="fc-slegend">系数 = 该月历史平均 ÷ 总平均（已归一化，12 个月平均正好 1.00）。<b>橙色 ≥1.08 偏旺、灰色 ≤0.92 偏淡</b>。预测时先按这个系数把历史「去掉季节」再拟合，最后乘回目标月的系数，所以淡旺季会体现在预测值里。'
       +(seas.w<1?('<br><span style="color:#b45309">样本只有 '+seas.n+' 条（不到 24 个月），目前按 <b>半量</b> 套用，避免把偶然波动当规律。</span>'):'')
       +(seas.n>=24?('<br>样本 '+seas.n+' 条（≥24 个月），已按 <b>全量</b> 套用。'):'')
       +'</div>';
   }
-  h+='</div>';
+  g+='</div>';
   // ---------- 阿里后台订单明细（Accio）：件数 / 款式数的备选来源 ----------
   const af=(fc.chat.accio&&fc.chat.accio.files)||[];
-  h+='<div class="biz-panel"><h4>阿里后台订单明细（Accio）<span class="tag">'+(af.length?af.length+' 个文件':'还没导入')+'</span>'
+  g+='<div class="biz-panel"><h4>阿里后台订单明细（Accio）<span class="tag">'+(af.length?af.length+' 个文件':'还没导入')+'</span>'
     +'<span style="margin-left:auto;display:flex;gap:6px;align-items:center">'
     +'<select class="fc-sel" id="fcAccioShop" title="这批数据属于哪个店铺">'
     +FC_SHOPS.map(s=>'<option value="'+s[0]+'">'+escHtml(s[1])+'</option>').join('')
@@ -15309,46 +15477,46 @@ function renderFc(){
     +'<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'fcAccioFile\').click()">导入订单明细 CSV</button>'
     +(af.length?'<button class="btn btn-sm" onclick="fcAccioClear()">清空</button>':'')
     +'</span></h4>';
-  h+='<input type="file" id="fcAccioFile" accept=".csv,.txt" multiple style="display:none" onchange="fcImportAccio()">';
+  g+='<input type="file" id="fcAccioFile" accept=".csv,.txt" multiple style="display:none" onchange="fcImportAccio()">';
   if(!af.length){
-    h+='<div class="fc-chatbox"><b>备选来源（v2.35 起已降级）。</b>这里是从<b>订单产品明细</b>里数出来的 quantity 合计。<br>'
+    g+='<div class="fc-chatbox"><b>备选来源（v2.35 起已降级）。</b>这里是从<b>订单产品明细</b>里数出来的 quantity 合计。<br>'
       +'<span style="color:#b45309">⚠️ 实测发现这个数偏大：平台记的是「下单数量」，一个样品单可能记几百件，跟实际发出去的样品件数不是一回事。</span>'
       +'现在默认走上面的<b>件数 / 款式数系数</b>；只有某店系数没设时，才退回用这里的数。<br>'
       +'要用就：左边选店铺 → 点「导入订单明细 CSV」→ 选 <code>Accio取数-订单款式与件数.js</code> 导出的 CSV（一次只能导一个店）。</div>';
   } else {
-    h+='<div class="fc-note">已导入 <b>'+af.length+'</b> 个文件，共覆盖 <b>'+Object.keys(fc.chat.months||{}).length+'</b> 个月'+(fc.chat.accio.updated?('（更新于 '+escHtml(fc.chat.accio.updated)+'）'):'')
+    g+='<div class="fc-note">已导入 <b>'+af.length+'</b> 个文件，共覆盖 <b>'+Object.keys(fc.chat.months||{}).length+'</b> 个月'+(fc.chat.accio.updated?('（更新于 '+escHtml(fc.chat.accio.updated)+'）'):'')
       +'。分店明细：'+af.map(x=>escHtml(((FC_SHOPS.find(s=>s[0]===x.shop)||[x.shop,x.shop])[1]))+' '+x.m+'个月').join('、')+'</div>';
-    h+='<div class="fc-fileline">文件：'+escHtml(af.map(x=>x.n).join('、').slice(0,320))+'</div>';
+    g+='<div class="fc-fileline">文件：'+escHtml(af.map(x=>x.n).join('、').slice(0,320))+'</div>';
   }
-  h+='</div>';
+  g+='</div>';
   // ---------- 聊天解析（样品件数 / 大货款式数补充来源） ----------
   const cm=fc.chat.months||{}, cfiles=fc.chat.files||[];
-  h+='<div class="biz-panel"><h4>聊天解析（补充来源）<span class="tag">'+(cfiles.length?cfiles.length+' 个文件':'还没导入')+'</span>'
+  g+='<div class="biz-panel"><h4>聊天解析（补充来源）<span class="tag">'+(cfiles.length?cfiles.length+' 个文件':'还没导入')+'</span>'
     +'<span style="margin-left:auto;display:flex;gap:6px">'
     +'<button class="btn btn-sm" onclick="document.getElementById(\'fcChatFile\').click()">导入 / 追加聊天 CSV</button>'
     +(cfiles.length?'<button class="btn btn-sm" onclick="fcChatClear()">清空</button>':'')
     +'</span></h4>';
   if(!cfiles.length){
-    h+='<div class="fc-chatbox"><b>优先用上面「阿里后台订单明细」</b>，那是平台记的准确数。这块只在订单明细导不了时兜底：从聊天记录里<u>估算</u>件数 / 款式数。<br>'
+    g+='<div class="fc-chatbox"><b>优先用上面「阿里后台订单明细」</b>，那是平台记的准确数。这块只在订单明细导不了时兜底：从聊天记录里<u>估算</u>件数 / 款式数。<br>'
       +'⚠️ 聊天里的数量经常是 <b>MOQ 讨论</b>（例如「MOQ is 50 pcs」「50,000 pieces」），不是实际成交数，估算结果可能偏高。<br>'
       +'要用的话点上面按钮选后台导出的聊天记录（可多选，CSV / TXT）：按月扫描 <code>3 samples</code>、<code>5个样品</code>、<code>3 designs</code>、<code>2款</code> 这类数量，只存统计结果、<b>不存聊天原文</b>；同一买家同一天只算一次（取最大值）。</div>';
   } else {
     const mons=Object.keys(cm).sort().reverse();
     let tp=0, ts=0; mons.forEach(m=>{ tp+=(cm[m].pcs||0); ts+=(cm[m].styles||0); });
-    h+='<div class="fc-note">已解析 <b>'+mons.length+'</b> 个月 · 累计样品 <b>'+tp+'</b> 件 / 大货款式 <b>'+ts+'</b> 款'+(fc.chat.updated?('（更新于 '+escHtml(fc.chat.updated)+'）'):'')+'。</div>';
-    h+='<div class="biz-tbl-wrap"><table class="biz-tbl fc-tbl"><thead><tr><th>月份</th><th class="r">样品件数</th><th class="r">大货款式数</th><th class="r">朗格斯 件/款</th><th class="r">凡适 件/款</th></tr></thead><tbody>';
+    g+='<div class="fc-note">已解析 <b>'+mons.length+'</b> 个月 · 累计样品 <b>'+tp+'</b> 件 / 大货款式 <b>'+ts+'</b> 款'+(fc.chat.updated?('（更新于 '+escHtml(fc.chat.updated)+'）'):'')+'。</div>';
+    g+='<div class="biz-tbl-wrap"><table class="biz-tbl fc-tbl"><thead><tr><th>月份</th><th class="r">样品件数</th><th class="r">大货款式数</th><th class="r">朗格斯 件/款</th><th class="r">凡适 件/款</th></tr></thead><tbody>';
     mons.slice(0,24).forEach(m=>{
       const a=cm[m]||{}, lg=(a.byShop||{}).langges||{}, fs2=(a.byShop||{}).fansi||{};
-      h+='<tr><td>'+escHtml(fcMonthLabel(m))+'</td><td class="r">'+fcNum(a.pcs||0)+'</td><td class="r">'+fcNum(a.styles||0)+'</td>'
+      g+='<tr><td>'+escHtml(fcMonthLabel(m))+'</td><td class="r">'+fcNum(a.pcs||0)+'</td><td class="r">'+fcNum(a.styles||0)+'</td>'
         +'<td class="r">'+fcNum(lg.pcs||0)+' / '+fcNum(lg.styles||0)+'</td><td class="r">'+fcNum(fs2.pcs||0)+' / '+fcNum(fs2.styles||0)+'</td></tr>';
     });
-    h+='</tbody></table></div>';
-    h+='<div class="fc-fileline">来源文件：'+escHtml(cfiles.map(x=>x.n).join('、').slice(0,320))+'</div>';
-    h+='<div class="fc-note">聊天里没明说数量的月份就是<b>没有</b>：表格显示「—」，且不参与那条指标的预测 —— 不会拿金额倒推一个假数出来。</div>';
+    g+='</tbody></table></div>';
+    g+='<div class="fc-fileline">来源文件：'+escHtml(cfiles.map(x=>x.n).join('、').slice(0,320))+'</div>';
+    g+='<div class="fc-note">聊天里没明说数量的月份就是<b>没有</b>：表格显示「—」，且不参与那条指标的预测 —— 不会拿金额倒推一个假数出来。</div>';
   }
-  h+='</div>';
+  g+='</div>';
   // 说明
-  h+='<div class="biz-panel"><h4>怎么算的</h4><div class="fc-note">'
+  g+='<div class="biz-panel"><h4>怎么算的</h4><div class="fc-note">'
     +'· <b>样品 / 大货</b>：按单笔金额划线，≤ $'+fcNum(cfg.line)+' 记样品，&gt; $'+fcNum(cfg.line)+' 记大货（和经营分析、提成规则同一条线）。<br>'
     +'· <b>收款口径</b>：按放款月份统计，同一订单多笔收款只算一单；<b>下单口径</b>：按下单月份统计订单表（可能只保留近 90 天）。<br>'
     +'· <b>近3月平均</b>：最近 3 个月的算术平均，稳但不看趋势。<br>'
@@ -15363,7 +15531,7 @@ function renderFc(){
     +'<div style="margin-top:10px"><button class="btn btn-primary" onclick="fcOpenReport()">生成预测报告（含数据 + 说明 + 依据，可打印 / 转 PDF）</button>'
     +' <button class="btn" onclick="fcDownloadReport()">下载报告 HTML</button></div>'
     +'</div>';
-  box.innerHTML=h;
+  box.innerHTML=h+fcFoldHtml(g);
 }
 // ---------- 聊天记录 → 样品件数 / 大货款式数（v2.32 新增，唯一来源） ----------
 // 思路：聊天 CSV 动辄几十 MB，导入时即时扫描、只把「按月 × 分店铺」的数量存下来，不存原文。
@@ -15947,7 +16115,11 @@ function renderCurrentTab(){
   else if(currentTab==='hr') renderHr();
   else if(currentTab==='freight') renderFreight();
   else if(currentTab==='crm') renderCrm();
-  else if(currentTab==='forecast') renderFc();
+  else if(currentTab==='forecast'){
+    renderFc();
+    // v2.50：第一次进来就去问分析系统「实拉数据到哪儿了」，问完自己重画
+    if(!fcAct.tried && !fcAct.loading) fcActReload();
+  }
   else if(currentTab==='fabric') renderFab();
   else if(currentTab==='biz') bizEmbEnter();   // v2.49：内嵌面板懒加载 + 探活
 }
