@@ -1688,7 +1688,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         客户跟进台
       </div>
-      <p class="section-subtitle">把 <b>询盘 → 建客户 → 报价 → 打样 → 成交</b> 这段过程也管起来。已成交客户<b>自动</b>从「经营分析」已导入的收款流水生成（<b>零录入</b>），你只管补<b>跟进记录、阶段、下次跟进日</b>；该跟进的客户自动置顶标红，并出现在最上面「今天要处理」里。</p>
+      <p class="section-subtitle">把 <b>询盘 → 建客户 → 报价 → 打样 → 成交</b> 这段过程也管起来。已成交客户<b>自动</b>从<b>历史收款流水</b>（经营分析下线前导入的那批）生成（<b>零录入</b>），你只管补<b>跟进记录、阶段、下次跟进日</b>；该跟进的客户自动置顶标红，并出现在最上面「今天要处理」里。</p>
       <div id="crmContent"></div>
     </div>
 
@@ -3196,7 +3196,7 @@ function planAutoEff(month,project,seller){
 function planFetchActual(quiet){
   const map=planAutoMap();
   const keys=Object.keys(map);
-  if(!keys.length){ if(!quiet) showToast('经营分析里还没有收款流水。先到「经营分析」导入收款表（或阿里后台订单），再回来抓取'); return 0; }
+  if(!keys.length){ if(!quiet) showToast('没有可抓的收款流水。经营分析已改成独立系统、不再往这里收数据，这里只能抓经营分析下线前导入的那批历史流水'); return 0; }
   let touched=0, kept=0;
   keys.forEach(k=>{
     const seg=k.split('|');
@@ -16315,7 +16315,7 @@ function renderCrm(){
       +'</div></div>';
   }else{
     h+='<div class="crm-tbl-wrap" id="crmTableWrap">'+crmTableHtml(list)+'</div>';
-    h+='<div class="fc-note">「<b>自动</b>」= 来自经营分析的收款流水（名单实时生成，删不掉，只能隐藏）；「<b>手工</b>」= 你自己建的潜在客户。<br>'
+    h+='<div class="fc-note">「<b>自动</b>」= 历史收款流水里带出的成交客户（名单实时生成，删不掉，只能隐藏）；「<b>手工</b>」= 你自己建的潜在客户。<br>'
       +'「最近动静」取<b>最近一次跟进 / 收款 / 首次成交</b>里最晚的那个；超过 <b>'+crm.cfg.silentDays+'</b> 天没动静就标红。</div>';
   }
   h+='</div>';
