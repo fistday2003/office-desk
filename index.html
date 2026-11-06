@@ -1242,7 +1242,9 @@ body.hr-col-dragging,body.hr-col-dragging *{cursor:col-resize!important;user-sel
 .fr-xrow:hover{border-color:#cfe2f0;box-shadow:0 1px 4px rgba(51,102,153,.07)}
 .fr-xrow>.fr-tnode{padding:1px;gap:4px;min-width:0}
 /* 主文件夹图标放大（条目紧凑，靠图标本身当视觉锚点），名字也略加粗 */
-.fr-xrow>.fr-tnode>.fr-tic{font-size:17px;line-height:1.15}
+/* v2.57：图标再放大到 34px（原 17px 的 2 倍），行高按图标撑开，别让文字压到眼皮上 */
+.fr-xrow>.fr-tnode>.fr-tic{font-size:34px;line-height:1.05}
+.fr-xrow>.fr-tnode{gap:6px;padding:2px 1px}
 .fr-xrow>.fr-tnode>.fr-tnm{font-size:13px;font-weight:600}
 .fr-xrow>.fr-tkids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:2px 0 0;border-left:0;padding-left:0;align-items:start}
 /* 每一栏 = 顶部类别标签 + 下面竖排文件；三栏各自配色，窄栏里靠让文字自然折行保证文件名不被截断 */
@@ -1687,7 +1689,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.56 · 2026-11-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.57 · 2026-11-06</div>
     </div>
   </aside>
 
@@ -2768,7 +2770,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.56';
+const APP_VERSION = 'v2.57';
 let tasks = [];
 let notes = [];
 let projects = [];
