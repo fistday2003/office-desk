@@ -1468,6 +1468,72 @@ tr:hover .fr-fwd-acts{opacity:1}
   .crm-toolbar .btn{flex:1 1 auto;justify-content:center}
   .crm-frm{grid-template-columns:1fr}
 }
+
+/* ---------- v2.56 店铺巡检（新模块）---------- */
+/* 布局只有一条主线：汇总卡 → 两店对比 → 巡检记录表 → 必办台账。
+   全部零依赖、不引外链，颜色只走 :root 变量，和别的模块同一套观感。 */
+.isp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.isp-tools{display:flex;gap:8px;flex-wrap:wrap}
+.isp-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:8px 0 14px}
+.isp-card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--card-bg)}
+.isp-card .k{font-size:11.5px;color:var(--text-secondary);margin-bottom:5px}
+.isp-card .v{font-size:21px;font-weight:700;line-height:1.25;font-variant-numeric:tabular-nums;color:var(--text)}
+.isp-card .s{font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5}
+.isp-card.warn{border-color:#fecaca;background:var(--danger-light)}
+.isp-card.warn .v{color:#b91c1c}
+.isp-card.ok{border-color:#a7f3d0;background:var(--success-light)}
+.isp-card.ok .v{color:#047857}
+.isp-duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px;margin-bottom:14px}
+.isp-store{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--card-bg)}
+.isp-store-h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;margin-bottom:8px;flex-wrap:wrap}
+.isp-store-h small{font-weight:500;color:var(--text-muted);font-size:11px}
+.isp-kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.isp-kv>div{background:#f8fafc;border-radius:7px;padding:6px 8px;min-width:0}
+.isp-kv .kk{font-size:10.5px;color:var(--text-muted);white-space:nowrap}
+.isp-kv .vv{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.isp-kv .vv.bad{color:#b91c1c}
+.isp-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.isp-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.isp-tbl th{text-align:left;padding:8px;background:#f8fafc;color:var(--text-secondary);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.isp-tbl td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top}
+.isp-tbl tbody tr:hover{background:#f8fafc}
+.isp-tbl .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.isp-tbl .nw{white-space:nowrap}
+.isp-tbl .txt{min-width:180px;line-height:1.55}
+.isp-pri{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap}
+.isp-pri.p0{background:#fee2e2;color:#b91c1c}
+.isp-pri.p1{background:#fef3c7;color:#92400e}
+.isp-pri.p2{background:#e0f2fe;color:#075985}
+.isp-dim{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;background:#f1f5f9;color:#475569;white-space:nowrap}
+.isp-st{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:11px;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.isp-st.todo{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.isp-st.doing{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.isp-st.done{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.isp-st.missed{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.isp-smp{font-size:10px;padding:1px 5px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:600;white-space:nowrap}
+.isp-sec{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:16px 0 8px;flex-wrap:wrap}
+.isp-sec h3{font-size:14px;font-weight:700}
+.isp-sec h3 small{font-weight:500;font-size:11.5px;color:var(--text-muted);margin-left:6px}
+.isp-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.isp-filters select,.isp-filters input{font-family:inherit;font-size:12.5px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--text);width:auto;min-height:32px}
+.isp-filters select{min-width:104px;max-width:170px}
+.isp-filters input{width:170px;min-height:32px}
+.isp-note{font-size:11.5px;color:var(--text-secondary);line-height:1.75;background:#f8fafc;border-left:3px solid var(--border);border-radius:0 6px 6px 0;padding:9px 11px;margin-top:16px}
+.isp-note b{color:var(--text)}
+.isp-empty{text-align:center;padding:22px 12px;color:var(--text-secondary);border:1px dashed var(--border);border-radius:10px;background:#fcfdff}
+.isp-empty h4{font-size:15px;margin-bottom:6px;color:var(--text)}
+.isp-empty p{font-size:12.5px;line-height:1.8;margin:0 auto 12px;max-width:560px}
+.isp-empty .isp-tools{justify-content:center}
+.isp-smpbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:7px 10px;margin-bottom:10px}
+.isp-acts{display:flex;gap:6px;white-space:nowrap}
+.isp-mini{font-size:11.5px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-secondary);cursor:pointer}
+.isp-mini:hover{border-color:var(--primary);color:var(--primary)}
+.isp-mini.del:hover{border-color:#fecaca;color:#b91c1c}
+@media (max-width:768px){
+  .isp-kv{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .isp-tools .btn{flex:1 1 auto;justify-content:center}
+  .isp-filters input{width:100%}
+}
 </style>
 </head>
 <body>
@@ -1587,6 +1653,11 @@ tr:hover .fr-fwd-acts{opacity:1}
         客户跟进
         <span class="nav-badge" id="crmBadge" style="display:none">0</span>
       </button>
+      <button class="nav-item" data-tab="inspect" title="两店（朗格斯 / 凡适）逐日巡检台账：未回预警 / 高潜商机 / 风险合规 / 话术质检">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="7"/><path d="M20 20l-4.6-4.6"/><path d="M7.6 10.6l2 2 3.6-3.6"/></svg>
+        店铺巡检
+        <span class="nav-badge" id="inspBadge" style="display:none">0</span>
+      </button>
       <button class="nav-item" data-tab="review">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         每周复盘
@@ -1616,7 +1687,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.55 · 2026-11-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.56 · 2026-11-06</div>
     </div>
   </aside>
 
@@ -1760,6 +1831,26 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div id="crmContent"></div>
     </div>
 
+    <!-- TAB: 店铺巡检（v2.56 新增模块） -->
+    <div class="tab-panel" id="tab-inspect">
+      <div class="isp-head">
+        <div>
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="7"/><path d="M20 20l-4.6-4.6"/><path d="M7.6 10.6l2 2 3.6-3.6"/></svg>
+            店铺巡检
+          </div>
+          <p class="section-subtitle">朗格斯 / 凡适两店的<b>逐日巡检台账</b>：每天记一次取数结果（会话 / 消息 / 待回 / 未读），把巡检发现的<b>必办事项</b>按 P0 / P1 / P2 落成待跟踪的条子，谁负责、卡在哪、兑现没有，一屏看完。「取数 + 诊断」由<b>巡检技能包</b>跑（Accio 直连，30~60 秒一店），这里只负责<b>留档、分派、跟兑现</b>，不重复取数。</p>
+        </div>
+        <div class="isp-tools">
+          <button class="btn btn-primary btn-sm" onclick="inspOpenRun()">＋ 记一次巡检</button>
+          <button class="btn btn-ghost btn-sm" onclick="inspOpenTodo()">＋ 新建必办</button>
+          <button class="btn btn-ghost btn-sm" onclick="inspCopyText()" title="按技能包的「可直接复制发群」格式生成纯文本">复制必办发群</button>
+          <button class="btn btn-ghost btn-sm" onclick="inspExportCsv()">导出 CSV</button>
+        </div>
+      </div>
+      <div id="inspectContent"></div>
+    </div>
+
     <!-- TAB: 面料库（v2.42） -->
     <div class="tab-panel" id="tab-fabric">
       <div class="section-title">
@@ -1830,6 +1921,10 @@ tr:hover .fr-fwd-acts{opacity:1}
   <button class="mnav-item" data-mtab="crm">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     客户
+  </button>
+  <button class="mnav-item" data-mtab="inspect">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="7"/><path d="M20 20l-4.6-4.6"/><path d="M7.6 10.6l2 2 3.6-3.6"/></svg>
+    巡检
   </button>
   <button class="mnav-item" data-mtab="review">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
@@ -2064,6 +2159,66 @@ tr:hover .fr-fwd-acts{opacity:1}
     </div>
   </div>
 </div>
+
+<!-- ====== MODAL: 记一次巡检（店铺巡检 v2.56）====== -->
+<div class="modal-overlay" id="modalInspRun" style="display:none">
+  <div class="modal" style="width:min(620px,95vw)">
+    <h3 id="modalInspRunTitle">记一次巡检</h3>
+    <p style="font-size:12.5px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">把技能包跑出来的那组数字抄进来（成功标志里的三个数字：<b>verified / failures / warnings</b> 和 <b>会话 N 条 / 消息 M 条</b>）。同一家店同一天已有记录时，保存会<b>覆盖</b>那天的数字，不会多出一条。</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 150px"><label>数据日期</label><input type="date" id="insRunDate"></div>
+      <div class="form-group" style="flex:1 1 150px"><label>店铺</label><select id="insRunStore"><option value="lignes">朗格斯 Lignes</option><option value="fansi">凡适 Fanshi</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 120px"><label>会话数</label><input type="number" id="insRunSessions" min="0" placeholder="如 120"></div>
+      <div class="form-group" style="flex:1 1 120px"><label>消息数</label><input type="number" id="insRunMsgs" min="0" placeholder="如 1300"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 120px"><label>待回会话（买家最后发言）</label><input type="number" id="insRunPending" min="0" placeholder="0"></div>
+      <div class="form-group" style="flex:1 1 120px"><label>未读条数</label><input type="number" id="insRunUnread" min="0" placeholder="0"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 200px"><label>数据完整性</label><select id="insRunPartial"><option value="0">verified · 0 失败 0 警告</option><option value="1">partial · 有失败/警告</option></select></div>
+      <div class="form-group" style="flex:1 1 150px"><label>失败 / 警告</label><div style="display:flex;gap:6px"><input type="number" id="insRunFail" min="0" placeholder="失败" style="width:50%"><input type="number" id="insRunWarn" min="0" placeholder="警告" style="width:50%"></div></div>
+    </div>
+    <div class="form-group"><label>备注（结论一句话 / 异常情况，可留空）</label><textarea id="insRunNote" rows="2" placeholder="如：凡适有 1 个账号取数失败，已重跑一次正常"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalInspRun')">取消</button>
+      <button class="btn btn-primary" onclick="inspSaveRun()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: 必办事项（店铺巡检 v2.56）====== -->
+<div class="modal-overlay" id="modalInspTodo" style="display:none">
+  <div class="modal" style="width:min(660px,95vw)">
+    <h3 id="modalInspTodoTitle">新建必办</h3>
+    <p style="font-size:12.5px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">按巡检口径写：<b>谁 + 对谁 + 做什么 + 什么时候</b>。责任人一律填<b>实名</b>（对应会话归属的业务员），拍板的事写「李主任」，流程的事写「运营」。</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 130px"><label>数据日期</label><input type="date" id="insTdDate"></div>
+      <div class="form-group" style="flex:1 1 120px"><label>店铺</label><select id="insTdStore"><option value="lignes">朗格斯</option><option value="fansi">凡适</option><option value="both">两店 / 不限</option></select></div>
+      <div class="form-group" style="flex:1 1 110px"><label>优先级</label><select id="insTdPri"><option value="P0">P0 · 上午（12:00 前）</option><option value="P1" selected>P1 · 今天（18:00 前）</option><option value="P2">P2 · 本周（3 个工作日）</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 150px"><label>维度</label><select id="insTdDim"></select></div>
+      <div class="form-group" style="flex:1 1 150px"><label>责任人（实名）</label><input type="text" id="insTdOwner" list="insOwnerList" placeholder="如 Alyssa Lignes"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1 1 160px"><label>客户 / 对象</label><input type="text" id="insTdCustomer" placeholder="客户名，或「全店」「团队」"></div>
+      <div class="form-group" style="flex:1 1 130px"><label>期限</label><input type="date" id="insTdDue"></div>
+    </div>
+    <div class="form-group"><label>要做什么（一句能照着做的话）</label><textarea id="insTdText" rows="2" placeholder="如：先发 Erika 的付款链接，她已说「我马上付」"></textarea></div>
+    <div class="form-group"><label>依据（客户原话 / 硬事实）</label><textarea id="insTdBasis" rows="2" placeholder="如：11/05 14:20 买家：「I will pay today」"></textarea></div>
+    <div class="form-group"><label>状态</label><select id="insTdStatus"><option value="todo">待办</option><option value="doing">进行中</option><option value="done">已兑现</option><option value="missed">未见兑现</option></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalInspTodo')">取消</button>
+      <button class="btn btn-primary" onclick="inspSaveTodo()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 巡检责任人候选（放在弹窗外面：datalist 在 display:none 的容器里会失效） -->
+<datalist id="insOwnerList"></datalist>
 
 <!-- ====== MODAL: 外贸运费账单 ====== -->
 <div class="modal-overlay" id="modalFreightBill" style="display:none">
@@ -2613,7 +2768,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.55';
+const APP_VERSION = 'v2.56';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -2700,6 +2855,11 @@ function loadData(){
   if(_crmr && typeof _crmr==='object' && !Array.isArray(_crmr)) crm = Object.assign(crmBlank(), _crmr);
   else crm = crmBlank();
   crmHeal();
+  // 店铺巡检（v2.56）
+  const _isp = rdStore('inspect', null);
+  if(_isp && typeof _isp==='object' && !Array.isArray(_isp)) insp = Object.assign(ispBlank(), _isp);
+  else insp = ispBlank();
+  ispHeal();
   // 面料库
   const _fb = rdStore('fabric', null);
   if(_fb && typeof _fb==='object' && !Array.isArray(_fb)) fab = Object.assign(fabBlank(), _fb);
@@ -2898,6 +3058,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'forecast',JSON.stringify(fc));
       localStorage.setItem(STORAGE_PREFIX+'crm',JSON.stringify(crm));
       localStorage.setItem(STORAGE_PREFIX+'fabric',JSON.stringify(fab));
+      localStorage.setItem(STORAGE_PREFIX+'inspect',JSON.stringify(insp));
     }catch(e){
       // 即使剥离附件元数据仍写不下：再退一步，连 files 也清空，保证文字记录绝不丢
       try{
@@ -2917,6 +3078,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'forecast',JSON.stringify(fc));
         localStorage.setItem(STORAGE_PREFIX+'crm',JSON.stringify(crm));
         localStorage.setItem(STORAGE_PREFIX+'fabric',JSON.stringify(fab));
+        localStorage.setItem(STORAGE_PREFIX+'inspect',JSON.stringify(insp));
         showToast('⚠️ 本地空间严重不足，已保留文字但部分附件未保存，请尽快导出备份', 'warning');
       }catch(e2){ showToast('⚠️ 本地存储写入失败，请导出备份到百度盘', 'warning'); }
     }
@@ -2966,7 +3128,7 @@ function totalItems(){return tasks.length + notes.length + projects.length + das
 
 // Check if sample data exists
 function hasSampleData(){
-  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample() || fabHasSample() || expProjHasSample();
+  return tasks.some(t=>t._sample) || notes.some(n=>n._sample) || projects.some(p=>p._sample) || dashboard.some(d=>d._sample) || plan.some(p=>p._sample) || expenses.some(e=>e._sample) || claims.some(c=>c._sample) || crmHasSample() || fabHasSample() || expProjHasSample() || ispHasSample();
 }
 
 // Clear sample data
@@ -2983,6 +3145,8 @@ function clearSampleData(){
   expProjClearSample();
   // 面料库的示例是给李主任当底稿改的：改过的（_touched）不清，只清没动过的
   fabClearSample();
+  // 店铺巡检（v2.56）：只摘 _sample 条目，真实台账一条不碰
+  inspClearSampleSilent();
   saveAll();
 }
 
@@ -6984,6 +7148,16 @@ function applyIncoming(data, label){
     stat.newFromIncoming += _rp.incomingNew;
   }
   arr('claims','claim', ()=>claims, v=>{claims=v;});
+  // 店铺巡检（v2.56）：巡检记录按「日期+店铺」唯一，必办按 id，只增不减
+  if(data && data.inspect && typeof data.inspect === 'object'){
+    const li = insp || ispBlank(), ii = data.inspect;
+    const rr = syncMergeById(li.runs||[], ii.runs||[], 'isprun');
+    const tr = syncMergeById(li.todos||[], ii.todos||[], 'isptodo');
+    insp.runs = rr.list; insp.todos = tr.list;
+    stat.kept += rr.keepLocal + tr.keepLocal;
+    stat.newFromIncoming += rr.incomingNew + tr.incomingNew;
+    ispHeal();
+  }
   // 人事：员工 / 候选人 各自按 id 合并（只增不减）；面试人员名单与评价维度按 map 合并
   if(data && data.hr && typeof data.hr === 'object'){
     const lh = hr || hrBlank(), ih = data.hr;
@@ -7107,12 +7281,13 @@ function asSnapshot(){
             crmRecs:Object.keys(crm.recs||{}).length, crmFollows:(crm.follows||[]).length,
             fabFabrics:((fab&&fab.fabrics)||[]).length, fabSuppliers:((fab&&fab.suppliers)||[]).length,
             expProjects:(expProjects||[]).length,
+            inspRuns:(insp&&insp.runs?insp.runs.length:0), inspTodos:(insp&&insp.todos?insp.todos.length:0),
             attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
     dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), expProjects:expProjects, claims:light(claims), hr:hr, freight:frSyncLight(),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded},
-    forecast:fc, crm:crm, fabric:fab
+    forecast:fc, crm:crm, fabric:fab, inspect:insp
   };
   try{
     const seen={n:0};
@@ -16163,6 +16338,7 @@ function renderCurrentTab(){
   }
   else if(currentTab==='fabric') renderFab();
   else if(currentTab==='biz') bizEmbEnter();   // v2.49：内嵌面板懒加载 + 探活
+  else if(currentTab==='inspect') renderInspect();   // v2.56：店铺巡检台账
 }
 
 function refreshAll(){
@@ -16176,6 +16352,7 @@ function refreshAll(){
   frBadge();
   crmBadge();
   fabBadge();
+  inspBadge();
 }
 
 function updateClearDemoBtn(){
@@ -18906,6 +19083,591 @@ function init(){
     // 运费：取回上次授权过的「保存到本地」目录句柄（界面显示当前保存位置 + 免二次选择）
     frDirRecall().then(()=>{ if(frDirHandleMem) renderFreight(); }).catch(()=>{});
   });
+}
+
+// ============================================================
+//  店铺巡检（v2.56 新增模块）
+//  数据键 inspect = {runs:[], todos:[], cfg:{}}
+//  职责边界：这里只做「留档 / 分派 / 跟兑现」。取数与四维诊断由巡检技能包
+//  （alibaba-store-inspection）跑，本模块不取数、不造数、不推算业务指标。
+// ============================================================
+const ISP_STORES = [['lignes','朗格斯 Lignes'],['fansi','凡适 Fanshi']];
+const ISP_STORE_NAME = {lignes:'朗格斯', fansi:'凡适', both:'两店'};
+const ISP_PRI = [['P0','P0 上午'],['P1','P1 今天'],['P2','P2 本周']];
+const ISP_PRI_HINT = {P0:'12:00 前必须动', P1:'18:00 前完成', P2:'3 个工作日内'};
+const ISP_DIMS = ['未回预警','高潜商机','风险合规','话术质检','数据完整性','其他'];
+const ISP_STATUS = [['todo','待办'],['doing','进行中'],['done','已兑现'],['missed','未见兑现']];
+const ISP_STATUS_NEXT = {todo:'doing', doing:'done', done:'todo', missed:'doing'};
+
+function ispBlank(){ return {runs:[], todos:[], cfg:{}}; }
+let insp = ispBlank();
+let ispRunEdit = null;      // 正在编辑的巡检记录 id
+let ispTodoEdit = null;     // 正在编辑的必办 id
+let ispRunFlt  = {store:'', month:''};
+let ispTodoFlt = {scope:'open', pri:'', store:'', q:''};
+
+function ispStoreName(k){ return ISP_STORE_NAME[k] || k || '—'; }
+function ispPriLabel(k){ const f=ISP_PRI.find(x=>x[0]===k); return f?f[1]:k; }
+function ispStatusLabel(k){ const f=ISP_STATUS.find(x=>x[0]===k); return f?f[1]:k; }
+function ispNum(v){ const n=Number(v); return (isFinite(n) && n>0) ? Math.round(n) : 0; }
+function ispIsDate(s){ return /^\d{4}-\d{2}-\d{2}$/.test(String(s||'')); }
+function ispDayDiff(d){
+  if(!ispIsDate(d)) return null;
+  const a=new Date(d+'T00:00:00'), b=new Date(todayStr()+'T00:00:00');
+  return Math.round((b-a)/86400000);
+}
+// 文字里出现「年-月-日」以外的格式一律不猜；相对天数只说人话
+function ispAgoText(d){
+  const n=ispDayDiff(d);
+  if(n===null) return '';
+  if(n===0) return '今天';
+  if(n===1) return '昨天';
+  if(n<0) return Math.abs(n)+' 天后';
+  return n+' 天前';
+}
+
+// 载入后统一归一化：坏字段只补这一项，绝不整块重置（历史记录不丢）
+function ispHeal(){
+  if(!insp || typeof insp!=='object' || Array.isArray(insp)) insp = ispBlank();
+  if(!Array.isArray(insp.runs))  insp.runs  = [];
+  if(!Array.isArray(insp.todos)) insp.todos = [];
+  if(!insp.cfg || typeof insp.cfg!=='object' || Array.isArray(insp.cfg)) insp.cfg = {};
+
+  insp.runs = insp.runs.filter(r=>r && typeof r==='object').map(r=>{
+    const o = Object.assign({}, r);
+    o.id = o.id || uid();
+    o.date = ispIsDate(o.date) ? o.date : todayStr();
+    o.store = (o.store==='fansi') ? 'fansi' : 'lignes';
+    o.sessions = ispNum(o.sessions); o.msgs = ispNum(o.msgs);
+    o.pending  = ispNum(o.pending);  o.unread = ispNum(o.unread);
+    o.fail     = ispNum(o.fail);     o.warn   = ispNum(o.warn);
+    o.partial  = o.partial ? 1 : 0;
+    o.note     = String(o.note||'');
+    o.createdAt = String(o.createdAt || (o.date+' 00:00:00'));
+    o._sample = !!o._sample;
+    return o;
+  });
+  // 同一天同一家店只保留一条：后写的赢（弹窗里也提示过「保存会覆盖当天数字」）
+  const runSeen = {}, runKeep = [];
+  insp.runs.forEach(r=>{
+    const k = r.date+'|'+r.store;
+    if(runSeen[k]===undefined){ runSeen[k]=runKeep.length; runKeep.push(r); }
+    else runKeep[runSeen[k]] = r;
+  });
+  insp.runs = runKeep;
+
+  insp.todos = insp.todos.filter(t=>t && typeof t==='object').map(t=>{
+    const o = Object.assign({}, t);
+    o.id = o.id || uid();
+    o.date = ispIsDate(o.date) ? o.date : todayStr();
+    o.store = (o.store==='fansi'||o.store==='both') ? o.store : 'lignes';
+    o.pri = ISP_PRI.some(p=>p[0]===o.pri) ? o.pri : 'P1';
+    o.dim = (ISP_DIMS.indexOf(o.dim)>=0) ? o.dim : '未回预警';
+    o.status = ISP_STATUS.some(s=>s[0]===o.status) ? o.status : 'todo';
+    o.owner = String(o.owner||''); o.customer = String(o.customer||'');
+    o.text = String(o.text||'');   o.basis = String(o.basis||'');
+    o.due = ispIsDate(o.due) ? o.due : '';
+    o.doneAt = o.doneAt || '';
+    o.createdAt = String(o.createdAt || Date.now());
+    o._sample = !!o._sample;
+    return o;
+  }).filter(t=>t.text || t.owner);   // 完全空白的脏条目直接丢
+}
+
+// ---------- 取数（全部只读，不改 insp） ----------
+function ispRunsSorted(){
+  return insp.runs.slice().sort((a,b)=>{
+    if(a.date!==b.date) return a.date<b.date ? 1 : -1;      // 新的在上
+    return (b.createdAt||'').localeCompare(a.createdAt||'');
+  });
+}
+function ispLatestRun(store){
+  const list = ispRunsSorted().filter(r=>!store || r.store===store);
+  return list.length ? list[0] : null;
+}
+function ispPrevRun(store, before){
+  const list = ispRunsSorted().filter(r=>r.store===store && r.date<before);
+  return list.length ? list[0] : null;
+}
+function ispOpenTodos(){
+  return insp.todos.filter(t=>t.status==='todo'||t.status==='doing');
+}
+function ispOverdue(t){
+  if(t.status==='done'||t.status==='missed') return false;
+  if(!t.due) return false;
+  return t.due < todayStr();
+}
+// 侧栏红点：只提醒「P0 未结 + 已超期」这两类真正要命的，不报大数
+function ispAlertCount(){
+  let n=0;
+  ispOpenTodos().forEach(t=>{ if(t.pri==='P0' || ispOverdue(t)) n++; });
+  return n;
+}
+function inspBadge(){
+  const el=document.getElementById('inspBadge');
+  if(!el) return;
+  let n=0;
+  try{ n=ispAlertCount(); }catch(e){ n=0; }
+  el.textContent=n;
+  el.style.display = n>0 ? '' : 'none';
+}
+function ispHasSample(){
+  try{ return insp.runs.some(r=>r._sample) || insp.todos.some(t=>t._sample); }catch(e){ return false; }
+}
+
+// ---------- 渲染 ----------
+function renderInspect(){
+  const box=document.getElementById('inspectContent');
+  if(!box) return;
+  if(!insp || !Array.isArray(insp.runs)) ispHeal();
+  const latestL = ispLatestRun('lignes'), latestF = ispLatestRun('fansi');
+  const hasRun = insp.runs.length>0, hasTodo = insp.todos.length>0;
+
+  let h='';
+
+  if(!hasRun && !hasTodo){
+    h += '<div class="isp-empty">'
+      + '<h4>还没有巡检记录</h4>'
+      + '<p>这个模块只干三件事：<b>把每天取到的数留档</b>、<b>把巡检发现的必办派到人</b>、<b>盯到兑现为止</b>。<br>'
+      + '每次巡检先用巡检技能包跑一遍（两店各 30~60 秒，输出会话 / 消息 / 待回 / 未读和四维问题），再把数字抄进来。</p>'
+      + '<div class="isp-tools">'
+      + '<button class="btn btn-primary btn-sm" onclick="inspOpenRun()">＋ 记第一次巡检</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="inspOpenTodo()">＋ 新建必办</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="inspLoadSample()">先载入一条示例看看</button>'
+      + '</div></div>';
+    h += ispNoteHtml();
+    box.innerHTML = h;
+    ispFillOwnerList();
+    return;
+  }
+
+  // ① 汇总卡
+  const lr = ispLatestRun();
+  const lL = latestL, lF = latestF;
+  const pendSum = (lL?lL.pending:0) + (lF?lF.pending:0);
+  const unreadSum = (lL?lL.unread:0) + (lF?lF.unread:0);
+  const open = ispOpenTodos();
+  const p0n = open.filter(t=>t.pri==='P0').length;
+  const od  = open.filter(t=>ispOverdue(t)).length;
+  const worst = [lL,lF].filter(Boolean).sort((a,b)=> (b.fail+b.warn)-(a.fail+a.warn));
+  const partialN = [lL,lF].filter(x=>x&&x.partial).length;
+
+  h += '<div class="isp-cards">';
+  h += '<div class="isp-card"><div class="k">最近一次巡检</div><div class="v">'+(lr?fmtDate(lr.date):'—')+'</div>'
+     + '<div class="s">'+(lr?ispAgoText(lr.date)+' · 共 '+insp.runs.length+' 次记录':'还没记过')+'</div></div>';
+  h += '<div class="isp-card'+(pendSum>0?' warn':' ok')+'"><div class="k">待回会话（买家最后发言）</div><div class="v">'+pendSum+'</div>'
+     + '<div class="s">朗格斯 '+(lL?lL.pending:'—')+' · 凡适 '+(lF?lF.pending:'—')+'</div></div>';
+  h += '<div class="isp-card"><div class="k">未读条数</div><div class="v">'+unreadSum+'</div>'
+     + '<div class="s">未读 0 ≠ 无待办，仍以「待回」为准</div></div>';
+  h += '<div class="isp-card'+(open.length?' warn':' ok')+'"><div class="k">未结必办</div><div class="v">'+open.length+'</div>'
+     + '<div class="s">P0 '+p0n+' 条 · 已超期 '+od+' 条</div></div>';
+  h += '<div class="isp-card'+(partialN?' warn':' ok')+'"><div class="k">数据完整性</div><div class="v">'+(partialN?('partial '+partialN):'verified')+'</div>'
+     + '<div class="s">'+(worst.length?('失败 '+worst[0].fail+' · 警告 '+worst[0].warn):'—')+'</div></div>';
+  h += '</div>';
+
+  // ② 两店对比
+  h += '<div class="isp-duo">';
+  ['lignes','fansi'].forEach(k=>{
+    const cur = (k==='lignes')?lL:lF;
+    h += '<div class="isp-store"><div class="isp-store-h">📁 '+ispStoreName(k)
+       + (cur?('<small>'+fmtDateFull(cur.date)+' · '+ispAgoText(cur.date)+'</small>'):'<small>还没有记录</small>')
+       + (cur&&cur.partial?' <span class="isp-pri p1">partial</span>':'')
+       + (cur&&cur._sample?' <span class="isp-smp">示例</span>':'')
+       + '</div>';
+    if(!cur){
+      h += '<div style="font-size:12.5px;color:var(--text-muted);line-height:1.8">还没记过这家店。<button class="isp-mini" onclick="inspOpenRun(null,\''+k+'\')">记一次</button></div>';
+    }else{
+      const pv = ispPrevRun(k, cur.date);
+      // badWhenUp：待回 / 未读涨了才是坏事（红）；会话 / 消息涨了是好事，只给中性灰
+      const d = (now, prev, badWhenUp)=> {
+        if(!pv) return '';
+        const diff = now - prev;
+        if(!diff) return ' <span style="color:var(--text-muted);font-size:10.5px">持平</span>';
+        const col = badWhenUp ? (diff>0?'#b91c1c':'#047857') : '#64748b';
+        return ' <span style="font-size:10.5px;color:'+col+'">'+(diff>0?'↑':'↓')+Math.abs(diff)+'</span>';
+      };
+      h += '<div class="isp-kv">'
+        + '<div><div class="kk">会话</div><div class="vv">'+cur.sessions+d(cur.sessions, pv?pv.sessions:0,false)+'</div></div>'
+        + '<div><div class="kk">消息</div><div class="vv">'+cur.msgs+d(cur.msgs, pv?pv.msgs:0,false)+'</div></div>'
+        + '<div><div class="kk">待回</div><div class="vv'+(cur.pending>0?' bad':'')+'">'+cur.pending+d(cur.pending, pv?pv.pending:0,true)+'</div></div>'
+        + '<div><div class="kk">未读</div><div class="vv'+(cur.unread>0?' bad':'')+'">'+cur.unread+d(cur.unread, pv?pv.unread:0,true)+'</div></div>'
+        + '</div>';
+      if(cur.note) h += '<div style="font-size:11.5px;color:var(--text-secondary);margin-top:7px;line-height:1.65">'+escHtml(cur.note)+'</div>';
+    }
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // ③ 巡检记录
+  h += '<div class="isp-sec"><h3>巡检记录 <small>同一家店同一天只留一条，重复保存会覆盖当天数字</small></h3>';
+  h += '<div class="isp-filters">';
+  h += '<select onchange="ispRunFlt.store=this.value;renderInspect()">'
+     + '<option value="">全部店铺</option>'
+     + ISP_STORES.map(s=>'<option value="'+s[0]+'"'+(ispRunFlt.store===s[0]?' selected':'')+'>'+s[1]+'</option>').join('')
+     + '</select>';
+  const months = Array.from(new Set(insp.runs.map(r=>r.date.slice(0,7)))).sort().reverse();
+  h += '<select onchange="ispRunFlt.month=this.value;renderInspect()"><option value="">全部月份</option>'
+     + months.map(m=>'<option value="'+m+'"'+(ispRunFlt.month===m?' selected':'')+'>'+m.replace('-',' 年 ')+' 月</option>').join('')
+     + '</select>';
+  h += '</div></div>';
+
+  let rl = ispRunsSorted();
+  if(ispRunFlt.store) rl = rl.filter(r=>r.store===ispRunFlt.store);
+  if(ispRunFlt.month) rl = rl.filter(r=>r.date.slice(0,7)===ispRunFlt.month);
+  if(!rl.length){
+    h += '<div class="isp-empty" style="padding:16px"><p style="margin:0">当前筛选下没有记录。</p></div>';
+  }else{
+    h += '<div class="isp-tbl-wrap"><table class="isp-tbl" id="ispRunTbl"><thead><tr>'
+       + '<th>数据日期</th><th>店铺</th><th class="r">会话</th><th class="r">消息</th><th class="r">待回</th><th class="r">未读</th>'
+       + '<th>完整性</th><th>备注</th><th></th></tr></thead><tbody>';
+    rl.forEach(r=>{
+      h += '<tr>'
+        + '<td class="nw">'+fmtDateFull(r.date)+(r._sample?' <span class="isp-smp">示例</span>':'')+'</td>'
+        + '<td class="nw">'+ispStoreName(r.store)+'</td>'
+        + '<td class="r">'+r.sessions+'</td><td class="r">'+r.msgs+'</td>'
+        + '<td class="r"'+(r.pending>0?' style="color:#b91c1c;font-weight:700"':'')+'>'+r.pending+'</td>'
+        + '<td class="r"'+(r.unread>0?' style="color:#b91c1c;font-weight:700"':'')+'>'+r.unread+'</td>'
+        + '<td class="nw">'+(r.partial
+            ? '<span class="isp-pri p1">失败 '+r.fail+' / 警告 '+r.warn+'</span>'
+            : '<span class="isp-pri p2">verified</span>')+'</td>'
+        + '<td class="txt">'+(r.note?escHtml(r.note):'<span style="color:var(--text-muted)">—</span>')+'</td>'
+        + '<td class="nw"><div class="isp-acts">'
+        + '<button class="isp-mini" onclick="inspOpenRun(\''+r.id+'\')">改</button>'
+        + '<button class="isp-mini del" onclick="inspDelRun(\''+r.id+'\')">删</button>'
+        + '</div></td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+
+  // ④ 必办台账
+  const tOpen = ispOpenTodos().length;
+  h += '<div class="isp-sec"><h3>今日必办 <small>谁 + 对谁 + 做什么 + 什么时候；责任人一律实名</small>'
+     + (tOpen?'<span class="isp-pri p0" style="margin-left:8px">未结 '+tOpen+'</span>':'')+'</h3>';
+  h += '<div class="isp-filters">';
+  h += '<select onchange="ispTodoFlt.scope=this.value;renderInspect()">'
+     + [['open','只看未结'],['all','全部'],['done','已兑现'],['missed','未见兑现']]
+        .map(o=>'<option value="'+o[0]+'"'+(ispTodoFlt.scope===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')
+     + '</select>';
+  h += '<select onchange="ispTodoFlt.pri=this.value;renderInspect()"><option value="">全部优先级</option>'
+     + ISP_PRI.map(p=>'<option value="'+p[0]+'"'+(ispTodoFlt.pri===p[0]?' selected':'')+'>'+p[1]+'</option>').join('')
+     + '</select>';
+  h += '<select onchange="ispTodoFlt.store=this.value;renderInspect()"><option value="">全部店铺</option>'
+     + ISP_STORES.map(s=>'<option value="'+s[0]+'"'+(ispTodoFlt.store===s[0]?' selected':'')+'>'+s[1]+'</option>').join('')
+     + '</select>';
+  h += '<input type="text" placeholder="搜责任人 / 客户 / 内容" value="'+escHtml(ispTodoFlt.q)+'" oninput="ispTodoFlt.q=this.value;renderInspect()">';
+  h += '</div></div>';
+
+  let tl = insp.todos.slice();
+  if(ispTodoFlt.scope==='open')   tl = tl.filter(t=>t.status==='todo'||t.status==='doing');
+  else if(ispTodoFlt.scope==='done')   tl = tl.filter(t=>t.status==='done');
+  else if(ispTodoFlt.scope==='missed') tl = tl.filter(t=>t.status==='missed');
+  if(ispTodoFlt.pri)   tl = tl.filter(t=>t.pri===ispTodoFlt.pri);
+  if(ispTodoFlt.store) tl = tl.filter(t=>t.store===ispTodoFlt.store || t.store==='both');
+  const q = ispTodoFlt.q.trim().toLowerCase();
+  if(q) tl = tl.filter(t=>(t.owner+' '+t.customer+' '+t.text+' '+t.basis).toLowerCase().indexOf(q)>=0);
+  // 排序：P0 → P1 → P2，同优先级里期限早的在前，没期限的往后
+  const priRank = {P0:0,P1:1,P2:2};
+  tl.sort((a,b)=>{
+    if(priRank[a.pri]!==priRank[b.pri]) return priRank[a.pri]-priRank[b.pri];
+    const ad=a.due||'9999-12-31', bd=b.due||'9999-12-31';
+    if(ad!==bd) return ad<bd?-1:1;
+    return (a.createdAt||'')<(b.createdAt||'')?-1:1;
+  });
+
+  if(!tl.length){
+    h += '<div class="isp-empty" style="padding:18px"><p style="margin:0 0 10px">'+(insp.todos.length?'当前筛选下没有必办。':'还没有必办事项。巡检发现的问题不落成条子，下次巡检大概率还是同一个问题。')+'</p>'
+       + '<div class="isp-tools"><button class="btn btn-ghost btn-sm" onclick="inspOpenTodo()">＋ 新建必办</button></div></div>';
+  }else{
+    h += '<div class="isp-tbl-wrap"><table class="isp-tbl" id="ispTodoTbl"><thead><tr>'
+       + '<th>优先级</th><th>期限</th><th>店铺</th><th>维度</th><th>要做什么</th><th>依据</th>'
+       + '<th>责任人</th><th>客户</th><th>状态</th><th></th></tr></thead><tbody>';
+    tl.forEach(t=>{
+      const od = ispOverdue(t);
+      h += '<tr>'
+        + '<td class="nw"><span class="isp-pri '+t.pri.toLowerCase()+'">'+t.pri+'</span>'
+        +   (t._sample?' <span class="isp-smp">示例</span>':'')+'</td>'
+        + '<td class="nw"'+(od?' style="color:#b91c1c;font-weight:700"':'')+'>'+(t.due?fmtDate(t.due):'—')
+        +   (od?'<br><span style="font-size:10.5px">已超期</span>':'')+'</td>'
+        + '<td class="nw">'+ispStoreName(t.store)+'</td>'
+        + '<td class="nw"><span class="isp-dim">'+escHtml(t.dim)+'</span></td>'
+        + '<td class="txt">'+escHtml(t.text||'—')+'</td>'
+        + '<td class="txt" style="color:var(--text-secondary);font-size:12px">'+(t.basis?escHtml(t.basis):'—')+'</td>'
+        + '<td class="nw">'+(t.owner?('<b>'+escHtml(t.owner)+'</b>'):'<span style="color:#b91c1c">未指定</span>')+'</td>'
+        + '<td class="nw">'+(t.customer?escHtml(t.customer):'—')+'</td>'
+        + '<td class="nw"><span class="isp-st '+t.status+'" title="点一下切状态：待办 → 进行中 → 已兑现 → 待办" onclick="ispCycleStatus(\''+t.id+'\')">'+ispStatusLabel(t.status)+'</span></td>'
+        + '<td class="nw"><div class="isp-acts">'
+        + '<button class="isp-mini" onclick="inspOpenTodo(\''+t.id+'\')">改</button>'
+        + '<button class="isp-mini del" onclick="inspDelTodo(\''+t.id+'\')">删</button>'
+        + '</div></td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+
+  h += ispNoteHtml();
+  box.innerHTML = h;
+  ispFillOwnerList();
+  inspBadge();
+}
+
+function ispNoteHtml(){
+  return '<div class="isp-note">'
+    + '<b>巡检口径（照技能包来，别自己另立一套）</b><br>'
+    + '· <b>四维诊断</b>：未回预警 / 高潜商机 / 风险合规 / 话术质检。每个问题都要能落到「谁 + 对谁 + 做什么 + 什么时候」。<br>'
+    + '· <b>三条最容易被忽略的</b>：① <code>unreadMessageCount</code> 不是「客户在等 N 条」，可能含窗口外消息；② <b>未读 = 0 ≠ 无待办</b>，必须看「买家最后发言待回」；③ 每条必办必须带<b>实名</b>责任人（取自会话归属的业务员），拍板的事写「李主任」，流程的事写「运营」。<br>'
+    + '· <b>优先级</b>：P0 = 上午 12:00 前必须动（钱 / 即将流失 / 合规）；P1 = 今天 18:00 前；P2 = 3 个工作日内。<br>'
+    + '· <b>数据完整性</b>：技能包成功标志里的 <code>provenance=verified · failures=0 · warnings=0</code> 才算 verified；有失败或警告就记 partial，并在备注里写清是哪家店、哪一步。'
+    + '</div>';
+}
+
+// 责任人候选项：取历史必办里出现过的实名，供输入框联想
+function ispFillOwnerList(){
+  const dl=document.getElementById('insOwnerList');
+  if(!dl) return;
+  const set={};
+  insp.todos.forEach(t=>{ if(t.owner) set[t.owner]=1; });
+  try{
+    (hr.staff||[]).forEach(s=>{ if(s && s.name && s.status!=='leave') set[s.name]=1; });
+  }catch(e){}
+  Object.keys(set).sort().forEach(v=>{
+    if(!dl.querySelector('option[value="'+String(v).replace(/"/g,'')+'"]')){
+      const o=document.createElement('option'); o.value=v; dl.appendChild(o);
+    }
+  });
+}
+
+// ---------- 巡检记录弹窗 ----------
+function ispShowModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
+
+function inspOpenRun(id, store){
+  ispRunEdit = id || null;
+  let r = id ? insp.runs.find(x=>x.id===id) : null;
+  // 新建但今天/这家店已有记录 → 先把旧的带出来，避免用户以为"从零开始填"
+  if(!r){
+    const same = insp.runs.find(x=>x.date===todayStr() && x.store===(store||'lignes'));
+    if(same) r = Object.assign({}, same, {__prefill:true});
+  }
+  document.getElementById('modalInspRunTitle').textContent = (r && !r.__prefill) ? '修改巡检记录' : (r && r.__prefill ? '记一次巡检（当天已有记录，保存会覆盖）' : '记一次巡检');
+  document.getElementById('insRunDate').value  = r ? r.date : todayStr();
+  document.getElementById('insRunStore').value = r ? r.store : (store || 'lignes');
+  ['insRunSessions','insRunMsgs','insRunPending','insRunUnread','insRunFail','insRunWarn'].forEach(k=>{
+    document.getElementById(k).value = '';
+  });
+  if(r){
+    document.getElementById('insRunSessions').value = r.sessions;
+    document.getElementById('insRunMsgs').value     = r.msgs;
+    document.getElementById('insRunPending').value  = r.pending;
+    document.getElementById('insRunUnread').value   = r.unread;
+    document.getElementById('insRunFail').value     = r.fail;
+    document.getElementById('insRunWarn').value     = r.warn;
+  }
+  document.getElementById('insRunPartial').value = (r&&r.partial) ? '1' : '0';
+  document.getElementById('insRunNote').value = r ? r.note : '';
+  ispShowModal('modalInspRun');
+}
+
+function inspSaveRun(){
+  const date = document.getElementById('insRunDate').value;
+  const store = document.getElementById('insRunStore').value;
+  if(!ispIsDate(date)){ showToast('请选数据日期'); return; }
+  if(store!=='lignes' && store!=='fansi'){ showToast('请选店铺'); return; }
+  // 同一天同一家店已经有记录 → 覆盖，不多出一条
+  const dup = ispRunEdit ? null : insp.runs.find(r=>r.date===date && r.store===store);
+  const base = ispRunEdit ? insp.runs.find(r=>r.id===ispRunEdit) : dup;
+  // 留空的数字不覆盖成 0：只改一个数时，其他数保持原样；真要清零就显式填 0
+  const val = (k, fallback) => {
+    const raw = document.getElementById(k).value;
+    return (String(raw).trim()==='') ? ispNum(fallback) : ispNum(raw);
+  };
+  const rec = {
+    id: ispRunEdit || (dup ? dup.id : uid()),
+    date: date, store: store,
+    sessions: val('insRunSessions', base?base.sessions:0), msgs: val('insRunMsgs', base?base.msgs:0),
+    pending: val('insRunPending', base?base.pending:0),    unread: val('insRunUnread', base?base.unread:0),
+    partial: document.getElementById('insRunPartial').value==='1' ? 1 : 0,
+    fail: val('insRunFail', base?base.fail:0), warn: val('insRunWarn', base?base.warn:0),
+    note: document.getElementById('insRunNote').value.trim(),
+    createdAt: (base && base.createdAt) ? base.createdAt : new Date().toISOString().slice(0,19).replace('T',' '),
+    _sample: false
+  };
+  const i = insp.runs.findIndex(r=>r.id===rec.id);
+  if(i>=0) insp.runs[i]=rec; else insp.runs.push(rec);
+  ispHeal(); saveAll();
+  closeModal('modalInspRun');
+  ispRunEdit=null;
+  renderInspect();
+  showToast('✓ 已记下 '+ispStoreName(store)+' '+fmtDate(date)+' 的巡检数据','info');
+}
+
+function inspDelRun(id){
+  const r=insp.runs.find(x=>x.id===id);
+  if(!r) return;
+  showConfirm('删除 '+ispStoreName(r.store)+' '+fmtDate(r.date)+' 这条巡检记录？删了就没有那天的留档了。', ()=>{
+    insp.runs = insp.runs.filter(x=>x.id!==id);
+    saveAll(); renderInspect(); showToast('已删除该条巡检记录','info');
+  });
+}
+
+// ---------- 必办弹窗 ----------
+function inspOpenTodo(id){
+  ispTodoEdit = id || null;
+  const t = id ? insp.todos.find(x=>x.id===id) : null;
+  document.getElementById('modalInspTodoTitle').textContent = t ? '修改必办' : '新建必办';
+  document.getElementById('insTdDate').value  = t ? t.date : todayStr();
+  document.getElementById('insTdStore').value = t ? t.store : 'lignes';
+  document.getElementById('insTdPri').value   = t ? t.pri : 'P1';
+  const sel = document.getElementById('insTdDim');
+  sel.innerHTML = ISP_DIMS.map(d=>'<option value="'+d+'">'+d+'</option>').join('');
+  sel.value = t ? t.dim : '未回预警';
+  document.getElementById('insTdOwner').value    = t ? t.owner : '';
+  document.getElementById('insTdCustomer').value = t ? t.customer : '';
+  document.getElementById('insTdDue').value      = t ? t.due : '';
+  document.getElementById('insTdText').value     = t ? t.text : '';
+  document.getElementById('insTdBasis').value    = t ? t.basis : '';
+  document.getElementById('insTdStatus').value   = t ? t.status : 'todo';
+  ispFillOwnerList();
+  ispShowModal('modalInspTodo');
+}
+
+function inspSaveTodo(){
+  const text = document.getElementById('insTdText').value.trim();
+  const owner = document.getElementById('insTdOwner').value.trim();
+  if(!text){ showToast('请写「要做什么」——一句能照着做的话'); return; }
+  if(!owner){ showToast('请填责任人实名（拍板的事写「李主任」，流程的事写「运营」）'); return; }
+  const rec = {
+    id: ispTodoEdit || uid(),
+    date: document.getElementById('insTdDate').value || todayStr(),
+    store: document.getElementById('insTdStore').value,
+    pri: document.getElementById('insTdPri').value,
+    dim: document.getElementById('insTdDim').value,
+    owner: owner,
+    customer: document.getElementById('insTdCustomer').value.trim(),
+    due: document.getElementById('insTdDue').value,
+    text: text,
+    basis: document.getElementById('insTdBasis').value.trim(),
+    status: document.getElementById('insTdStatus').value,
+    doneAt: '',
+    createdAt: new Date().toISOString().slice(0,19).replace('T',' '),
+    _sample: false
+  };
+  if(rec.status==='done') rec.doneAt = todayStr();
+  const i = insp.todos.findIndex(t=>t.id===rec.id);
+  if(i>=0){
+    rec.createdAt = insp.todos[i].createdAt || rec.createdAt;
+    if(rec.status==='done' && insp.todos[i].status!=='done') rec.doneAt = todayStr();
+    insp.todos[i]=rec;
+  }else insp.todos.push(rec);
+  ispHeal(); saveAll();
+  closeModal('modalInspTodo');
+  ispTodoEdit=null;
+  renderInspect();
+  showToast('✓ 必办已派给 '+owner,'info');
+}
+
+function inspDelTodo(id){
+  const t=insp.todos.find(x=>x.id===id);
+  if(!t) return;
+  showConfirm('删除这条必办？「'+String(t.text||'').slice(0,30)+'」删了就查不到当时的依据了。', ()=>{
+    insp.todos = insp.todos.filter(x=>x.id!==id);
+    saveAll(); renderInspect(); showToast('已删除该条必办','info');
+  });
+}
+
+function ispCycleStatus(id){
+  const t = insp.todos.find(x=>x.id===id);
+  if(!t) return;
+  t.status = ISP_STATUS_NEXT[t.status] || 'todo';
+  t.doneAt = (t.status==='done') ? todayStr() : '';
+  saveAll(); renderInspect();
+}
+
+// ---------- 复制发群 / 导出 ----------
+function inspCopyText(){
+  const open = ispOpenTodos().filter(t=>t.status!=='missed');
+  const rank = {P0:0,P1:1,P2:2};
+  open.sort((a,b)=> rank[a.pri]-rank[b.pri] || ((a.due||'9999')<(b.due||'9999')?-1:1));
+  if(!open.length){ showToast('当前没有未结的必办，没什么可发的'); return; }
+  const d = new Date();
+  const lines = ['【今日必办 · '+(d.getMonth()+1)+'月'+d.getDate()+'日】',''];
+  ['P0','P1','P2'].forEach(p=>{
+    const g = open.filter(t=>t.pri===p);
+    if(!g.length) return;
+    lines.push(p+'（'+ISP_PRI_HINT[p]+'）');
+    g.forEach((t,i)=>{
+      let s = (i+1)+'. 【'+(t.owner||'未指定')+'】→ '+(t.customer||'全店')+'：'+t.text;
+      if(t.basis) s += '（依据：'+t.basis+'）';
+      if(t.due)   s += ' ［'+fmtDate(t.due)+' 前］';
+      lines.push(s);
+    });
+    lines.push('');
+  });
+  const miss = insp.todos.filter(t=>t.status==='missed');
+  if(miss.length){
+    lines.push('未见兑现（上一轮派了但没做）：');
+    miss.slice(0,10).forEach((t,i)=>{ lines.push((i+1)+'. 【'+(t.owner||'未指定')+'】→ '+(t.customer||'全店')+'：'+t.text); });
+    lines.push('');
+  }
+  const text = lines.join('\n');
+  const done = ()=>showToast('✓ 已复制，直接粘到群里','info');
+  const fallback = ()=>{
+    try{
+      const ta=document.createElement('textarea');
+      ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if(ok){ done(); return; }
+    }catch(e){}
+    try{ fabCsv([text.split('\n')], '今日必办_'+todayStr()+'.txt'); showToast('复制被浏览器拦了，已改成下载 txt','warning'); }
+    catch(e){ showToast('复制失败，请手动从表格里抄','warning'); }
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    }else fallback();
+  }catch(e){ fallback(); }
+}
+
+function inspExportCsv(){
+  if(!insp.runs.length && !insp.todos.length){ showToast('没有可导出的内容'); return; }
+  const rows=[['类型','数据日期','店铺','优先级','维度','要做什么','依据','责任人','客户','期限','状态','会话','消息','待回','未读','完整性','失败','警告','备注']];
+  ispRunsSorted().forEach(r=>{
+    rows.push(['巡检记录', r.date, ispStoreName(r.store), '', '', '', '', '', '', '', '', r.sessions, r.msgs, r.pending, r.unread,
+      r.partial?'partial':'verified', r.fail, r.warn, r.note||'']);
+  });
+  insp.todos.forEach(t=>{
+    rows.push(['必办', t.date, ispStoreName(t.store), t.pri, t.dim, t.text, t.basis, t.owner, t.customer, t.due,
+      ispStatusLabel(t.status), '', '', '', '', '', '', '', '']);
+  });
+  fabCsv(rows, '店铺巡检_'+todayStr()+'.csv');
+  showToast('✓ 已导出巡检记录 '+insp.runs.length+' 条、必办 '+insp.todos.length+' 条','info');
+}
+
+// ---------- 示例（只在用户点了按钮时才出现，绝不自动种） ----------
+function inspLoadSample(){
+  const d1 = new Date(Date.now()-86400000);
+  const ymd = d1.getFullYear()+'-'+String(d1.getMonth()+1).padStart(2,'0')+'-'+String(d1.getDate()).padStart(2,'0');
+  const due = new Date(Date.now()+86400000);
+  const dueStr = due.getFullYear()+'-'+String(due.getMonth()+1).padStart(2,'0')+'-'+String(due.getDate()).padStart(2,'0');
+  insp.runs.push({id:uid(), date:ymd, store:'lignes', sessions:120, msgs:1300, pending:9, unread:3, partial:0, fail:0, warn:0,
+    note:'示例：两店都 verified，朗格斯待回 9 条集中在 3 个业务员名下', createdAt:new Date().toISOString().slice(0,19).replace('T',' '), _sample:true});
+  insp.runs.push({id:uid(), date:ymd, store:'fansi', sessions:38, msgs:410, pending:4, unread:2, partial:1, fail:1, warn:2,
+    note:'示例：凡适有 1 个账号取数失败，重跑一次后正常，仍按 partial 记', createdAt:new Date().toISOString().slice(0,19).replace('T',' '), _sample:true});
+  insp.todos.push({id:uid(), date:ymd, store:'lignes', pri:'P0', dim:'未回预警', owner:'示例·Alyssa', customer:'示例客户 Erika',
+    due:dueStr, text:'先发 Erika 的付款链接，她已说「我马上付」', basis:'11/05 14:20 买家原话：I will pay today',
+    status:'todo', doneAt:'', createdAt:new Date().toISOString().slice(0,19).replace('T',' '), _sample:true});
+  insp.todos.push({id:uid(), date:ymd, store:'fansi', pri:'P1', dim:'高潜商机', owner:'示例·孟伊', customer:'示例客户 RISE',
+    due:'', text:'RISE 已问 MOQ，今天回一份 10 件起订的阶梯报价', basis:'11/05 询盘：What is your MOQ for 10 pcs?',
+    status:'doing', doneAt:'', createdAt:new Date().toISOString().slice(0,19).replace('T',' '), _sample:true});
+  ispHeal(); saveAll(); renderInspect();
+  showToast('已载入示例（带「示例」标记），看点完可以一键清掉','info');
+}
+function inspClearSampleSilent(){
+  insp.runs  = insp.runs.filter(r=>!r._sample);
+  insp.todos = insp.todos.filter(t=>!t._sample);
+}
+function inspClearSample(){
+  inspClearSampleSilent();
+  saveAll(); renderInspect(); showToast('示例已清除，真实记录一条没动','info');
 }
 
 init();
