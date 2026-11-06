@@ -1585,7 +1585,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.50 · 2026-11-05</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.51 · 2026-11-06</div>
     </div>
   </aside>
 
@@ -2582,7 +2582,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.50';
+const APP_VERSION = 'v2.51';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -15021,6 +15021,8 @@ function fcSet(key, val){
   saveAll(); renderFc();
 }
 // ---------- v2.50：Accio 实拉月度数据（每月过完自动取，比旧导入准） ----------
+// v2.51：两个店改成「一次一起取」（分析系统按 ACCIO_TRACE_CONTEXT 钉住店铺连接），
+//        所以这里不再有「请去 Accio 切店铺」的提示，缺店只是重试失败，点一下就行。
 // 为什么加：v2.48 之后经营分析不再导 Excel，biz.pays/orders 停在 9 月，
 // 「订单预测」里的 10 月就成了半截假数。分析系统那边每月过完会自动去 Accio 拉真实
 // 订单（笔数/样品/大货/金额/客户数）+ 聊天（样品件数/款式数），写到 data/fc_actual.json。
@@ -15100,16 +15102,14 @@ function fcActHtml(){
   }
   const need=fcActNeed();
   const got=Object.keys(a.months||{}).sort().reverse();
-  const boundTxt = a.bound ? ('Accio 当前绑定 <b>'+escHtml(fcShopName(a.bound))+'</b>') : 'Accio 里还没绑定店铺';
   let cls='', txt='';
   if(!need.length){
-    txt='<b>实测数据</b>　近 3 个月都取全了，下表用的就是后台实数（每月过完自动取，不用你管）。';
+    txt='<b>实测数据</b>　朗格斯 + 凡适 两个店一次取完，近几个月都齐了，下表用的就是后台实数（每月过完自动取，不用你管）。';
   }else{
     const m0=need[0], shops=(a.pending[m0]||[]).map(x=>escHtml(x.label)).join('、');
     cls=' warn';
-    txt='<b>实测数据</b>　<span style="color:#b45309">⚠️ <b>要切店铺</b>：'+boundTxt+'，'
-      +escHtml(fcMonthLabel(m0))+' 还差 <b>'+shops+'</b> 没取。'
-      +'请到 Accio 里把店铺切到【'+shops+'】，回来点「取这个月的数」。</span>';
+    txt='<b>实测数据</b>　<span style="color:#b45309">⚠️ '+escHtml(fcMonthLabel(m0))+' 还差 <b>'+shops+'</b> 没取到。'
+      +'两个店是<b>一次一起取</b>的（不用你去切来切去），点「取这个月的数」重试一次就行。</span>';
   }
   let out='<div class="fc-act'+cls+'"><span class="fc-act-dot '+(need.length?'wait':'ok')+'"></span>'+txt;
   if(a.msg) out+='<span style="color:var(--text-muted)">'+escHtml(a.msg)+'</span>';
@@ -15159,7 +15159,7 @@ function renderFc(){
   h+='<span class="fc-sep"></span><button class="btn btn-sm" onclick="fcExportCsv()">导出 CSV</button>';
   h+='<input type="file" id="fcChatFile" multiple accept=".csv,.txt" style="display:none" onchange="fcImportChat()">';
   h+='</div>';
-  // 第一行永远是「这份数字是哪来的」—— 服务在不在、哪个月还没取、要不要切店铺
+  // 第一行永远是「这份数字是哪来的」—— 服务在不在、哪个月还没取、两个店齐不齐
   h+=fcActHtml();
   if(!nAct){
     h+='<div class="fc-warn"><b>还没有历史数据。</b>到「经营分析」上传订单表 / 收款表；或者点上面「取这个月的数」直接从 Accio 拉，也可以手工补录。</div>';
