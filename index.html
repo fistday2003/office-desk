@@ -1227,22 +1227,25 @@ body.hr-col-dragging,body.hr-col-dragging *{cursor:col-resize!important;user-sel
 .fr-tfile:hover .fr-tnm{text-decoration:underline}
 .fr-tsz{color:var(--text-muted);font-size:11px;margin-left:2px}
 .fr-tempty{padding:2px 6px;color:var(--text-muted);font-size:11.5px}
-/* ---------- v2.52：运费目录树改「横向排布」——一家货代一行，三个类别并排 ---------- */
-/* 原来 月份→货代→类别→文件 四级竖排，一家货代占 4 行；现在货代名在左，清单/凭证/发票三栏在右 */
+/* ---------- v2.53：运费目录树「文件夹横排」——货代文件夹从左到右并排，像资源管理器 ---------- */
+/* v2.52 是「一家货代占一整行」竖着堆；v2.53 把货代这一层做成横排卡片：一行放 N 家（自动换行），
+   每家卡片里仍是「运费清单 / 付款凭证 / 运费发票」三栏。纵向行数从「每家 1 行」再压到「每行 N 家」。 */
 .fr-tnode-month{font-size:12px}
+/* 月份下面的这一层 = 货代文件夹横排容器（自适应列宽：宽屏 3 列，窄屏自动降列） */
 .fr-tree>.fr-tnode-month+.fr-tkids,
-.fr-tree>.fr-tnode-month+.fr-tkids.hidden{margin-left:0;border-left:0;padding-left:0}
-.fr-xrow{display:flex;align-items:flex-start;gap:10px;padding:2px 2px;border-radius:6px}
-.fr-xrow:hover{background:#eef4f8}
-.fr-xrow+.fr-xrow{border-top:1px dashed var(--border)}
-.fr-xrow>.fr-tnode{flex:0 0 138px;min-width:0;padding-top:3px}
-.fr-xrow>.fr-tkids{flex:1 1 auto;min-width:0;margin-left:0;border-left:0;padding-left:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-/* 每栏 = 一枚类别标签 + 若干个文件，全部横向流动（放不下才换行），一行就够高 */
-.fr-xcat{min-width:0;display:flex;flex-wrap:wrap;align-items:flex-start;gap:1px 8px;background:var(--card-bg);border:1px solid var(--border);border-left:3px solid #cbd5e1;border-radius:6px;padding:2px 7px 3px}
+.fr-tree>.fr-tnode-month+.fr-tkids.hidden{margin-left:0;border-left:0;padding-left:0;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr));gap:6px 10px;align-items:start}
+/* 一张卡片 = 一家货代：上面文件夹名（可点收起），下面三行「清单 / 凭证 / 发票」 */
+.fr-xrow{display:block;min-width:0;background:var(--card-bg);border:1px solid var(--border);border-radius:7px;padding:1px 8px 3px;transition:border-color .12s,box-shadow .12s}
+.fr-xrow:hover{border-color:#cfe2f0;box-shadow:0 1px 4px rgba(51,102,153,.07)}
+.fr-xrow>.fr-tnode{padding:1px 2px;min-width:0}
+.fr-xrow>.fr-tkids{display:flex;flex-direction:column;gap:1px;margin-left:0;border-left:0;padding-left:0}
+/* 每一类 = 一枚类别标签 + 若干个文件，横着流动（放不下才换行），标签等宽让三行对得齐 */
+.fr-xcat{min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:0 9px;background:transparent;border:0;border-left:2px solid #cbd5e1;border-radius:0;padding:0 0 0 7px;line-height:1.4}
 .fr-xcat[data-cat="list"]{border-left-color:#7cc0e8}
 .fr-xcat[data-cat="voucher"]{border-left-color:#eab53c}
 .fr-xcat[data-cat="invoice"]{border-left-color:#5cb98a}
-.fr-xcat-h{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;font-size:10.5px;font-weight:700;color:var(--text-secondary);letter-spacing:.02em;white-space:nowrap;padding-right:7px;border-right:1px dotted var(--border)}
+.fr-xcat-h{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;min-width:76px;font-size:10.5px;font-weight:700;color:var(--text-secondary);letter-spacing:.02em;white-space:nowrap;padding-right:7px;border-right:1px dotted var(--border)}
 .fr-xcat-h b{color:var(--primary);font-size:10.5px;font-weight:700}
 .fr-xcat .fr-tfile{padding:1px 4px;font-size:12px;line-height:1.5;max-width:100%}
 .fr-xcat .fr-tempty{padding:1px 4px;font-size:11px}
@@ -1604,7 +1607,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.52 · 2026-11-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.53 · 2026-11-06</div>
     </div>
   </aside>
 
@@ -2601,7 +2604,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.52';
+const APP_VERSION = 'v2.53';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -8112,8 +8115,9 @@ function renderFreight(){
     h+='<div class="fr-monthbody" id="frMb_'+mk+'"'+(closed?' style="display:none"':'')+'>';
     const fwdMap={}; list.forEach(b=>{ (fwdMap[b.forwarder]=fwdMap[b.forwarder]||[]).push(b); });
     // 目录树：点文件夹展开/收起，点文件直接打开预览（不再是死文本）
-    // 目录树（v2.52 横向排布）：一家货代一行 —— 左边货代名 + 笔数，右边「运费清单 / 付款凭证 / 运费发票」三栏并排，
-    // 文件直接躺在自己那一栏里；点货代名收 / 展开这一行的三栏，点文件打开预览。纵向行数从「每货代 4 行」压到 1 行。
+    // 目录树（v2.53 文件夹横排）：货代这一层做成并排卡片（一排放 2~3 家，自动换行），
+    // 每家卡片里三行「运费清单 / 付款凭证 / 运费发票」，每行 = 类别标签 + 横着流动的文件。
+    // 点货代名收 / 展开这一卡，点文件打开预览。竖排时一家占 4 行，现在一屏能看一整个月的货代。
     h+='<div class="fr-tree">';
     let monthKids='';
     Object.keys(fwdMap).sort().forEach(fw=>{
