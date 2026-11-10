@@ -1689,7 +1689,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.57 · 2026-11-06</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.59 · 2026-11-10</div>
     </div>
   </aside>
 
@@ -2770,7 +2770,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.57';
+const APP_VERSION = 'v2.59';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -8163,8 +8163,16 @@ function frMapSeller(name){
   return 'unassigned';
 }
 function frMonthLabel(m){ if(!m||m.length<6) return m||''; return m.slice(0,4)+'年'+parseInt(m.slice(4),10)+'月'; }
-// ---- 月份区块折叠（只改显示，不动数据；状态存内存，刷新后默认展开） ----
+// ---- 月份区块折叠（只改显示，不动数据；状态存内存，刷新后回到默认：只展开当前月份） ----
 let frClosedMonths = {};
+// v2.58：首次进入只展开「当前月份」（= 数据里最新的那个月，也就是眼下在核对账单的那一个月），
+// 以往月份一律收起 —— 一屏先看见本月要紧的几笔，老月份需要时再点开。
+// 用 frMonthsInit 记住"默认值只应用一次"，否则用户手动展开老月份后一重渲染又被打回去。
+let frMonthsInit = false;
+function frApplyDefaultMonths(months){
+  frClosedMonths = {};
+  months.forEach((m,i)=>{ if(i>0) frClosedMonths[frMonthKey(m)] = 1; });
+}
 function frMonthKey(m){ return 'mk_' + String((m===undefined||m===null||m==='')?'none':m).replace(/[^0-9A-Za-z_-]/g,'_'); }
 function frToggleMonth(m){
   const k=frMonthKey(m);
@@ -8266,6 +8274,8 @@ function frRowActsHtml(b){
 function renderFreight(){
   const box=document.getElementById('frContent'); if(!box) return;
   frBadge();
+  // v2.59：进页先体检一次「合计行被当明细」的历史账单（只修确证重复的，见三重门禁）
+  if(!window.__frHealedOnce){ window.__frHealedOnce=true; try{ frHealDupTotalBills(); }catch(e){} }
   if(freight.bills.length===0){
     box.innerHTML='<div style="text-align:center;padding:46px 20px;color:var(--text-muted)"><p style="margin-bottom:14px">还没有运费账单记录</p><button class="btn btn-primary" onclick="openFreightBillModal()">登记第一笔运费账单</button></div>';
     return;
@@ -8274,6 +8284,7 @@ function renderFreight(){
   const unpaid = freight.bills.filter(b=>b.status!=='已收发票');
   const unpaidAmt = unpaid.reduce((s,b)=>s+(b.total||0),0);
   const months=[...new Set(freight.bills.map(b=>b.month))].sort().reverse();
+  if(!frMonthsInit && months.length){ frMonthsInit = true; frApplyDefaultMonths(months); }
   const allMonthsOpen = months.some(m=>!frClosedMonths[frMonthKey(m)]);
   let h='';
   h+='<div class="fr-summary">';
@@ -8420,6 +8431,13 @@ function openFreightBillModal(id){
   frModalForwarder = b ? (b.forwarder||'') : '';
   frModalFiles = b ? {list:(b.files.list||[]).slice(), voucher:(b.files.voucher||[]).slice(), invoice:(b.files.invoice||[]).slice()} : {list:[],voucher:[],invoice:[]};
   frModalDetail = b ? (b.detail||[]).slice() : [];
+  // v2.59：老账单里若混着「合计 / 小计」行，编辑时先摘掉（保存即修正；不保存则原样不动）
+  let frSumDropped=0;
+  if(frModalDetail.length){
+    const kept=frModalDetail.filter(r=>!(r && frIsSumLabel(r.seller)));
+    frSumDropped=frModalDetail.length-kept.length;
+    if(frSumDropped) frModalDetail=kept;
+  }
   document.getElementById('frLangges').value = b ? (b.langges||0) : '';
   document.getElementById('frFansi').value = b ? (b.fansi||0) : '';
   document.getElementById('frUnassigned').value = b ? (b.unassigned||0) : '';
@@ -8430,6 +8448,7 @@ function openFreightBillModal(id){
   frRenderModalFiles();
   frRenderDetailReview();
   frRecalcTotal();
+  if(frSumDropped && frModalDetail.length){ frDetailRecalc(); showToast('这条账单里混着 '+frSumDropped+' 行「合计」行，已去掉不再计入金额 —— 核对后保存即修正','info'); }
   document.getElementById('modalFreightBill').style.display='flex';
 }
 function frRecalcTotal(){
@@ -8494,6 +8513,9 @@ function saveFreightBill(){
   if(frModalId){ const i=freight.bills.findIndex(x=>x.id===frModalId); if(i>=0) freight.bills[i]=rec; }
   else freight.bills.push(rec);
   frLearnSellerMap();     // 记住这次核对过的业务员归属，下次自动分对
+  // v2.58：刚保存的这一月一定展开 —— 否则补录老月份时，默认收起会让人以为"没存进去"
+  frMonthsInit = true;
+  delete frClosedMonths[frMonthKey(month)];
   frModalId=null;
   saveAll(); closeModal('modalFreightBill'); refreshAll();
   showToast('✓ 已保存运费账单','info');
@@ -8667,6 +8689,9 @@ function frParseFreightText(text){
   t.split(/\r?\n/).forEach(raw=>{
     const line=raw.replace(/\s+/g,' ').trim();
     if(!line) return;
+    // v2.59：合计 / 小计行整行跳过（数字去掉后只剩「本期合计额」这类标签）
+    const bare=line.replace(/[\d,.\s¥$￥:：=\-]/g,'');
+    if(bare && bare.length<=12 && FR_SUM_WORD.test(bare)) return;
     const nums=(line.match(/\d[\d,]*(?:\.\d{1,2})?/g)||[])
       .map(s=>parseFloat(String(s).replace(/,/g,'')))
       .filter(n=>{ if(!isFinite(n)) return false;
@@ -8753,9 +8778,26 @@ function frDetectForwarder(s){
   for(const n of names){ if(n && n.length>=2 && t.indexOf(n.slice(0,2))>=0) return n; }
   return '';
 }
+// v2.59：账单自带的「本期合计 / 小计 / 总计」行不是明细 —— 当成明细再加一次，总额正好翻倍。
+// 判定：单个单元格文字去掉空白后「短」且含合计类词（长句里的「合计」是备注说明，不动）
+const FR_SUM_WORD=/合计|小计|总计|共计|汇总|总额|总金额|sub-?total|grand-?total|^\s*total\s*$|^\s*sum\s*$/i;
+function frIsSumLabel(s){
+  const t=String(s==null?'':s).replace(/\s+/g,'');
+  if(!t || t.length>12) return false;              // 太长 = 一句话，不当汇总行
+  if(/[¥$]|^\d/.test(t)) return false;             // 纯金额 / 金额+数字，不算标签
+  return FR_SUM_WORD.test(t);
+}
+// 一行里有没有「合计」标签（跳过金额列自身）
+function frRowSumLabel(r, amtIdx){
+  for(let i=0;i<(r||[]).length;i++){
+    if(i===amtIdx) continue;
+    if(frIsSumLabel(r[i])) return String(r[i]).trim();
+  }
+  return '';
+}
 // 行 → 写入三个金额框 + 生成明细（返回识别结果，供提示条使用）
 function frApplyCsvRows(rows, silent){
-  const out={ok:false, count:0, lg:0, fs:0, un:0, unknown:[]};
+  const out={ok:false, count:0, lg:0, fs:0, un:0, unknown:[], skipped:[]};
   if(!rows||!rows.length){ if(!silent) showToast('表格里没读到内容'); return out; }
   const head=rows[0].map(c=>String(c||'').toLowerCase());
   const sellerIdx=head.findIndex(c=>/(业务员|业务|销售|名称|姓名|客户|name|sales|seller|person)/.test(c));
@@ -8764,11 +8806,14 @@ function frApplyCsvRows(rows, silent){
   if(sIdx<0||aIdx<0){ sIdx=0; aIdx=rows[0].length-1; }
   else dataRows=rows.slice(1);
   if(sIdx===aIdx){ if(!silent) showToast('没认出「业务员」和「金额」两列，请检查表头或手动填'); return out; }
-  let lg=0, fs=0, un=0; const detail=[];
+  let lg=0, fs=0, un=0; const detail=[], skipped=[];
   dataRows.forEach(r=>{
     const seller=String(r[sIdx]||'').trim();
     const amt=parseFloat(String(r[aIdx]||'').replace(/[, ¥$￥]/g,''));
     if(!seller || isNaN(amt)) return;
+    // v2.59：合计 / 小计行跳过（否则「合计」被当明细再加一遍，总额翻倍）
+    const sumLbl=frRowSumLabel(r, aIdx);
+    if(sumLbl){ skipped.push({label:sumLbl, amount:Math.round(amt*100)/100}); return; }
     const proj=frMapSeller(seller);
     if(proj==='langges') lg+=amt; else if(proj==='fansi') fs+=amt; else un+=amt;
     detail.push({seller:seller, amount:Math.round(amt*100)/100, project:proj});
@@ -8780,10 +8825,10 @@ function frApplyCsvRows(rows, silent){
   document.getElementById('frUnassigned').value=un;
   frModalDetail=detail;
   frRecalcTotal(); frRenderDetailReview();
-  out.ok=true; out.count=detail.length; out.lg=lg; out.fs=fs; out.un=un;
+  out.ok=true; out.count=detail.length; out.lg=lg; out.fs=fs; out.un=un; out.skipped=skipped;
   out.unknown=detail.filter(d=>d.project==='unassigned').map(d=>d.seller);
   if(!silent){
-    showToast('已读取 '+detail.length+' 行：朗格斯 '+fmtCNY(lg)+' / 凡适 '+fmtCNY(fs)+(out.unknown.length?(' / 未分配 '+fmtCNY(un)+'（'+out.unknown.length+' 个业务员待确认）'):''), 'info');
+    showToast('已读取 '+detail.length+' 行：朗格斯 '+fmtCNY(lg)+' / 凡适 '+fmtCNY(fs)+(out.unknown.length?(' / 未分配 '+fmtCNY(un)+'（'+out.unknown.length+' 个业务员待确认）'):'')+(skipped.length?('（已跳过 '+skipped.length+' 行合计行）'):''), 'info');
   }
   return out;
 }
@@ -8868,6 +8913,9 @@ function frRenderAutoHint(info){
       h+='<div style="margin-top:3px">⚠ 未分配业务员：<b>'+escHtml(info.res.unknown.join('、'))+'</b> —— 在下方明细里把「归属项目」改成朗格斯 / 凡适，改完自动重新合计，保存时会记住（下次自动分对）。</div>';
     }
     if(info.notes && info.notes.length) h+='<div style="margin-top:3px">'+info.notes.map(n=>'· '+escHtml(n)).join('<br>')+'</div>';
+    if(info.res.skipped && info.res.skipped.length){
+      h+='<div style="margin-top:3px">· 已自动跳过 <b>'+info.res.skipped.length+' 行合计行</b>（'+info.res.skipped.map(s=>escHtml(s.label)+' '+fmtCNY(s.amount)).join('、')+'）—— 合计不重复计入，总金额不会再翻倍</div>';
+    }
   } else {
     h+='<div class="fr-ah-t">⚠ 没能自动识别出金额数据</div>';
     const tags=[]; (info.done||[]).forEach(d=>tags.push(d)); (info.notes||[]).forEach(n=>tags.push(n));
@@ -8906,6 +8954,36 @@ function frDetailRecalc(){
 function frDetailSetProject(i,p){ if(!frModalDetail[i]) return; frModalDetail[i].project=p; frDetailRecalc(); frRenderDetailReview(); }
 function frDetailAmountChange(i,v){ if(!frModalDetail[i]) return; const a=parseFloat(v); frModalDetail[i].amount=isNaN(a)?0:Math.round(a*100)/100; frDetailRecalc(); }
 function frDetailRemove(i){ if(!frModalDetail[i]) return; frModalDetail.splice(i,1); frDetailRecalc(); frRenderDetailReview(); }
+// v2.59：历史账单里混进去的「合计行」一次性修掉 —— 三重门禁全过才动，且只会删那一行
+function frHealDupTotalBills(){
+  const r2=n=>Math.round(n*100)/100;
+  const fixed=[];
+  (freight.bills||[]).forEach(b=>{
+    const d=Array.isArray(b.detail)? b.detail : [];
+    if(d.length<2) return;
+    const badIdx=[]; d.forEach((r,i)=>{ if(r && frIsSumLabel(r.seller)) badIdx.push(i); });
+    if(!badIdx.length || badIdx.length>=d.length) return;
+    const keep=d.filter((r,i)=>badIdx.indexOf(i)<0);
+    const sumKeep=r2(keep.reduce((s,r)=>s+(Number(r.amount)||0),0));
+    const sumBad=r2(badIdx.reduce((s,i)=>s+(Number(d[i].amount)||0),0));
+    if(Math.abs(sumBad-sumKeep)>0.02) return;                 // 门禁1：合计行金额 == 其余行之和
+    const lb=r2(Number(b.langges)||0), fb=r2(Number(b.fansi)||0), ub=r2(Number(b.unassigned)||0);
+    const bt=r2(Number(b.total)||0);
+    if(Math.abs(r2(lb+fb+ub)-bt)>0.02) return;                // 门禁2：账单三个数就是明细加出来的（没被手改过）
+    if(Math.abs(bt-r2(sumBad+sumKeep))>0.02) return;          // 门禁3：总额 == 全部行之和（确认真的重复了）
+    const nl=r2(keep.filter(r=>r.project==='langges').reduce((s,r)=>s+(Number(r.amount)||0),0));
+    const nf=r2(keep.filter(r=>r.project==='fansi').reduce((s,r)=>s+(Number(r.amount)||0),0));
+    const nu=r2(keep.filter(r=>r.project!=='langges'&&r.project!=='fansi').reduce((s,r)=>s+(Number(r.amount)||0),0));
+    const oldT=bt;
+    b.detail=keep; b.langges=nl; b.fansi=nf; b.unassigned=nu; b.total=r2(nl+nf+nu);
+    fixed.push({fwd:b.forwarder||'', month:b.month||'', from:oldT, to:b.total});
+  });
+  if(fixed.length){
+    saveAll();
+    showToast('✓ 已修正 '+fixed.length+' 条账单的重复合计行：'+fixed.map(x=>x.fwd+' '+frMonthLabel(x.month)+' '+fmtCNY(x.from)+' → '+fmtCNY(x.to)).join('；'),'info');
+  }
+  return fixed.length;
+}
 // 保存时把用户确认过的归属记进 sellerMap（下次自动分对）
 function frLearnSellerMap(){
   (frModalDetail||[]).forEach(r=>{
