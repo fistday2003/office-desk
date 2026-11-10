@@ -8275,7 +8275,7 @@ function renderFreight(){
   const box=document.getElementById('frContent'); if(!box) return;
   frBadge();
   // v2.59：进页先体检一次「合计行被当明细」的历史账单（只修确证重复的，见三重门禁）
-  if(!window.__frHealedOnce){ window.__frHealedOnce=true; try{ frHealDupTotalBills(); }catch(e){} }
+  if(!window.__frHealedOnce && freight.bills && freight.bills.length){ window.__frHealedOnce=true; try{ frHealDupTotalBills(); }catch(e){} }
   if(freight.bills.length===0){
     box.innerHTML='<div style="text-align:center;padding:46px 20px;color:var(--text-muted)"><p style="margin-bottom:14px">还没有运费账单记录</p><button class="btn btn-primary" onclick="openFreightBillModal()">登记第一笔运费账单</button></div>';
     return;
