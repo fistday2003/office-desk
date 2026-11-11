@@ -1032,6 +1032,9 @@ body.dark .biz-switch{background:#3b2a16;border-color:#7c4a1e;color:#fbbf24}
 .fc-chatbox{border:1px dashed var(--border);border-radius:8px;padding:10px 12px;background:var(--card-bg);font-size:12px;color:var(--text-secondary);line-height:1.8}
 .fc-na{color:var(--text-muted)}
 .fc-fileline{font-size:11.5px;color:var(--text-muted);line-height:1.8;margin-top:6px;word-break:break-all}
+/* v2.60：按项目修正件数 / 款数（弹窗里的「自动值」灰字 + 表格里的「修正前」小字） */
+.fc-pk-auto{font-size:10.5px;color:var(--text-muted);line-height:1.4;min-height:14px;margin-top:1px}
+.fc-orig{font-size:10.5px;color:#b45309;line-height:1.35;margin-top:1px;white-space:nowrap}
 @media (max-width:768px){
   .fc-grid{grid-template-columns:repeat(2,1fr)}
   .fc-tools .fc-sep{display:none}
@@ -1689,7 +1692,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.59 · 2026-11-10</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.60 · 2026-11-11</div>
     </div>
   </aside>
 
@@ -2541,6 +2544,35 @@ tr:hover .fr-fwd-acts{opacity:1}
     <h3 id="modalFcMonthTitle">手工修正 / 定目标</h3>
     <input type="hidden" id="fcMonthKey">
     <div id="fcMonthHint" style="font-size:12.5px;color:var(--text-secondary);line-height:1.7;margin-bottom:10px"></div>
+    <!-- v2.60：按项目（朗格斯 / 凡适）修正「样品件数 / 大货款数」——只改这两项，合计随修正实时重算 -->
+    <div style="border:1px solid var(--border);border-radius:8px;padding:7px 10px 5px;margin-bottom:10px">
+      <div style="font-size:12.5px;font-weight:600;margin-bottom:1px">按项目修正 · 样品件数 / 大货款数</div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:5px">只改这两个数，按朗格斯 / 凡适分开填。<b>留空 = 用自动折算值</b>（下面灰字就是自动值，也就是修正前的数）。</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed">
+        <thead><tr>
+          <th style="text-align:left;padding:0 6px 3px;font-weight:500;color:var(--text-secondary);width:64px">项目</th>
+          <th style="padding:0 6px 3px;font-weight:500;color:var(--text-secondary)">样品件数</th>
+          <th style="padding:0 6px 3px;font-weight:500;color:var(--text-secondary)">大货款数</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="padding:1px 6px;white-space:nowrap">朗格斯</td>
+            <td style="padding:1px 6px"><input type="number" min="0" step="1" id="fcPk_langges_pcs" oninput="fcPkRecalc()"><div class="fc-pk-auto" id="fcPkAuto_langges_pcs"></div></td>
+            <td style="padding:1px 6px"><input type="number" min="0" step="1" id="fcPk_langges_styles" oninput="fcPkRecalc()"><div class="fc-pk-auto" id="fcPkAuto_langges_styles"></div></td>
+          </tr>
+          <tr>
+            <td style="padding:1px 6px;white-space:nowrap">凡适</td>
+            <td style="padding:1px 6px"><input type="number" min="0" step="1" id="fcPk_fansi_pcs" oninput="fcPkRecalc()"><div class="fc-pk-auto" id="fcPkAuto_fansi_pcs"></div></td>
+            <td style="padding:1px 6px"><input type="number" min="0" step="1" id="fcPk_fansi_styles" oninput="fcPkRecalc()"><div class="fc-pk-auto" id="fcPkAuto_fansi_styles"></div></td>
+          </tr>
+          <tr>
+            <td style="padding:4px 6px 1px;border-top:1px solid var(--border);font-weight:600">合计</td>
+            <td style="padding:4px 6px 1px;border-top:1px solid var(--border);text-align:right"><b id="fcPkSumPcs">—</b><div class="fc-pk-auto" id="fcPkAutoSumPcs"></div></td>
+            <td style="padding:4px 6px 1px;border-top:1px solid var(--border);text-align:right"><b id="fcPkSumStyles">—</b><div class="fc-pk-auto" id="fcPkAutoSumStyles"></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 100px"><label>订单数</label><input type="number" id="fcMorders" min="0" step="1"></div>
       <div class="form-group" style="flex:1 1 100px"><label>样品数</label><input type="number" id="fcMsample" min="0" step="1"></div>
@@ -2770,7 +2802,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.59';
+const APP_VERSION = 'v2.60';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -14730,6 +14762,21 @@ let fc = fcBlank();
 function fcHeal(){
   if(!fc || typeof fc!=='object' || Array.isArray(fc)) fc = fcBlank();
   if(!fc.months || typeof fc.months!=='object' || Array.isArray(fc.months)) fc.months={};
+  // v2.60：按项目修正的件数 / 款数（pk）归一化 —— 只认朗格斯 / 凡适、只认数字，其它一律剔掉，别让脏数据进预测
+  Object.keys(fc.months).forEach(k=>{
+    const o=fc.months[k];
+    if(!o || typeof o!=='object' || Array.isArray(o)){ delete fc.months[k]; return; }
+    if(o.pk===undefined || o.pk===null) return;
+    if(typeof o.pk!=='object' || Array.isArray(o.pk)){ delete o.pk; return; }
+    const nn=v=>(v===undefined||v===null||v===''||!isFinite(Number(v)))?null:Number(v);
+    const pk={};
+    FC_SHOPS.forEach(s=>{
+      const b=(o.pk&&o.pk[s[0]])||{};
+      const p=nn(b.pcs), st=nn(b.styles);
+      if(p!==null || st!==null) pk[s[0]]={pcs:p, styles:st};
+    });
+    if(Object.keys(pk).length) o.pk=pk; else delete o.pk;
+  });
   if(!fc.goals  || typeof fc.goals !=='object' || Array.isArray(fc.goals))  fc.goals={};
   if(!fc.chat   || typeof fc.chat  !=='object' || Array.isArray(fc.chat))   fc.chat=fcChatBlank();
   if(!Array.isArray(fc.chat.files)) fc.chat.files=[];
@@ -14943,6 +14990,60 @@ function fcPcsStyles(shop, month, kk, sampleN, bulkN){
   const styles = (ks>0) ? (bv>0 ? bv*ks : null) : fcChatVal(month, shop, 'styles');
   return {pcs:pcs, styles:styles};
 }
+// ---------- v2.60：按项目（朗格斯 / 凡适）手工修正「样品件数 / 大货款数」 ----------
+// 存法：fc.months['2026-10'].pk = {langges:{pcs:124, styles:12}, fansi:{pcs:39, styles:6}}
+// 语义：留空（键不存在 / null）= 用自动折算值；填 0 = 这个月确实是 0，与「留空」严格区分
+function fcPkOf(m){ const o=(fc.months||{})[m]; const pk=(o&&o.pk)||{}; return (typeof pk==='object'&&!Array.isArray(pk))?pk:{}; }
+function fcPkVal(m, shop, key){
+  const b=fcPkOf(m)[shop]||{};
+  const v=b[key];
+  return (v===undefined||v===null||v===''||!isFinite(Number(v)))?null:Number(v);
+}
+// 该月有没有任何「按项目」修正（用于「手工」徽标 / 取消「实测」标记）
+function fcPkHas(m){
+  const pk=fcPkOf(m);
+  return FC_SHOPS.some(s=>{
+    const b=pk[s[0]]||{};
+    const h=v=>(v!==undefined && v!==null && v!=='' && isFinite(Number(v)));
+    return h(b.pcs) || h(b.styles);
+  });
+}
+// 弹窗里「自动值」的缓存（打开弹窗时算一次，供实时合计用）
+let fcPkAuto=null;
+// 修正过 → 表格里多显示一行「修正前 xxx」，让人一眼看出改了多少
+function fcOrigCell(autoV, curV){
+  if(autoV===null||autoV===undefined) return '';
+  if(curV===null||curV===undefined) return '';
+  const a=Math.round(Number(autoV)), c=Math.round(Number(curV));
+  if(!isFinite(a) || a===c) return '';
+  return '<div class="fc-orig" title="自动折算值 '+fcNum(autoV)+'，手工改成 '+fcNum(curV)+'">修正前 '+fcNum(a)+'</div>';
+}
+// 弹窗里 4 个格子（朗格斯/凡适 × 件数/款数）一改 → 合计立刻重算；合计始终是「修正后」的两店之和
+function fcPkRecalc(){
+  const rd=id=>{ const el=document.getElementById(id); if(!el) return null;
+    const t=String(el.value||'').trim(); return (t===''||isNaN(Number(t))||Number(t)<0)?null:Number(t); };
+  let sp=0, ss=0, hp=false, hs=false, ap=0, ast=0, hap=false, hast=false;
+  FC_SHOPS.forEach(s=>{
+    const sh=s[0], a=(fcPkAuto&&fcPkAuto[sh])||{};
+    const p=rd('fcPk_'+sh+'_pcs'), st=rd('fcPk_'+sh+'_styles');
+    const pv=(p!==null)?p:((typeof a.pcs==='number')?a.pcs:null);
+    const sv=(st!==null)?st:((typeof a.styles==='number')?a.styles:null);
+    if(pv!==null){ sp+=pv; hp=true; }
+    if(sv!==null){ ss+=sv; hs=true; }
+    if(typeof a.pcs==='number'){ ap+=a.pcs; hap=true; }
+    if(typeof a.styles==='number'){ ast+=a.styles; hast=true; }
+    const e1=document.getElementById('fcPkAuto_'+sh+'_pcs');
+    if(e1) e1.textContent=(typeof a.pcs==='number')?('自动 '+fcNum(Math.round(a.pcs))):'没有自动值（这个月缺单数或系数）';
+    const e2=document.getElementById('fcPkAuto_'+sh+'_styles');
+    if(e2) e2.textContent=(typeof a.styles==='number')?('自动 '+fcNum(Math.round(a.styles))):'没有自动值（这个月缺单数或系数）';
+  });
+  const s1=document.getElementById('fcPkSumPcs'), s2=document.getElementById('fcPkSumStyles');
+  if(s1) s1.textContent = hp?fcNum(Math.round(sp)):'—';
+  if(s2) s2.textContent = hs?fcNum(Math.round(ss)):'—';
+  const g1=document.getElementById('fcPkAutoSumPcs'), g2=document.getElementById('fcPkAutoSumStyles');
+  if(g1) g1.textContent = hap?('自动 '+fcNum(Math.round(ap))):'';
+  if(g2) g2.textContent = hast?('自动 '+fcNum(Math.round(ast))):'';
+}
 function fcR2(v){ const n=Number(v); return isFinite(n) ? Math.round(n*100)/100 : 0; }
 // 是否已经配了任何一店的实测系数（决定指标标签写「系数」还是「明细」）
 function fcHasCal(){
@@ -15003,30 +15104,43 @@ function fcSeries(scope){
     const bulk   = has(man.bulk)   ? Number(man.bulk)   : Math.max(0, orders-sample);
     // 样品件数 / 大货款式数：v2.35 起按「这个月自己的单数 × 系数」折算 —— 单数就用上面这几个数，
     // 保证表里显示的「样品单数」和折算用的单数是同一个数（v2.37 修正：以前这里会再取一次单数，可能对不上）
-    let pcs=null, styles=null;
+    // v2.60：按项目手工修正优先 —— 合计列就是「两店修正后相加」，不是改完还算原来的自动值
+    let pcs=null, styles=null, pcsAuto=null, stylesAuto=null, pkMan=false;
+    const mpOf=sh=>fcPkVal(m, sh, 'pcs'), msOf=sh=>fcPkVal(m, sh, 'styles');
     if(shops.length===1){
-      const v=fcPcsStyles(shops[0], m, K[shops[0]], sample, bulk);
-      pcs=v.pcs; styles=v.styles;
+      const sh=shops[0];
+      const v=fcPcsStyles(sh, m, K[sh], sample, bulk);
+      pcsAuto=v.pcs; stylesAuto=v.styles;
+      const mp=mpOf(sh), ms=msOf(sh);
+      pcs    = (mp!==null)?mp:v.pcs;
+      styles = (ms!==null)?ms:v.styles;
+      pkMan  = (mp!==null || ms!==null);
     }else{
-      let sp=0, ss=0, hp=false, hs=false;
+      let sp=0, ss=0, hp=false, hs=false, ap=0, ast=0, hap=false, hast=false;
       shops.forEach(sh=>{
         const b=fcCalOrders(sh, m, shopAuto[sh], fc.months||{});
         const v=fcPcsStyles(sh, m, K[sh], b.sample, b.bulk);
-        if(v.pcs!==null && v.pcs!==undefined){ sp+=v.pcs; hp=true; }
-        if(v.styles!==null && v.styles!==undefined){ ss+=v.styles; hs=true; }
+        if(v.pcs!==null && v.pcs!==undefined){ ap+=v.pcs; hap=true; }
+        if(v.styles!==null && v.styles!==undefined){ ast+=v.styles; hast=true; }
+        const mp=mpOf(sh), ms=msOf(sh);
+        if(mp!==null || ms!==null) pkMan=true;
+        const pv=(mp!==null)?mp:v.pcs, sv=(ms!==null)?ms:v.styles;
+        if(pv!==null && pv!==undefined){ sp+=pv; hp=true; }
+        if(sv!==null && sv!==undefined){ ss+=sv; hs=true; }
       });
       pcs = hp?sp:null; styles = hs?ss:null;
+      pcsAuto = hap?ap:null; stylesAuto = hast?ast:null;
     }
     const partial = (m===cur && day<dim);
     const scale = partial ? (dim/Math.max(1,day)) : 1;
     const est = {orders:orders*scale, sample:sample*scale, bulk:bulk*scale, amount:amount*scale, buyers:buyers*scale,
                  pcs:(pcs===null?null:pcs*scale), styles:(styles===null?null:styles*scale)};
-    const manN = Object.keys(man).filter(k=>k!=='note' && has(man[k])).length;
+    const manN = Object.keys(man).filter(k=>k!=='note' && k!=='pk' && has(man[k])).length;
     return {month:m, orders:orders, sample:sample, bulk:bulk, amount:amount, buyers:buyers,
-            act:(!!a.act && manN===0),
-            pcs:pcs, styles:styles,
+            act:(!!a.act && manN===0 && !pkMan),
+            pcs:pcs, styles:styles, pcsAuto:pcsAuto, stylesAuto:stylesAuto, pkMan:pkMan,
             partial:partial, scale:scale, est:est,
-            man:manN>0 || !!man.note, note:man.note||''};
+            man:manN>0 || !!man.note || pkMan, note:man.note||''};
   });
 }
 // ---------- 淡旺季：只用「自己家的历史」算（同月平均法），不套行业预设 ----------
@@ -15652,7 +15766,7 @@ function renderFc(){
         +td(pL[hi],'langges')+td(pF[hi],'fansi')+sumTd+'<td>'+fcDelta(sv, baseAll(k), '')+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>，<b>与上面「范围」下拉无关</b>（范围只影响下面的趋势图和月度明细），所以三栏永远对得上。下面小字是波动区间。带蓝标的两个指标：写「<b>折算</b>」= 按固定的件数 / 款式数系数折算出来，写「<b>明细</b>」= 系数没设、退回订单产品明细。<br>数字后面括号里的：<b>前一段是波动区间</b>（如 35~95）<b>，带 ×号的是这格用的系数</b>（如 ×1.51）—— <b>件数 ÷ 单数 永远正好等于它</b>。</div>';
+    h+='<div class="fc-note"><b>合计 = 朗格斯 + 凡适 逐项相加</b>，<b>与上面「范围」下拉无关</b>（范围只影响下面的趋势图和月度明细），所以三栏永远对得上。下面小字是波动区间。带蓝标的两个指标：写「<b>折算</b>」= 按固定的件数 / 款式数系数折算出来，写「<b>明细</b>」= 系数没设、退回订单产品明细。<br>数字后面括号里的：<b>前一段是波动区间</b>（如 35~95）<b>，带 ×号的是这格用的系数</b>（如 ×1.51）—— <b>没手工改过的月份，件数 ÷ 单数 正好等于它；手工改过的月份以你填的数为准</b>。</div>';
     h+='</div>';
   }
   // 图表
@@ -15703,9 +15817,9 @@ function renderFc(){
       h+='<td>'+badge+manTag+'</td>';
       h+='<td class="r">'+fcNum(s.orders)+'</td>';
       h+='<td class="r">'+fcNum(s.sample)+'</td>';
-      h+='<td class="r">'+fcNumCell(s.pcs)+'</td>';
+      h+='<td class="r">'+fcNumCell(s.pcs)+fcOrigCell(s.pcsAuto, s.pcs)+'</td>';
       h+='<td class="r">'+fcNum(s.bulk)+'</td>';
-      h+='<td class="r">'+fcNumCell(s.styles)+'</td>';
+      h+='<td class="r">'+fcNumCell(s.styles)+fcOrigCell(s.stylesAuto, s.styles)+'</td>';
       h+='<td class="r">'+fcNum(s.amount)+'</td>';
       h+='<td class="r">'+fcNum(Math.round(s.amount*(cfg.fx||FC_FX)))+'</td>';
       h+='<td class="r">'+fcNum(s.buyers)+'</td>';
@@ -15738,7 +15852,7 @@ function renderFc(){
   if(_oldN>0){
     h+='<div style="text-align:center;margin-top:10px"><button class="btn btn-sm" id="fcOldBtn" data-more="展开更早的 '+_oldN+' 个月" onclick="fcToggleOld()">'+(fcShowOld?'收起更早的月份':'展开更早的 '+_oldN+' 个月')+'</button></div>';
   }
-  h+='<div class="fc-note">「修正」只影响本模块的预测输入，<b>不会改动经营分析里的原始订单 / 收款数据</b>；留空的字段仍然用自动统计值。「样品件」「大货款」两列只来自聊天解析，不能在弹窗里手填。</div>';
+  h+='<div class="fc-note">「修正」只影响本模块的预测输入，<b>不会改动经营分析里的原始订单 / 收款数据</b>；留空的字段仍然用自动统计值。<b>「样品件」「大货款」两列可以在「修正」弹窗里按朗格斯 / 凡适分开手填</b>：填过的月份这一列会多显示一行「修正前 xxx」，表格里的数（含合计）<b>已经是修正后的数</b>，预测也会跟着修正后的历史走。</div>';
   h+='</div>';
   // ---------- 淡旺季（只用自己的历史算） ----------
   const seas=fcSeasonIdx(series, cfg.metric);
@@ -16092,10 +16206,24 @@ function fcOpenMonth(m){
   const isFuture = !s;
   document.getElementById('modalFcMonthTitle').textContent = (isFuture?'设定目标 / 补录 · ':'手工修正 · ')+fcMonthLabel(m);
   document.getElementById('fcMonthKey').value=m;
-  const chatTip = '<br><span style="color:var(--text-muted)">「样品件数」「大货款式数」不在这个弹窗里改 —— 这两个数只能由聊天记录解析出来（当前：样品 '+((s&&s.pcs!=null)?fcNum(s.pcs):'—')+' 件 / 款式 '+((s&&s.styles!=null)?fcNum(s.styles):'—')+' 款）。</span>';
+  const chatTip = '<br><span style="color:var(--text-muted)">上面那块只改「样品件数 / 大货款数」（按朗格斯 / 凡适分开填）；改过的月份，月度明细里会同时显示修正后的数和「修正前」的数。</span>';
   document.getElementById('fcMonthHint').innerHTML = (isFuture
     ? '这个月还没有实际数据 —— 填「目标」即可（预测值会自动和它比达成率）；如果已经知道实际数，也可以直接填在上面。'
     : '留空表示继续用自动统计值（订单 '+fcNum(s?s.orders:0)+' / 样品单 '+fcNum(s?s.sample:0)+' / 金额 '+fcNum(s?s.amount:0)+' / 客户 '+fcNum(s?s.buyers:0)+'）。') + chatTip;
+  // v2.60：先算出两店各自的「自动值」放灰字里，再填修正值 —— 这样一眼能看出改了哪格、改前是多少
+  const _aL=fcAutoMap('langges')||{}, _aF=fcAutoMap('fansi')||{};
+  const _cL=fcCalOrders('langges', m, _aL, fc.months||{});
+  const _cF=fcCalOrders('fansi',   m, _aF, fc.months||{});
+  fcPkAuto={
+    langges: fcPcsStyles('langges', m, fcCalK('langges'), _cL.sample, _cL.bulk),
+    fansi  : fcPcsStyles('fansi',   m, fcCalK('fansi'),   _cF.sample, _cF.bulk)
+  };
+  FC_SHOPS.forEach(x=>{
+    const sh=x[0], b=(fcPkOf(m)[sh]||{});
+    const pv=v=>(v===undefined||v===null||v==='')?'':v;
+    const e1=document.getElementById('fcPk_'+sh+'_pcs');    if(e1) e1.value=pv(b.pcs);
+    const e2=document.getElementById('fcPk_'+sh+'_styles'); if(e2) e2.value=pv(b.styles);
+  });
   const elO=document.getElementById('fcMorders'), elS=document.getElementById('fcMsample'),
         elB=document.getElementById('fcMbulk'),   elA=document.getElementById('fcMamount'),
         elY=document.getElementById('fcMbuyers');
@@ -16104,6 +16232,7 @@ function fcOpenMonth(m){
   document.getElementById('fcMnote').value = man.note||'';
   document.getElementById('fcGorders').value = goal.orders!==undefined ? goal.orders : '';
   document.getElementById('fcGamount').value = goal.amount!==undefined ? goal.amount : '';
+  fcPkRecalc();
   box.style.display='flex';
 }
 function fcSaveMonth(){
@@ -16118,6 +16247,15 @@ function fcSaveMonth(){
   const v4=rdv('fcMamount'); if(v4!==null) o.amount=v4;
   const v5=rdv('fcMbuyers'); if(v5!==null) o.buyers=v5;
   const note=gv('fcMnote');
+  // v2.60：按项目修正的件数 / 款数（留空的格子不写进去 = 回到自动折算值；填 0 就是 0）
+  const rdv0=id=>{ const v=gv(id); if(v===''||isNaN(Number(v))) return null; const nn=Number(v); return nn<0?null:nn; };
+  const pk={};
+  FC_SHOPS.forEach(x=>{
+    const sh=x[0];
+    const p=rdv0('fcPk_'+sh+'_pcs'), st=rdv0('fcPk_'+sh+'_styles');
+    if(p!==null || st!==null) pk[sh]={pcs:p, styles:st};
+  });
+  if(Object.keys(pk).length) o.pk=pk;
   const go=gv('fcGorders'), ga=gv('fcGamount');
   const goal={};
   if(go!=='' && !isNaN(Number(go))) goal.orders=Number(go);
@@ -16212,7 +16350,7 @@ function fcSummaryText(ctx){
              const b=k.styles?('大货单 ×'+fcR2(k.styles.k)):'';
              const t=[a,b].filter(Boolean).join('、');
              return escHtml(s[1])+'（'+t+'）';
-           }).filter(x=>!/（）/.test(x)).join('；')+'；系数是初始值，按 '+(c.calRows||0)+' 个月（2026 年 7~9 月）实测值定下来后固定使用，不随数据自动变，可在面板直接改；')
+           }).filter(x=>!/（）/.test(x)).join('；')+'；系数是初始值，按 '+(c.calRows||0)+' 个月（2026 年 7~9 月）实测值定下来后固定使用，不随数据自动变，可在面板直接改；有手工修正的月份以修正值为准；')
         : ('样品件数 / 大货款式数来自订单产品明细 / 聊天解析（覆盖 '+c.chatMonths+' 个月，'+(c.chatMonths?('抓不到的月份留空、不参与该指标预测'):'目前还没有数据，建议去上面设「件数 / 款式数系数」')+'）；'))
     +'④ 季节节奏参考了平时整理的行业规律（见第三节），只用于解释，不直接改数字。');
   return L.join('');
@@ -16279,7 +16417,7 @@ function fcReportHtml(){
   H+='<li><b>淡旺季处理</b>：'+(c.seas.ok?('用自家历史算每个月的季节系数（12 个月平均=1.00）：先算「该月 ÷ 该年均值」的相对比抹掉年份间基数差异，再对多年取中位数（满 3 年时去掉最高最低），然后先把历史去掉季节再拟合、最后乘回目标月系数。'+fcEsc(String(Number(String(t).split('-')[1])))+' 月系数 <b>'+c.seas.idx[Number(String(t).split('-')[1])].toFixed(2)+'</b>，样本 '+c.seas.n+' 条，'+(c.seas.w>=1?'全量套用':'半量套用（样本不足 24 个月）')+'。'):('淡旺季采用<b>年内相对比 + 多年中位数</b>（该月 ÷ 该年均值，再多年取中位数），但当前历史只有 '+c.nAct+' 个月、不足 12 个月，月份还没走满一轮，<b>本次未套用</b> —— 硬套会把偶发波动当规律。<b>只用自己的历史算，不套行业预设值。</b>'))+'</li>';
   H+='<li><b>波动区间</b>：按历史对趋势线的偏离程度 + 相邻月份最大波动估算，<b>不是保证能落在这个范围里</b>。</li>';
   if(c.last && c.last.partial) H+='<li><b>当月折算</b>：'+fcEsc(fcMonthLabel(c.last.month))+' 还没过完，已按已过天数折算成整月（约 ×'+c.last.scale.toFixed(2)+'），否则会低估。</li>';
-  H+='<li><b>样品件数 / 大货款式数</b>：'+(c.hasCal?('按<b>固定系数</b>折算 —— <b>预测样品件数 = 预测样品单数 × 系数</b>，<b>预测大货款式数 = 预测大货单数 × 系数</b>。一个样品单不等于一件样品、一个订单也可能多个款式，所以用「平均一个样品单几件样品 / 平均一个大货单几个款式」折算。系数是初始值（按 2026 年 7~9 月 '+(c.calRows||0)+' 个月的实测值定下来后<b>固定使用</b>，不随数据自动变），在当前页「<b>件数 / 款式数系数</b>」面板可直接改，改完预测立即跟着变。'):('目前来自订单产品明细解析（覆盖 '+(c.chatMonths||0)+' 个月），建议到上面「<b>件数 / 款式数系数</b>」面板设系数（明细里的数量是下单量，会虚高）。'))+'</li>';
+  H+='<li><b>样品件数 / 大货款式数</b>：'+(c.hasCal?('按<b>固定系数</b>折算 —— <b>预测样品件数 = 预测样品单数 × 系数</b>，<b>预测大货款式数 = 预测大货单数 × 系数</b>。一个样品单不等于一件样品、一个订单也可能多个款式，所以用「平均一个样品单几件样品 / 平均一个大货单几个款式」折算。系数是初始值（按 2026 年 7~9 月 '+(c.calRows||0)+' 个月的实测值定下来后<b>固定使用</b>，不随数据自动变），在当前页「<b>件数 / 款式数系数</b>」面板可直接改，改完预测立即跟着变；<b>个别月份在「修正」弹窗里手工改过件数 / 款数的（按朗格斯 / 凡适分开填），那几个月以你填的数为准</b>。'):('目前来自订单产品明细解析（覆盖 '+(c.chatMonths||0)+' 个月），建议到上面「<b>件数 / 款式数系数</b>」面板设系数（明细里的数量是下单量，会虚高）。'))+'</li>';
   H+='</ul>';
   // 三、行业节奏参考
   H+='<h2>三、行业淡旺季参考（外部规律，仅用于解释与校验）</h2>';
