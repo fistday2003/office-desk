@@ -1692,7 +1692,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.61 · 2026-11-11</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.62 · 2026-11-13</div>
     </div>
   </aside>
 
@@ -2738,35 +2738,36 @@ tr:hover .fr-fwd-acts{opacity:1}
     <div id="syncTestResult" style="font-size:12px;margin-bottom:8px;display:none;padding:8px 12px;border-radius:6px"></div>
 
     <hr style="border:none;border-top:1px solid var(--border);margin:16px 0 14px">
-    <h4 style="font-size:14px;font-weight:700;margin:0 0 4px">自动三点同步</h4>
+    <h4 style="font-size:14px;font-weight:700;margin:0 0 4px">数据存放</h4>
     <p style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:10px">
-      你录入、上传、记录的所有内容（含附件），都会自动存到<b>云端存档</b>和<b>本地资料包</b>，不用手动点。<br>
-      令牌只填一次，保存在本机浏览器里。
+      <b style="color:#15803d">v2.62 起：所有数据只存在这台电脑的浏览器里</b>，不再往 GitHub 上传。<br>
+      GitHub 上只放程序本身（代码），不放你的任何业务数据。<br>
+      备份请用顶部「完整备份（含附件）」导出到电脑，或让它自动存到 D:\BaiduSyncdisk 资料包。
     </p>
     <div class="as-box">
       <div class="as-row">
-        <label>开启自动同步</label>
-        <span class="switch"><input type="checkbox" id="asEnabled"><span class="slider"></span></span>
+        <label>自动上传到 GitHub（已停用）</label>
+        <span class="switch"><input type="checkbox" id="asEnabled" disabled><span class="slider"></span></span>
       </div>
-      <div class="as-status" id="asStatus">未配置</div>
+      <div class="as-status" id="asStatus">已停用</div>
     </div>
     <div class="form-group">
-      <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">GitHub 令牌</label>
-      <input type="password" id="asToken" placeholder="ghp_ 开头的一串字符" autocomplete="off" spellcheck="false">
+      <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">GitHub 令牌（已停用，留空）</label>
+      <input type="password" id="asToken" placeholder="v2.62 起不再使用" autocomplete="off" spellcheck="false" disabled>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-      <button class="btn btn-ghost" id="btnAsSyncNow" style="flex:1 1 46%;justify-content:center">立即同步一次</button>
-      <button class="btn btn-ghost" id="btnAsRestore" style="flex:1 1 46%;justify-content:center">从云端恢复（合并）</button>
+      <button class="btn btn-ghost" id="btnAsSyncNow" style="flex:1 1 46%;justify-content:center" disabled>立即上传（已停用）</button>
+      <button class="btn btn-ghost" id="btnAsRestore" style="flex:1 1 46%;justify-content:center" disabled>从云端恢复（已停用）</button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
       <button class="btn btn-ghost" id="btnAsUndo" style="flex:1 1 100%;justify-content:center">⏪ 回退到上次恢复/同步前</button>
     </div>
     <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:6px" id="asSnapHint"></p>
     <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">
-      「恢复」和「接收同步」都是<b>合并式（只增不减）</b>：本机已有、对方没有的记录一律保留，不会再把新登记的内容抹掉。
+      云端上传与云端恢复均已停用；「回退到上次恢复/同步前」用的是<b>本机快照</b>，仍然可用，用于误操作后救回。
     </p>
     <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">
-      本地资料包由「自动同步存档」计划任务每 15 分钟自动拉取一次，路径：D:\BaiduSyncdisk\工作文件\自研软件\办公平台
+      本机资料包路径：D:\BaiduSyncdisk\工作文件\自研软件\办公平台（由本机脚本维护，不经过任何云端）
     </p>
 
     <div class="modal-actions">
@@ -2802,7 +2803,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.61';
+const APP_VERSION = 'v2.62';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -6982,7 +6983,7 @@ function getAsCfg(){
   let c = {};
   try{ c = JSON.parse(localStorage.getItem(AS_KEY)||'{}') || {}; }catch(e){ c = {}; }
   return {
-    enabled: c.enabled !== false,
+    enabled: c.enabled === true,   // v2.62：默认关（数据只存本地），不再是「没配过就开」
     token: c.token || '',
     repo: c.repo || AS_REPO,
     branch: c.branch || 'main',
@@ -6997,7 +6998,13 @@ function setAsCfg(patch){
   try{ localStorage.setItem(AS_KEY, JSON.stringify(c)); }catch(e){}
   return c;
 }
-function asReady(){ const c = getAsCfg(); return !!(c.enabled && c.token && c.repo); }
+// v2.62 起：**数据只存本地**，云端上传整体停用（李主任 2026-11-13 定）。
+// 函数名与后续链路保留，只为不牵动「上传/接收同步」按钮的兼容分支；
+// 硬闸放这里，所有入口（自动排程 / 切后台 / 失败重试 / 手动点）都先问它。
+const AS_CLOUD_OFF = true;
+function asReady(){ if(AS_CLOUD_OFF) return false; const c = getAsCfg(); return !!(c.enabled && c.token && c.repo); }
+// 顺手清掉本机残留的旧令牌（既然不再上传，密钥没必要留着）
+try{ const _c = getAsCfg(); if(_c.token || _c.enabled) setAsCfg({enabled:false, token:'', lastError:''}); }catch(e){}
 
 // 轻量内容哈希：用来给附件命名 + 去重（同一张图不会重复上传）
 function asHash(s){
@@ -7379,6 +7386,7 @@ function asSchedule(delay){
 }
 
 async function asRun(manual){
+  if(AS_CLOUD_OFF){ if(manual) showToast('数据只存本地，云端上传已停用', 'info'); return; }
   let cfg;
   try{ cfg = getAsCfg(); }catch(e){ return; }
   if(!cfg.token){ if(manual) showToast('请先粘贴 GitHub 令牌'); return; }
@@ -7534,6 +7542,13 @@ function asRenderStatus(state){
       dot.className = 'as-dot' + (!c.token || !c.enabled ? '' : (asRunning ? ' syncing' : (c.lastError ? ' err' : ' ok')));
     }
     if(!el) return;
+    if(AS_CLOUD_OFF){
+      if(on){ on.checked = false; on.disabled = true; }
+      if(inp){ inp.value = ''; inp.disabled = true; }
+      if(dot) dot.className = 'as-dot';
+      el.innerHTML = '<span class="ok">已停用</span>：数据只存本机浏览器，不再上传。要备份请用顶部「完整备份（含附件）」导出到电脑';
+      return;
+    }
     if(!c.token){
       el.innerHTML = '<span class="wait">未配置</span>：现在点「上传同步」只能传文字、照片不会同步；把 GitHub 令牌粘到下面，照片也会一起同步（无体积上限）';
     } else if(!c.enabled){
@@ -12286,7 +12301,7 @@ function renderBiz(){
 
   // 导入记录 + 拖拽区
   h+='<div class="biz-panel"><h4>导入数据 <span class="tag">订单 '+biz.orders.length+' 条 · 收款 '+biz.pays.length+' 笔</span>'
-    + '<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">全部数据落在本机浏览器，并自动同步存档</span></h4>'
+    + '<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">全部数据只落在本机浏览器，不上传云端</span></h4>'
     + bizDropZone() + bizUploadLog() + '</div>';
 
   // 历史资料档案（含本地保存路径）
