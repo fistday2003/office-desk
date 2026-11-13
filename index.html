@@ -6514,6 +6514,13 @@ document.getElementById('syncNameInput').addEventListener('keydown',(e)=>{
 document.getElementById('btnSyncTestConn').addEventListener('click', async ()=>{
   const resultEl = document.getElementById('syncTestResult');
   const btn = document.getElementById('btnSyncTestConn');
+  if(AS_CLOUD_OFF){
+    resultEl.style.display = 'block';
+    resultEl.style.background = '#fef3c7';
+    resultEl.style.color = '#92400e';
+    resultEl.textContent = '已停用：数据只存本地，不再做云端连通测试（v2.62）';
+    return;
+  }
   btn.disabled = true;
   resultEl.style.display = 'block';
   resultEl.style.background = 'var(--bg-secondary)';
@@ -6647,6 +6654,7 @@ function chunkByBytes(str, maxBytes){
 }
 
 async function doSyncUpload(){
+  if(AS_CLOUD_OFF){ showToast('数据只存本地，云端同步已停用', 'info'); return; }
   const count = totalItems();
   showToast('<span class="sync-spinner"></span>正在上传 '+count+' 条数据...', 'info');
 
@@ -6751,6 +6759,7 @@ document.getElementById('btnSyncReceive').addEventListener('click', async ()=>{
 });
 
 async function doSyncReceive(){
+  if(AS_CLOUD_OFF){ showToast('数据只存本地，云端同步已停用', 'info'); return; }
   showToast('<span class="sync-spinner"></span>正在接收数据...', 'info');
 
   const topic = getSyncTopic();
