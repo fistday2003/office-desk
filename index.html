@@ -371,6 +371,17 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .badge-tag.active{background:var(--accent);color:#fff}
 .badge-done{background:var(--success-light);color:var(--success)}
 .badge-blocked{background:var(--danger-light);color:var(--danger)}
+/* v2.63 灵感速记：自动识别标签（比手打标签更粗更醒目，带闪电图标）+ 日期 */
+.note-auto-tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;line-height:1.4;
+  padding:3px 10px 3px 8px;border-radius:12px;border:1px solid transparent;cursor:pointer;
+  letter-spacing:.3px;-webkit-font-smoothing:antialiased}
+.note-auto-tag svg{width:11px;height:11px;flex:0 0 11px;opacity:.85}
+.note-auto-tag:hover{filter:brightness(.94)}
+.note-time{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--text-secondary);
+  font-variant-numeric:tabular-nums;white-space:nowrap;padding:2px 8px;background:#f8fafc;border:1px solid var(--border);border-radius:12px}
+.note-time svg{width:11px;height:11px;opacity:.7}
+.note-tag-hint{font-size:12px;color:var(--text-secondary);line-height:1.75;margin:-4px 0 12px}
+.note-tag-hint b{color:var(--text)}
 
 /* Buttons */
 .btn{padding:8px 16px;border-radius:6px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:5px}
@@ -1692,7 +1703,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.62 · 2026-11-13</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.63 · 2026-11-16</div>
     </div>
   </aside>
 
@@ -1733,6 +1744,10 @@ tr:hover .fr-fwd-acts{opacity:1}
         </button>
       </div>
       <div class="tag-filter" id="tagFilter"></div>
+      <p class="note-tag-hint">
+        标签有两种：<b>带闪电的彩色标签</b>是系统按内容自动识别出来的（订单 / 客户 / 面料 / 报账 / 物流 / 人事 / 流程 / 风险 / 待办 / 资料，最多标 3 个，哪类词出现得多就标哪类），
+        不写进数据里 —— 识别规则升级后，老笔记也会自动跟着更新；<b>浅绿色标签</b>是你自己手写的。点任何一个标签都能筛选。
+      </p>
       <div id="noteList"></div>
     </div>
 
@@ -1990,7 +2005,11 @@ tr:hover .fr-fwd-acts{opacity:1}
   <div class="modal" data-drop-note-modal="1">
     <h3 id="modalNoteTitle">速记灵感</h3>
     <div class="form-group"><label>内容</label><textarea id="noteContent" placeholder="写下你的想法..."></textarea></div>
-    <div class="form-group"><label>标签（用逗号分隔）</label><input type="text" id="noteTags" placeholder="例如：产品,营销,待办"></div>
+    <div class="form-group"><label>标签（选填，可留空）</label><input type="text" id="noteTags" placeholder="例如：产品,营销,待办">
+      <p style="font-size:11.5px;color:var(--text-muted);line-height:1.65;margin-top:6px">
+        留空也行 —— 保存后系统会<b style="color:var(--text-secondary)">按内容自动识别标签</b>（订单 / 客户 / 面料 / 报账 / 物流 / 人事 / 流程 / 风险 / 待办 / 资料），最多标 3 个；你手写的标签会一起保留，不会被覆盖。
+      </p>
+    </div>
     <div class="form-group"><label>附件（选填）</label>
       <div id="noteModalFiles" class="task-files" style="margin-top:0"></div>
       <div class="task-file-add"><button type="button" class="btn btn-sm btn-ghost" onclick="pickNoteModalFiles()">📎 添加附件</button><span id="noteModalFilesHint" style="font-size:11px;color:var(--text-muted);margin-left:8px">图片自动压缩，单个文件最大 3MB，也可直接拖文件进来</span></div>
@@ -2803,7 +2822,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.62';
+const APP_VERSION = 'v2.63';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -5298,19 +5317,120 @@ function openTaskModal(){
 // ============================================================
 //  NOTES TAB
 // ============================================================
+// ===== v2.63 自动标签引擎 =====
+// 规则表：内容里命中哪类关键词最多，就标哪几类。纯本地字符串匹配，不联网、不改数据。
+// 注意：自动标签**不写进 notes**（不落库）—— 规则一升级，所有老笔记自动跟着更新。
+const NOTE_AUTO_RULES = [
+  { tag:'订单', fg:'#b45309', bg:'#fef3c7', bd:'#fde68a',
+    kws:['订单','下单','大货','样品单','样单','尾款','定金','订金','报价','报盘','合同','起订量','MOQ','单款','单价','付款','收款','pi'] },
+  { tag:'客户', fg:'#1d4ed8', bg:'#dbeafe', bd:'#bfdbfe',
+    kws:['客户','询盘','跟进','回复','阿里','国际站','店铺','旺旺','邮件','拜访','老客户','新客户','小满','商机'] },
+  { tag:'面料', fg:'#6d28d9', bg:'#ede9fe', bd:'#ddd6fe',
+    kws:['面料','样布','色卡','克重','成分','染厂','印花','涂层','涤纶','锦纶','氨纶','门幅','坯布','打样','色牢度','缩水','四面弹'] },
+  { tag:'报账', fg:'#c2410c', bg:'#ffedd5', bd:'#fed7aa',
+    kws:['报账','报销','发票','垫付','支出','费用','转账','账户','票据','核销','预算','成本','利润','核算','提成','打款'] },
+  { tag:'物流', fg:'#0e7490', bg:'#cffafe', bd:'#a5f3fc',
+    kws:['运费','货代','快递','发货','物流','提单','报关','空运','海运','顺丰','入仓','出货','产地证','清关','单证','船期'] },
+  { tag:'人事', fg:'#be123c', bg:'#ffe4e6', bd:'#fecdd3',
+    kws:['招聘','面试','入职','离职','试用','转正','绩效','工资','考勤','请假','员工','团队','培训','考核','交接'] },
+  { tag:'流程', fg:'#475569', bg:'#e2e8f0', bd:'#cbd5e1',
+    kws:['流程','制度','规范','规定','审批','签字','重申','要求','通知','执行','落实','统一','标准','责任','审核'] },
+  { tag:'风险', fg:'#b91c1c', bg:'#fee2e2', bd:'#fecaca',
+    kws:['风险','赔偿','赔款','索赔','客诉','投诉','货损','罚款','扣款','损失','延期','逾期','纠纷','禁止','务必','注意','追责'] },
+  { tag:'待办', fg:'#a16207', bg:'#fef9c3', bd:'#fde047',
+    kws:['尽快','本周','下周','明天','后天','截止','记得','别忘','待办','需要处理','安排一下','回复我'] },
+  { tag:'资料', fg:'#0369a1', bg:'#e0f2fe', bd:'#bae6fd',
+    kws:['http','www.','链接','网址','账号','密码','登录','附件','表格','截图','地址','电话'] }
+];
+
+const NOTE_AUTO_MAX = 3;          // 一条笔记最多标几个自动标签（再多就吵了）
+const NOTE_AUTO_VER = 'r1';       // 规则版本：改了关键词就必须改这个，缓存才会整体失效
+const noteAutoCache = new Map();  // 版本|content → 结果缓存，避免每次刷新都重算
+
+// 统计一个关键词在文本里出现几次；2~4 个字母的英文词要求左右不是字母数字，防 pi 命中 picking
+function noteKwCount(s, k){
+  const kl = String(k).toLowerCase();
+  const shortEn = /^[a-z]{1,4}$/.test(kl);
+  let n = 0, from = 0, idx;
+  while((idx = s.indexOf(kl, from)) !== -1){
+    if(shortEn){
+      const before = idx > 0 ? s[idx-1] : '';
+      const after  = idx + kl.length < s.length ? s[idx+kl.length] : '';
+      if(!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) n++;
+    } else {
+      n++;
+    }
+    from = idx + kl.length;
+  }
+  return n;
+}
+
+// 返回 [{tag,fg,bg,bd,n}]，按命中次数从多到少，最多 NOTE_AUTO_MAX 个
+function noteAutoTags(content){
+  const raw = String(content || '');
+  if(!raw.trim()) return [];
+  const key = NOTE_AUTO_VER + '|' + raw;
+  if(noteAutoCache.has(key)) return noteAutoCache.get(key);
+  const s = raw.toLowerCase();
+  const hits = [];
+  NOTE_AUTO_RULES.forEach((r, ri)=>{
+    let n = 0;
+    r.kws.forEach(k=>{ n += noteKwCount(s, k); });
+    if(n > 0) hits.push({ tag:r.tag, fg:r.fg, bg:r.bg, bd:r.bd, n:n, ri:ri });
+  });
+  hits.sort((a, b)=> (b.n - a.n) || (a.ri - b.ri));
+  const out = hits.slice(0, NOTE_AUTO_MAX);
+  if(noteAutoCache.size > 800) noteAutoCache.clear();
+  noteAutoCache.set(key, out);
+  return out;
+}
+
+function noteAutoTagNames(n){
+  return noteAutoTags(n && n.content).map(a=>a.tag);
+}
+
+// 笔记日期：YYYY-MM-DD（本地时区）
+function noteDateStr(ts){
+  const d = new Date(Number(ts) || Date.now());
+  if(isNaN(d.getTime())) return '';
+  const p = v=>String(v).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+}
+function noteTimeStr(ts){
+  const d = new Date(Number(ts) || Date.now());
+  if(isNaN(d.getTime())) return '';
+  const p = v=>String(v).padStart(2, '0');
+  return noteDateStr(ts) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+const NOTE_CLOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
+const NOTE_BOLT_SVG  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13l0-8z"/></svg>';
+
 function getAllTags(){
   const tagSet = new Set();
-  notes.forEach(n=>n.tags.forEach(t=>tagSet.add(t)));
+  notes.forEach(n=>{
+    (n.tags || []).forEach(t=>tagSet.add(t));
+    noteAutoTagNames(n).forEach(t=>tagSet.add(t));
+  });
   return Array.from(tagSet).sort();
 }
 
 function renderTagFilter(){
   const tags = getAllTags();
   const container = document.getElementById('tagFilter');
+  // v2.63：区分「只有自动识别命中」的标签（带闪电、深色）和「自己手打过」的标签（浅绿色）
+  const manualSet = new Set();
+  notes.forEach(n=>(n.tags||[]).forEach(t=>manualSet.add(t)));
   let html = '<span class="tag-filter-label">筛选标签：</span>';
   html += '<span class="badge badge-tag'+(noteFilterTag===null?' active':'')+'" onclick="setNoteFilter(null)">全部</span>';
   tags.forEach(tag=>{
-    html += '<span class="badge badge-tag'+(noteFilterTag===tag?' active':'')+'" onclick="setNoteFilter(\''+escAttr(tag)+'\')">'+escHtml(tag)+'</span>';
+    if(!manualSet.has(tag)){
+      const a = NOTE_AUTO_RULES.find(r=>r.tag===tag) || {fg:'#334155', bg:'#e2e8f0', bd:'#cbd5e1'};
+      html += '<span class="note-auto-tag" style="background:'+(noteFilterTag===tag?a.fg:a.bg)+';color:'+(noteFilterTag===tag?'#fff':a.fg)+';border-color:'+a.bd+'"'
+            + ' title="自动识别标签（按笔记内容判断，不是你手打的）"'
+            + ' onclick="setNoteFilter(\''+escAttr(tag)+'\')">'+NOTE_BOLT_SVG+escHtml(tag)+'</span>';
+    } else {
+      html += '<span class="badge badge-tag'+(noteFilterTag===tag?' active':'')+'" title="你自己写的标签" onclick="setNoteFilter(\''+escAttr(tag)+'\')">'+escHtml(tag)+'</span>';
+    }
   });
   container.innerHTML = html;
 }
@@ -5324,7 +5444,8 @@ function setNoteFilter(tag){
 function renderNotes(){
   const container = document.getElementById('noteList');
   let filtered = [...notes];
-  if(noteFilterTag) filtered = filtered.filter(n=>n.tags.includes(noteFilterTag));
+  // v2.63：筛选同时匹配「手打标签」和「自动识别标签」
+  if(noteFilterTag) filtered = filtered.filter(n=>(n.tags||[]).includes(noteFilterTag) || noteAutoTagNames(n).indexOf(noteFilterTag) !== -1);
   filtered.sort((a,b)=>b.createdAt-a.createdAt);
   
   let html = '';
@@ -5359,10 +5480,20 @@ function renderNotes(){
       html += '</div>';
     }
     html += '<div class="card-meta">';
-    n.tags.forEach(tag=>{
-      html += '<span class="badge badge-tag" onclick="setNoteFilter(\''+escAttr(tag)+'\')">'+escHtml(tag)+'</span>';
+    // v2.63：左下角由「67天前」改成「2026-09-10」，鼠标悬停才知道是几天前 / 几点几分
+    const ago = timeAgo(n.createdAt);
+    html += '<span class="note-time" title="'+escAttr(noteTimeStr(n.createdAt)+' 记录（'+ago+'）')+'">'+NOTE_CLOCK_SVG+noteDateStr(n.createdAt)+'</span>';
+    // 自动识别标签（带闪电，颜色深、字重 700）—— 手打过的同名标签不重复显示
+    const manualTags = (n.tags || []).filter(Boolean);
+    noteAutoTags(n.content).forEach(a=>{
+      if(manualTags.indexOf(a.tag) !== -1) return;
+      html += '<span class="note-auto-tag" style="background:'+a.bg+';color:'+a.fg+';border-color:'+a.bd+'"'
+            + ' title="自动识别：'+escAttr(a.tag)+'（内容里命中 '+a.n+' 处关键词）· 点一下可筛选"'
+            + ' onclick="setNoteFilter(\''+escAttr(a.tag)+'\')">'+NOTE_BOLT_SVG+escHtml(a.tag)+'</span>';
     });
-    html += '<span style="font-size:11px;color:var(--text-muted)">'+timeAgo(n.createdAt)+'</span>';
+    manualTags.forEach(tag=>{
+      html += '<span class="badge badge-tag" title="你自己写的标签" onclick="setNoteFilter(\''+escAttr(tag)+'\')">'+escHtml(tag)+'</span>';
+    });
     html += '</div></div>';
   });
   container.innerHTML = html;
@@ -5374,7 +5505,7 @@ function editNote(id){
   if(!n) return;
   document.getElementById('modalNoteTitle').textContent = '编辑灵感';
   document.getElementById('noteContent').value = n.content;
-  document.getElementById('noteTags').value = n.tags.join('，');
+  document.getElementById('noteTags').value = (n.tags||[]).join('，');
   noteModalFiles = (n.files||[]).slice();
   noteModalPending = 0;
   renderNoteModalFiles();
