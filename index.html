@@ -382,6 +382,49 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .note-time svg{width:11px;height:11px;opacity:.7}
 .note-tag-hint{font-size:12px;color:var(--text-secondary);line-height:1.75;margin:-4px 0 12px}
 .note-tag-hint b{color:var(--text)}
+/* v2.64 灵感速记：拖拽上传投放区（弹窗里一块看得见、能拖进去的地方） */
+.note-dropzone{display:flex;align-items:center;gap:12px;border:2px dashed var(--border);border-radius:10px;
+  background:var(--bg-soft,#f7f8fa);padding:13px 14px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.note-dropzone:hover{border-color:var(--accent);background:var(--accent-light)}
+.note-dropzone.dz-over{border-color:var(--accent);border-style:solid;background:var(--accent-light);transform:scale(1.012)}
+.note-dropzone .dz-ic{width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:var(--accent-light);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.note-dropzone.dz-over .dz-ic{background:var(--accent);color:#fff}
+.note-dropzone .dz-txt{min-width:0;flex:1 1 auto}
+.note-dropzone .dz-btn{flex:0 0 auto;white-space:nowrap;margin-left:4px}   /* 手机上「选择文件」曾被挤成竖排两行 */
+.note-dropzone .dz-main{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.5}
+.note-dropzone.dz-over .dz-main{color:var(--accent)}
+.note-dropzone .dz-sub{font-size:11.5px;color:var(--text-muted);line-height:1.6;margin-top:3px}
+/* 卡片：拖文件进来时盖一层，明说「松手就能加」 */
+.note-card{position:relative}
+/* v2.64 灵感速记：图片附件改成缩略图墙，点一下在页面里看大图（可翻页/下载），不再新开标签页 */
+.note-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.note-thumb{position:relative;width:132px;height:132px;border-radius:9px;overflow:hidden;border:1px solid var(--border);
+  cursor:zoom-in;background:var(--bg,#f1f5f9)}
+.note-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .18s ease}
+.note-thumb:hover img{transform:scale(1.05)}
+.note-thumb::after{content:'点击看大图';position:absolute;left:0;right:0;bottom:0;padding:4px 0 3px;text-align:center;
+  font-size:10.5px;font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));
+  opacity:0;transition:opacity .15s}
+.note-thumb:hover::after{opacity:1}
+.note-thumb-del{position:absolute;top:4px;right:4px;width:20px;height:20px;min-height:20px;border-radius:50%;
+  background:rgba(239,68,68,.94);color:#fff;font-size:12px;font-weight:700;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;z-index:2}
+.note-thumb:hover .note-thumb-del{opacity:1}
+@media (hover:none){ .note-thumb-del{opacity:1} }   /* 手机没有 hover，删除钮常显 */
+@media (max-width:768px){ .note-thumb{width:104px;height:104px} }
+.note-card.drop-hover{outline:2px dashed var(--accent);outline-offset:2px;background:var(--accent-light)!important}
+.note-card.drop-hover::after{content:'松手即可添加附件';position:absolute;inset:0;border-radius:inherit;
+  background:rgba(13,148,136,.10);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--accent);pointer-events:none}
+/* 文件拖进页面时，先用虚线框标出哪些卡片能接（只在速记页生效）；
+   不额外挂文字角标 —— 会盖住卡片右上角那排图标按钮，拖到某张卡片上时自然会出现「松手即可添加附件」 */
+body.note-dragging .tab-panel.active #noteList .note-card{outline:2px dashed var(--accent);outline-offset:2px}
+@media (max-width:768px){
+  .note-dropzone{padding:11px 12px;gap:10px}
+  .note-dropzone .dz-drag{display:none}   /* 手机上不能拖，文案只说"点按钮选" */
+  .note-dropzone .dz-btn{min-height:36px}
+}
 
 /* Buttons */
 .btn{padding:8px 16px;border-radius:6px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:5px}
@@ -1703,7 +1746,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.63 · 2026-11-16</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.64 · 2026-11-17</div>
     </div>
   </aside>
 
@@ -2011,8 +2054,15 @@ tr:hover .fr-fwd-acts{opacity:1}
       </p>
     </div>
     <div class="form-group"><label>附件（选填）</label>
+      <div class="note-dropzone" id="noteModalZone" onclick="pickNoteModalFiles()" title="点这里选文件，或直接把文件拖进来">
+        <span class="dz-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+        <span class="dz-txt">
+          <div class="dz-main" id="noteModalDzMain"><span class="dz-drag">把文件拖到这里，或</span>点右边按钮选</div>
+          <div class="dz-sub" id="noteModalFilesHint">图片自动压缩，单个文件最大 3MB，最多 9 个</div>
+        </span>
+        <button type="button" class="btn btn-sm btn-ghost dz-btn" onclick="event.stopPropagation();pickNoteModalFiles()">选择文件</button>
+      </div>
       <div id="noteModalFiles" class="task-files" style="margin-top:0"></div>
-      <div class="task-file-add"><button type="button" class="btn btn-sm btn-ghost" onclick="pickNoteModalFiles()">📎 添加附件</button><span id="noteModalFilesHint" style="font-size:11px;color:var(--text-muted);margin-left:8px">图片自动压缩，单个文件最大 3MB，也可直接拖文件进来</span></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnNoteCancel">取消</button>
@@ -2822,7 +2872,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.63';
+const APP_VERSION = 'v2.64';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -5161,18 +5211,24 @@ function renderNoteModalFiles(){
   noteModalFiles.forEach((f,idx)=>{
     const isImg = f.type && f.type.indexOf('image/')===0;
     html += '<div class="task-file-item">';
-    if(isImg) html += '<img src="'+f.dataUrl+'">';
+    if(isImg) html += '<img src="'+f.dataUrl+'" onclick="viewNoteModalFile('+idx+')" title="点击看大图" style="cursor:zoom-in">';
     else html += '<span class="file-ic">📄</span>';
     html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
     html += '<button class="task-file-del" onclick="removeNoteModalFile('+idx+')" title="移除">×</button>';
     html += '</div>';
   });
   box.innerHTML = html;
-  if(hint) hint.textContent = noteModalPending>0 ? '正在处理附件，请稍候...' : '图片自动压缩，单个文件最大 3MB，也可直接拖文件进来';
+  if(hint) hint.textContent = noteModalPending>0 ? ('正在处理 '+noteModalPending+' 个附件，请稍候...') : '图片自动压缩，单个文件最大 3MB，最多 9 个';
 }
 function removeNoteModalFile(idx){
   noteModalFiles.splice(idx,1);
   renderNoteModalFiles();
+}
+// v2.64：还没保存的附件也能先看大图（弹窗叠在上面，关掉继续编辑，数据不丢）
+function viewNoteModalFile(idx){
+  const f = noteModalFiles[idx];
+  if(!f) return;
+  showFileView(f, noteModalFiles, idx);
 }
 function addNoteFilesFromList(nid, files){
   if(files.length===0) return;
@@ -5180,6 +5236,7 @@ function addNoteFilesFromList(nid, files){
   if(!n) return;
   n.files = n.files||[];
   if(n.files.length + files.length > 9){ showToast('每条速记最多添加 9 个附件'); return; }
+  showToast('正在处理 '+files.length+' 个附件…', 'info');
   let done = 0; const results = [];
   files.forEach(f=>{
     processTaskFile(f).then(r=>{
@@ -5207,12 +5264,35 @@ function removeNoteFile(nid, idx){
 function viewNoteFile(nid, idx){
   const n = notes.find(nn=>nn.id===nid);
   if(!n || !n.files || !n.files[idx]) return;
-  window.open(n.files[idx].dataUrl, '_blank');
+  // v2.64：改成页内预览（大图 + 上一张/下一张 + 下载），不再新开标签页
+  showFileView(n.files[idx], n.files, idx);
 }
 
 // ===== 拖拽文件添加附件（待办详情 / 项目卡片 / 速记卡片 / 新建编辑弹窗）=====
 function dropZoneFromEvent(e){
   return e.target.closest ? e.target.closest('[data-project-id],[data-drop-task],[data-drop-task-modal],[data-drop-modal],[data-drop-note],[data-drop-note-modal],[data-drop-exp-modal],[data-drop-clm-modal],[data-drop-fr-cat],[data-drop-fr-action],[data-drop-to]') : null;
+}
+// v2.64：判断这次拖的是不是「文件」（看板/列表的内部拖动不是文件，别误伤）
+function dragHasFiles(e){
+  const t = e.dataTransfer && e.dataTransfer.types;
+  if(!t) return false;
+  for(let i=0;i<t.length;i++) if(t[i]==='Files') return true;
+  return false;
+}
+// v2.64：速记弹窗里的投放区高亮（拖到弹窗任意位置都算，按钮那块也跟着亮）
+function noteDzHi(on){
+  const z = document.getElementById('noteModalZone');
+  if(!z) return;
+  on = !!on;
+  if(z.dataset.over === (on ? '1' : '0')) return;   // 状态没变就别动 DOM，dragover 是一帧一次
+  z.dataset.over = on ? '1' : '0';
+  z.classList.toggle('dz-over', on);
+  const m = document.getElementById('noteModalDzMain');
+  if(m) m.innerHTML = on ? '松手就加到这条速记上' : '<span class="dz-drag">把文件拖到这里，或</span>点右边按钮选';
+}
+function noteDragging(on){
+  document.body.classList.toggle('note-dragging', !!on);
+  if(!on) noteDzHi(false);
 }
 document.addEventListener('dragover', e=>{
   const zone = dropZoneFromEvent(e);
@@ -5220,17 +5300,36 @@ document.addEventListener('dragover', e=>{
     e.preventDefault();
     if(e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
     zone.classList.add('drop-hover');
+    noteDzHi(!!zone.dataset.dropNoteModal);   // 拖到别的区域就把速记投放区的高亮收回去
+    return;
   }
+  noteDzHi(false);
+  // v2.64：拖的是文件但没对准能接的地方 —— 也要拦下，否则浏览器会直接把文件打开、把整个页面顶掉
+  if(dragHasFiles(e)) e.preventDefault();
 });
 document.addEventListener('dragleave', e=>{
   const zone = dropZoneFromEvent(e);
   if(zone && !zone.contains(e.relatedTarget)) zone.classList.remove('drop-hover');
+  if(!e.relatedTarget) noteDragging(false);   // 拖出窗口了
+});
+// v2.64：文件拖进/离开窗口时给个整体提示（速记页的卡片会显示「可拖入」）
+document.addEventListener('dragenter', e=>{
+  if(dragHasFiles(e)) noteDragging(true);
 });
 document.addEventListener('drop', e=>{
   const zone = dropZoneFromEvent(e);
-  if(!zone) return;
+  noteDragging(false);
+  if(!zone){
+    // v2.64：没对准投放区 —— 拦住默认行为（不然整页被文件替换，看着像数据没了），并告诉他该往哪拖
+    if(dragHasFiles(e)){
+      e.preventDefault();
+      showToast('请把文件拖到速记卡片上，或打开速记后拖进附件区', 'info');
+    }
+    return;
+  }
   e.preventDefault();
   zone.classList.remove('drop-hover');
+  noteDzHi(false);
   const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
   if(files.length===0) return;
   if(zone.dataset.dropExpModal) addExpModalFilesFromList(files);
@@ -5460,20 +5559,30 @@ function renderNotes(){
     html += '<button class="btn-icon" onclick="editNote(\''+n.id+'\')" title="编辑"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
     html += '<button class="btn-icon" onclick="deleteNote(\''+n.id+'\')" title="删除" style="color:var(--danger)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
     html += '</div></div>';
-    // 附件区
+    // 附件区（v2.64：图片走缩略图墙，点一下页内看大图；其他文件还是横条）
     const nfiles = n.files||[];
-    if(nfiles.length>0){
+    const isImgFile = f=>f && f.type && f.type.indexOf('image/')===0;
+    const imgIdx = [], otherIdx = [];
+    nfiles.forEach((f,idx)=>{ (isImgFile(f)?imgIdx:otherIdx).push(idx); });
+    if(imgIdx.length>0){
+      html += '<div class="note-thumbs">';
+      imgIdx.forEach(idx=>{
+        const f = nfiles[idx];
+        html += '<div class="note-thumb" onclick="viewNoteFile(\''+n.id+'\','+idx+')" title="'+escAttr(f.name)+' · 点击看大图">';
+        html += '<img src="'+f.dataUrl+'" alt="'+escAttr(f.name)+'" loading="lazy">';
+        html += '<span class="note-thumb-del" onclick="event.stopPropagation();removeNoteFile(\''+n.id+'\','+idx+')" title="删除这张图">×</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    if(otherIdx.length>0){
       html += '<div class="task-files">';
-      nfiles.forEach((f,idx)=>{
-        const isImg = f.type && f.type.indexOf('image/')===0;
+      otherIdx.forEach(idx=>{
+        const f = nfiles[idx];
         html += '<div class="task-file-item">';
-        if(isImg){
-          html += '<img src="'+f.dataUrl+'" onclick="viewNoteFile(\''+n.id+'\','+idx+')" title="点击放大">';
-        } else {
-          html += '<span class="file-ic">📄</span>';
-        }
+        html += '<span class="file-ic">📄</span>';
         html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
-        if(!isImg) html += '<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">下载</a>';
+        html += '<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">下载</a>';
         html += '<button class="task-file-del" onclick="removeNoteFile(\''+n.id+'\','+idx+')" title="删除附件">×</button>';
         html += '</div>';
       });
