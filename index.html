@@ -399,7 +399,8 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
 .note-card{position:relative}
 /* v2.64 灵感速记：图片附件改成缩略图墙，点一下在页面里看大图（可翻页/下载），不再新开标签页 */
 .note-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.note-thumb{position:relative;width:132px;height:132px;border-radius:9px;overflow:hidden;border:1px solid var(--border);
+/* v2.65：预览尺寸放大到原来的 3 倍（132→396），小截图在卡片上也能看清 */
+.note-thumb{position:relative;width:396px;height:396px;border-radius:9px;overflow:hidden;border:1px solid var(--border);
   cursor:zoom-in;background:var(--bg,#f1f5f9)}
 .note-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .18s ease}
 .note-thumb:hover img{transform:scale(1.05)}
@@ -412,7 +413,7 @@ label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4
   display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;z-index:2}
 .note-thumb:hover .note-thumb-del{opacity:1}
 @media (hover:none){ .note-thumb-del{opacity:1} }   /* 手机没有 hover，删除钮常显 */
-@media (max-width:768px){ .note-thumb{width:104px;height:104px} }
+@media (max-width:768px){ .note-thumb{width:312px;height:312px} }
 .note-card.drop-hover{outline:2px dashed var(--accent);outline-offset:2px;background:var(--accent-light)!important}
 .note-card.drop-hover::after{content:'松手即可添加附件';position:absolute;inset:0;border-radius:inherit;
   background:rgba(13,148,136,.10);display:flex;align-items:center;justify-content:center;
@@ -744,6 +745,17 @@ body.note-dragging .tab-panel.active #noteList .note-card{outline:2px dashed var
 .exp-chip:hover{border-color:var(--primary);color:var(--primary-dark)}
 .exp-chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
 .exp-chip.active:hover{color:#fff}
+/* v2.65 报账经手人：下拉（datalist）+ 名单编辑弹窗 */
+.exp-hdl-mgr{flex:0 0 auto;padding:1px 8px;border-radius:11px;font-size:11px;font-weight:600;line-height:1.75;background:var(--card-bg);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;white-space:nowrap;font-family:inherit}
+.exp-hdl-mgr:hover{border-color:var(--primary);color:var(--primary-dark)}
+.exp-hdl-tip{font-size:12.5px;color:var(--text-secondary);line-height:1.75;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:-4px 0 13px}
+.exp-hdl-list{display:flex;flex-direction:column;gap:5px;max-height:50vh;overflow-y:auto}
+.exp-hdl-row{display:flex;align-items:center;gap:8px}
+.exp-hdl-no{flex:0 0 20px;font-size:11.5px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums}
+.exp-hdl-in{flex:1 1 auto;min-width:0;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:var(--card-bg);color:var(--text);font-family:inherit}
+.exp-hdl-del{flex:0 0 auto;padding:5px 10px;font-size:12px;min-width:0;white-space:nowrap}
+.exp-hdl-empty{font-size:12.5px;color:var(--text-muted);padding:10px 2px;line-height:1.7}
+.exp-chiphead{font-size:11.5px;color:var(--text-muted);align-self:center;white-space:nowrap}
 .exp-sums{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
 .exp-sum{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
 .exp-sum .es-label{font-size:12px;color:var(--text-secondary);margin-bottom:5px}
@@ -890,6 +902,13 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .exp-pitem-act{order:7}
   .exp-set-tbl th,.exp-set-tbl td{padding:6px 6px;font-size:12px}
   .exp-proj-foot .btn{flex:1 1 auto;justify-content:center}
+  /* v2.65：手机上「经手人」标签本来就被两栏挤得只剩半行，括号说明省掉、按钮才放得下 */
+  .exp-hdl-sub{display:none}
+  .exp-hdl-mgr{font-size:11px;padding:1px 7px}
+  /* 右边那栏的 label 被 44px 的「编辑名单」按钮撑高了，左边也撑一样高，两个输入框才对得齐 */
+  .exp-payee-grp label{min-height:44px;display:flex;align-items:center}
+  /* 手机上列表自己滚，保证「添加 / 保存名单」永远在屏幕内，不用先滑到底才点得到 */
+  .exp-hdl-list{max-height:38vh}
 }
 /* ---------- 专项报账 CSS 结束 ---------- */
 
@@ -1746,7 +1765,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.64 · 2026-11-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.66 · 2026-11-17</div>
     </div>
   </aside>
 
@@ -2117,8 +2136,12 @@ tr:hover .fr-fwd-acts{opacity:1}
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px" id="expCatChips"></div>
     <div class="form-group"><label>事由 / 摘要</label><input type="text" id="expDesc" placeholder="这笔钱花在哪了"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 130px"><label>收款方（可留空）</label><input type="text" id="expPayee" placeholder="付给了谁，如 顺丰 / 某供应商"></div>
-      <div class="form-group" style="flex:1 1 130px"><label>经手人（谁付的这笔钱）</label><input type="text" id="expHandler" placeholder="谁经手这笔钱，如 孟伊"></div>
+      <div class="form-group exp-payee-grp" style="flex:1 1 130px"><label>收款方（可留空）</label><input type="text" id="expPayee" placeholder="付给了谁，如 顺丰 / 某供应商"></div>
+      <div class="form-group" style="flex:1 1 130px">
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:8px">经手人<span class="exp-hdl-sub">（谁付的这笔钱）</span><button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份下拉名单">编辑名单</button></label>
+        <input type="text" id="expHandler" list="expHandlerList" autocomplete="off" placeholder="点箭头选或打字" onchange="expRenderProjBanner()">
+        <datalist id="expHandlerList"></datalist>
+      </div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 12px" id="expHandlerChips"></div>
     <div class="form-group"><label>备注（可留空）</label><textarea id="expNote" rows="2" placeholder="发票号、补充说明"></textarea></div>
@@ -2161,6 +2184,26 @@ tr:hover .fr-fwd-acts{opacity:1}
   </div>
 </div>
 
+<!-- ====== MODAL: 经手人名单编辑（v2.65） ====== -->
+<div class="modal-overlay" id="modalExpHandlers" style="display:none">
+  <div class="modal" style="max-width:520px">
+    <h3>经手人名单</h3>
+    <div class="exp-hdl-tip">
+      这里决定报账时「经手人」下拉里有谁。可以直接改名、删掉、加新人。<br>
+      <b>只影响以后新填的笔</b>——已经在账上的名字不会被改（要改就到那条记录里单独编辑）。
+    </div>
+    <div id="expHdlList" class="exp-hdl-list"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input type="text" id="expHdlNew" placeholder="加一个人，如 张三" style="flex:1 1 auto;min-width:0" onkeydown="if(event.key==='Enter'){event.preventDefault();expHdlAdd()}">
+      <button type="button" class="btn" onclick="expHdlAdd()" style="white-space:nowrap">添加</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeExpHandlerMgr()">取消</button>
+      <button class="btn btn-primary" onclick="saveExpHandlerMgr()">保存名单</button>
+    </div>
+  </div>
+</div>
+
 <!-- ====== 凭证预览弹窗 ====== -->
 <div class="modal-overlay" id="modalExpView" style="display:none">
   <div class="modal" style="width:min(900px,94vw)">
@@ -2177,13 +2220,15 @@ tr:hover .fr-fwd-acts{opacity:1}
 
 <!-- ====== 附件预览弹窗（v2.45：待做事项的事项/项目附件） ====== -->
 <div class="modal-overlay" id="modalFileView" style="display:none">
-  <div class="modal" style="width:min(900px,94vw)">
+  <div class="modal" style="width:min(1200px,96vw)">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
       <h3 id="fileViewTitle" style="margin:0;font-size:15px;word-break:break-all">附件预览</h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span id="fileViewNav" style="font-size:12px;color:var(--text-muted)"></span>
         <button class="btn" id="btnFilePrev" onclick="fileViewStep(-1)" style="display:none">‹ 上一个</button>
         <button class="btn" id="btnFileNext" onclick="fileViewStep(1)" style="display:none">下一个 ›</button>
+        <button class="btn" id="btnFvZoom" onclick="fileViewZoomToggle()" style="display:none">适合窗口</button>
+        <button class="btn" id="btnFvOpenTab" onclick="fileViewOpenNewTab()" title="用浏览器新标签页打开这个文件（能预览就预览，不能预览会自动下载）">新窗口打开</button>
         <a class="btn" id="fileViewDl" download style="cursor:pointer;text-decoration:none">下载</a>
         <button class="btn" onclick="closeFileView()">关闭</button>
       </div>
@@ -2872,7 +2917,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.64';
+const APP_VERSION = 'v2.66';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -2930,6 +2975,9 @@ function loadData(){
   if(!planGoals || typeof planGoals!=='object' || Array.isArray(planGoals)) planGoals={};
   expenses  = rdStore('expenses', [], true);
   expProjects = rdStore('exp_projects', [], true);
+  // v2.65 经手人名单（可编辑；没存过 / 存坏了 → 回落默认 11 人）
+  expHandlers = rdStore('exp_handlers', [], true);
+  expHandlersHeal();
   claims    = rdStore('claims', [], true);
   dashOrphans = rdStore('dash_orphan', [], true);
   planOrphans = rdStore('plan_orphan', [], true);
@@ -3155,6 +3203,7 @@ function saveAll(){
       localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
       localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser(expenses)));
       localStorage.setItem(STORAGE_PREFIX+'exp_projects',JSON.stringify(expProjects));
+      localStorage.setItem(STORAGE_PREFIX+'exp_handlers',JSON.stringify(expHandlers||[]));
       localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser(claims)));
       localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(stripHrFiles(hr)));
       localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight()));
@@ -3175,6 +3224,7 @@ function saveAll(){
         localStorage.setItem(STORAGE_PREFIX+'plan_goals',JSON.stringify(planGoals));
         localStorage.setItem(STORAGE_PREFIX+'expenses',JSON.stringify(ser2(expenses)));
         localStorage.setItem(STORAGE_PREFIX+'exp_projects',JSON.stringify(expProjects));
+        localStorage.setItem(STORAGE_PREFIX+'exp_handlers',JSON.stringify(expHandlers||[]));
         localStorage.setItem(STORAGE_PREFIX+'claims',JSON.stringify(ser2(claims)));
         localStorage.setItem(STORAGE_PREFIX+'hr',JSON.stringify(stripHrFiles(hr)));
         localStorage.setItem(STORAGE_PREFIX+'freight',JSON.stringify(serFreight2()));
@@ -4955,7 +5005,8 @@ function viewTaskModalFile(idx){
 // （图片 / PDF / 文本 / 其它），另外多支持多附件「上一个 / 下一个」。
 let fileViewList = [];
 let fileViewIdx = 0;
-let fileViewBlob = null;    // PDF 用的 blob URL，关弹窗要 revoke，不然内存泄漏
+let fileViewBlob = null;    // PDF / 新窗口打开用的 blob URL，关弹窗要 revoke，不然内存泄漏
+let fileViewImgMode = 'x3'; // v2.65：大图默认按「3 倍原始尺寸」显示（可滚动），可切「适合窗口」；关弹窗后重置回 3 倍
 
 function dataUrlToBlobUrl(dataUrl){
   try{
@@ -5001,6 +5052,21 @@ function closeFileView(){
   if(fileViewBlob){ try{ URL.revokeObjectURL(fileViewBlob); }catch(e){} fileViewBlob = null; }
   fileViewList = [];
   fileViewIdx = 0;
+  fileViewImgMode = 'x3';   // 下次打开还是默认 3 倍
+}
+// v2.65：3 倍 ↔ 适合窗口 切换（只对图片生效）
+function fileViewZoomToggle(){
+  fileViewImgMode = (fileViewImgMode === 'x3') ? 'fit' : 'x3';
+  fileViewRender();
+}
+// v2.65：把当前附件转成 blob URL 用新标签页打开 —— 浏览器能预览的直接看，不能预览的会自动下载，比只能「下载」少一步
+function fileViewOpenNewTab(){
+  const f = fileViewList[fileViewIdx];
+  if(!f || !f.dataUrl){ showToast('这个附件没有内容，打不开'); return; }
+  if(fileViewBlob){ try{ URL.revokeObjectURL(fileViewBlob); }catch(e){} }
+  fileViewBlob = dataUrlToBlobUrl(f.dataUrl);
+  if(fileViewBlob){ window.open(fileViewBlob, '_blank'); }
+  else { showToast('打开失败，请用「下载」保存后查看'); }
 }
 function fileViewRender(){
   const f = fileViewList[fileViewIdx] || {};
@@ -5027,8 +5093,36 @@ function fileViewRender(){
   const isTxt = t.indexOf('text/') === 0 || t === 'application/json' || /\.(txt|csv|md|log|json|xml|html?)$/i.test(nm);
 
   if(isImg){
-    body.innerHTML = '<img src="' + f.dataUrl + '" alt="" style="max-width:100%;max-height:66vh;display:block;margin:0 auto;border-radius:8px">';
+    // v2.65：默认按 3 倍原始尺寸显示（超宽可滚动看细节），右上角可切回「适合窗口」
+    body.innerHTML = '<div id="fvImgWrap" style="overflow:auto;max-height:74vh;background:#f8fafc;border-radius:8px">'
+      + '<img id="fvImg" src="' + f.dataUrl + '" alt="" style="display:block;border-radius:8px">'
+      + '</div>';
+    const zoomBtn = document.getElementById('btnFvZoom');
+    if(zoomBtn){
+      zoomBtn.style.display = '';
+      zoomBtn.textContent = (fileViewImgMode === 'x3') ? '适合窗口' : '3倍大小';
+    }
+    const im = document.getElementById('fvImg');
+    im.onload = function(){
+      const wrap = document.getElementById('fvImgWrap');
+      if(!wrap) return;
+      const nw = im.naturalWidth || im.width || 300;
+      if(fileViewImgMode === 'x3'){
+        im.style.width = (nw * 3) + 'px';   // 硬 3 倍，大了就靠外层滚动条看
+        im.style.maxWidth = 'none';
+        im.style.maxHeight = 'none';
+        im.style.margin = '0';
+      } else {
+        im.style.width = '';
+        im.style.maxWidth = '100%';
+        im.style.maxHeight = '66vh';
+        im.style.margin = '0 auto';
+      }
+    };
+    if(im.complete && im.naturalWidth > 0) im.onload();
   } else if(isPdf){
+    const zb = document.getElementById('btnFvZoom');
+    if(zb) zb.style.display = 'none';
     // ⚠️ Chrome 里 iframe 直接吃 data:application/pdf 会白屏，必须先转 blob URL
     fileViewBlob = dataUrlToBlobUrl(f.dataUrl);
     if(fileViewBlob){
@@ -5053,7 +5147,11 @@ function fileViewRender(){
     body.innerHTML = '<pre style="white-space:pre-wrap;word-break:break-all;font-size:13px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:66vh;overflow:auto;margin:0">' + escHtml(txt.slice(0, 20000)) + '</pre>';
   } else {
     const kb = f.size ? (' · ' + fmtSize(f.size)) : '';
-    body.innerHTML = '<div class="exp-empty"><b>这种格式不能在页面里直接看</b><br>' + escHtml(nm) + kb + '<br>点右上角「下载」，用电脑上对应的软件（Excel / Word / 压缩包等）打开</div>';
+    body.innerHTML = '<div class="exp-empty"><b>浏览器弹窗里不能直接预览这种格式</b><br>' + escHtml(nm) + kb
+      + '<br>点「新窗口打开」交给浏览器/对应软件直接打开，或点「下载」存到电脑再看'
+      + '<div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
+      + '<button class="btn" onclick="fileViewOpenNewTab()">🚀 新窗口打开</button>'
+      + '<a class="btn" href="' + (f.dataUrl||'') + '" download="' + escAttr(nm) + '">下载</a></div></div>';
   }
 }
 function fmtSize(b){
@@ -5213,7 +5311,7 @@ function renderNoteModalFiles(){
     html += '<div class="task-file-item">';
     if(isImg) html += '<img src="'+f.dataUrl+'" onclick="viewNoteModalFile('+idx+')" title="点击看大图" style="cursor:zoom-in">';
     else html += '<span class="file-ic">📄</span>';
-    html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+    html += '<div class="file-info"><span class="file-name" onclick="viewNoteModalFile('+idx+')" title="点击查看" style="cursor:pointer">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+(isImg?'':' · 点击可查看')+'</span></div>';
     html += '<button class="task-file-del" onclick="removeNoteModalFile('+idx+')" title="移除">×</button>';
     html += '</div>';
   });
@@ -5581,7 +5679,8 @@ function renderNotes(){
         const f = nfiles[idx];
         html += '<div class="task-file-item">';
         html += '<span class="file-ic">📄</span>';
-        html += '<div class="file-info"><span class="file-name">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+'</span></div>';
+        // v2.65：文档也能直接点开看（页内预览 / 新窗口打开），不用再先下载
+        html += '<div class="file-info"><span class="file-name" onclick="viewNoteFile(\''+n.id+'\','+idx+')" title="点击查看" style="cursor:pointer">'+escHtml(f.name)+'</span><span class="file-size">'+fmtSize(f.size)+' · 点击可查看</span></div>';
         html += '<a class="file-dl" href="'+f.dataUrl+'" download="'+escAttr(f.name)+'">下载</a>';
         html += '<button class="task-file-del" onclick="removeNoteFile(\''+n.id+'\','+idx+')" title="删除附件">×</button>';
         html += '</div>';
@@ -6319,7 +6418,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>{
 // ============================================================
 document.getElementById('btnExportFull').addEventListener('click',(ev)=>{ bkExportFull(!!(ev && ev.shiftKey)); });
 document.getElementById('btnExport').addEventListener('click',()=>{
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,claims,hr,freight,biz,exportedAt:new Date().toISOString()};
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,expHandlers,claims,hr,freight,biz,exportedAt:new Date().toISOString()};
   // 把隔离区的损坏原文一并写进备份文件，任何信息都不会真的丢
   try{
     const corrupt = {};
@@ -6383,7 +6482,7 @@ async function bkFileDataUrl(fid, mem){
   return (g && g.dataUrl) ? g.dataUrl : '';
 }
 function bkSnapshotData(){
-  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,claims,hr,freight,biz,forecast:fc,crm,fabric:fab,
+  const data = {tasks,notes,projects,dashboard,plan,planGoals,expenses,expProjects,expHandlers,claims,hr,freight,biz,forecast:fc,crm,fabric:fab,
                 _app:'办公工作台', _version:APP_VERSION, exportedAt:new Date().toISOString()};
   try{
     const corrupt={};
@@ -7437,6 +7536,20 @@ function applyIncoming(data, label){
     stat.kept += _rp.keepLocal;
     stat.newFromIncoming += _rp.incomingNew;
   }
+  // 经手人名单（v2.65）：本地优先、外来新增的追加在后面（只增不减；同名忽略大小写不重复）
+  if(data && Array.isArray(data.expHandlers) && data.expHandlers.length){
+    const _hs = {};
+    (expHandlers||[]).forEach(n=>{ const k=String(n==null?'':n).trim().toLowerCase(); if(k) _hs[k]=1; });
+    let _ha = 0;
+    data.expHandlers.forEach(v=>{
+      const n = String(v==null?'':v).replace(/\s+/g,' ').trim();
+      if(!n) return;
+      const k = n.toLowerCase();
+      if(_hs[k]) return;
+      _hs[k]=1; expHandlers.push(n); _ha++;
+    });
+    if(_ha){ expHandlersHeal(); stat.newFromIncoming += _ha; }
+  }
   arr('claims','claim', ()=>claims, v=>{claims=v;});
   // 店铺巡检（v2.56）：巡检记录按「日期+店铺」唯一，必办按 id，只增不减
   if(data && data.inspect && typeof data.inspect === 'object'){
@@ -7574,7 +7687,7 @@ function asSnapshot(){
             inspRuns:(insp&&insp.runs?insp.runs.length:0), inspTodos:(insp&&insp.todos?insp.todos.length:0),
             attachments:attCount},
     tasks:light(tasks), notes:light(notes), projects:light(projects),
-    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), expProjects:expProjects, claims:light(claims), hr:hr, freight:frSyncLight(),
+    dashboard:dashboard, plan:plan, planGoals:planGoals, expenses:light(expenses), expProjects:expProjects, expHandlers:expHandlers, claims:light(claims), hr:hr, freight:frSyncLight(),
     biz:{orders:biz.orders, pays:biz.pays, firstPay:biz.firstPay, firstOrder:biz.firstOrder||{}, fixCountry:biz.fixCountry,
          uploads:(biz.uploads||[]).slice(-20), chats:biz.chats||null, seeded:!!biz.seeded},
     forecast:fc, crm:crm, fabric:fab, inspect:insp
@@ -7874,6 +7987,63 @@ const EXP_ACCOUNTS = [
   {key:'haiyue',  name:'海悦',     cls:'hy'}
 ];
 const EXP_CATS = ['快递费','样品费','差旅','招待','办公用品','交通','其他'];
+// ---------------- 经手人名单（v2.65） ----------------
+// 报账里的「经手人」从手打改成下拉：默认就是下面这 11 个人，用户可自己增删改名（存 exp_handlers）。
+// 三条不能破的：
+//   ① 名单只是「选项」，不是白名单 —— 手打名单外的名字照样能存（离职的 Hannah / 李楠 这类历史数据不能因为下拉就填不进去）。
+//   ② 改名只影响以后新填的笔，**历史记录里的名字绝不自动跟着改**（记录是事实，不能因为改名单被篡改）。
+//   ③ 名单空了要回落到默认 11 人，不能出现「下拉里一个人都没有」的死局。
+const EXP_HANDLERS_DEFAULT = ['李鹏','李国良','李雪洋','孟伊','周文怡','乔萌萌','赵然','罗小宇','陈曦','牛森林','崔燕柯'];
+let expHandlers = [];       // 运行时名单（loadData 里读 exp_handlers）
+let expHdlDraft = [];       // 名单编辑弹窗里的草稿副本（取消即丢弃，不动全局）
+
+// 清洗：去掉首尾空格 / 合并中间多个空格 / 去空 / 按忽略大小写去重；清空了就回默认
+function expHandlersHeal(){
+  const seen = {}, out = [];
+  (Array.isArray(expHandlers) ? expHandlers : []).forEach(v=>{
+    const n = String(v==null?'':v).replace(/\s+/g,' ').trim();
+    if(!n) return;
+    const k = n.toLowerCase();
+    if(seen[k]) return;
+    seen[k] = 1;
+    out.push(n);
+  });
+  expHandlers = out.length ? out : EXP_HANDLERS_DEFAULT.slice();
+}
+// 名字归一化：跟名单里某个写法一样（忽略大小写）就用名单的写法，其余原样保留
+function expHandlerNorm(v){
+  const s = String(v==null?'':v).replace(/\s+/g,' ').trim();
+  if(!s) return '';
+  const hit = (expHandlers||[]).find(n=>n.toLowerCase()===s.toLowerCase());
+  return hit || s;
+}
+// 最近用过的经手人（新的在前），用来在表单下做一键点选
+function expRecentHandlers(n){
+  const seen = {}, out = [];
+  (expenses||[]).slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).forEach(r=>{
+    const h = String((r&&r.handler)||'').trim();
+    if(!h) return;
+    const k = h.toLowerCase();
+    if(seen[k]) return;
+    seen[k] = 1; out.push(h);
+  });
+  return out.slice(0, n||5);
+}
+// 下拉选项 = 名单 + 历史记录里出现过但不认识的名字（方便再次选到老写法，不至于「选不到就只能手打」）
+function expRenderHandlerOptions(){
+  const dl = document.getElementById('expHandlerList');
+  if(!dl) return;
+  const seen = {}, list = [];
+  (expHandlers||[]).forEach(n=>{ const k=n.toLowerCase(); if(!seen[k]){ seen[k]=1; list.push(n); } });
+  (expenses||[]).forEach(r=>{
+    const n = String((r&&r.handler)||'').replace(/\s+/g,' ').trim();
+    if(!n) return;
+    const k = n.toLowerCase();
+    if(seen[k]) return;
+    seen[k]=1; list.push(n);
+  });
+  dl.innerHTML = list.map(n=>'<option value="'+escAttr(n)+'"></option>').join('');
+}
 let expSelMonth = 'all';
 let expSelAccount = 'all';
 let expSelStatus = 'all';
@@ -8295,6 +8465,7 @@ function openExpModal(id, projId){
   document.getElementById('expCategory').value = rec ? (rec.category||'') : '';
   document.getElementById('expDesc').value = rec ? (rec.desc||'') : '';
   document.getElementById('expPayee').value = rec ? (rec.payee||'') : '';
+  expRenderHandlerOptions();   // v2.65：先把下拉选项铺好，再回填值
   document.getElementById('expHandler').value = rec ? (rec.handler||'') : '';
   document.getElementById('expNote').value = rec ? (rec.note||'') : '';
   expModalFiles = (rec && rec.files) ? rec.files.slice() : [];
@@ -8353,7 +8524,7 @@ function saveExpRecord(){
     category: String(document.getElementById('expCategory').value||'').trim(),
     desc: desc,
     payee: String(document.getElementById('expPayee').value||'').trim(),
-    handler: String(document.getElementById('expHandler').value||'').trim(),
+    handler: expHandlerNorm(document.getElementById('expHandler').value),   // v2.65：跟名单里的写法对齐（名单外的名字原样保留）
     note: String(document.getElementById('expNote').value||'').trim(),
     files: expModalFiles.slice(),
     createdAt: Date.now()
@@ -19386,6 +19557,11 @@ function expProjAddMemberIdx(i){
   const s=(hr&&hr.staff)?hr.staff[i]:null;
   if(s && s.name) expProjAddMember(String(s.name));
 }
+// v2.65：人事库为空时，参与人也从经手人名单里点选
+function expProjAddMemberName(btn){
+  const nm = btn ? String(btn.getAttribute('data-nm')||'').trim() : '';
+  if(nm) expProjAddMember(nm);
+}
 function openExpProjModal(id){
   editingExpProjId = id||null;
   const p = id ? expProjById(id) : null;
@@ -19403,9 +19579,15 @@ function openExpProjModal(id){
       const nm=String((s&&s.name)||'').trim();
       if(nm) btns.push('<button type="button" class="exp-chip" onclick="expProjAddMemberIdx('+i+')">'+escHtml(nm)+'</button>');
     });
-    box.innerHTML = btns.length
-      ? ('<span style="font-size:11.5px;color:var(--text-muted);align-self:center">从人事名单快捷加入：</span>'+btns.join(''))
-      : '<span style="font-size:11.5px;color:var(--text-muted)">直接在上面手填名字就行（多个人用顿号或逗号隔开）</span>';
+    if(btns.length){
+      box.innerHTML = '<span class="exp-chiphead">从人事名单快捷加入：</span>'+btns.join('');
+    } else {
+      // v2.65：人事库还没录人时，退一步用「经手人名单」，总比让用户纯手打强
+      const fallback=(expHandlers||[]).map(nm=>'<button type="button" class="exp-chip" onclick="expProjAddMemberName(this)" data-nm="'+escAttr(nm)+'">'+escHtml(nm)+'</button>');
+      box.innerHTML = fallback.length
+        ? ('<span class="exp-chiphead">从经手人名单快捷加入：</span>'+fallback.join(''))
+        : '<span style="font-size:11.5px;color:var(--text-muted)">直接在上面手填名字就行（多个人用顿号或逗号隔开）</span>';
+    }
   }
   document.getElementById('modalExpProj').style.display='flex';
   if(!p) setTimeout(()=>{ try{ document.getElementById('expProjName').focus(); }catch(e){} }, 120);
@@ -19473,23 +19655,110 @@ function expRenderProjBanner(){
   const chips=document.getElementById('expHandlerChips');
   if(chips){
     const members = p ? (p.members||[]) : [];
-    chips.innerHTML = members.length
-      ? ('<span style="font-size:11.5px;color:var(--text-muted);align-self:center">谁付的钱？点一下：</span>'
-         + members.map((nm,i)=>'<button type="button" class="exp-chip" onclick="expPickHandlerIdx('+i+')">'+escHtml(nm)+'</button>').join(''))
-      : '';
+    const cur = String(((document.getElementById('expHandler')||{}).value)||'').trim();
+    if(members.length){
+      chips.innerHTML = '<span class="exp-chiphead">谁付的钱？点一下：</span>'
+        + members.map((nm,i)=>'<button type="button" class="exp-chip'+(cur===nm?' active':'')+'" onclick="expPickHandlerIdx('+i+')">'+escHtml(nm)+'</button>').join('');
+    } else {
+      // v2.65：没有专项时，把最近常填的几位放成一排（一点就填好，不用每次去下拉里翻）
+      const recent = expRecentHandlers(5);
+      const list = recent.length ? recent : (expHandlers||[]).slice(0,5);
+      chips.innerHTML = list.length
+        ? ('<span class="exp-chiphead">常填的人：</span>'
+           + list.map(nm=>'<button type="button" class="exp-chip'+(expHandlerNorm(cur)===nm?' active':'')+'" onclick="expPickHandlerName(this)" data-nm="'+escAttr(nm)+'">'+escHtml(nm)+'</button>').join(''))
+        : '';
+    }
   }
+}
+// v2.65：点一下把名字填进经手人框（再点一次取消），并刷新选中态
+function expPickHandlerName(btn){
+  const el=document.getElementById('expHandler'); if(!el) return;
+  const nm = btn ? String(btn.getAttribute('data-nm')||'').trim() : '';
+  if(!nm) return;
+  el.value = (expHandlerNorm(el.value)===nm) ? '' : nm;
+  expRenderProjBanner();
 }
 function expPickHandlerIdx(i){
   const p = expModalProjId ? expProjById(expModalProjId) : null;
   if(!p) return;
   const nm=(p.members||[])[i]; if(!nm) return;
   const el=document.getElementById('expHandler'); if(!el) return;
-  el.value = (el.value===nm) ? '' : nm;
+  el.value = (expHandlerNorm(el.value)===nm) ? '' : nm;   // v2.65：跟名单写法对齐
+  expRenderProjBanner();                                   // 刷新 chip 选中态
 }
 function expModalDetach(){
   expModalProjId=null;
   expRenderProjBanner();
   showToast('这笔改成「日常报账」了，保存后生效','info');
+}
+
+// ---------------- 经手人名单编辑（v2.65） ----------------
+// 草稿在 expHdlDraft 里改，点「保存名单」才写回 expHandlers —— 点取消等于什么都没动。
+function openExpHandlerMgr(){
+  expHdlDraft = (expHandlers||[]).slice();
+  expHdlRender();
+  const nw=document.getElementById('expHdlNew'); if(nw) nw.value='';
+  document.getElementById('modalExpHandlers').style.display='flex';
+}
+function closeExpHandlerMgr(){
+  expHdlDraft = [];
+  closeModal('modalExpHandlers');
+  expRenderHandlerOptions();
+  expRenderProjBanner();
+}
+function expHdlRender(){
+  const box=document.getElementById('expHdlList'); if(!box) return;
+  if(!expHdlDraft.length){
+    box.innerHTML='<div class="exp-hdl-empty">名单空了。至少留一个人，不然报账时没得选。</div>';
+    return;
+  }
+  box.innerHTML = expHdlDraft.map((nm,i)=>
+    '<div class="exp-hdl-row">'
+    + '<span class="exp-hdl-no">'+(i+1)+'</span>'
+    + '<input type="text" class="exp-hdl-in" maxlength="20" value="'+escAttr(nm)+'" data-i="'+i+'" placeholder="名字" oninput="expHdlEdit('+i+',this.value)">'
+    + '<button type="button" class="btn exp-hdl-del" onclick="expHdlDel('+i+')" title="从名单里删掉">删</button>'
+    + '</div>').join('');
+}
+function expHdlEdit(i,v){
+  if(i<0 || i>=expHdlDraft.length) return;
+  expHdlDraft[i] = String(v==null?'':v);
+}
+function expHdlDel(i){
+  if(i<0 || i>=expHdlDraft.length) return;
+  const nm = String(expHdlDraft[i]||'').replace(/\s+/g,' ').trim();
+  expHdlDraft.splice(i,1);
+  expHdlRender();
+  if(nm) showToast('已把「'+nm+'」移出名单（点「保存名单」才生效）','info');
+}
+function expHdlAdd(){
+  const el=document.getElementById('expHdlNew'); if(!el) return;
+  const n = String(el.value||'').replace(/\s+/g,' ').trim();
+  if(!n){ showToast('先在框里填个名字'); try{el.focus()}catch(e){} return; }
+  if(expHdlDraft.some(x=>String(x==null?'':x).trim().toLowerCase()===n.toLowerCase())){
+    showToast('「'+n+'」已经在名单里了'); try{el.select()}catch(e){} return;
+  }
+  expHdlDraft.push(n);
+  el.value='';
+  expHdlRender();
+  try{ el.focus(); }catch(e){}
+}
+function saveExpHandlerMgr(){
+  const cleaned=[], seen={};
+  expHdlDraft.forEach(v=>{
+    const n = String(v==null?'':v).replace(/\s+/g,' ').trim();
+    if(!n) return;
+    const k = n.toLowerCase();
+    if(seen[k]) return;
+    seen[k]=1; cleaned.push(n);
+  });
+  if(!cleaned.length){ showToast('名单至少要留一个人'); return; }
+  expHandlers = cleaned;
+  saveAll();
+  expHdlDraft = [];
+  closeModal('modalExpHandlers');
+  expRenderHandlerOptions();
+  expRenderProjBanner();
+  showToast('经手人名单已保存（'+cleaned.length+' 人）');
 }
 
 // ---------------- 统一报账（整个项目一次性打包归档） ----------------
