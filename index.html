@@ -1765,7 +1765,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.66 · 2026-11-17</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.67 · 2026-11-19</div>
     </div>
   </aside>
 
@@ -2917,7 +2917,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.66';
+const APP_VERSION = 'v2.67';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -10349,6 +10349,7 @@ function zipStore(files){
 
 // ---------------- 明细 CSV / 明细单 HTML ----------------
 function expCsv(list, invoiceNames){
+  if(!invoiceNames) invoiceNames=expVoucherNames(list);   // v2.67：凭证文件名跟着事由走
   const q=v=>{
     const s=String(v==null?'':v);
     return /[",\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
@@ -10365,21 +10366,25 @@ function expCsv(list, invoiceNames){
   out+=['','','','','合计','',total.toFixed(2),'','','',''].map(q).join(',')+'\n';
   return out;
 }
-function expPrintHtml(list, s, scope, autoPrint){
+function expPrintHtml(list, s, scope, autoPrint, invoiceNames){
+  if(!invoiceNames) invoiceNames=expVoucherNames(list);   // v2.67：事由下面小字印出凭证文件名，财务照名字找文件
   const now=new Date();
   const two=n=>String(n).padStart(2,'0');
   const when=now.getFullYear()+'-'+two(now.getMonth()+1)+'-'+two(now.getDate())+' '+two(now.getHours())+':'+two(now.getMinutes());
   let rows='', i=0, invN=0;
   // 列序：序号 / 日期 / 类别 / 事由 / 收款方 / 经手人 / 金额 / 凭证 / 状态 / 备注 / 记账账户（记账账户放最后）
-  list.forEach(r=>{
+  list.forEach((r,k)=>{
     i++;
     const a=expAcct(r.account);
-    const nf=(r.files||[]).length; invN+=nf;
+    const nf=(r.files||[]).filter(f=>f && f.dataUrl).length; invN+=nf;
+    const fnm=(invoiceNames[k]||[]);
+    const showFnm = fnm.length && !(fnm.length===1 && fnm[0]===String(r.desc||''));
     rows+='<tr>'
       + '<td class="c idx">'+i+'</td>'
       + '<td class="c nowrap">'+escHtml(r.date||'')+'</td>'
       + '<td class="c">'+(r.category?escHtml(r.category):'<span class="none">—</span>')+'</td>'
-      + '<td class="desc">'+escHtml(r.desc||'')+'</td>'
+      + '<td class="desc">'+(r.desc?escHtml(r.desc):'<span class="none">—</span>')
+        +(showFnm?('<div class="fnm">'+fnm.map(x=>escHtml(x)).join('<br>')+'</div>'):'')+'</td>'
       + '<td class="c">'+(r.payee?escHtml(r.payee):'<span class="none">—</span>')+'</td>'
       + '<td class="c">'+(r.handler?escHtml(r.handler):'<span class="none">—</span>')+'</td>'
       + '<td class="r amt'+(eNum(r.amount)<0?' inc':'')+'">'+eNum(r.amount).toFixed(2)+'</td>'
@@ -10429,6 +10434,7 @@ function expPrintHtml(list, s, scope, autoPrint){
    +'td.r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}'
    +'td.idx{color:#94a3b8}'
    +'td.desc{min-width:150px}'
+   +'td.desc .fnm{font-size:10.5px;color:#94a3b8;margin-top:2px;line-height:1.5;word-break:break-all}'
    +'td.amt{font-weight:600}'
    +'td.amt.inc{color:#047857}'
    +'td.note{color:#64748b;font-size:11.5px}'
@@ -10471,7 +10477,7 @@ function expPrintHtml(list, s, scope, autoPrint){
      +(s.incCount?(' ｜ 含收入 '+fmtCNY(s.inc)+'（'+s.incCount+' 笔）'):'')+'</td>'
    +'</tr></tfoot></table>'
    +'<div class="sign"><span>经手人：____________</span><span>审核：____________</span><span>日期：____________</span></div>'
-   +'<div class="foot">本明细单由「办公工作台 · 报账整理」自动生成 ｜ 附件凭证见同目录「凭证」文件夹</div>'
+   +'<div class="foot">本明细单由「办公工作台 · 报账整理」自动生成 ｜ 凭证文件名与「事由」一致（同一条多张时加 _1 / _2），都在同目录「凭证」文件夹里</div>'
    + (autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},350)}<\/script>' : '')
    +'</body></html>';
 }
@@ -10492,8 +10498,59 @@ function expReadmeTxt(list, s, scope){
    +'报账明细单.html  —— 双击用浏览器打开，可直接打印或存 PDF\r\n'
    +'凭证\\            —— 单独一个文件夹，放全部发票/收据照片\r\n'
    +'\r\n'
-   +'凭证文件命名规则：序号_日期_金额.扩展名（序号与明细表一一对应）\r\n'
-   +'（例如 03_20260912_86.00.jpg 就是明细表里第 3 条那笔的凭证）\r\n';
+   +'凭证文件命名规则（v2.67 起）\r\n'
+   +'----------------------------------------\r\n'
+   +'直接用「事由」当文件名：顺丰到付.jpg 就是「顺丰到付」那一笔的凭证。\r\n'
+   +'同一条有多张凭证 → 后面加序号：顺丰到付_1.jpg、顺丰到付_2.jpg\r\n'
+   +'两条记录事由撞了（比如都叫「快递费」）→ 自动补日期和金额区分：快递费_20260912_86.00.jpg\r\n'
+   +'事由空着 → 退到「类别 + 日期」，再没有就叫「报账」。\r\n'
+   +'明细表里「事由」那一栏下面也印着对应文件名，对着看就知道哪张是哪笔。\r\n';
+}
+
+// ---------------- v2.67 凭证文件名 = 报账事由 ----------------
+// 以前叫「01_20260912_86.00.jpg」，财务拿到包得对着明细表一行行查序号。
+// 现在直接把「事由」当文件名：打开文件夹就知道哪张票是哪笔，明细表里事由那一栏印的就是文件名。
+// 一条有多个凭证时加序号：顺丰到付_1.jpg / 顺丰到付_2.jpg。
+function expFileSafe(s, max){
+  let t=String(s==null?'':s);
+  t=t.replace(/[\\/:*?"<>|\r\n\t]+/g,' ');        // Windows 文件名非法字符 + 换行
+  t=t.replace(/[\u0000-\u001f\u00a0]+/g,' ');
+  t=t.replace(/\s+/g,' ').trim();
+  t=t.replace(/^[.\s]+|[.\s]+$/g,'');            // 首尾的点和空格（Windows 会自己吃掉，干脆别带）
+  t=t.replace(/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i,'_$1');  // Windows 保留名
+  if(max && t.length>max) t=t.slice(0,max).replace(/[.\s]+$/,'');
+  return t;
+}
+// 返回与 list 一一对应的二维数组：[['事由.jpg'], ['事由_1.jpg','事由_2.pdf'], …]
+function expVoucherNames(list){
+  const usedBase=Object.create(null);   // 已被占用的主名（判断不同条目撞了同一个事由）
+  const usedFull=Object.create(null);   // 已生成的完整文件名（含扩展名，兜底防重）
+  const out=[];
+  (list||[]).forEach(r=>{
+    const files=(r.files||[]).filter(f=>f && f.dataUrl);
+    const dateKey=String(r.date||'').replace(/-/g,'');
+    let base=expFileSafe(r.desc,40).replace(/\.(jpe?g|png|gif|webp|bmp|heic|tiff?|pdf|ofd|docx?|xlsx?|zip|rar|txt|csv)$/i,'').trim();
+    // 事由空着（老记录、或者只填了类别）→ 退到「类别 + 日期」，总比没有强
+    if(!base) base=expFileSafe(((r.category||'')+' '+(dateKey||'')),40);
+    if(!base) base='报账';
+    // 不同条目用了同一个事由：把日期和金额补进去，否则两张票同名分不清是哪笔
+    let cand=base;
+    if(usedBase[cand]!==undefined) cand=expFileSafe(base+'_'+dateKey+'_'+eNum(r.amount).toFixed(2), 70);
+    let n=1;
+    while(usedBase[cand]!==undefined && n<99){ n++; cand=expFileSafe(base+'_'+n, 70); }
+    usedBase[cand]=1;
+    const names=files.map((f,i)=>{
+      const m=String(f.name||'').match(/\.([A-Za-z0-9]{1,5})$/);
+      const ext=m?m[1].toLowerCase():'jpg';
+      let nm=(files.length>1 ? (cand+'_'+(i+1)) : cand)+'.'+ext;
+      let k=1;
+      while(usedFull[nm] && k<99){ k++; nm=(files.length>1?(cand+'_'+(i+1)):cand)+'_'+k+'.'+ext; }
+      usedFull[nm]=1;
+      return nm;
+    });
+    out.push(names);
+  });
+  return out;
 }
 
 // ---------------- 导出文件包 / 打印 ----------------
@@ -10503,7 +10560,8 @@ function expPackageAction(){
   if(!picked.length){ showToast('先在明细里勾选要报账的条目（可点「全选待报账条目」一次选完）'); return; }
   const s=expSum(picked);
   showConfirm('把勾选的 '+picked.length+' 笔打包成 zip？\n'
-    +'合计 '+fmtCNY(s.total)+(s.incCount?('（其中收入 '+fmtCNY(s.inc)+'）'):'')+'，凭证 '+s.files+' 张', ()=>{
+    +'合计 '+fmtCNY(s.total)+(s.incCount?('（其中收入 '+fmtCNY(s.inc)+'）'):'')+'，凭证 '+s.files+' 张\n'
+    +'凭证文件名直接用「事由」，同一条有多张时加 _1 / _2', ()=>{
       const ok = expDoPackage(picked, s);
       if(!ok) return;
       expSel={}; renderExpenses();
@@ -10520,20 +10578,16 @@ function expDoPackage(list, s){
     if(typeof TextEncoder==='undefined'){ showToast('当前浏览器不支持打包，请用电脑上的 Chrome / Edge'); return false; }
     const stamp=todayStr().replace(/-/g,'');
     const scope=expScopeLabel();
-    const invFiles=[], invoiceNames=[];
+    const invFiles=[];
+    // v2.67：文件名改成「事由」（多条加 _1/_2），不再用 01_日期_金额 的序号
+    const invoiceNames=expVoucherNames(list);
     let idx=0;
-    list.forEach(r=>{
-      const names=[];
-      (r.files||[]).forEach(f=>{
-        if(!f || !f.dataUrl) return;
+    list.forEach((r,k)=>{
+      const files=(r.files||[]).filter(f=>f && f.dataUrl);
+      files.forEach((f,i)=>{
         idx++;
-        const m=String(f.name||'').match(/\.([A-Za-z0-9]{1,5})$/);
-        const ext=m?m[1].toLowerCase():'jpg';
-        const nm=String(idx).padStart(2,'0')+'_'+String(r.date||'').replace(/-/g,'')+'_'+eNum(r.amount).toFixed(2)+'.'+ext;
-        names.push(nm);
-        invFiles.push({name:'凭证/'+nm, data:dataUrlToU8(f.dataUrl)});
+        invFiles.push({name:'凭证/'+invoiceNames[k][i], data:dataUrlToU8(f.dataUrl)});
       });
-      invoiceNames.push(names);
     });
     const enc=new TextEncoder();
     const zipFiles=[
@@ -19865,9 +19919,13 @@ function expProjReadme(p){
    +'专项明细.csv     —— 项目里每一笔支出（Excel 打开，已带 BOM，中文不乱码）\r\n'
    +'分摊结算表.csv   —— 每个人垫了多少、该摊多少、谁该转给谁多少\r\n'
    +'专项明细单.html  —— 双击用浏览器打开，可直接打印或存 PDF（带签字栏）\r\n'
-   +'凭证\\            —— 全部发票 / 收据照片，文件名序号与明细表一一对应\r\n'
+   +'凭证\\            —— 全部发票 / 收据照片，文件名就是「事由」（同一条多张时加 _1 / _2）\r\n'
    +'\r\n'
-   +'凭证文件命名规则：序号_日期_金额.扩展名\r\n';
+   +'凭证文件命名规则（v2.67 起）\r\n'
+   +'----------------------------------------\r\n'
+   +'直接用「事由」当文件名；同一条有多张凭证加序号：打车_1.jpg、打车_2.jpg\r\n'
+   +'两条记录事由撞了 → 自动补日期和金额区分：打车_20260912_86.00.jpg\r\n'
+   +'明细单里「事由」那一栏下面也印着对应文件名，对着看就知道哪张是哪笔。\r\n';
 }
 function expProjPrintHtml(p, autoPrint){
   const st=expProjSettle(p);
@@ -19876,15 +19934,19 @@ function expProjPrintHtml(p, autoPrint){
   const two=n=>String(n).padStart(2,'0');
   const when=now.getFullYear()+'-'+two(now.getMonth()+1)+'-'+two(now.getDate())+' '+two(now.getHours())+':'+two(now.getMinutes());
   let rows='', i=0, invN=0;
-  items.forEach(r=>{
+  const vnm=expVoucherNames(items);   // v2.67：凭证文件名跟着事由走
+  items.forEach((r,k)=>{
     i++;
     const a=expAcct(r.account);
-    const nf=(r.files||[]).length; invN+=nf;
+    const nf=(r.files||[]).filter(f=>f && f.dataUrl).length; invN+=nf;
+    const fnm=(vnm[k]||[]);
+    const showFnm = fnm.length && !(fnm.length===1 && fnm[0]===String(r.desc||''));
     rows+='<tr>'
       +'<td class="c idx">'+i+'</td>'
       +'<td class="c nowrap">'+escHtml(r.date||'')+'</td>'
       +'<td class="c">'+(r.category?escHtml(r.category):'<span class="none">—</span>')+'</td>'
-      +'<td class="desc">'+escHtml(r.desc||'')+'</td>'
+      +'<td class="desc">'+(r.desc?escHtml(r.desc):'<span class="none">—</span>')
+        +(showFnm?('<div class="fnm">'+fnm.map(x=>escHtml(x)).join('<br>')+'</div>'):'')+'</td>'
       +'<td class="c">'+(r.payee?escHtml(r.payee):'<span class="none">—</span>')+'</td>'
       +'<td class="c">'+(String(r.handler||'').trim()?escHtml(String(r.handler).trim()):'<span class="none">未填</span>')+'</td>'
       +'<td class="r amt'+(eNum(r.amount)<0?' inc':'')+'">'+eNum(r.amount).toFixed(2)+'</td>'
@@ -19926,6 +19988,7 @@ function expProjPrintHtml(p, autoPrint){
    +'tfoot td{padding:9px 7px;font-size:12.5px;font-weight:700;background:#eef7f5;border-top:2px solid #0f766e}'
    +'td.c{text-align:center}td.r{text-align:right;font-variant-numeric:tabular-nums}td.nowrap{white-space:nowrap}'
    +'td.note{font-size:11.5px;color:#64748b}'
+   +'td.desc .fnm{font-size:10.5px;color:#94a3b8;margin-top:2px;line-height:1.5;word-break:break-all}'
    +'td.amt{font-weight:700;font-variant-numeric:tabular-nums}td.amt.inc{color:#047857}'
    +'.st{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600}'
    +'.st.wait{background:#fef3c7;color:#b45309}.st.done{background:#d1fae5;color:#047857}'
@@ -19981,20 +20044,15 @@ function expProjPackage(p){
   try{
     if(typeof TextEncoder==='undefined'){ showToast('当前浏览器不支持打包，请用电脑上的 Chrome / Edge'); return false; }
     const items=expProjItems(p.id);
-    const invFiles=[], names=[];
+    const invFiles=[];
+    // v2.67：文件名改成「事由」（多条加 _1/_2）
+    const names=expVoucherNames(items);
     let idx=0;
-    items.forEach(r=>{
-      const arr=[];
-      (r.files||[]).forEach(f=>{
-        if(!f || !f.dataUrl) return;
+    items.forEach((r,k)=>{
+      (r.files||[]).filter(f=>f && f.dataUrl).forEach((f,i)=>{
         idx++;
-        const m=String(f.name||'').match(/\.([A-Za-z0-9]{1,5})$/);
-        const ext=m?m[1].toLowerCase():'jpg';
-        const nm=String(idx).padStart(2,'0')+'_'+String(r.date||'').replace(/-/g,'')+'_'+eNum(r.amount).toFixed(2)+'.'+ext;
-        arr.push(nm);
-        invFiles.push({name:'凭证/'+nm, data:dataUrlToU8(f.dataUrl)});
+        invFiles.push({name:'凭证/'+names[k][i], data:dataUrlToU8(f.dataUrl)});
       });
-      names.push(arr);
     });
     const enc=new TextEncoder();
     const zipFiles=[
