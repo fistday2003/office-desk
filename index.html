@@ -757,7 +757,7 @@ body.note-dragging .tab-panel.active #noteList .note-card{outline:2px dashed var
   .staff-lab>.exp-hdl-mgr{font-size:10px;padding:1px 6px}
 }
 .exp-hdl-tip{font-size:12.5px;color:var(--text-secondary);line-height:1.75;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:-4px 0 13px}
-.exp-hdl-list{display:flex;flex-direction:column;gap:5px;max-height:50vh;overflow-y:auto}
+.exp-hdl-list{display:flex;flex-direction:column;gap:5px;max-height:min(34vh,340px);overflow-y:auto}   /* v2.69：给「从人事导入 / 加一个人 / 保存名单」留出位置，矮窗口不用滚弹窗 */
 .exp-hdl-row{display:flex;align-items:center;gap:8px}
 .exp-hdl-no{flex:0 0 20px;font-size:11.5px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums}
 .exp-hdl-in{flex:1 1 auto;min-width:0;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:var(--card-bg);color:var(--text);font-family:inherit}
@@ -917,6 +917,11 @@ button.file-dl{background:none;border:none;padding:0;cursor:pointer;font-family:
   .exp-payee-grp label{min-height:44px;display:flex;align-items:center}
   /* 手机上列表自己滚，保证「添加 / 保存名单」永远在屏幕内，不用先滑到底才点得到 */
   .exp-hdl-list{max-height:38vh}
+}
+/* v2.69：矮窗口（笔记本缩放 / 小屏）里再收一档，保证「从人事导入 / 加一个人 / 保存名单」一屏都看得见 */
+@media (max-height:700px){
+  .exp-hdl-list{max-height:26vh}
+  .exp-hdl-tip{line-height:1.6;padding:7px 10px;font-size:12px}
 }
 /* ---------- 专项报账 CSS 结束 ---------- */
 
