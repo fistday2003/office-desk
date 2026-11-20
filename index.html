@@ -748,6 +748,14 @@ body.note-dragging .tab-panel.active #noteList .note-card{outline:2px dashed var
 /* v2.65 报账经手人：下拉（datalist）+ 名单编辑弹窗 */
 .exp-hdl-mgr{flex:0 0 auto;padding:1px 8px;border-radius:11px;font-size:11px;font-weight:600;line-height:1.75;background:var(--card-bg);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;white-space:nowrap;font-family:inherit}
 .exp-hdl-mgr:hover{border-color:var(--primary);color:var(--primary-dark)}
+/* v2.68：所有「填内部人员」的标签都改成「左文字 + 右编辑名单」，共用同一份名单 */
+.staff-lab{display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap}
+.staff-lab>.exp-hdl-mgr{margin-left:auto}
+/* 手机上「负责业务 + 客户名」并排时，按钮一挤输入框就只剩半个 —— 窄屏让填人的那一栏独占一行 */
+@media (max-width:480px){
+  .form-group.staff-grp{flex:1 1 100%!important}
+  .staff-lab>.exp-hdl-mgr{font-size:10px;padding:1px 6px}
+}
 .exp-hdl-tip{font-size:12.5px;color:var(--text-secondary);line-height:1.75;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin:-4px 0 13px}
 .exp-hdl-list{display:flex;flex-direction:column;gap:5px;max-height:50vh;overflow-y:auto}
 .exp-hdl-row{display:flex;align-items:center;gap:8px}
@@ -1765,7 +1773,7 @@ tr:hover .fr-fwd-acts{opacity:1}
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
         清空所有数据
       </button>
-      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.67 · 2026-11-19</div>
+      <div style="padding:8px 0 2px;text-align:center;font-size:11px;color:var(--text-muted)">版本 v2.68 · 2026-11-20</div>
     </div>
   </aside>
 
@@ -2138,7 +2146,7 @@ tr:hover .fr-fwd-acts{opacity:1}
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group exp-payee-grp" style="flex:1 1 130px"><label>收款方（可留空）</label><input type="text" id="expPayee" placeholder="付给了谁，如 顺丰 / 某供应商"></div>
       <div class="form-group" style="flex:1 1 130px">
-        <label style="display:flex;align-items:center;justify-content:space-between;gap:8px">经手人<span class="exp-hdl-sub">（谁付的这笔钱）</span><button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份下拉名单">编辑名单</button></label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:8px">经手人<span class="exp-hdl-sub">（谁付的这笔钱）</span><button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份人员名单">编辑名单</button></label>
         <input type="text" id="expHandler" list="expHandlerList" autocomplete="off" placeholder="点箭头选或打字" onchange="expRenderProjBanner()">
         <datalist id="expHandlerList"></datalist>
       </div>
@@ -2184,13 +2192,13 @@ tr:hover .fr-fwd-acts{opacity:1}
   </div>
 </div>
 
-<!-- ====== MODAL: 经手人名单编辑（v2.65） ====== -->
+<!-- ====== MODAL: 内部人员名单编辑（v2.65 起，v2.68 升为全平台共用） ====== -->
 <div class="modal-overlay" id="modalExpHandlers" style="display:none">
   <div class="modal" style="max-width:520px">
-    <h3>经手人名单</h3>
+    <h3>内部人员名单</h3>
     <div class="exp-hdl-tip">
-      这里决定报账时「经手人」下拉里有谁。可以直接改名、删掉、加新人。<br>
-      <b>只影响以后新填的笔</b>——已经在账上的名字不会被改（要改就到那条记录里单独编辑）。
+      这一份名单决定全平台所有「填人」的地方下拉里有谁：<b>报账经手人、货损/客诉负责业务、巡检责任人、人事经办人</b>——改一次，四处一起生效。<br>
+      可以直接改名、删掉、加新人。<b>只影响以后新填的记录</b>——已经存在的数据不会被改（要改就到那条记录里单独编辑）。
     </div>
     <div id="expHdlList" class="exp-hdl-list"></div>
     <div style="display:flex;gap:8px;margin-top:12px">
@@ -2247,7 +2255,7 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group" style="flex:1 1 110px"><label>问题性质</label><select id="clmNature"></select></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div class="form-group" style="flex:1 1 130px"><label>负责业务</label><input type="text" id="clmOwner" placeholder="如 孟伊"></div>
+      <div class="form-group staff-grp" style="flex:1 1 130px"><label class="staff-lab">负责业务<button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份人员名单">编辑名单</button></label><input type="text" id="clmOwner" list="staffList" autocomplete="off" placeholder="选人或手打"></div>
       <div class="form-group" style="flex:1 1 130px"><label>客户名</label><input type="text" id="clmCustomer" placeholder="客户 / 店铺名"></div>
       <div class="form-group" style="flex:1 1 130px"><label>货损金额（元，可留空）</label><input type="number" id="clmAmount" step="0.01" placeholder="0.00" inputmode="decimal"></div>
     </div>
@@ -2320,7 +2328,7 @@ tr:hover .fr-fwd-acts{opacity:1}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 150px"><label>维度</label><select id="insTdDim"></select></div>
-      <div class="form-group" style="flex:1 1 150px"><label>责任人（实名）</label><input type="text" id="insTdOwner" list="insOwnerList" placeholder="如 Alyssa Lignes"></div>
+      <div class="form-group staff-grp" style="flex:1 1 150px"><label class="staff-lab">责任人（实名）<button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份人员名单">编辑名单</button></label><input type="text" id="insTdOwner" list="staffList" autocomplete="off" placeholder="选人或手打"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <div class="form-group" style="flex:1 1 160px"><label>客户 / 对象</label><input type="text" id="insTdCustomer" placeholder="客户名，或「全店」「团队」"></div>
@@ -2338,6 +2346,9 @@ tr:hover .fr-fwd-acts{opacity:1}
 
 <!-- 巡检责任人候选（放在弹窗外面：datalist 在 display:none 的容器里会失效） -->
 <datalist id="insOwnerList"></datalist>
+
+<!-- v2.68：全平台统一的「内部人员」候选（货损负责业务 / 巡检责任人 / 人事经办人 共用，来源见 staffFillLists） -->
+<datalist id="staffList"></datalist>
 
 <!-- ====== MODAL: 外贸运费账单 ====== -->
 <div class="modal-overlay" id="modalFreightBill" style="display:none">
@@ -2490,7 +2501,7 @@ tr:hover .fr-fwd-acts{opacity:1}
       <div class="form-group" style="flex:1 1 120px"><label>调整后（元）*</label><input type="number" id="hslAfter" step="1" inputmode="decimal"></div>
     </div>
     <div class="form-group"><label>调整原因</label><input type="text" id="hslReason" placeholder="如 转正核定 / 年度调薪 / 岗位晋升"></div>
-    <div class="form-group"><label>经办人</label><input type="text" id="hslBy" placeholder="如 李国良"></div>
+    <div class="form-group"><label class="staff-lab">经办人<button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份人员名单">编辑名单</button></label><input type="text" id="hslBy" list="staffList" autocomplete="off" placeholder="选人或手打"></div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('modalHrSalary')">取消</button>
       <button class="btn btn-primary" id="btnHrSalarySave">保存调薪</button>
@@ -2917,7 +2928,7 @@ tr:hover .fr-fwd-acts{opacity:1}
 //  DATA LAYER
 // ============================================================
 const STORAGE_PREFIX = 'wb_office_';
-const APP_VERSION = 'v2.67';
+const APP_VERSION = 'v2.68';
 let tasks = [];
 let notes = [];
 let projects = [];
@@ -8029,20 +8040,41 @@ function expRecentHandlers(n){
   });
   return out.slice(0, n||5);
 }
-// 下拉选项 = 名单 + 历史记录里出现过但不认识的名字（方便再次选到老写法，不至于「选不到就只能手打」）
+// 下拉选项 = 名单 + 人事在职员工 + 各模块历史里出现过但不认识的名字
+// （v2.68 起升成全平台共用：报账经手人 / 货损负责业务 / 巡检责任人 / 人事经办人 都吃这一份）
 function expRenderHandlerOptions(){
-  const dl = document.getElementById('expHandlerList');
-  if(!dl) return;
-  const seen = {}, list = [];
-  (expHandlers||[]).forEach(n=>{ const k=n.toLowerCase(); if(!seen[k]){ seen[k]=1; list.push(n); } });
-  (expenses||[]).forEach(r=>{
-    const n = String((r&&r.handler)||'').replace(/\s+/g,' ').trim();
+  staffFillLists();
+}
+// 候选人池（顺序 = 名单 → 人事在职 → 各模块历史），忽略大小写去重
+function staffPool(){
+  const seen = {}, out = [];
+  const add = v=>{
+    const n = String(v==null?'':v).replace(/\s+/g,' ').trim();
     if(!n) return;
     const k = n.toLowerCase();
     if(seen[k]) return;
-    seen[k]=1; list.push(n);
+    seen[k]=1; out.push(n);
+  };
+  (expHandlers||[]).forEach(add);
+  try{ (hr.staff||[]).forEach(s=>{ if(s && s.name && s.status!=='leave') add(s.name); }); }catch(e){}
+  try{ (expenses||[]).forEach(r=>{ if(r) add(r.handler); }); }catch(e){}
+  try{ (claims||[]).forEach(r=>{ if(r) add(r.owner); }); }catch(e){}
+  try{ ((insp&&insp.todos)||[]).forEach(t=>{ if(t) add(t.owner); }); }catch(e){}
+  try{
+    (hr.staff||[]).forEach(s=>{
+      ((s&&s.salaryLog)||[]).forEach(l=>{ if(l) add(l.by); });
+      ((s&&s.transferLog)||[]).forEach(l=>{ if(l) add(l.by); });
+    });
+  }catch(e){}
+  return out;
+}
+// 把候选灌进所有人员下拉（staffList 是主用；另外两个 id 是老版本留下的，一并填上免得漏）
+function staffFillLists(){
+  const opts = staffPool().map(n=>'<option value="'+escAttr(n)+'"></option>').join('');
+  ['staffList','expHandlerList','insOwnerList'].forEach(id=>{
+    const dl=document.getElementById(id);
+    if(dl) dl.innerHTML = opts;
   });
-  dl.innerHTML = list.map(n=>'<option value="'+escAttr(n)+'"></option>').join('');
 }
 let expSelMonth = 'all';
 let expSelAccount = 'all';
@@ -9824,6 +9856,7 @@ function openClmModal(id){
   clmModalFiles = (rec && rec.files) ? rec.files.slice() : [];
   clmModalPending = 0;
   renderClmModalFiles();
+  staffFillLists();
   document.getElementById('modalClm').style.display='flex';
   if(!rec) setTimeout(()=>{ try{ document.getElementById('clmCustomer').focus(); }catch(e){} }, 120);
 }
@@ -9842,7 +9875,7 @@ function saveClmRecord(){
     id: editingClmId || uid(),
     date: date,
     project: document.getElementById('clmProject').value || '其他',
-    owner: String(document.getElementById('clmOwner').value||'').trim(),
+    owner: expHandlerNorm(document.getElementById('clmOwner').value),
     customer: customer,
     desc: desc,
     nature: document.getElementById('clmNature').value || '其他',
@@ -13890,6 +13923,7 @@ function openHrSalaryModal(id){
   document.getElementById('hslAfter').value='';
   document.getElementById('hslReason').value='';
   document.getElementById('hslBy').value='李国良';
+  staffFillLists();
   document.getElementById('modalHrSalary').style.display='flex';
 }
 function hrSalaryItemChange(){
@@ -13912,7 +13946,7 @@ function saveHrSalary(){
   s.salary[key]=after;
   s.salaryLog = s.salaryLog||[];
   s.salaryLog.push({ id:uid(), date:date, item:item, before:before, after:after,
-    reason:String(document.getElementById('hslReason').value||'').trim(), by:String(document.getElementById('hslBy').value||'').trim(), at:Date.now() });
+    reason:String(document.getElementById('hslReason').value||'').trim(), by:expHandlerNorm(document.getElementById('hslBy').value), at:Date.now() });
   hrSalaryForId=null;
   saveAll(); closeModal('modalHrSalary'); refreshAll();
   showToast('✓ 已登记调薪并更新薪资构成', 'info');
@@ -17384,6 +17418,7 @@ function refreshAll(){
   crmBadge();
   fabBadge();
   inspBadge();
+  staffFillLists();   // v2.68：人员下拉跟着名单 / 人事 / 历史一起刷新
 }
 
 function updateClearDemoBtn(){
@@ -17942,6 +17977,12 @@ function crmField(label, id, val, type, hint){
   return '<div class="crm-fld"><label>'+escHtml(label)+(hint?(' <span style="color:#b45309">'+escHtml(hint)+'</span>'):'')+'</label>'
     +'<input type="'+type+'" id="'+id+'" value="'+escAttr(val||'')+'"></div>';
 }
+// v2.68：填内部人员的输入框（带统一下拉 + 「编辑名单」入口）
+function staffField(label, id, val, hint){
+  return '<div class="crm-fld"><label class="staff-lab">'+escHtml(label)+(hint?(' <span style="color:#b45309">'+escHtml(hint)+'</span>'):'')
+    +'<button type="button" class="exp-hdl-mgr" onclick="openExpHandlerMgr()" title="增删 / 改名这份人员名单">编辑名单</button></label>'
+    +'<input type="text" id="'+id+'" list="staffList" autocomplete="off" value="'+escAttr(val||'')+'"></div>';
+}
 function crmSelField(label, id, values, cur, labels){
   const ls=labels||values;
   let o='';
@@ -17974,6 +18015,7 @@ function crmNewCustomer(){
 function renderCrmModal(){
   const box=document.getElementById('crmModalBody');
   if(!box) return;
+  staffFillLists();
   const cid=crmOpenCid;
   const title=document.getElementById('crmModalTitle');
   if(!cid){ box.innerHTML=''; if(title) title.textContent='客户'; return; }
@@ -17999,7 +18041,7 @@ function renderCrmModal(){
   h+='<div class="crm-frm">';
   h+=crmField('客户名','crmFName',name,'text', auto?'':'');
   h+=crmField('国家 / 地区','crmFCountry',rec.country||(c?c.country:''),'text','');
-  h+=crmField('归属业务员','crmFSeller',rec.seller||(c?c.seller:''),'text','');
+  h+=staffField('归属业务员','crmFSeller',rec.seller||(c?c.seller:''),'');
   h+=crmSelField('来源','crmFSource',CRM_SOURCES,rec.source||'');
   h+=crmSelField('阶段','crmFStage',CRM_STAGE_KEYS,rec.stage||(auto?'dealt':'inquiry'),CRM_STAGES.map(x=>x.name));
   h+=crmSelField('等级','crmFLevel',CRM_LEVELS.map(x=>x[0]),rec.level||'',CRM_LEVELS.map(x=>x[1]));
@@ -18038,7 +18080,7 @@ function renderCrmModal(){
   h+='<div class="crm-frm">';
   h+=crmField('日期','crmADate',today,'date','');
   h+=crmSelField('渠道','crmACh',CRM_CHANNELS,'TM');
-  h+=crmField('跟单人','crmABy',rec.seller||(c?c.seller:''),'text','');
+  h+=staffField('跟单人','crmABy',rec.seller||(c?c.seller:''),'');
   h+=crmSelField('顺便推进到','crmAStageAdv',[''].concat(CRM_STAGE_KEYS),'',
                  ['（阶段不变）'].concat(CRM_STAGES.map(x=>x.name)));
   h+=crmField('下次跟进','crmANext','','date','');
@@ -18058,7 +18100,7 @@ function crmSaveCustomer(){
   const patch={
     name: crmVal('crmFName').trim(),
     country: crmVal('crmFCountry').trim(),
-    seller: crmVal('crmFSeller').trim(),
+    seller: expHandlerNorm(crmVal('crmFSeller')),
     source: crmVal('crmFSource'),
     stage: crmVal('crmFStage') || 'inquiry',
     level: crmVal('crmFLevel'),
@@ -18078,7 +18120,7 @@ function crmAddFollow(){
   if(!text){ showToast('先写一句跟进内容吧'); return; }
   const date=crmVal('crmADate') || todayStr();
   const next=crmVal('crmANext');
-  const by=crmVal('crmABy').trim();
+  const by=expHandlerNorm(crmVal('crmABy'));
   crm.follows.push({id:uid(), cid:cid, date:date, ch:crmVal('crmACh')||'TM',
                     text:text, next:next,
                     inAt:crmVal('crmAIn'), reAt:crmVal('crmARe'), by:by});
@@ -19627,21 +19669,15 @@ function openExpProjModal(id){
   document.getElementById('expProjNote').value = p ? (p.note||'') : '';
   const box=document.getElementById('expProjMemberChips');
   if(box){
-    const staff=(hr&&hr.staff)||[];
-    const btns=[];
-    staff.forEach((s,i)=>{
-      const nm=String((s&&s.name)||'').trim();
-      if(nm) btns.push('<button type="button" class="exp-chip" onclick="expProjAddMemberIdx('+i+')">'+escHtml(nm)+'</button>');
-    });
-    if(btns.length){
-      box.innerHTML = '<span class="exp-chiphead">从人事名单快捷加入：</span>'+btns.join('');
-    } else {
-      // v2.65：人事库还没录人时，退一步用「经手人名单」，总比让用户纯手打强
-      const fallback=(expHandlers||[]).map(nm=>'<button type="button" class="exp-chip" onclick="expProjAddMemberName(this)" data-nm="'+escAttr(nm)+'">'+escHtml(nm)+'</button>');
-      box.innerHTML = fallback.length
-        ? ('<span class="exp-chiphead">从经手人名单快捷加入：</span>'+fallback.join(''))
-        : '<span style="font-size:11.5px;color:var(--text-muted)">直接在上面手填名字就行（多个人用顿号或逗号隔开）</span>';
-    }
+    // v2.68：候选 = 统一人员名单（用户维护的那份）+ 人事在职员工，先到先得、忽略大小写去重
+    const names=[], seen={};
+    const push=nm=>{ const n=String(nm==null?'':nm).trim(); if(!n) return; const k=n.toLowerCase(); if(seen[k]) return; seen[k]=1; names.push(n); };
+    (expHandlers||[]).forEach(push);
+    ((hr&&hr.staff)||[]).forEach(s=>{ if(s && s.status!=='leave') push(s.name); });
+    const btns=names.map(nm=>'<button type="button" class="exp-chip" onclick="expProjAddMemberName(this)" data-nm="'+escAttr(nm)+'">'+escHtml(nm)+'</button>');
+    box.innerHTML = btns.length
+      ? ('<span class="exp-chiphead">从人员名单快捷加入：</span>'+btns.join(''))
+      : '<span style="font-size:11.5px;color:var(--text-muted)">直接在上面手填名字就行（多个人用顿号或逗号隔开）</span>';
   }
   document.getElementById('modalExpProj').style.display='flex';
   if(!p) setTimeout(()=>{ try{ document.getElementById('expProjName').focus(); }catch(e){} }, 120);
@@ -19763,7 +19799,7 @@ function closeExpHandlerMgr(){
 function expHdlRender(){
   const box=document.getElementById('expHdlList'); if(!box) return;
   if(!expHdlDraft.length){
-    box.innerHTML='<div class="exp-hdl-empty">名单空了。至少留一个人，不然报账时没得选。</div>';
+    box.innerHTML='<div class="exp-hdl-empty">名单空了。至少留一个人，不然这几个下拉里都没得选。</div>';
     return;
   }
   box.innerHTML = expHdlDraft.map((nm,i)=>
@@ -20552,20 +20588,9 @@ function ispNoteHtml(){
     + '</div>';
 }
 
-// 责任人候选项：取历史必办里出现过的实名，供输入框联想
+// 责任人候选项（v2.68 起并入全平台统一名单，见 staffFillLists）
 function ispFillOwnerList(){
-  const dl=document.getElementById('insOwnerList');
-  if(!dl) return;
-  const set={};
-  insp.todos.forEach(t=>{ if(t.owner) set[t.owner]=1; });
-  try{
-    (hr.staff||[]).forEach(s=>{ if(s && s.name && s.status!=='leave') set[s.name]=1; });
-  }catch(e){}
-  Object.keys(set).sort().forEach(v=>{
-    if(!dl.querySelector('option[value="'+String(v).replace(/"/g,'')+'"]')){
-      const o=document.createElement('option'); o.value=v; dl.appendChild(o);
-    }
-  });
+  staffFillLists();
 }
 
 // ---------- 巡检记录弹窗 ----------
@@ -20657,13 +20682,13 @@ function inspOpenTodo(id){
   document.getElementById('insTdText').value     = t ? t.text : '';
   document.getElementById('insTdBasis').value    = t ? t.basis : '';
   document.getElementById('insTdStatus').value   = t ? t.status : 'todo';
-  ispFillOwnerList();
+  staffFillLists();
   ispShowModal('modalInspTodo');
 }
 
 function inspSaveTodo(){
   const text = document.getElementById('insTdText').value.trim();
-  const owner = document.getElementById('insTdOwner').value.trim();
+  const owner = expHandlerNorm(document.getElementById('insTdOwner').value);
   if(!text){ showToast('请写「要做什么」——一句能照着做的话'); return; }
   if(!owner){ showToast('请填责任人实名（拍板的事写「李主任」，流程的事写「运营」）'); return; }
   const rec = {
